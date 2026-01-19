@@ -346,6 +346,33 @@
   </div>
 
   {% if my_bookings %}
+  <!-- Summary Stats - Loaded & Remaining Feature -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="card border-primary shadow-sm">
+        <div class="card-body text-center">
+          <h6 class="text-muted mb-2"><i class="fa fa-shopping-cart"></i> Total Booked</h6>
+          <h4 class="text-primary mb-0 fw-bold">{{ total_booked }} Qt</h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-success shadow-sm">
+        <div class="card-body text-center">
+          <h6 class="text-muted mb-2"><i class="fa fa-check-circle"></i> Total Loaded</h6>
+          <h4 class="text-success mb-0 fw-bold">{{ total_loaded }} Qt</h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-warning shadow-sm">
+        <div class="card-body text-center">
+          <h6 class="text-muted mb-2"><i class="fa fa-clock"></i> Total Remaining</h6>
+          <h4 class="text-warning mb-0 fw-bold">{{ total_remaining }} Qt</h4>
+        </div>
+      </div>
+    </div>
+  </div>
   <table class="table table-bordered table-striped align-middle">
     <tr class="table-warning">
       <th>Order ID</th>
@@ -368,11 +395,19 @@
       </td>
       
       <td>
-        <span class="badge bg-success">{{ b[3] }} Qt</span>
+        {% if b[3] and b[3] > 0 %}
+          <span class="badge bg-success">{{ b[3] }} Qt</span>
+        {% else %}
+          <span class="badge bg-secondary">0 Qt</span>
+        {% endif %}
       </td>
       
       <td>
-        <span class="badge bg-warning">{{ b[4] }} Qt</span>
+        {% if b[4] and b[4] > 0 %}
+          <span class="badge bg-warning">{{ b[4] }} Qt</span>
+        {% else %}
+          <span class="badge bg-success">0 Qt</span>
+        {% endif %}
       </td>
       
       <td>
@@ -473,7 +508,7 @@
 
       <!-- CANCEL -->
       <td>
-        {% if b[3] == 'pending' %}
+        {% if b[5] == 'pending' or (b[3] == 0 and b[4] == b[2]) %}
           <a href="/cancel_booking/{{ b[0] }}"
              class="btn btn-sm btn-outline-danger"
              onclick="return confirm('Cancel this booking?')">

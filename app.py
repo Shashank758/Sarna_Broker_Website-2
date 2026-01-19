@@ -983,12 +983,19 @@ ORDER BY mb.created_at DESC
 
     my_bookings = cur.fetchall()
 
+    # Calculate totals for summary
+    total_booked = sum(b[2] or 0 for b in my_bookings)
+    total_loaded = sum(b[3] or 0 for b in my_bookings)
+    total_remaining = sum(b[4] or 0 for b in my_bookings)
 
     con.close()
     return render_template(
         "market.html",
         miller_stocks=miller_stocks,
-        my_bookings=my_bookings
+        my_bookings=my_bookings,
+        total_booked=total_booked,
+        total_loaded=total_loaded,
+        total_remaining=total_remaining
     )
 
 @app.route("/book_miller_stock/<int:stock_id>", methods=["POST"])
