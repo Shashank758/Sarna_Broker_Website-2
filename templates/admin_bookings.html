@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Miller Bookings | Sarna Broker</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/static/css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+
+<!-- ================= TOP NAVBAR ================= -->
+<nav class="admin-navbar">
+  <div class="nav-left">
+    <img src="static/image/Sarna broker.png" alt="Logo">
+    <span>Sarna Broker</span>
+  </div>
+
+  <center><b>JAI SHREE SHYAM</b></center>
+
+  <div class="nav-right">
+    <span class="admin-name">
+      <i class="fa fa-user-circle"></i> Admin
+    </span>
+    <img src="static/image/images.png" alt="Logo">
+  </div>
+</nav>
+
+<div class="admin-container">
+
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar">
+    <h4>Sarna Broker</h4>
+    <ul>
+      <li><a href="/admin"><i class="fa fa-gauge"></i> Dashboard</a></li>
+      <li><a href="/admin/compare"><i class="fa fa-balance-scale"></i> Rate Comparison</a></li>
+      <li><a href="/admin/users"><i class="fa fa-users"></i> Users</a></li>
+      <li><a href="/admin/stock"><i class="fa fa-box"></i> Miller Stock</a></li>
+      <li><a href="/admin/stock-history"><i class="fa fa-history"></i> Stock Update History</a></li>
+      <li class="active"><i class="fa fa-shopping-cart"></i> Bookings</li>
+      <li><a href="/admin/miller-profiles"><i class="fa fa-industry"></i> Miller Profiles</a></li>
+      <li><a href="/admin/buyer-profiles"><i class="fa fa-store"></i> Buyer Profiles</a></li>
+      <li>
+        <i class="fa fa-right-from-bracket"></i>
+        <a href="/logout">Logout</a>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="admin-main">
+
+    <div class="admin-top">
+      <h5>📦 Miller Bookings (Admin Control)</h5>
+      <span class="admin-badge">Admin</span>
+    </div>
+
+    <!-- ================= MILLER BOOKINGS (NEW & IMPORTANT) ================= -->
+    <div class="table-card mt-5">
+      <h6>📦 Miller Bookings (Admin Control)</h6>
+
+      <table class="table table-bordered table-striped table-sm align-middle">
+        <tr class="table-warning">
+          <th>Order ID</th>
+          <th>Buyer</th>
+          <th>Miller</th>
+          <th>Crop</th>
+          <th>Qty</th>
+          <th>Price</th>
+          <th>Total</th>
+          <th>Booking</th>
+          <th>Loading Status</th>
+          <th>Loaded Qty</th>
+          <th>Bill</th>
+          <th>Loaded At</th>
+          <th>Remark</th>
+          <th>Action</th>
+        </tr>
+
+        {% for b in bookings %}
+        <tr>
+          <td><strong class="text-primary">{{ b[11] if b[11] else 'N/A' }}</strong></td>
+          <td>{{ b[1] }}</td>
+          <td>{{ b[2] }}</td>
+          <td>{{ b[3] }}</td>
+          <td>{{ b[4] }} Qt</td>
+          <td>₹{{ b[5] }}</td>
+          <td><b>₹{{ b[6] }}</b></td>
+        
+          <!-- Booking Status -->
+          <td>
+            {% if b[7] == 'pending' %}
+              <span class="badge bg-warning">Pending</span>
+            {% elif b[7] == 'approved' %}
+              <span class="badge bg-success">Approved</span>
+            {% else %}
+              <span class="badge bg-danger">Declined</span>
+            {% endif %}
+          </td>
+        
+          <!-- Loading Status -->
+          <td>
+            {% if b[12] == 'pending' %}
+              <span class="badge bg-warning">Pending</span>
+            {% elif b[12] == 'completed' %}
+              <span class="badge bg-success">Completed</span>
+            {% elif b[12] == 'in_progress' %}
+              <span class="badge bg-info">In Progress</span>
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+        
+          <!-- Loaded Quantity -->
+          <td>
+            {% if b[14] %}
+              <span class="badge bg-primary">{{ b[14] }} Qt</span>
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+        
+          <!-- Bill Document -->
+          <td>
+            {% if b[12] == 'completed' and b[13] %}
+              {% if b[13].lower().endswith('.pdf') %}
+                <button type="button" 
+                        class="btn btn-sm btn-primary"
+                        data-bs-toggle="modal" 
+                        data-bs-target="#billModal{{ b[0] }}">
+                  <i class="fa fa-file-pdf"></i> View
+                </button>
+              {% else %}
+                <button type="button" 
+                        class="btn btn-sm btn-primary"
+                        data-bs-toggle="modal" 
+                        data-bs-target="#billModal{{ b[0] }}">
+                  <i class="fa fa-image"></i> View
+                </button>
+              {% endif %}
+              
+              <!-- Bill View Modal -->
+              <div class="modal fade" id="billModal{{ b[0] }}" tabindex="-1" aria-labelledby="billModalLabel{{ b[0] }}" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="billModalLabel{{ b[0] }}">Bill Document - Order {{ b[11] }}</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                      {% if b[13].lower().endswith('.pdf') %}
+                        <iframe src="/static/uploads/bills/{{ b[13] }}" 
+                                style="width: 100%; height: 600px; border: none;">
+                          <p>Your browser does not support PDFs. 
+                            <a href="/static/uploads/bills/{{ b[13] }}" target="_blank">Download the PDF</a>
+                          </p>
+                        </iframe>
+                      {% else %}
+                        <img src="/static/uploads/bills/{{ b[13] }}" 
+                             alt="Bill" 
+                             class="img-fluid" 
+                             style="max-height: 70vh;">
+                      {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                      <a href="/static/uploads/bills/{{ b[13] }}" 
+                         target="_blank" 
+                         class="btn btn-primary">
+                        <i class="fa fa-download"></i> Download
+                      </a>
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% elif b[12] == 'completed' %}
+              <span class="text-muted small">No bill</span>
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+        
+          <!-- Loaded Date -->
+          <td>{{ b[9] or '—' }}</td>
+        
+          <!-- Remark -->
+          <td>{{ b[10] or '—' }}</td>
+        
+          <!-- Admin Action -->
+          <td>
+            {% if b[7] == 'pending' %}
+              <a href="/admin/approve_booking/{{ b[0] }}"
+                 class="btn btn-sm btn-success mb-1">Approve</a>
+              <br>
+              <a href="/admin/decline_booking/{{ b[0] }}"
+                 class="btn btn-sm btn-danger"
+                 onclick="return confirm('Decline booking?')">
+                 Decline
+              </a>
+            {% else %}
+              —
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>
+
