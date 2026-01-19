@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Farmer Dashboard | Sarna Broker</title>
+
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body class="bg-light">
+
+<!-- ================= HEADER ================= -->
+<div class="market-header">
+  <div class="d-flex justify-content-between align-items-center">
+    <div>
+      <h4 class="mb-0">Farmer Dashboard</h4>
+      <small class="opacity-75">Manage your crops & prices</small>
+    </div>
+    <a href="/post_crop" class="btn btn-light fw-semibold">
+      <i class="fa fa-plus"></i> Add Crop
+    </a>
+  </div>
+</div>
+
+<!-- ================= STATS ================= -->
+<div class="container mt-4">
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="stat-box">
+        <i class="fa fa-seedling"></i>
+        <div>
+          <h6>Total Crops</h6>
+          <p>{{ crops|length }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="stat-box">
+        <i class="fa fa-check-circle"></i>
+        <div>
+          <h6>Active</h6>
+          <p>{{ crops|selectattr(8,'equalto',0)|list|length }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="stat-box">
+        <i class="fa fa-lock"></i>
+        <div>
+          <h6>Sold</h6>
+          <p>{{ crops|selectattr(8,'equalto',1)|list|length }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= CROPS SHOWCASE ================= -->
+<div class="container mt-4 mb-5">
+
+<div class="row g-4">
+
+{% for c in crops %}
+<div class="col-lg-6">
+
+  <div class="crop-modern-card flex-column">
+
+    <!-- IMAGE BANNER -->
+    <div class="crop-img" style="width:100%; height:230px;">
+      {% if c[7] %}
+        <img src="{{ url_for('static', filename='uploads/crops/' + c[7]) }}">
+      {% else %}
+        <i class="fa fa-leaf"></i>
+      {% endif %}
+
+      <span class="status-chip {{ 'sold' if c[8]==1 else 'active' }}">
+        {{ 'Sold' if c[8]==1 else 'Active' }}
+      </span>
+    </div>
+
+    <!-- CARD BODY -->
+    <div class="crop-content">
+
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="mb-1">{{ c[2]|capitalize }}</h5>
+        <span class="price-big">₹{{ c[4] }}</span>
+      </div>
+
+      <p class="text-muted mb-2">
+        <i class="fa fa-location-dot"></i> {{ c[6] }}
+      </p>
+
+      <!-- INFO GRID -->
+      <div class="crop-meta">
+        <div>
+          <small>Quantity</small>
+          <strong>{{ c[5] }}</strong>
+        </div>
+        <div>
+          <small>Variety</small>
+          <strong>{{ c[3] or 'N/A' }}</strong>
+        </div>
+        <div>
+          <small>Status</small>
+          <strong>{{ 'Active' if c[8]==0 else 'Sold' }}</strong>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ACTION FOOTER -->
+    <div class="crop-actions px-3 pb-3">
+      <a href="/edit_crop/{{ c[0] }}" class="btn btn-outline-success btn-sm">
+        <i class="fa fa-pen"></i> Edit
+      </a>
+
+      <a href="/delete_crop/{{ c[0] }}" class="btn btn-outline-danger btn-sm">
+        <i class="fa fa-trash"></i>
+      </a>
+
+      {% if c[8] == 0 %}
+      <a href="/mark_sold/{{ c[0] }}" class="btn btn-success btn-sm">
+        Mark Sold
+      </a>
+      {% endif %}
+    </div>
+
+  </div>
+
+</div>
+{% endfor %}
+
+</div>
+</div>
+
+<!-- ================= BOTTOM NAV ================= -->
+<div class="bottom-nav">
+  <div class="nav-item">
+    <a href="/market"><i class="fa fa-store"></i><br>Market</a>
+  </div>
+  <div class="nav-item active">
+    <i class="fa fa-seedling"></i><br>Dashboard
+  </div>
+  <div class="nav-item">
+    <a href="/post_crop"><i class="fa fa-plus-circle"></i><br>Sell</a>
+  </div>
+  <div class="nav-item">
+    <a href="/profile"><i class="fa fa-user"></i><br>Profile</a>
+  </div>
+</div>
+
+</body>
+</html>

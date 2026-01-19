@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Invoice | Sarna Broker</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="container mt-4">
+
+<div class="card shadow p-4">
+
+  <h4 class="mb-3 text-success">🧾 Trade Invoice</h4>
+
+  {% if invoice %}
+
+  <table class="table table-bordered">
+    <tr>
+      <th>Invoice ID</th>
+      <td>{{ invoice[0] }}</td>
+    </tr>
+    <tr>
+      <th>Buyer</th>
+      <td>{{ invoice[1] }}</td>
+    </tr>
+    <tr>
+      <th>Miller</th>
+      <td>{{ invoice[2] }}</td>
+    </tr>
+    <tr>
+      <th>Crop</th>
+      <td>{{ invoice[3] }}</td>
+    </tr>
+    <tr>
+      <th>Quantity</th>
+      <td>{{ invoice[4] }} Quintal</td>
+    </tr>
+    <tr>
+      <th>Price / Quintal</th>
+      <td>₹{{ invoice[5] }}</td>
+    </tr>
+    <tr>
+      <th>Total Amount</th>
+      <td class="fw-bold text-success">
+        ₹{{ invoice[4] * invoice[5] }}
+      </td>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <td>{{ invoice[6] }}</td>
+    </tr>
+  </table>
+
+  <div class="text-center mt-3">
+    <button onclick="window.print()" class="btn btn-success">
+      🖨 Print / Download Invoice
+    </button>
+  </div>
+
+  {% else %}
+    <p class="text-danger">Invoice not found.</p>
+  {% endif %}
+
+</div>
+
+</body>
+</html>

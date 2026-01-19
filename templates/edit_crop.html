@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Crop | Sarna Broker</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<div class="card">
+    <h2>Edit Crop</h2>
+
+    <form method="POST">
+
+        <input name="crop" value="{{ crop[2] }}" required>
+        <input name="variety" value="{{ crop[3] }}">
+        <input name="price" type="number" value="{{ crop[4] }}" required>
+        <input name="quantity" type="number" value="{{ crop[5] }}" required>
+        <input name="location" value="{{ crop[6] }}" required>
+
+        <button type="submit">Update Crop</button>
+    </form>
+
+    <a href="/my_commodity">Cancel</a>
+</div>
+
+</body>
+</html>

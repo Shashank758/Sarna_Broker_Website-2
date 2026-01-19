@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Miller Dashboard | Sarna Broker</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+  :root{
+    --green:#1e7e34;
+    --green-dark:#155d27;
+    --green-soft:#e9f5ee;
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --text:#2c3e50;
+    --muted:#6c757d;
+    --radius:14px;
+  }
+  
+  /* ---------- GLOBAL ---------- */
+  body{
+    background:var(--bg);
+    font-family:"Inter","Segoe UI",sans-serif;
+    color:var(--text);
+  }
+  
+  /* ---------- HEADER ---------- */
+  .mandi-header{
+    background:linear-gradient(135deg,var(--green),#28a745);
+    color:#fff;
+    padding:20px 24px;
+    border-radius:var(--radius);
+    margin-top:24px;
+    box-shadow:0 8px 25px rgba(0,0,0,.12);
+  }
+  .mandi-header h4{
+    font-weight:700;
+    letter-spacing:.3px;
+  }
+  .mandi-header small{
+    opacity:.9;
+    font-size:13px;
+  }
+  
+  /* ---------- PROFILE BUTTON ---------- */
+  .profile-btn{
+    position:absolute;
+    right:20px;
+    top:20px;
+    border-radius:20px;
+    padding:6px 14px;
+    font-weight:600;
+  }
+  
+  /* ---------- CARDS ---------- */
+  .section-card{
+    background:var(--card);
+    border-radius:var(--radius);
+    padding:22px;
+    margin-bottom:32px;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .section-card:hover{
+    transform:translateY(-2px);
+    box-shadow:0 14px 35px rgba(0,0,0,.12);
+  }
+  
+  /* ---------- TITLES ---------- */
+  .section-title{
+    font-weight:700;
+    margin-bottom:18px;
+    font-size:16px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  
+  /* ---------- FILTER CARD ---------- */
+  .card{
+    border-radius:var(--radius);
+    border:none;
+    box-shadow:0 6px 20px rgba(0,0,0,.08);
+  }
+  
+  /* ---------- TABLE ---------- */
+  .table{
+    margin-bottom:0;
+  }
+  .table th{
+    background:var(--green-soft);
+    text-align:center;
+    font-size:13px;
+    font-weight:700;
+    border:none;
+  }
+  .table td{
+    text-align:center;
+    vertical-align:middle;
+    font-size:14px;
+    border-color:#eef2f6;
+  }
+  .table tr:hover{
+    background:#f9fbfd;
+  }
+  
+  /* ---------- BADGES ---------- */
+  .badge{
+    font-size:12px;
+    padding:6px 10px;
+    border-radius:20px;
+  }
+  .qty-badge{
+    font-weight:700;
+  }
+  
+  /* ---------- BUTTONS ---------- */
+  .btn-agri{
+    background:var(--green);
+    color:#fff;
+    border:none;
+    font-weight:600;
+    border-radius:10px;
+    padding:10px;
+  }
+  .btn-agri:hover{
+    background:var(--green-dark);
+  }
+  
+  .btn-success, .btn-danger{
+    border-radius:10px;
+    font-weight:600;
+  }
+  
+  /* ---------- ALERT STATS ---------- */
+  .alert{
+    border-radius:var(--radius);
+    font-weight:600;
+    box-shadow:0 6px 20px rgba(0,0,0,.08);
+  }
+  
+  /* ---------- INPUTS ---------- */
+  .form-control, .form-select{
+    border-radius:10px;
+    padding:10px;
+  }
+  .form-control:focus, .form-select:focus{
+    border-color:var(--green);
+    box-shadow:0 0 0 .15rem rgba(30,126,52,.25);
+  }
+  
+  /* ---------- ACTION AREA ---------- */
+  td form input{
+    border-radius:8px;
+  }
+  
+  /* ---------- MOBILE ---------- */
+  @media(max-width:768px){
+    .profile-btn{
+      position:static;
+      margin-top:12px;
+    }
+  }
+  </style>
+  
+</head>
+
+<body class="container mb-5">
+
+<!-- ================= HEADER ================= -->
+<div class="mandi-header position-relative">
+  <h4><i class="fa fa-industry"></i> Miller Trading Dashboard</h4>
+  <small>Manage stock, approve orders & view trade status</small>
+
+  <a href="/miller/profile" class="btn btn-light btn-sm profile-btn">
+    <i class="fa fa-user"></i> My Profile
+  </a>
+  {% if session['is_staff'] %}
+<span class="badge bg-warning">STAFF MODE</span>
+{% endif %}
+
+</div>
+
+<!-- ================= POST STOCK ================= -->
+<div class="section-card mt-4">
+  <h6 class="section-title text-success">
+    <i class="fa fa-plus-circle"></i> Post New Stock
+  </h6>
+
+  <form method="POST">
+    <div class="row g-3">
+
+      <div class="col-md-4">
+        <label class="form-label">Crop</label>
+        <select name="crop" class="form-control" required>
+          <option value="">Select Crop</option>
+          <option>wheat</option>
+          <option>chawal</option>
+          <option>sarso</option>
+          <option>maize</option>
+          <option>paddy</option>
+          <option>mustard oil cake</option>
+        </select>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Quantity (Quintal)</label>
+        <input type="number" name="quantity" class="form-control" min="1" required>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Price / Quintal</label>
+        <input type="number" name="price" class="form-control" min="1" required>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Condition</label>
+        <select name="condition" class="form-control">
+          <option>Net</option>
+          <option>Full</option>
+        </select>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Bag Type</label>
+        <select name="bag_type" class="form-control">
+          <option>Jute</option>
+          <option>Plastic</option>
+        </select>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Deduction</label>
+        <input type="number"
+               name="deduction"
+               value="0"
+               class="form-control form-control-sm"
+               readonly>
+      </div>
+      
+
+      <div class="col-12">
+        <button class="btn btn-agri w-100">
+          <i class="fa fa-upload"></i> Post Stock
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+
+{% if not session.is_staff %}
+<div class="section-card">
+  <h6 class="section-title text-dark">
+    <i class="fa fa-users"></i> Staff Management
+  </h6>
+
+  <form method="POST" action="/miller/create_staff" class="row g-2">
+    <div class="col-md-4">
+      <input name="name" class="form-control" placeholder="Staff Name" required>
+    </div>
+    <div class="col-md-4">
+      <input name="email" class="form-control" placeholder="Staff Email" required>
+    </div>
+    <div class="col-md-4">
+      <input name="password" class="form-control" placeholder="Password" required>
+    </div>
+    <div class="col-12">
+      <button class="btn btn-primary w-100">Create Staff</button>
+    </div>
+  </form>
+</div>
+{% endif %}
+
+<!-- ================= LIVE STOCK ================= -->
+<div class="section-card">
+  <h6 class="section-title text-primary">
+    <i class="fa fa-warehouse"></i> Live Stock
+  </h6>
+
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover">
+      <tr>
+        <th>Crop</th>
+        <th>Qty</th>
+        <th>Price</th>
+        <th>Condition</th>
+        <th>Bag</th>
+        <th>Deduction</th>
+        <th>Update</th>
+      </tr>
+
+      {% for s in stocks %}
+      <form method="POST" action="/update_miller_stock/{{ s[0] }}">
+      <tr>
+        <td><b>{{ s[2] }}</b></td>
+        <td><input type="number" name="quantity" value="{{ s[3] }}" class="form-control form-control-sm"></td>
+        <td><input type="number" name="price" value="{{ s[4] }}" class="form-control form-control-sm"></td>
+        <td>
+          <select name="condition" class="form-control form-control-sm">
+            <option {{ 'selected' if s[5]=='Net' }}>Net</option>
+            <option {{ 'selected' if s[5]=='Full' }}>Full</option>
+          </select>
+        </td>
+        <td>
+          <select name="bag_type" class="form-control form-control-sm">
+            <option {{ 'selected' if s[6]=='Jute' }}>Jute</option>
+            <option {{ 'selected' if s[6]=='Plastic' }}>Plastic</option>
+          </select>
+        </td>
+        <td><input type="number" name="deduction" value="{{ s[7] }}" class="form-control form-control-sm"></td>
+        <td><button class="btn btn-sm btn-primary w-100">Update</button></td>
+      </tr>
+      </form>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+
+<!-- ================= ORDERS ================= -->
+{% set pending = bookings | selectattr(4,'equalto','pending') | list %}
+{% set approved = bookings | selectattr(4,'equalto','approved') | list %}
+{% set rejected = bookings | selectattr(4,'equalto','declined') | list %}
+
+<div class="alert alert-success d-flex justify-content-between align-items-center">
+  <div>
+    <strong>Visible Orders:</strong>
+    <span id="visibleOrders">0</span>
+  </div>
+  <div>
+    <strong>Total Quantity:</strong>
+    <span id="totalQty">0</span> Qt
+  </div>
+</div>
+
+<!-- ================= BOOKING FILTER ================= -->
+<div class="card mb-4 shadow-sm">
+  <div class="card-body">
+    <div class="row g-2 align-items-end">
+
+      <div class="col-md-3">
+        <label class="form-label fw-semibold">Filter by Status</label>
+        <select id="statusFilter" class="form-select">
+          <option value="all">All</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="declined">Rejected</option>
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label fw-semibold">Buyer Name</label>
+        <input type="text" id="buyerFilter"
+               class="form-control"
+               placeholder="Search buyer">
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label fw-semibold">Crop</label>
+        <input type="text" id="cropFilter"
+               class="form-control"
+               placeholder="Search crop">
+      </div>
+
+      <div class="col-md-3">
+        <button onclick="clearFilters()"
+                class="btn btn-outline-secondary w-100">
+          Clear Filters
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- PENDING -->
+<div class="section-card">
+  <h6 class="section-title text-warning">
+    <i class="fa fa-clock"></i> Pending Orders
+  </h6>
+
+  {% if pending %}
+  <table class="table table-bordered">
+    <tr>
+      <th>Order ID</th><th>Buyer</th><th>Crop</th><th>Qty</th><th>Action</th>
+    </tr>
+
+    {% for b in pending %}
+    <tr class="booking-row"
+        data-status="pending"
+        data-buyer="{{ b[1]|lower }}"
+        data-crop="{{ b[2]|lower }}">
+
+      <td><strong class="text-primary">{{ b[10] if b[10] else 'N/A' }}</strong></td>
+      <td>{{ b[1] }}</td>
+      <td>{{ b[2] }}</td>
+      <td><span class="badge bg-success qty-badge">{{ b[3] }} Qt</span></td>
+      <td>
+        <a href="/miller/approve_booking/{{ b[0] }}"
+           class="btn btn-sm btn-success w-100 mb-1">
+           Approve
+        </a>
+
+        <form method="POST" action="/miller/decline_booking/{{ b[0] }}">
+          <input name="reason"
+                 class="form-control form-control-sm mb-1"
+                 placeholder="Reject reason"
+                 required>
+          <button class="btn btn-sm btn-danger w-100">Reject</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+
+  </table>
+  {% else %}
+    <p class="text-muted">No pending orders.</p>
+  {% endif %}
+</div>
+<!-- APPROVED -->
+<div class="section-card">
+  <h6 class="section-title text-success">
+    <i class="fa fa-check-circle"></i> Approved Orders
+  </h6>
+
+  {% if approved %}
+  <table class="table table-bordered">
+    <tr>
+      <th>Order ID</th>
+      <th>Buyer</th>
+      <th>Crop</th>
+      <th>Booked</th>
+      <th>Loaded</th>
+      <th>Remaining</th>
+      <th>Bill</th>
+      <th>Action</th>
+    </tr>
+    
+    {% for b in approved %}
+    <tr>
+      {% set remaining = b[3] - b[7] %}
+
+<tr>
+  <td><strong class="text-primary">{{ b[10] if b[10] else 'N/A' }}</strong></td>
+  <td>{{ b[1] }}</td>
+  <td>{{ b[2] }}</td>
+
+  <td>
+    <span class="badge bg-primary">{{ b[3] }} Qt</span>
+  </td>
+
+  <td>
+    <span class="badge bg-success">{{ b[7] }} Qt</span>
+  </td>
+
+  <td>
+    <span class="badge bg-warning">{{ remaining }} Qt</span>
+  </td>
+
+  <td>
+    {% if b[8] == 'completed' and b[9] %}
+      {% if b[9].lower().endswith('.pdf') %}
+        <div class="text-center">
+          <i class="fa fa-file-pdf fa-3x text-danger d-block mb-1"></i>
+          <button type="button" 
+                  class="btn btn-sm btn-primary"
+                  data-bs-toggle="modal" 
+                  data-bs-target="#billModal{{ b[0] }}">
+            <i class="fa fa-eye"></i> View
+          </button>
+        </div>
+      {% else %}
+        <div class="text-center">
+          <img src="/static/uploads/bills/{{ b[9] }}" 
+               alt="Bill" 
+               class="img-thumbnail mb-1" 
+               style="max-width: 80px; max-height: 80px; cursor: pointer; object-fit: cover;"
+               data-bs-toggle="modal" 
+               data-bs-target="#billModal{{ b[0] }}">
+          <button type="button" 
+                  class="btn btn-sm btn-primary d-block w-100"
+                  data-bs-toggle="modal" 
+                  data-bs-target="#billModal{{ b[0] }}">
+            <i class="fa fa-eye"></i> View
+          </button>
+        </div>
+      {% endif %}
+      
+      <!-- Bill View Modal -->
+      <div class="modal fade" id="billModal{{ b[0] }}" tabindex="-1" aria-labelledby="billModalLabel{{ b[0] }}" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="billModalLabel{{ b[0] }}">Bill Document - {{ b[1] }}</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+              {% if b[9].lower().endswith('.pdf') %}
+                <iframe src="/static/uploads/bills/{{ b[9] }}" 
+                        style="width: 100%; height: 600px; border: none;">
+                  <p>Your browser does not support PDFs. 
+                    <a href="/static/uploads/bills/{{ b[9] }}" target="_blank">Download the PDF</a>
+                  </p>
+                </iframe>
+              {% else %}
+                <img src="/static/uploads/bills/{{ b[9] }}" 
+                     alt="Bill" 
+                     class="img-fluid" 
+                     style="max-height: 70vh;">
+              {% endif %}
+            </div>
+            <div class="modal-footer">
+              <a href="/static/uploads/bills/{{ b[9] }}" 
+                 target="_blank" 
+                 class="btn btn-primary">
+                <i class="fa fa-download"></i> Download
+              </a>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% elif b[8] == 'completed' %}
+      <span class="text-muted small">No bill uploaded</span>
+    {% else %}
+      <span class="text-muted small">—</span>
+    {% endif %}
+  </td>
+
+  <td>
+    {% if remaining > 0 %}
+      <form method="POST" action="/miller/update_loading/{{ b[0] }}">
+        <input type="number"
+               name="load_qty"
+               max="{{ remaining }}"
+               min="1"
+               class="form-control form-control-sm mb-1"
+               placeholder="Load Qty"
+               required>
+
+        <button class="btn btn-sm btn-success w-100">
+          🚚 Update Loading
+        </button>
+      </form>
+    {% elif b[8] == 'completed' %}
+      <!-- Upload/Change Bill Form -->
+      {% if not b[9] %}
+        <label for="billInput{{ b[0] }}" class="btn btn-sm btn-outline-primary w-100 mb-1" style="cursor: pointer;">
+          <i class="fa fa-upload"></i> Upload Bill
+        </label>
+      {% endif %}
+      
+      <form method="POST" action="/miller/upload_bill/{{ b[0] }}" enctype="multipart/form-data" id="billForm{{ b[0] }}">
+        <input type="file" 
+               name="bill_document" 
+               id="billInput{{ b[0] }}" 
+               accept="image/*,.pdf"
+               onchange="document.getElementById('billForm{{ b[0] }}').submit();"
+               style="display: none;">
+      </form>
+      
+      {% if b[9] %}
+        <button type="button" 
+                class="btn btn-sm btn-outline-secondary w-100 mt-1"
+                onclick="document.getElementById('billInput{{ b[0] }}').click();">
+          <i class="fa fa-edit"></i> Change Bill
+        </button>
+      {% endif %}
+      
+      <span class="badge bg-success d-block mt-1">Completed</span>
+    {% else %}
+      <span class="badge bg-success">Completed</span>
+    {% endif %}
+  </td>
+</tr>
+
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p class="text-muted">No approved orders.</p>
+  {% endif %}
+</div>
+
+<!-- REJECTED -->
+<div class="section-card">
+  <h6 class="section-title text-danger">
+    <i class="fa fa-times-circle"></i> Rejected Orders
+  </h6>
+
+  {% if rejected %}
+<table class="table table-bordered">
+  <tr>
+    <th>Order ID</th>
+    <th>Buyer</th>
+    <th>Crop</th>
+    <th>Qty</th>
+    <th>Reason</th>
+  </tr>
+
+  {% for b in rejected %}
+  <tr class="booking-row"
+      data-status="declined"
+      data-buyer="{{ b[1]|lower }}"
+      data-crop="{{ b[2]|lower }}">
+
+    <td><strong class="text-primary">{{ b[10] if b[10] else 'N/A' }}</strong></td>
+    <td>{{ b[1] }}</td>
+    <td>{{ b[2] }}</td>
+    <td>
+      <span class="badge bg-danger qty-badge">{{ b[3] }} Qt</span>
+    </td>
+    <td>{{ b[5] }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p class="text-muted">No rejected orders.</p>
+{% endif %}
+
+</div>
+<script>
+  function applyFilters() {
+    const status = document.getElementById("statusFilter").value;
+    const buyer = document.getElementById("buyerFilter").value.toLowerCase();
+    const crop  = document.getElementById("cropFilter").value.toLowerCase();
+  
+    let totalQty = 0;
+    let visibleCount = 0;
+  
+    document.querySelectorAll(".booking-row").forEach(row => {
+      const rowStatus = row.dataset.status;
+      const rowBuyer  = row.dataset.buyer;
+      const rowCrop   = row.dataset.crop;
+      const qtyText   = row.querySelector(".qty-badge").innerText;
+      const qty       = parseInt(qtyText);
+  
+      const matchStatus = (status === "all" || status === rowStatus);
+      const matchBuyer  = rowBuyer.includes(buyer);
+      const matchCrop   = rowCrop.includes(crop);
+  
+      if (matchStatus && matchBuyer && matchCrop) {
+        row.style.display = "";
+        visibleCount++;
+        totalQty += qty;
+      } else {
+        row.style.display = "none";
+      }
+    });
+  
+    document.getElementById("totalQty").innerText = totalQty;
+    document.getElementById("visibleOrders").innerText = visibleCount;
+  }
+  
+  function clearFilters() {
+    document.getElementById("statusFilter").value = "all";
+    document.getElementById("buyerFilter").value = "";
+    document.getElementById("cropFilter").value = "";
+    applyFilters();
+  }
+  
+  document.getElementById("statusFilter").addEventListener("change", applyFilters);
+  document.getElementById("buyerFilter").addEventListener("keyup", applyFilters);
+  document.getElementById("cropFilter").addEventListener("keyup", applyFilters);
+
+  window.onload = applyFilters;
+  </script>
+  
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

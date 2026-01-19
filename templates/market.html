@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Market | Sarna Broker</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  /* ================= GLOBAL ================= */
+  body{
+    background:#f3f6fb;
+    font-family: "Segoe UI", system-ui, sans-serif;
+  }
+  
+  /* ================= HEADER ================= */
+  .market-header{
+    background: linear-gradient(135deg,#157347,#28a745);
+    padding:22px 30px;
+    border-radius:18px;
+    color:#fff;
+    margin:20px;
+    box-shadow:0 20px 45px rgba(0,0,0,.25);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  
+  .market-header h5{
+    font-size:24px;
+    font-weight:800;
+    letter-spacing:.4px;
+  }
+  
+  .market-header small{
+    opacity:.9;
+  }
+  
+  /* ================= FILTER BAR ================= */
+  .filters{
+    display:flex;
+    gap:15px;
+    margin:20px;
+    flex-wrap:wrap;
+  }
+  
+  .filter-chip{
+    background:#fff;
+    padding:10px 22px;
+    border-radius:40px;
+    font-weight:700;
+    font-size:14px;
+    border:2px solid #e2f0e8;
+    cursor:pointer;
+    box-shadow:0 6px 15px rgba(0,0,0,.08);
+    transition:.25s ease;
+  }
+  
+  .filter-chip:hover{
+    background:#198754;
+    color:#fff;
+    transform:translateY(-2px);
+  }
+  
+  /* ================= SECTION TITLES ================= */
+  .section-title{
+    font-size:18px;
+    font-weight:800;
+    margin-bottom:15px;
+  }
+  
+  /* ================= FARMER CARDS ================= */
+  .market-card{
+    background:#fff;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 18px 45px rgba(0,0,0,.12);
+    transition:.3s ease;
+  }
+  
+  .market-card:hover{
+    transform:translateY(-5px);
+  }
+  
+  .market-img-real{
+    width:100%;
+    height:180px;
+    object-fit:cover;
+  }
+  
+  .market-body{
+    padding:18px;
+  }
+  
+  .price-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin:10px 0;
+  }
+  
+  .price-big{
+    font-size:20px;
+    font-weight:900;
+    color:#198754;
+  }
+  
+  .qty-chip{
+    background:#e9f7ef;
+    padding:6px 14px;
+    border-radius:20px;
+    font-weight:700;
+  }
+  
+  .seller-box{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:10px;
+    font-weight:700;
+  }
+  
+  /* ================= MILLER TABLE ================= */
+  .table-wrapper{
+    background:#fff;
+    padding:20px;
+    border-radius:20px;
+    box-shadow:0 20px 50px rgba(0,0,0,.15);
+  }
+  
+  .table thead th{
+    background:#e9f7ef;
+    font-size:13px;
+    text-transform:uppercase;
+    font-weight:800;
+  }
+  
+  .table tbody tr{
+    transition:.25s ease;
+  }
+  
+  .table tbody tr:hover{
+    background:#f1fbf6;
+  }
+  
+  .table td{
+    vertical-align:middle;
+    font-size:14px;
+  }
+  
+  .qty-badge{
+    background:#6c757d;
+    color:#fff;
+    padding:6px 12px;
+    border-radius:20px;
+  }
+  
+  .price-text{
+    font-size:17px;
+    font-weight:900;
+    color:#198754;
+  }
+  
+  .deduction{
+    color:#dc3545;
+    font-weight:900;
+  }
+  
+  .book-btn{
+    background:#198754;
+    border:none;
+    font-weight:800;
+    border-radius:12px;
+  }
+  
+  .book-btn:hover{
+    background:#146c43;
+  }
+  
+  /* ================= BOOKINGS ================= */
+  .alert-info{
+    border-left:6px solid #0dcaf0;
+    border-radius:14px;
+    box-shadow:0 6px 20px rgba(0,0,0,.12);
+  }
+  
+  /* ================= BOTTOM NAV ================= */
+  .bottom-nav{
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    background:#fff;
+    display:flex;
+    justify-content:space-around;
+    padding:12px 0;
+    box-shadow:0 -10px 30px rgba(0,0,0,.2);
+  }
+  
+  .nav-item{
+    text-align:center;
+    font-weight:800;
+    color:#6c757d;
+  }
+  
+  .nav-item.active{
+    color:#198754;
+  }
+  </style>
+</head>
+
+<a href="/buyer/profile" class="btn btn-light btn-sm fw-bold">
+  <i class="fa fa-user"></i> My Profile
+</a>
+
+<body class="bg-light">
+
+<!-- ================= HEADER ================= -->
+<div class="market-header">
+  <div>
+    <h5 class="mb-0">Market</h5>
+    <small class="opacity-75">
+      <i class="fa fa-location-dot"></i> Choose location
+    </small>
+  </div>
+  <span class="badge bg-light text-success">Buyers</span>
+</div>
+
+<!-- ================= FILTERS ================= -->
+<div class="filters">
+  <div class="filter-chip">Crop Type</div>
+  <div class="filter-chip">Location</div>
+  <div class="filter-chip">Price</div>
+  <div class="filter-chip">Quantity</div>
+</div>
+
+<!-- ================= FARMER CROPS ================= -->
+<div class="container mt-3">
+  <h6 class="mb-3 fw-bold">Farmer Crops</h6>
+
+  <div class="row g-4">
+  {% for c in crops %}
+  <div class="col-md-6 col-lg-4">
+    <div class="market-card">
+
+      <img src="{{ url_for('static', filename='uploads/crops/' + c[7]) }}"
+           class="market-img-real">
+
+      <div class="market-body">
+        <h6 class="fw-bold">{{ c[2] }} for sale</h6>
+
+        <p class="text-muted mb-1">
+          <i class="fa fa-location-dot"></i> {{ c[6] }}
+        </p>
+
+        <div class="price-row">
+          <span class="price-big">₹{{ c[4] }} / Kg</span>
+          <span class="qty-chip">{{ c[5] }} Qty</span>
+        </div>
+
+        <div class="seller-box">
+          <i class="fa fa-user-circle"></i>
+          <div>
+            <strong>{{ c[8] }}</strong>
+            <span class="badge bg-success ms-1">Farmer</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  </div>
+</div>
+
+<!-- ================= MILLER STOCKS ================= -->
+<div class="container mt-5">
+  <h6 class="mb-3 fw-bold">Miller Stocks (Live)</h6>
+
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped align-middle">
+      <thead class="table-success">
+        <tr>
+          <th>Miller</th>
+          <th>Crop</th>
+          <th>Qty (Qt)</th>
+          <th>Price</th>
+          <th>Condition</th>
+          <th>Bag</th>
+          <th>Deduction</th>
+          <th>Book</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for m in miller_stocks %}
+        <tr>
+          <td>
+            <i class="fa fa-industry text-success"></i>
+            <strong>{{ m[9] }}</strong>
+          </td>
+          <td>{{ m[2] }}</td>
+
+          <td>
+            {% if m[3] > 0 %}
+              <span class="badge bg-secondary">{{ m[3] }} Qt</span>
+            {% else %}
+              <span class="badge bg-danger">Sold Out</span>
+            {% endif %}
+          </td>
+
+          <td class="fw-bold text-success">₹{{ m[4] }}</td>
+          <td><span class="badge bg-info">{{ m[5] }}</span></td>
+          <td>{{ m[6] }}</td>
+          <td>₹{{ m[7] }}</td>
+
+          <td>
+            {% if m[3] > 0 %}
+            <form method="POST" action="/book_miller_stock/{{ m[0] }}">
+              <input type="number"
+                     name="quantity"
+                     min="1"
+                     max="{{ m[3] }}"
+                     class="form-control form-control-sm mb-1"
+                     placeholder="Qty"
+                     required>
+              <button class="btn btn-success btn-sm w-100">Book</button>
+            </form>
+            {% else %}
+              <span class="text-muted">Unavailable</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ================= MY BOOKINGS ================= -->
+<div class="container mt-5 mb-5">
+  <h5 class="fw-bold">My Bookings</h5>
+
+  <div class="alert alert-info">
+    <strong>Note:</strong> Invoice will be available only after
+    <b>Admin approval</b>.
+  </div>
+
+  {% if my_bookings %}
+  <table class="table table-bordered table-striped align-middle">
+    <tr class="table-warning">
+      <th>Order ID</th>
+      <th>Crop</th>
+      <th>Booked</th>
+      <th>Loaded</th>
+      <th>Remaining</th>
+      <th>Loading Status</th>
+      <th>Bill</th>
+      <th>Invoice</th>
+    </tr>
+
+    {% for b in my_bookings %}
+    <tr>
+      <td><strong class="text-primary">{{ b[9] if b[9] else 'N/A' }}</strong></td>
+      <td>{{ b[1] }}</td>
+
+      <td>
+        <span class="badge bg-primary">{{ b[2] }} Qt</span>
+      </td>
+      
+      <td>
+        <span class="badge bg-success">{{ b[3] }} Qt</span>
+      </td>
+      
+      <td>
+        <span class="badge bg-warning">{{ b[4] }} Qt</span>
+      </td>
+      
+      <td>
+        {% if b[5] == 'pending' %}
+          <span class="badge bg-secondary">Waiting for Truck</span>
+        {% elif b[5] == 'partial' %}
+          <span class="badge bg-info">🚚 Partial Loading</span>
+        {% elif b[5] == 'loaded' %}
+          <span class="badge bg-success">✅ Fully Loaded</span>
+        {% elif b[5] == 'rejected' %}
+          <span class="badge bg-danger">❌ Rejected</span>
+        {% endif %}
+      </td>
+
+      <!-- BILL COLUMN -->
+      <td>
+        {% if b[8] == 'completed' and b[7] %}
+          {% if b[7].lower().endswith('.pdf') %}
+            <div class="text-center">
+              <i class="fa fa-file-pdf fa-3x text-danger d-block mb-1"></i>
+              <button type="button" 
+                      class="btn btn-sm btn-primary"
+                      data-bs-toggle="modal" 
+                      data-bs-target="#billModal{{ b[0] }}">
+                <i class="fa fa-eye"></i> View
+              </button>
+            </div>
+          {% else %}
+            <div class="text-center">
+              <img src="/static/uploads/bills/{{ b[7] }}" 
+                   alt="Bill" 
+                   class="img-thumbnail mb-1" 
+                   style="max-width: 80px; max-height: 80px; cursor: pointer; object-fit: cover;"
+                   data-bs-toggle="modal" 
+                   data-bs-target="#billModal{{ b[0] }}">
+              <button type="button" 
+                      class="btn btn-sm btn-primary d-block w-100"
+                      data-bs-toggle="modal" 
+                      data-bs-target="#billModal{{ b[0] }}">
+                <i class="fa fa-eye"></i> View
+              </button>
+            </div>
+          {% endif %}
+          
+          <!-- Bill View Modal -->
+          <div class="modal fade" id="billModal{{ b[0] }}" tabindex="-1" aria-labelledby="billModalLabel{{ b[0] }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="billModalLabel{{ b[0] }}">Bill Document - {{ b[1] }}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                  {% if b[7].lower().endswith('.pdf') %}
+                    <iframe src="/static/uploads/bills/{{ b[7] }}" 
+                            style="width: 100%; height: 600px; border: none;">
+                      <p>Your browser does not support PDFs. 
+                        <a href="/static/uploads/bills/{{ b[7] }}" target="_blank">Download the PDF</a>
+                      </p>
+                    </iframe>
+                  {% else %}
+                    <img src="/static/uploads/bills/{{ b[7] }}" 
+                         alt="Bill" 
+                         class="img-fluid" 
+                         style="max-height: 70vh;">
+                  {% endif %}
+                </div>
+                <div class="modal-footer">
+                  <a href="/static/uploads/bills/{{ b[7] }}" 
+                     target="_blank" 
+                     class="btn btn-primary">
+                    <i class="fa fa-download"></i> Download
+                  </a>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% elif b[8] == 'completed' %}
+          <span class="text-muted small">Bill not uploaded yet</span>
+        {% else %}
+          <span class="text-muted small">—</span>
+        {% endif %}
+      </td>
+
+      <!-- INVOICE -->
+      <td>
+        {% if b[5] == 'loaded' %}
+  <a href="/invoice/{{ b[0] }}"
+     class="btn btn-sm btn-success">
+     📄 Download Invoice
+  </a>
+{% else %}
+  <span class="text-muted">Available after full loading</span>
+{% endif %}
+
+      </td>
+
+      <!-- CANCEL -->
+      <td>
+        {% if b[3] == 'pending' %}
+          <a href="/cancel_booking/{{ b[0] }}"
+             class="btn btn-sm btn-outline-danger"
+             onclick="return confirm('Cancel this booking?')">
+            Cancel
+          </a>
+        {% else %}
+          —
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+    <p class="text-muted">No bookings yet.</p>
+  {% endif %}
+</div>
+
+<!-- ================= BOTTOM NAV ================= -->
+<div class="bottom-nav">
+  <div class="nav-item active">
+    <i class="fa fa-store"></i><br>Market
+  </div>
+  <div class="nav-item">
+    <a href="/logout">
+      <i class="fa fa-right-from-bracket"></i><br>Logout
+    </a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  setInterval(() => {
+    location.reload();
+  }, 10000);
+</script>
+
+</body>
+</html>
