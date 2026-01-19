@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Miller Rate Comparison | Sarna Broker</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+<!-- ================= TOP NAVBAR ================= -->
+<nav class="admin-navbar">
+  <div class="nav-left">
+    <img src="static/image/Sarna broker.png" alt="Logo">
+    <span>Sarna Broker</span>
+  </div>
+
+  <center><b>JAI SHREE SHYAM</b></center>
+
+  <div class="nav-right">
+    <span class="admin-name">
+      <i class="fa fa-user-circle"></i> Admin
+    </span>
+    <img src="static/image/images.png" alt="Logo">
+  </div>
+</nav>
+
+<div class="admin-container">
+
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar">
+    <h4>Sarna Broker</h4>
+    <ul>
+      <li><a href="/admin"><i class="fa fa-gauge"></i> Dashboard</a></li>
+      <li class="active"><i class="fa fa-balance-scale"></i> Rate Comparison</li>
+      <li><a href="/admin/users"><i class="fa fa-users"></i> Users</a></li>
+      <li><a href="/admin/stock"><i class="fa fa-box"></i> Miller Stock</a></li>
+      <li><a href="/admin/stock-history"><i class="fa fa-history"></i> Stock Update History</a></li>
+      <li><a href="/admin/bookings"><i class="fa fa-shopping-cart"></i> Bookings</a></li>
+      <li><a href="/admin/miller-profiles"><i class="fa fa-industry"></i> Miller Profiles</a></li>
+      <li><a href="/admin/buyer-profiles"><i class="fa fa-store"></i> Buyer Profiles</a></li>
+      <li>
+        <i class="fa fa-right-from-bracket"></i>
+        <a href="/logout">Logout</a>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="admin-main">
+
+    <div class="admin-top">
+      <h5>Miller Rate Comparison</h5>
+      <span class="admin-badge">Admin</span>
+    </div>
+
+<!-- ================= MILLER RATE COMPARISON ================= -->
+<div class="table-card mt-5">
+  <h6>📊 Compare Rates from Different Millers</h6>
+  <p class="text-muted">Select up to 6 millers and compare their rates side by side</p>
+  
+  <div class="row mb-3">
+    <div class="col-md-3">
+      <label class="form-label">Filter by Crop (Optional)</label>
+      <select id="cropFilter" class="form-select">
+        <option value="">All Crops</option>
+        <option value="wheat">Wheat</option>
+        <option value="chawal">Chawal</option>
+        <option value="sarso">Sarso</option>
+        <option value="maize">Maize</option>
+        <option value="paddy">Paddy</option>
+        <option value="mustard oil cake">Mustard Oil Cake</option>
+      </select>
+    </div>
+    <div class="col-md-9">
+      <label class="form-label">Select Millers (Up to 6)</label>
+      <div class="d-flex flex-wrap gap-2">
+        <select id="miller1" class="form-select" style="width: auto; min-width: 150px;">
+          <option value="">Select Miller 1</option>
+          {% for m in millers %}
+          <option value="{{ m[0] }}">{{ m[1] }}</option>
+          {% endfor %}
+        </select>
+        <select id="miller2" class="form-select" style="width: auto; min-width: 150px;">
+          <option value="">Select Miller 2</option>
+          {% for m in millers %}
+          <option value="{{ m[0] }}">{{ m[1] }}</option>
+          {% endfor %}
+        </select>
+        <select id="miller3" class="form-select" style="width: auto; min-width: 150px;">
+          <option value="">Select Miller 3</option>
+          {% for m in millers %}
+          <option value="{{ m[0] }}">{{ m[1] }}</option>
+          {% endfor %}
+        </select>
+        <select id="miller4" class="form-select" style="width: auto; min-width: 150px;">
+          <option value="">Select Miller 4</option>
+          {% for m in millers %}
+          <option value="{{ m[0] }}">{{ m[1] }}</option>
+          {% endfor %}
+        </select>
+        <select id="miller5" class="form-select" style="width: auto; min-width: 150px;">
+          <option value="">Select Miller 5</option>
+          {% for m in millers %}
+          <option value="{{ m[0] }}">{{ m[1] }}</option>
+          {% endfor %}
+        </select>
+        <select id="miller6" class="form-select" style="width: auto; min-width: 150px;">
+          <option value="">Select Miller 6</option>
+          {% for m in millers %}
+          <option value="{{ m[0] }}">{{ m[1] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </div>
+  
+  <button onclick="compareMillers()" class="btn btn-success mb-3">
+    <i class="fa fa-balance-scale"></i> Compare Rates
+  </button>
+  <button onclick="clearComparison()" class="btn btn-outline-secondary mb-3">
+    <i class="fa fa-times"></i> Clear
+  </button>
+  
+  <div id="comparisonResults"></div>
+</div>
+
+  </main>
+</div>
+
+<script>
+  async function compareMillers() {
+    const selectedMillers = [];
+    const cropFilter = document.getElementById('cropFilter').value;
+    
+    // Get selected millers (up to 6)
+    for (let i = 1; i <= 6; i++) {
+      const select = document.getElementById(`miller${i}`);
+      if (select.value) {
+        selectedMillers.push(select.value);
+      }
+    }
+    
+    if (selectedMillers.length === 0) {
+      alert('Please select at least one miller to compare.');
+      return;
+    }
+    
+    // Fetch data for each miller
+    const millerData = [];
+    for (const millerId of selectedMillers) {
+      try {
+        const response = await fetch(`/admin/api/miller_stock/${millerId}`);
+        const data = await response.json();
+        millerData.push(data);
+      } catch (error) {
+        console.error(`Error fetching data for miller ${millerId}:`, error);
+      }
+    }
+    
+    // Filter by crop if specified
+    if (cropFilter) {
+      millerData.forEach(miller => {
+        miller.stocks = miller.stocks.filter(stock => 
+          stock.crop.toLowerCase() === cropFilter.toLowerCase()
+        );
+      });
+    }
+    
+    // Display comparison
+    displayComparison(millerData);
+  }
+  
+  function displayComparison(millerData) {
+    const resultsDiv = document.getElementById('comparisonResults');
+    
+    if (millerData.length === 0) {
+      resultsDiv.innerHTML = '<p class="text-muted">No data available.</p>';
+      return;
+    }
+    
+    // Get all unique crops across all millers
+    const allCrops = new Set();
+    millerData.forEach(miller => {
+      miller.stocks.forEach(stock => {
+        allCrops.add(stock.crop);
+      });
+    });
+    
+    if (allCrops.size === 0) {
+      resultsDiv.innerHTML = '<p class="text-warning">No stock available for the selected millers/crop.</p>';
+      return;
+    }
+    
+    // Create comparison table
+    let html = `
+      <div class="table-responsive mt-4">
+        <table class="table table-bordered table-striped align-middle">
+          <thead class="table-primary">
+            <tr>
+              <th>Crop</th>
+    `;
+    
+    // Add miller columns
+    millerData.forEach(miller => {
+      html += `<th class="text-center" style="min-width: 200px;">
+        <strong>${miller.miller_name}</strong>
+      </th>`;
+    });
+    
+    html += `</tr></thead><tbody>`;
+    
+    // Add rows for each crop
+    allCrops.forEach(crop => {
+      html += `<tr><td><strong>${crop}</strong></td>`;
+      
+      millerData.forEach(miller => {
+        const stock = miller.stocks.find(s => s.crop === crop);
+        
+        if (stock) {
+          html += `
+            <td class="text-center">
+              <div class="mb-2">
+                <small class="text-muted d-block">Price/Qt:</small>
+                <strong class="text-success">₹${stock.price}</strong>
+              </div>
+              <div class="mb-2">
+                <small class="text-muted d-block">Quantity:</small>
+                <span class="badge bg-info">${stock.quantity} Qt</span>
+              </div>
+              <div class="mb-2">
+                <small class="text-muted d-block">Condition:</small>
+                <span>${stock.condition}</span>
+              </div>
+              <div class="mb-2">
+                <small class="text-muted d-block">Bag Type:</small>
+                <span>${stock.bag_type}</span>
+              </div>
+              <div>
+                <small class="text-muted d-block">Deduction:</small>
+                <span class="text-danger">₹${stock.deduction}</span>
+              </div>
+            </td>
+          `;
+        } else {
+          html += `<td class="text-center text-muted">—</td>`;
+        }
+      });
+      
+      html += `</tr>`;
+    });
+    
+    html += `</tbody></table></div>`;
+    
+    resultsDiv.innerHTML = html;
+  }
+  
+  function clearComparison() {
+    // Clear all selections
+    for (let i = 1; i <= 6; i++) {
+      document.getElementById(`miller${i}`).value = '';
+    }
+    document.getElementById('cropFilter').value = '';
+    document.getElementById('comparisonResults').innerHTML = '';
+  }
+</script>
+
+</body>
+</html>
+
