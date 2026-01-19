@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Buyer Profiles | Sarna Broker</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+<!-- ================= TOP NAVBAR ================= -->
+<nav class="admin-navbar">
+  <div class="nav-left">
+    <img src="static/image/Sarna broker.png" alt="Logo">
+    <span>Sarna Broker</span>
+  </div>
+
+  <center><b>JAI SHREE SHYAM</b></center>
+
+  <div class="nav-right">
+    <span class="admin-name">
+      <i class="fa fa-user-circle"></i> Admin
+    </span>
+    <img src="static/image/images.png" alt="Logo">
+  </div>
+</nav>
+
+<div class="admin-container">
+
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar">
+    <h4>Sarna Broker</h4>
+    <ul>
+      <li><a href="/admin"><i class="fa fa-gauge"></i> Dashboard</a></li>
+      <li><a href="/admin/compare"><i class="fa fa-balance-scale"></i> Rate Comparison</a></li>
+      <li><a href="/admin/users"><i class="fa fa-users"></i> Users</a></li>
+      <li><a href="/admin/stock"><i class="fa fa-box"></i> Miller Stock</a></li>
+      <li><a href="/admin/stock-history"><i class="fa fa-history"></i> Stock Update History</a></li>
+      <li><a href="/admin/bookings"><i class="fa fa-shopping-cart"></i> Bookings</a></li>
+      <li><a href="/admin/miller-profiles"><i class="fa fa-industry"></i> Miller Profiles</a></li>
+      <li class="active"><i class="fa fa-store"></i> Buyer Profiles</li>
+      <li>
+        <i class="fa fa-right-from-bracket"></i>
+        <a href="/logout">Logout</a>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="admin-main">
+
+    <div class="admin-top">
+      <h5>🛒 Trader / Buyer Profiles</h5>
+      <span class="admin-badge">Admin</span>
+    </div>
+
+<!-- ================= BUYER PROFILES ================= -->
+<div class="table-card mt-5">
+  <h6>🛒 Trader / Buyer Profiles</h6>
+
+  {% if buyer_profiles %}
+  <table class="table table-bordered table-striped table-sm align-middle">
+    <tr class="table-info">
+      <th>Trader Name</th>
+      <th>Shop Name</th>
+      <th>Phone</th>
+      <th>Address</th>
+      <th>Document</th>
+      <th>Created</th>
+    </tr>
+
+    {% for b in buyer_profiles %}
+    <tr>
+      <td>{{ b[1] }}</td>
+      <td>{{ b[2] }}</td>
+      <td>{{ b[3] }}</td>
+      <td>{{ b[4] }}</td>
+      <td>
+        {% if b[5] %}
+          <a href="{{ url_for('static', filename='uploads/miller_docs/' + b[5]) }}"
+
+             target="_blank"
+             class="btn btn-sm btn-outline-primary">
+            View
+          </a>
+        {% else %}
+          —
+        {% endif %}
+      </td>
+      <td>{{ b[6] }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+    <p class="text-muted">No trader profiles submitted yet.</p>
+  {% endif %}
+</div>
+
+  </main>
+</div>
+
+</body>
+</html>
+
