@@ -336,13 +336,13 @@
   </div>
 </div>
 
-<!-- ================= MY BOOKINGS ================= -->
+<!-- ================= ACTIVE ORDERS ================= -->
 <div class="container mt-5 mb-5">
-  <h5 class="fw-bold">My Bookings</h5>
+  <h5 class="fw-bold">Active Orders</h5>
 
   <div class="alert alert-info">
     <strong>Note:</strong> Invoice will be available only after
-    <b>Admin approval</b>.
+    <b>full loading is completed</b>.
   </div>
 
   {% if my_bookings %}
@@ -421,7 +421,7 @@
           <span class="badge bg-danger">❌ Rejected</span>
         {% endif %}
       </td>
-
+      
       <!-- BILL COLUMN -->
       <td>
         {% if b[8] == 'completed' and b[7] %}
@@ -495,34 +495,211 @@
 
       <!-- INVOICE -->
       <td>
-        {% if b[5] == 'loaded' %}
-  <a href="/invoice/{{ b[0] }}"
-     class="btn btn-sm btn-success">
-     📄 Download Invoice
-  </a>
-{% else %}
-  <span class="text-muted">Available after full loading</span>
-{% endif %}
-
-      </td>
-
-      <!-- CANCEL -->
-      <td>
-        {% if b[5] == 'pending' or (b[3] == 0 and b[4] == b[2]) %}
-          <a href="/cancel_booking/{{ b[0] }}"
-             class="btn btn-sm btn-outline-danger"
-             onclick="return confirm('Cancel this booking?')">
-            Cancel
+        {% if b[8] == 'completed' %}
+          <a href="/invoice/{{ b[0] }}"
+             class="btn btn-sm btn-success">
+            <i class="fa fa-download"></i> Download Invoice
           </a>
         {% else %}
-          —
+          <span class="text-muted small">Available after full loading</span>
         {% endif %}
       </td>
+
+          <!-- Pending Booking - Can Cancel -->
+          <td>
+            {% set remaining_qty = b[4] or 0 %}
+            {% set loaded_qty = b[3] or 0 %}
+            {% set booked_qty = b[2] or 0 %}
+            {% set booking_status = b[10] if b[10] else 'pending' %}
+            {% set loading_status = b[8] if b[8] else 'pending' %}
+          
+            {% if booking_status == 'pending' %}
+              <a href="/cancel_booking/{{ b[0] }}"
+                 class="btn btn-sm btn-outline-danger w-100 mb-1"
+                 onclick="return confirm('Cancel this booking?')">
+                <i class="fa fa-times"></i> Cancel
+              </a>
+              <span class="badge bg-warning d-block">Awaiting Approval</span>
+          
+            {% elif booking_status == 'declined' %}
+              <span class="badge bg-danger d-block">
+                <i class="fa fa-times-circle"></i> Rejected
+              </span>
+          
+            {% elif booking_status == 'approved' and remaining_qty > 0 %}
+              <form method="POST"
+                    action="/buyer/update_loading/{{ b[0] }}"
+                    enctype="multipart/form-data">
+          
+                <input type="number"
+                       name="load_qty"
+                       min="1"
+                       max="{{ remaining_qty }}"
+                       class="form-control form-control-sm mb-1"
+                       placeholder="Qty to load"
+                       required>
+          
+                <input type="file"
+                       name="invoice"
+                       accept="image/*,.pdf"
+                       class="form-control form-control-sm mb-1"
+                       required>
+          
+                <button type="submit"
+                        class="btn btn-success btn-sm w-100">
+                  🚚 Upload & Update Loading
+                </button>
+              </form>
+          
+              {% set progress = ((loaded_qty / booked_qty) * 100) | round %}
+              <div class="progress mt-2" style="height:6px;">
+                <div class="progress-bar bg-success"
+                     style="width: {{ progress }}%">
+                </div>
+              </div>
+              <small class="text-muted">{{ progress }}% Loaded</small>
+          
+            {% elif loading_status == 'completed' %}
+              <span class="badge bg-success d-block">
+                <i class="fa fa-check-circle"></i> Completed
+              </span>
+          
+            {% else %}
+              <span class="badge bg-secondary">
+                <i class="fa fa-info-circle"></i> {{ booking_status|title }}
+              </span>
+            {% endif %}
+          </td>          
     </tr>
     {% endfor %}
   </table>
   {% else %}
-    <p class="text-muted">No bookings yet.</p>
+    <p class="text-muted">No active orders.</p>
+  {% endif %}
+</div>
+
+<!-- ================= COMPLETED ORDERS ================= -->
+<div class="container mt-5 mb-5">
+  <h5 class="fw-bold text-success">
+    <i class="fa fa-check-circle"></i> Completed Orders
+  </h5>
+
+  {% if completed_bookings %}
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped align-middle">
+      <tr class="table-success">
+        <th>Order ID</th>
+        <th>Crop</th>
+        <th>Booked</th>
+        <th>Loaded</th>
+        <th>Completed Date</th>
+        <th>Bill</th>
+        <th>Invoice</th>
+      </tr>
+
+      {% for b in completed_bookings %}
+      <tr>
+        <td><strong class="text-primary">{{ b[9] if b[9] else 'N/A' }}</strong></td>
+        <td>{{ b[1] }}</td>
+
+        <td>
+          <span class="badge bg-primary">{{ b[2] }} Qt</span>
+        </td>
+        
+        <td>
+          <span class="badge bg-success">{{ b[3] }} Qt</span>
+        </td>
+        
+        <td>
+          {% if b[6] %}
+            <small>{{ b[6][:10] }}</small>
+          {% else %}
+            <span class="text-muted small">—</span>
+          {% endif %}
+        </td>
+
+        <!-- BILL COLUMN -->
+        <td>
+          {% if b[7] %}
+            {% if b[7].lower().endswith('.pdf') %}
+              <div class="text-center">
+                <i class="fa fa-file-pdf fa-2x text-danger d-block mb-1"></i>
+                <button type="button" 
+                        class="btn btn-sm btn-primary"
+                        data-bs-toggle="modal" 
+                        data-bs-target="#billModal{{ b[0] }}">
+                  <i class="fa fa-eye"></i> View
+                </button>
+              </div>
+            {% else %}
+              <div class="text-center">
+                <img src="/static/uploads/bills/{{ b[7] }}" 
+                     alt="Bill" 
+                     class="img-thumbnail mb-1" 
+                     style="max-width: 60px; max-height: 60px; cursor: pointer; object-fit: cover;"
+                     data-bs-toggle="modal" 
+                     data-bs-target="#billModal{{ b[0] }}">
+                <button type="button" 
+                        class="btn btn-sm btn-primary d-block w-100"
+                        data-bs-toggle="modal" 
+                        data-bs-target="#billModal{{ b[0] }}">
+                  <i class="fa fa-eye"></i> View
+                </button>
+              </div>
+            {% endif %}
+            
+            <!-- Bill View Modal -->
+            <div class="modal fade" id="billModal{{ b[0] }}" tabindex="-1" aria-labelledby="billModalLabel{{ b[0] }}" aria-hidden="true">
+              <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="billModalLabel{{ b[0] }}">Bill Document - {{ b[1] }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body text-center">
+                    {% if b[7].lower().endswith('.pdf') %}
+                      <iframe src="/static/uploads/bills/{{ b[7] }}" 
+                              style="width: 100%; height: 600px; border: none;">
+                        <p>Your browser does not support PDFs. 
+                          <a href="/static/uploads/bills/{{ b[7] }}" target="_blank">Download the PDF</a>
+                        </p>
+                      </iframe>
+                    {% else %}
+                      <img src="/static/uploads/bills/{{ b[7] }}" 
+                           alt="Bill" 
+                           class="img-fluid" 
+                           style="max-height: 70vh;">
+                    {% endif %}
+                  </div>
+                  <div class="modal-footer">
+                    <a href="/static/uploads/bills/{{ b[7] }}" 
+                       target="_blank" 
+                       class="btn btn-primary">
+                      <i class="fa fa-download"></i> Download
+                    </a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% else %}
+            <span class="text-muted small">No bill uploaded</span>
+          {% endif %}
+        </td>
+
+        <!-- INVOICE -->
+        <td>
+          <a href="/invoice/{{ b[0] }}"
+             class="btn btn-sm btn-success">
+            <i class="fa fa-download"></i> Download Invoice
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% else %}
+    <p class="text-muted">No completed orders yet.</p>
   {% endif %}
 </div>
 
@@ -539,11 +716,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-  setInterval(() => {
-    location.reload();
-  }, 10000);
-</script>
+
 
 </body>
 </html>

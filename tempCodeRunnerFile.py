@@ -136,18 +136,20 @@ CREATE TABLE IF NOT EXISTS miller_profiles (
 """)
 
     # DEFAULT ADMIN
-    cur.execute("SELECT * FROM users WHERE role='admin'")
+    # DEFAULT ADMIN (SAFE)
+    cur.execute("SELECT id FROM users WHERE role='admin'")
     if not cur.fetchone():
-        cur.execute("""
-        INSERT INTO users (name,email,password,role,status)
-        VALUES (?,?,?,?,?)
-        """,(
-              request.form["name"],
-    request.form["email"],
-    request.form["password"],
-    request.form["role"],
-    "pending"
-        ))
+     cur.execute("""
+        INSERT INTO users (name, email, password, role, status)
+        VALUES (?, ?, ?, ?, ?)
+    """, (
+        "Admin",
+        "admin@sarna.com",
+        "admin123",
+        "admin",
+        "approved"
+    ))
+
 
     con.commit()
     con.close()
@@ -968,11 +970,12 @@ SELECT
     mb.quantity,           -- 2 Booked
     mb.loaded_qty,         -- 3 Loaded
     (mb.quantity - mb.loaded_qty) AS remaining, -- 4 Remaining
-    mb.truck_status,       -- 5 Status
+    mb.truck_status,       -- 5 Truck status
     mb.loaded_at,          -- 6 Last updated
     mb.bill_document,      -- 7 Bill document
-    mb.loading_status,      -- 8 Loading status
-    mb.order_id            -- 9 Order ID
+    mb.loading_status,     -- 8 Loading status
+    mb.order_id,           -- 9 Order ID
+    mb.status              -- 10 Booking status (pending/approved/declined)
 FROM miller_bookings mb
 JOIN miller_stock ms ON mb.stock_id = ms.id
 WHERE mb.buyer_id=?
@@ -981,12 +984,24 @@ ORDER BY mb.created_at DESC
 
     my_bookings = cur.fetchall()
 
+    # Separate bookings into active and completed
+    active_bookings = [b for b in my_bookings if b[8] != 'completed']
+    completed_bookings = [b for b in my_bookings if b[8] == 'completed']
+
+    # Calculate totals for summary (only active bookings)
+    total_booked = sum(b[2] or 0 for b in active_bookings)
+    total_loaded = sum(b[3] or 0 for b in active_bookings)
+    total_remaining = sum(b[4] or 0 for b in active_bookings)
 
     con.close()
     return render_template(
         "market.html",
         miller_stocks=miller_stocks,
-        my_bookings=my_bookings
+        my_bookings=active_bookings,
+        completed_bookings=completed_bookings,
+        total_booked=total_booked,
+        total_loaded=total_loaded,
+        total_remaining=total_remaining
     )
 
 @app.route("/book_miller_stock/<int:stock_id>", methods=["POST"])
@@ -1046,6 +1061,71 @@ def cancel_booking(id):
         )
         con.commit()
 
+    con.close()
+    return redirect("/market")
+
+@app.route("/buyer/update_loading/<int:id>", methods=["POST"])
+def buyer_update_loading(id):
+    """Allow buyers/traders to update the loaded quantity"""
+    if session.get("role") != "buyer":
+        return redirect("/market")
+
+    load_qty = int(request.form.get("load_qty", 0))
+
+    con = get_db()
+    cur = con.cursor()
+
+    # Fetch booking and verify it belongs to this buyer
+    cur.execute("""
+        SELECT quantity, loaded_qty, buyer_id, status
+        FROM miller_bookings
+        WHERE id=? AND buyer_id=?
+    """, (id, session.get("user_id")))
+    
+    result = cur.fetchone()
+    if not result:
+        con.close()
+        return redirect("/market")
+    
+    total_qty, loaded_qty, buyer_id, booking_status = result
+    
+    # Only allow updates for approved bookings
+    if booking_status != 'approved':
+        con.close()
+        return redirect("/market")
+    
+    # Calculate remaining quantity and validate
+    remaining = total_qty - loaded_qty
+    
+    # Validate: can't load more than remaining
+    if load_qty > remaining:
+        load_qty = remaining
+    
+    # Calculate new loaded quantity
+    new_loaded = loaded_qty + load_qty
+    
+    # Update loading status
+    if new_loaded >= total_qty:
+        new_loaded = total_qty
+        loading_status = "completed"
+    else:
+        loading_status = "partial"
+    
+    # Update truck status if needed
+    if new_loaded > 0 and loaded_qty == 0:
+        truck_status = "partial"
+    elif new_loaded >= total_qty:
+        truck_status = "loaded"
+    else:
+        truck_status = "partial"
+    
+    cur.execute("""
+        UPDATE miller_bookings
+        SET loaded_qty=?, loading_status=?, truck_status=?, loaded_at=CURRENT_TIMESTAMP
+        WHERE id=? AND buyer_id=?
+    """, (new_loaded, loading_status, truck_status, id, session.get("user_id")))
+
+    con.commit()
     con.close()
     return redirect("/market")
 

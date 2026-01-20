@@ -432,139 +432,66 @@
       <th>Buyer</th>
       <th>Crop</th>
       <th>Booked</th>
-      <th>Bill</th>
-      <th>Action</th>
+      <th>Loaded</th>
+      <th>Remaining</th>
+      <th>Invoices (Per Truck)</th>
     </tr>
-    
+  
     {% for b in approved %}
-    {% set remaining = b[3] - b[7] %}
+    {% set booking_id = b[0] %}
+    {% set booked = b[3] %}
+    {% set loaded = b[7] %}
+    {% set remaining = booked - loaded %}
+  
     <tr>
-      <td><strong class="text-primary">{{ b[10] if b[10] else 'N/A' }}</strong></td>
+      <td><strong class="text-primary">{{ b[10] }}</strong></td>
       <td>{{ b[1] }}</td>
       <td>{{ b[2] }}</td>
-
+  
+      <td><span class="badge bg-primary">{{ booked }} Qt</span></td>
+  
       <td>
-        <span class="badge bg-primary">{{ b[3] }} Qt</span>
+        <span class="badge bg-success">{{ loaded }} Qt</span>
       </td>
-
+  
       <td>
-    {% if b[8] == 'completed' and b[9] %}
-      {% if b[9].lower().endswith('.pdf') %}
-        <div class="text-center">
-          <i class="fa fa-file-pdf fa-3x text-danger d-block mb-1"></i>
-          <button type="button" 
-                  class="btn btn-sm btn-primary"
-                  data-bs-toggle="modal" 
-                  data-bs-target="#billModal{{ b[0] }}">
-            <i class="fa fa-eye"></i> View
-          </button>
-        </div>
-      {% else %}
-        <div class="text-center">
-          <img src="/static/uploads/bills/{{ b[9] }}" 
-               alt="Bill" 
-               class="img-thumbnail mb-1" 
-               style="max-width: 80px; max-height: 80px; cursor: pointer; object-fit: cover;"
-               data-bs-toggle="modal" 
-               data-bs-target="#billModal{{ b[0] }}">
-          <button type="button" 
-                  class="btn btn-sm btn-primary d-block w-100"
-                  data-bs-toggle="modal" 
-                  data-bs-target="#billModal{{ b[0] }}">
-            <i class="fa fa-eye"></i> View
-          </button>
-        </div>
-      {% endif %}
-      
-      <!-- Bill View Modal -->
-      <div class="modal fade" id="billModal{{ b[0] }}" tabindex="-1" aria-labelledby="billModalLabel{{ b[0] }}" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="billModalLabel{{ b[0] }}">Bill Document - {{ b[1] }}</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center">
-              {% if b[9].lower().endswith('.pdf') %}
-                <iframe src="/static/uploads/bills/{{ b[9] }}" 
-                        style="width: 100%; height: 600px; border: none;">
-                  <p>Your browser does not support PDFs. 
-                    <a href="/static/uploads/bills/{{ b[9] }}" target="_blank">Download the PDF</a>
-                  </p>
-                </iframe>
-              {% else %}
-                <img src="/static/uploads/bills/{{ b[9] }}" 
-                     alt="Bill" 
-                     class="img-fluid" 
-                     style="max-height: 70vh;">
-              {% endif %}
-            </div>
-            <div class="modal-footer">
-              <a href="/static/uploads/bills/{{ b[9] }}" 
-                 target="_blank" 
-                 class="btn btn-primary">
-                <i class="fa fa-download"></i> Download
-              </a>
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    {% elif b[8] == 'completed' %}
-      <span class="text-muted small">No bill uploaded</span>
-    {% else %}
-      <span class="text-muted small">—</span>
-    {% endif %}
-  </td>
-
-  <td>
-    {% if remaining > 0 %}
-      <form method="POST" action="/miller/update_loading/{{ b[0] }}">
-        <input type="number"
-               name="load_qty"
-               max="{{ remaining }}"
-               min="1"
-               class="form-control form-control-sm mb-1"
-               placeholder="Load Qty"
-               required>
-
-        <button class="btn btn-sm btn-success w-100">
-          🚚 Update Loading
-        </button>
-      </form>
-    {% elif b[8] == 'completed' %}
-      <!-- Upload/Change Bill Form -->
-      {% if not b[9] %}
-        <label for="billInput{{ b[0] }}" class="btn btn-sm btn-outline-primary w-100 mb-1" style="cursor: pointer;">
-          <i class="fa fa-upload"></i> Upload Bill
-        </label>
-      {% endif %}
-      
-      <form method="POST" action="/miller/upload_bill/{{ b[0] }}" enctype="multipart/form-data" id="billForm{{ b[0] }}">
-        <input type="file" 
-               name="bill_document" 
-               id="billInput{{ b[0] }}" 
-               accept="image/*,.pdf"
-               onchange="document.getElementById('billForm{{ b[0] }}').submit();"
-               style="display: none;">
-      </form>
-      
-      {% if b[9] %}
-        <button type="button" 
-                class="btn btn-sm btn-outline-secondary w-100 mt-1"
-                onclick="document.getElementById('billInput{{ b[0] }}').click();">
-          <i class="fa fa-edit"></i> Change Bill
-        </button>
-      {% endif %}
-      
-      <span class="badge bg-success d-block mt-1">Completed</span>
-    {% else %}
-      <span class="badge bg-success">Completed</span>
-    {% endif %}
-  </td>
+        {% if remaining > 0 %}
+          <span class="badge bg-warning">{{ remaining }} Qt</span>
+        {% else %}
+          <span class="badge bg-success">0 Qt</span>
+        {% endif %}
+      </td>
+  
+      <!-- 🔴 PER LOADING INVOICES -->
+      <td>
+        {% if invoices_map.get(booking_id) %}
+          <ul class="list-unstyled mb-0">
+            {% for inv in invoices_map[booking_id] %}
+              <li class="mb-1">
+                <span class="badge bg-info">
+                  {{ inv.qty }} Qt
+                </span>
+  
+                <a href="/static/uploads/bills/{{ inv.file }}"
+                   target="_blank"
+                   class="btn btn-sm btn-outline-primary ms-1">
+                  <i class="fa fa-file-invoice"></i> Invoice
+                </a>
+  
+                <small class="text-muted d-block">
+                  {{ inv.date[:16] }}
+                </small>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <span class="text-muted small">No loading yet</span>
+        {% endif %}
+      </td>
     </tr>
     {% endfor %}
   </table>
+  
   {% else %}
   <p class="text-muted">No approved orders.</p>
   {% endif %}

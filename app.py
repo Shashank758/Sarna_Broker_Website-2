@@ -153,9 +153,24 @@ CREATE TABLE IF NOT EXISTS miller_profiles (
 
     con.commit()
     con.close()
+    
+def upgrade_miller_stock_status():
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("PRAGMA table_info(miller_stock)")
+    cols = [c[1] for c in cur.fetchall()]
+
+    if "status" not in cols:
+        cur.execute("""
+            ALTER TABLE miller_stock
+            ADD COLUMN status TEXT DEFAULT 'open'
+        """)
+
+    con.commit()
+    con.close()
 
 init_db()
-
 def upgrade_staff_system():
     con = get_db()
     cur = con.cursor()
@@ -171,7 +186,25 @@ def upgrade_staff_system():
 
     con.commit()
     con.close()
-    
+def upgrade_loading_invoices():
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS loading_invoices (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        booking_id INTEGER,
+        loaded_qty INTEGER,
+        invoice_file TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
+    con.commit()
+    con.close()
+
+upgrade_loading_invoices()
+   
 def get_effective_user_id():
     # For miller staff → parent miller
     if session.get("role") == "miller" and session.get("is_staff"):
@@ -245,6 +278,7 @@ upgrade_db()
 upgrade_users_table()
 upgrade_partial_loading()
 upgrade_staff_system()
+upgrade_miller_stock_status()
 
 def upgrade_miller_booking_truck_status():
     con = get_db()
@@ -411,6 +445,18 @@ def upgrade_miller_profile_table():
 
     con.commit()
     con.close()
+    
+    cur.execute("""
+CREATE TABLE IF NOT EXISTS payments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    booking_id INTEGER,
+    miller_id INTEGER,
+    buyer_id INTEGER,
+    amount INTEGER,
+    status TEXT DEFAULT 'pending',
+    paid_at DATETIME
+)
+""")
 
 # ---------------- AUTH ----------------
 @app.route("/", methods=["GET", "POST"])
@@ -595,49 +641,60 @@ def miller_dashboard():
 """, (miller_id,))
     bookings = cur.fetchall()
 
-    con.close()
+    # 🔹 FETCH PER-TRUCK LOADING INVOICES
+    cur = get_db().cursor()
+    cur.execute("""
+    SELECT booking_id, loaded_qty, invoice_file, created_at
+    FROM loading_invoices
+    ORDER BY created_at ASC
+""")
+    rows = cur.fetchall()
+
+# Group invoices by booking_id
+    invoices_map = {}
+    for r in rows:
+     invoices_map.setdefault(r[0], []).append({
+        "qty": r[1],
+        "file": r[2],
+        "date": r[3]
+    })
+
+    cur.connection.close()
 
     return render_template(
-        "miller.html",
-        stocks=stocks,
-        bookings=bookings
-    )
-@app.route("/miller/update_loading/<int:id>", methods=["POST"])
-def update_loading(id):
+    "miller.html",
+    stocks=stocks,
+    bookings=bookings,
+    invoices_map=invoices_map
+)
+
+@app.route("/miller/pay/<int:booking_id>")
+def miller_pay(booking_id):
     if session.get("role") != "miller":
         return redirect("/")
-
-    load_qty = int(request.form["load_qty"])
 
     con = get_db()
     cur = con.cursor()
 
-    # Fetch booking
     cur.execute("""
-        SELECT quantity, loaded_qty
-        FROM miller_bookings
-        WHERE id=?
-    """, (id,))
-    total_qty, loaded_qty = cur.fetchone()
-
-    new_loaded = loaded_qty + load_qty
-
-    if new_loaded >= total_qty:
-        new_loaded = total_qty
-        status = "completed"
-    else:
-        status = "partial"
-
-    cur.execute("""
-        UPDATE miller_bookings
-        SET loaded_qty=?, loading_status=?
-        WHERE id=?
-    """, (new_loaded, status, id))
+        INSERT INTO payments
+        (booking_id, miller_id, buyer_id, amount, status, paid_at)
+        SELECT
+            mb.id,
+            ms.miller_id,
+            mb.buyer_id,
+            (mb.loaded_qty * ms.price),
+            'paid',
+            CURRENT_TIMESTAMP
+        FROM miller_bookings mb
+        JOIN miller_stock ms ON mb.stock_id = ms.id
+        WHERE mb.id=? AND mb.loading_status='completed'
+    """, (booking_id,))
 
     con.commit()
     con.close()
     return redirect("/miller")
-    
+  
 @app.route("/miller/upload_bill/<int:booking_id>", methods=["POST"])
 def upload_booking_bill(booking_id):
     if session.get("role") != "miller":
@@ -861,15 +918,29 @@ def miller_approve_booking(id):
     con = get_db()
     cur = con.cursor()
 
+    # Deduct quantity now
     cur.execute("""
-    UPDATE miller_bookings
-    SET status='approved', decision_at=CURRENT_TIMESTAMP
-    WHERE id=?
+        UPDATE miller_stock
+        SET quantity = quantity - (
+            SELECT quantity FROM miller_bookings WHERE id=?
+        ),
+        status = 'processing'
+        WHERE id = (
+            SELECT stock_id FROM miller_bookings WHERE id=?
+        )
+    """, (id, id))
+
+    cur.execute("""
+        UPDATE miller_bookings
+        SET status='approved',
+            decision_at=CURRENT_TIMESTAMP
+        WHERE id=?
     """, (id,))
 
     con.commit()
     con.close()
     return redirect("/miller")
+
 
     return redirect("/admin")
 
@@ -959,6 +1030,7 @@ def market():
     FROM miller_stock
     JOIN users ON miller_stock.miller_id = users.id
     WHERE miller_stock.quantity > 0
+    AND miller_stock.status = 'open'
     ORDER BY created_at DESC
     """)
     miller_stocks = cur.fetchall()
@@ -970,11 +1042,12 @@ SELECT
     mb.quantity,           -- 2 Booked
     mb.loaded_qty,         -- 3 Loaded
     (mb.quantity - mb.loaded_qty) AS remaining, -- 4 Remaining
-    mb.truck_status,       -- 5 Status
+    mb.truck_status,       -- 5 Truck status
     mb.loaded_at,          -- 6 Last updated
     mb.bill_document,      -- 7 Bill document
-    mb.loading_status,      -- 8 Loading status
-    mb.order_id            -- 9 Order ID
+    mb.loading_status,     -- 8 Loading status
+    mb.order_id,           -- 9 Order ID
+    mb.status              -- 10 Booking status (pending/approved/declined)
 FROM miller_bookings mb
 JOIN miller_stock ms ON mb.stock_id = ms.id
 WHERE mb.buyer_id=?
@@ -983,16 +1056,21 @@ ORDER BY mb.created_at DESC
 
     my_bookings = cur.fetchall()
 
-    # Calculate totals for summary
-    total_booked = sum(b[2] or 0 for b in my_bookings)
-    total_loaded = sum(b[3] or 0 for b in my_bookings)
-    total_remaining = sum(b[4] or 0 for b in my_bookings)
+    # Separate bookings into active and completed
+    active_bookings = [b for b in my_bookings if b[8] != 'completed']
+    completed_bookings = [b for b in my_bookings if b[8] == 'completed']
+
+    # Calculate totals for summary (only active bookings)
+    total_booked = sum(b[2] or 0 for b in active_bookings)
+    total_loaded = sum(b[3] or 0 for b in active_bookings)
+    total_remaining = sum(b[4] or 0 for b in active_bookings)
 
     con.close()
     return render_template(
         "market.html",
         miller_stocks=miller_stocks,
-        my_bookings=my_bookings,
+        my_bookings=active_bookings,
+        completed_bookings=completed_bookings,
         total_booked=total_booked,
         total_loaded=total_loaded,
         total_remaining=total_remaining
@@ -1007,24 +1085,25 @@ def book_miller_stock(stock_id):
     con = get_db()
     cur = con.cursor()
 
-    cur.execute("SELECT quantity FROM miller_stock WHERE id=?", (stock_id,))
+    cur.execute("""
+        SELECT quantity, status
+        FROM miller_stock
+        WHERE id=?
+    """, (stock_id,))
     row = cur.fetchone()
 
-    if row and row[0] >= qty:
-        cur.execute(
-            "UPDATE miller_stock SET quantity=quantity-? WHERE id=?",
-            (qty, stock_id)
-        )
+    if row and row[0] >= qty and row[1] == 'open':
         order_id = generate_next_order_id()
         cur.execute("""
-        INSERT INTO miller_bookings (stock_id,buyer_id,quantity,status,order_id)
-        VALUES (?,?,?, 'pending', ?)
+            INSERT INTO miller_bookings
+            (stock_id, buyer_id, quantity, status, order_id)
+            VALUES (?, ?, ?, 'pending', ?)
         """, (stock_id, get_effective_user_id(), qty, order_id))
-
-        con.commit()   # ✅ VERY IMPORTANT
+        con.commit()
 
     con.close()
     return redirect("/market")
+
 
 @app.route("/cancel_booking/<int:id>")
 def cancel_booking(id):
@@ -1058,6 +1137,68 @@ def cancel_booking(id):
     con.close()
     return redirect("/market")
 
+@app.route("/buyer/update_loading/<int:id>", methods=["POST"])
+def buyer_update_loading(id):
+    if session.get("role") != "buyer":
+        return redirect("/market")
+
+    load_qty = int(request.form.get("load_qty", 0))
+    invoice = request.files.get("invoice")
+
+    if load_qty <= 0 or not invoice:
+        return redirect("/market")
+
+    filename = secure_filename(invoice.filename)
+    invoice.save(os.path.join(app.config["BILL_FOLDER"], filename))
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT quantity, loaded_qty
+        FROM miller_bookings
+        WHERE id=? AND buyer_id=? AND status='approved'
+    """, (id, session["user_id"]))
+
+    row = cur.fetchone()
+    if not row:
+        con.close()
+        return redirect("/market")
+
+    total_qty, loaded_qty = row
+    remaining = total_qty - loaded_qty
+
+    if load_qty > remaining:
+        load_qty = remaining
+
+    new_loaded = loaded_qty + load_qty
+
+    loading_status = "completed" if new_loaded == total_qty else "partial"
+    truck_status = "loaded" if new_loaded == total_qty else "partial"
+
+    # ✅ Update booking totals
+    cur.execute("""
+        UPDATE miller_bookings
+        SET loaded_qty=?,
+            loading_status=?,
+            truck_status=?,
+            loaded_at=CURRENT_TIMESTAMP
+        WHERE id=? AND buyer_id=?
+    """, (new_loaded, loading_status, truck_status, id, session["user_id"]))
+
+    # ✅ Save per-truck invoice
+    cur.execute("""
+        INSERT INTO loading_invoices
+        (booking_id, loaded_qty, invoice_file)
+        VALUES (?, ?, ?)
+    """, (id, load_qty, filename))
+
+    con.commit()
+    con.close()
+
+    return redirect("/market")
+
+
 @app.route("/invoice/<int:booking_id>")
 def invoice(booking_id):
     if session.get("role") != "buyer":
@@ -1067,24 +1208,22 @@ def invoice(booking_id):
     cur = con.cursor()
 
     cur.execute("""
-        SELECT
-            mb.id,                 -- invoice id
-            buyer.name,            -- buyer
-            miller.name,           -- miller
-            ms.crop,               -- crop
-            mb.quantity,           -- quantity
-            ms.price,              -- price
-            mb.loaded_at           -- date
-        FROM miller_bookings mb
-        JOIN miller_stock ms ON mb.stock_id = ms.id
-        JOIN users buyer ON mb.buyer_id = buyer.id
-        JOIN users miller ON ms.miller_id = miller.id
-        WHERE mb.id=?
-          AND mb.buyer_id=?
-          AND mb.truck_status='loaded'
-    """, (booking_id, get_effective_user_id()
+    SELECT
+        mb.id,
+        buyer.name,
+        miller.name,
+        ms.crop,
+        mb.loaded_qty,
+        ms.price,
+        p.paid_at
+    FROM miller_bookings mb
+    JOIN miller_stock ms ON mb.stock_id = ms.id
+    JOIN users buyer ON mb.buyer_id = buyer.id
+    JOIN users miller ON ms.miller_id = miller.id
+    JOIN payments p ON p.booking_id = mb.id
+    WHERE mb.id=? AND mb.buyer_id=? AND p.status='paid'
+""", (booking_id, get_effective_user_id()))
 
-))
 
     invoice = cur.fetchone()
     con.close()
