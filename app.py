@@ -465,11 +465,27 @@ def upgrade_payments_table():
 
     con.commit()
     con.close()
+def upgrade_miller_stock_reserved_qty():
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("PRAGMA table_info(miller_stock)")
+    cols = [c[1] for c in cur.fetchall()]
+
+    if "reserved_qty" not in cols:
+        cur.execute("""
+            ALTER TABLE miller_stock
+            ADD COLUMN reserved_qty INTEGER DEFAULT 0
+        """)
+
+    con.commit()
+    con.close()
 
 upgrade_miller_booking_qc()
 upgrade_miller_booking_order_id()
 upgrade_miller_payment_fields()
 upgrade_payments_table()
+upgrade_miller_stock_reserved_qty()
 
 def generate_next_order_id():
     """Generate next order ID in format S10001, S10002, etc."""
