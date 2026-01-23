@@ -2,721 +2,1172 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Market | Sarna Broker</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  /* ================= GLOBAL ================= */
-  body{
-    background:#f3f6fb;
-    font-family: "Segoe UI", system-ui, sans-serif;
+  :root {
+    --primary: #1e6f5c;
+    --primary-dark: #145a48;
+    --bg: #f4f7f6;
+    --card: #ffffff;
+    --text: #2c3e50;
+    --muted: #7f8c8d;
+    --border: #e5e9ec;
+    --success: #198754;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --info: #0dcaf0;
+    --radius: 14px;
   }
-  
-  /* ================= HEADER ================= */
-  .market-header{
-    background: linear-gradient(135deg,#157347,#28a745);
-    padding:22px 30px;
-    border-radius:18px;
-    color:#fff;
-    margin:20px;
-    box-shadow:0 20px 45px rgba(0,0,0,.25);
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+
+  /* ---------- GLOBAL ---------- */
+  body {
+    background: var(--bg);
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    color: var(--text);
+    font-weight: 400;
+    line-height: 1.6;
   }
-  
-  .market-header h5{
-    font-size:24px;
-    font-weight:800;
-    letter-spacing:.4px;
+
+  .app-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
-  
-  .market-header small{
-    opacity:.9;
+
+  /* ---------- NAVBAR ---------- */
+  .navbar {
+    border-radius: var(--radius);
+    margin: 16px;
+    box-shadow: 0 10px 28px rgba(0,0,0,.08);
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   }
-  
-  /* ================= FILTER BAR ================= */
-  .filters{
-    display:flex;
-    gap:15px;
-    margin:20px;
-    flex-wrap:wrap;
+
+  .navbar-brand {
+    font-weight: 800;
+    font-size: 1.25rem;
   }
-  
-  .filter-chip{
-    background:#fff;
-    padding:10px 22px;
-    border-radius:40px;
-    font-weight:700;
-    font-size:14px;
-    border:2px solid #e2f0e8;
-    cursor:pointer;
-    box-shadow:0 6px 15px rgba(0,0,0,.08);
-    transition:.25s ease;
+
+  /* ---------- MARKET FRAME ---------- */
+  .market-frame {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
-  
-  .filter-chip:hover{
-    background:#198754;
-    color:#fff;
-    transform:translateY(-2px);
+
+  .data-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 16px 80px 16px;
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 transparent;
   }
-  
-  /* ================= SECTION TITLES ================= */
-  .section-title{
-    font-size:18px;
-    font-weight:800;
-    margin-bottom:15px;
+
+  .data-scroll::-webkit-scrollbar {
+    width: 6px;
   }
-  
-  /* ================= FARMER CARDS ================= */
-  .market-card{
-    background:#fff;
-    border-radius:18px;
-    overflow:hidden;
-    box-shadow:0 18px 45px rgba(0,0,0,.12);
-    transition:.3s ease;
+
+  .data-scroll::-webkit-scrollbar-track {
+    background: transparent;
   }
-  
-  .market-card:hover{
-    transform:translateY(-5px);
+
+  .data-scroll::-webkit-scrollbar-thumb {
+    background-color: #c1c1c1;
+    border-radius: 20px;
   }
-  
-  .market-img-real{
-    width:100%;
-    height:180px;
-    object-fit:cover;
+
+  /* ---------- SECTION TITLES ---------- */
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
-  
-  .market-body{
-    padding:18px;
+
+  .section-title i {
+    color: var(--primary);
   }
-  
-  .price-row{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin:10px 0;
+
+  /* ---------- CARD STYLES ---------- */
+  .card-box {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 24px rgba(0,0,0,.06);
+    border: 1px solid var(--border);
+    padding: 1.25rem;
   }
-  
-  .price-big{
-    font-size:20px;
-    font-weight:900;
-    color:#198754;
+
+  .market-card {
+    background: white;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0,0,0,.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid var(--border);
   }
-  
-  .qty-chip{
-    background:#e9f7ef;
-    padding:6px 14px;
-    border-radius:20px;
-    font-weight:700;
+
+  .market-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0,0,0,.1);
   }
-  
-  .seller-box{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin-top:10px;
-    font-weight:700;
+
+  .market-img-real {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
   }
-  
-  /* ================= MILLER TABLE ================= */
-  .table-wrapper{
-    background:#fff;
-    padding:20px;
-    border-radius:20px;
-    box-shadow:0 20px 50px rgba(0,0,0,.15);
+
+  .market-body {
+    padding: 1rem;
   }
-  
-  .table thead th{
-    background:#e9f7ef;
-    font-size:13px;
-    text-transform:uppercase;
-    font-weight:800;
+
+  /* ---------- TABLE STYLES ---------- */
+  .table-responsive {
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
   }
-  
-  .table tbody tr{
-    transition:.25s ease;
+
+  .table {
+    margin-bottom: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
   }
-  
-  .table tbody tr:hover{
-    background:#f1fbf6;
+
+  .table thead th {
+    background-color: #f8f9fa;
+    border: none;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 1rem 0.75rem;
+    white-space: nowrap;
   }
-  
-  .table td{
-    vertical-align:middle;
-    font-size:14px;
+
+  .table tbody tr {
+    transition: background-color 0.2s ease;
   }
-  
-  .qty-badge{
-    background:#6c757d;
-    color:#fff;
-    padding:6px 12px;
-    border-radius:20px;
+
+  .table tbody tr:hover {
+    background-color: #f8fafb;
   }
-  
-  .price-text{
-    font-size:17px;
-    font-weight:900;
-    color:#198754;
+
+  .table tbody td {
+    border: none;
+    padding: 1rem 0.75rem;
+    vertical-align: middle;
+    font-weight: 500;
+    border-top: 1px solid var(--border);
   }
-  
-  .deduction{
-    color:#dc3545;
-    font-weight:900;
+
+  .table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0,0,0,.02);
   }
-  
-  .book-btn{
-    background:#198754;
-    border:none;
-    font-weight:800;
-    border-radius:12px;
+
+  /* ---------- BADGES ---------- */
+  .badge {
+    font-weight: 600;
+    padding: 0.4em 0.8em;
+    border-radius: 20px;
+    font-size: 0.75rem;
   }
-  
-  .book-btn:hover{
-    background:#146c43;
+
+  .badge.bg-success {
+    background-color: #d1e7dd !important;
+    color: #0f5132 !important;
   }
-  
-  /* ================= BOOKINGS ================= */
-  .alert-info{
-    border-left:6px solid #0dcaf0;
-    border-radius:14px;
-    box-shadow:0 6px 20px rgba(0,0,0,.12);
+
+  .badge.bg-secondary {
+    background-color: #e2e3e5 !important;
+    color: #383d41 !important;
   }
-  
-  /* ================= BOTTOM NAV ================= */
-  .bottom-nav{
-    position:fixed;
-    bottom:0;
-    left:0;
-    width:100%;
-    background:#fff;
-    display:flex;
-    justify-content:space-around;
-    padding:12px 0;
-    box-shadow:0 -10px 30px rgba(0,0,0,.2);
+
+  .badge.bg-danger {
+    background-color: #f8d7da !important;
+    color: #842029 !important;
   }
-  
-  .nav-item{
-    text-align:center;
-    font-weight:800;
-    color:#6c757d;
+
+  .badge.bg-info {
+    background-color: #cff4fc !important;
+    color: #055160 !important;
   }
-  
-  .nav-item.active{
-    color:#198754;
+
+  /* ---------- ORDER STATUS ---------- */
+  .order-status {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
   }
-  </style>
+
+  .status-approved { background: #e7f0ff; color: #0d6efd; }
+  .status-active { background: #fff3cd; color: #856404; }
+  .status-loaded { background: #e9f7ef; color: #157347; }
+  .status-partial { background: #fdecea; color: #842029; }
+  .status-paid { background: #d4edda; color: #155724; }
+
+  /* ---------- ORDER CARDS ---------- */
+  .order-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+    overflow: hidden;
+    box-shadow: 0 6px 18px rgba(0,0,0,.06);
+    transition: all 0.2s ease;
+  }
+
+  .order-card:hover {
+    box-shadow: 0 10px 28px rgba(0,0,0,.08);
+  }
+
+  .order-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+  }
+
+  .order-main {
+    flex: 1;
+  }
+
+  .order-id {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--primary);
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .order-crop {
+    font-weight: 700;
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+
+  .order-meta-row {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .order-meta-row span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .order-expand {
+    color: var(--muted);
+    transition: transform 0.3s ease;
+  }
+
+  .accordion-button:not(.collapsed) .order-expand {
+    transform: rotate(180deg);
+  }
+
+  /* ---------- ACCORDION BODY ---------- */
+  .accordion-body {
+    padding: 1.25rem;
+    background-color: #f8fafb;
+  }
+
+  .order-body-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .order-body-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .soft-card {
+    background: white;
+    border-radius: calc(var(--radius) - 4px);
+    padding: 1rem;
+    border: 1px solid var(--border);
+  }
+
+  .kv {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f1f3f5;
+  }
+
+  .kv:last-child {
+    border-bottom: none;
+  }
+
+  .kv span:first-child {
+    color: var(--muted);
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+
+  .kv span:last-child {
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  /* ---------- BUTTONS ---------- */
+  .btn {
+    border-radius: 10px;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    transition: all 0.2s ease;
+  }
+
+  .btn-primary {
+    background: var(--primary);
+    border: none;
+  }
+
+  .btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+  }
+
+  .btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  /* ---------- PROGRESS BAR ---------- */
+  .progress {
+    height: 8px;
+    border-radius: 10px;
+    background-color: #e9ecef;
+  }
+
+  .progress-bar {
+    border-radius: 10px;
+    transition: width 0.6s ease;
+  }
+
+  /* ---------- SEARCH & FILTERS ---------- */
+  .orders-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .search {
+    flex: 1;
+    min-width: 250px;
+  }
+
+  .search input {
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .pill {
+    background: #e9ecef;
+    color: var(--text);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  /* ---------- MODAL STYLES ---------- */
+  .modal-content {
+    border-radius: var(--radius);
+    border: none;
+    box-shadow: 0 20px 40px rgba(0,0,0,.15);
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 768px) {
+    .data-scroll {
+      padding: 0 12px 60px 12px;
+    }
+    
+    .navbar {
+      margin: 12px;
+    }
+    
+    .table-responsive {
+      font-size: 0.85rem;
+    }
+    
+    .order-card-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    
+    .order-meta-row {
+      flex-wrap: wrap;
+    }
+    
+    .orders-toolbar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .search {
+      min-width: 100%;
+    }
+  }
+
+  /* ---------- UTILITY ---------- */
+  .text-muted {
+    color: var(--muted) !important;
+  }
+
+  .fw-bold {
+    font-weight: 700 !important;
+  }
+
+  .fw-800 {
+    font-weight: 800 !important;
+  }
+</style>
 </head>
 
-<a href="/buyer/profile" class="btn btn-light btn-sm fw-bold">
-  <i class="fa fa-user"></i> My Profile
-</a>
-
 <body class="bg-light">
+<div class="app-shell">
+  
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+      <!-- LEFT: TITLE + LOCATION -->
+      <div class="d-flex flex-column">
+        <span class="navbar-brand mb-0">Market Dashboard</span>
+        <small class="text-light opacity-75">
+          <i class="fa fa-location-dot me-1"></i> Choose location
+        </small>
+      </div>
 
-<!-- ================= HEADER ================= -->
-<div class="market-header">
-  <div>
-    <h5 class="mb-0">Market</h5>
-    <small class="opacity-75">
-      <i class="fa fa-location-dot"></i> Choose location
-    </small>
-  </div>
-  <span class="badge bg-light text-success">Buyers</span>
-</div>
+      <!-- RIGHT: ROLE + PROFILE -->
+      <div class="d-flex align-items-center gap-3">
+        <span class="badge bg-light text-success px-3 py-2 fw-600">Trader</span>
 
-<!-- ================= FILTERS ================= -->
-<div class="filters">
-  <div class="filter-chip">Crop Type</div>
-  <div class="filter-chip">Location</div>
-  <div class="filter-chip">Price</div>
-  <div class="filter-chip">Quantity</div>
-</div>
+        <a href="/buyer/profile" class="btn btn-light btn-sm fw-600">
+          <i class="fa fa-user me-1"></i> My Profile
+        </a>
 
-<!-- ================= FARMER CROPS ================= -->
-<div class="container mt-3">
-  <h6 class="mb-3 fw-bold">Farmer Crops</h6>
-
-  <div class="row g-4">
-  {% for c in crops %}
-  <div class="col-md-6 col-lg-4">
-    <div class="market-card">
-
-      <img src="{{ url_for('static', filename='uploads/crops/' + c[7]) }}"
-           class="market-img-real">
-
-      <div class="market-body">
-        <h6 class="fw-bold">{{ c[2] }} for sale</h6>
-
-        <p class="text-muted mb-1">
-          <i class="fa fa-location-dot"></i> {{ c[6] }}
-        </p>
-
-        <div class="price-row">
-          <span class="price-big">₹{{ c[4] }} / Kg</span>
-          <span class="qty-chip">{{ c[5] }} Qty</span>
-        </div>
-
-        <div class="seller-box">
-          <i class="fa fa-user-circle"></i>
-          <div>
-            <strong>{{ c[8] }}</strong>
-            <span class="badge bg-success ms-1">Farmer</span>
-          </div>
-        </div>
+        <a href="/buyer/payments" class="btn btn-light btn-sm fw-600">
+          <i class="fa fa-money-check me-1"></i> Payments
+        </a>
       </div>
     </div>
-  </div>
-  {% endfor %}
-  </div>
-</div>
+  </nav>
 
-<!-- ================= MILLER STOCKS ================= -->
-<div class="container mt-5">
-  <h6 class="mb-3 fw-bold">Miller Stocks (Live)</h6>
-
-  <div class="table-responsive">
-    <table class="table table-bordered table-striped align-middle">
-      <thead class="table-success">
-        <tr>
-          <th>Miller</th>
-          <th>Crop</th>
-          <th>Qty (Qt)</th>
-          <th>Price</th>
-          <th>Condition</th>
-          <th>Bag</th>
-          <th>Deduction</th>
-          <th>Book</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        {% for m in miller_stocks %}
-        <tr>
-          <td>
-            <i class="fa fa-industry text-success"></i>
-            <strong>{{ m[9] }}</strong>
-          </td>
-          <td>{{ m[2] }}</td>
-
-          <td>
-            {% if m[3] > 0 %}
-              <span class="badge bg-secondary">{{ m[3] }} Qt</span>
-            {% else %}
-              <span class="badge bg-danger">Sold Out</span>
-            {% endif %}
-          </td>
-
-          <td class="fw-bold text-success">₹{{ m[4] }}</td>
-          <td><span class="badge bg-info">{{ m[5] }}</span></td>
-          <td>{{ m[6] }}</td>
-          <td>₹{{ m[7] }}</td>
-
-          <td>
-            {% if m[3] > 0 %}
-            <form method="POST" action="/book_miller_stock/{{ m[0] }}">
-              <input type="number"
-                     name="quantity"
-                     min="1"
-                     max="{{ m[3] }}"
-                     class="form-control form-control-sm mb-1"
-                     placeholder="Qty"
-                     required>
-              <button class="btn btn-success btn-sm w-100">Book</button>
-            </form>
-            {% else %}
-              <span class="text-muted">Unavailable</span>
-            {% endif %}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<!-- ================= ACTIVE ORDERS ================= -->
-<div class="container mt-5 mb-5">
-  <h5 class="fw-bold">Active Orders</h5>
-
-  <div class="alert alert-info">
-    <strong>Note:</strong> Invoice will be available only after
-    <b>full loading is completed</b>.
-  </div>
-
-  {% if my_bookings %}
-  <!-- Summary Stats - Loaded & Remaining Feature -->
-  <div class="row g-3 mb-4">
-    <div class="col-md-4">
-      <div class="card border-primary shadow-sm">
-        <div class="card-body text-center">
-          <h6 class="text-muted mb-2"><i class="fa fa-shopping-cart"></i> Total Booked</h6>
-          <h4 class="text-primary mb-0 fw-bold">{{ total_booked }} Qt</h4>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card border-success shadow-sm">
-        <div class="card-body text-center">
-          <h6 class="text-muted mb-2"><i class="fa fa-check-circle"></i> Total Loaded</h6>
-          <h4 class="text-success mb-0 fw-bold">{{ total_loaded }} Qt</h4>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card border-warning shadow-sm">
-        <div class="card-body text-center">
-          <h6 class="text-muted mb-2"><i class="fa fa-clock"></i> Total Remaining</h6>
-          <h4 class="text-warning mb-0 fw-bold">{{ total_remaining }} Qt</h4>
-        </div>
-      </div>
-    </div>
-  </div>
-  <table class="table table-bordered table-striped align-middle">
-    <tr class="table-warning">
-      <th>Order ID</th>
-      <th>Crop</th>
-      <th>Booked</th>
-      <th>Loaded</th>
-      <th>Remaining</th>
-      <th>Loading Status</th>
-      <th>Bill</th>
-      <th>Invoice</th>
-    </tr>
-
-    {% for b in my_bookings %}
-    <tr>
-      <td><strong class="text-primary">{{ b[9] if b[9] else 'N/A' }}</strong></td>
-      <td>{{ b[1] }}</td>
-
-      <td>
-        <span class="badge bg-primary">{{ b[2] }} Qt</span>
-      </td>
+  <!-- MAIN CONTENT -->
+  <div class="market-frame">
+    <div class="data-scroll">
       
-      <td>
-        {% if b[3] and b[3] > 0 %}
-          <span class="badge bg-success">{{ b[3] }} Qt</span>
-        {% else %}
-          <span class="badge bg-secondary">0 Qt</span>
-        {% endif %}
-      </td>
-      
-      <td>
-        {% if b[4] and b[4] > 0 %}
-          <span class="badge bg-warning">{{ b[4] }} Qt</span>
-        {% else %}
-          <span class="badge bg-success">0 Qt</span>
-        {% endif %}
-      </td>
-      
-      <td>
-        {% if b[5] == 'pending' %}
-          <span class="badge bg-secondary">Waiting for Truck</span>
-        {% elif b[5] == 'partial' %}
-          <span class="badge bg-info">🚚 Partial Loading</span>
-        {% elif b[5] == 'loaded' %}
-          <span class="badge bg-success">✅ Fully Loaded</span>
-        {% elif b[5] == 'rejected' %}
-          <span class="badge bg-danger">❌ Rejected</span>
-        {% endif %}
-      </td>
-      
-      <!-- BILL COLUMN -->
-      <td>
-        {% if b[8] == 'completed' and b[7] %}
-          {% if b[7].lower().endswith('.pdf') %}
-            <div class="text-center">
-              <i class="fa fa-file-pdf fa-3x text-danger d-block mb-1"></i>
-              <button type="button" 
-                      class="btn btn-sm btn-primary"
-                      data-bs-toggle="modal" 
-                      data-bs-target="#billModal{{ b[0] }}">
-                <i class="fa fa-eye"></i> View
-              </button>
-            </div>
-          {% else %}
-            <div class="text-center">
-              <img src="/static/uploads/bills/{{ b[7] }}" 
-                   alt="Bill" 
-                   class="img-thumbnail mb-1" 
-                   style="max-width: 80px; max-height: 80px; cursor: pointer; object-fit: cover;"
-                   data-bs-toggle="modal" 
-                   data-bs-target="#billModal{{ b[0] }}">
-              <button type="button" 
-                      class="btn btn-sm btn-primary d-block w-100"
-                      data-bs-toggle="modal" 
-                      data-bs-target="#billModal{{ b[0] }}">
-                <i class="fa fa-eye"></i> View
-              </button>
-            </div>
-          {% endif %}
-          
-          <!-- Bill View Modal -->
-          <div class="modal fade" id="billModal{{ b[0] }}" tabindex="-1" aria-labelledby="billModalLabel{{ b[0] }}" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="billModalLabel{{ b[0] }}">Bill Document - {{ b[1] }}</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center">
-                  {% if b[7].lower().endswith('.pdf') %}
-                    <iframe src="/static/uploads/bills/{{ b[7] }}" 
-                            style="width: 100%; height: 600px; border: none;">
-                      <p>Your browser does not support PDFs. 
-                        <a href="/static/uploads/bills/{{ b[7] }}" target="_blank">Download the PDF</a>
-                      </p>
-                    </iframe>
-                  {% else %}
-                    <img src="/static/uploads/bills/{{ b[7] }}" 
-                         alt="Bill" 
-                         class="img-fluid" 
-                         style="max-height: 70vh;">
-                  {% endif %}
-                </div>
-                <div class="modal-footer">
-                  <a href="/static/uploads/bills/{{ b[7] }}" 
-                     target="_blank" 
-                     class="btn btn-primary">
-                    <i class="fa fa-download"></i> Download
-                  </a>
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        {% elif b[8] == 'completed' %}
-          <span class="text-muted small">Bill not uploaded yet</span>
-        {% else %}
-          <span class="text-muted small">—</span>
-        {% endif %}
-      </td>
-
-      <!-- INVOICE -->
-      <td>
-        {% if b[8] == 'completed' %}
-          <a href="/invoice/{{ b[0] }}"
-             class="btn btn-sm btn-success">
-            <i class="fa fa-download"></i> Download Invoice
-          </a>
-        {% else %}
-          <span class="text-muted small">Available after full loading</span>
-        {% endif %}
-      </td>
-
-          <!-- Pending Booking - Can Cancel -->
-          <td>
-            {% set remaining_qty = b[4] or 0 %}
-            {% set loaded_qty = b[3] or 0 %}
-            {% set booked_qty = b[2] or 0 %}
-            {% set booking_status = b[10] if b[10] else 'pending' %}
-            {% set loading_status = b[8] if b[8] else 'pending' %}
-          
-            {% if booking_status == 'pending' %}
-              <a href="/cancel_booking/{{ b[0] }}"
-                 class="btn btn-sm btn-outline-danger w-100 mb-1"
-                 onclick="return confirm('Cancel this booking?')">
-                <i class="fa fa-times"></i> Cancel
-              </a>
-              <span class="badge bg-warning d-block">Awaiting Approval</span>
-          
-            {% elif booking_status == 'declined' %}
-              <span class="badge bg-danger d-block">
-                <i class="fa fa-times-circle"></i> Rejected
-              </span>
-          
-            {% elif booking_status == 'approved' and remaining_qty > 0 %}
-              <form method="POST"
-                    action="/buyer/update_loading/{{ b[0] }}"
-                    enctype="multipart/form-data">
-          
-                <input type="number"
-                       name="load_qty"
-                       min="1"
-                       max="{{ remaining_qty }}"
-                       class="form-control form-control-sm mb-1"
-                       placeholder="Qty to load"
-                       required>
-          
-                <input type="file"
-                       name="invoice"
-                       accept="image/*,.pdf"
-                       class="form-control form-control-sm mb-1"
-                       required>
-          
-                <button type="submit"
-                        class="btn btn-success btn-sm w-100">
-                  🚚 Upload & Update Loading
-                </button>
-              </form>
-          
-              {% set progress = ((loaded_qty / booked_qty) * 100) | round %}
-              <div class="progress mt-2" style="height:6px;">
-                <div class="progress-bar bg-success"
-                     style="width: {{ progress }}%">
-                </div>
-              </div>
-              <small class="text-muted">{{ progress }}% Loaded</small>
-          
-            {% elif loading_status == 'completed' %}
-              <span class="badge bg-success d-block">
-                <i class="fa fa-check-circle"></i> Completed
-              </span>
-          
-            {% else %}
-              <span class="badge bg-secondary">
-                <i class="fa fa-info-circle"></i> {{ booking_status|title }}
-              </span>
-            {% endif %}
-          </td>          
-    </tr>
-    {% endfor %}
-  </table>
-  {% else %}
-    <p class="text-muted">No active orders.</p>
-  {% endif %}
-</div>
-
-<!-- ================= COMPLETED ORDERS ================= -->
-<div class="container mt-5 mb-5">
-  <h5 class="fw-bold text-success">
-    <i class="fa fa-check-circle"></i> Completed Orders
-  </h5>
-
-  {% if completed_bookings %}
-  <div class="table-responsive">
-    <table class="table table-bordered table-striped align-middle">
-      <tr class="table-success">
-        <th>Order ID</th>
-        <th>Crop</th>
-        <th>Booked</th>
-        <th>Loaded</th>
-        <th>Completed Date</th>
-        <th>Bill</th>
-        <th>Invoice</th>
-      </tr>
-
-      {% for b in completed_bookings %}
-      <tr>
-        <td><strong class="text-primary">{{ b[9] if b[9] else 'N/A' }}</strong></td>
-        <td>{{ b[1] }}</td>
-
-        <td>
-          <span class="badge bg-primary">{{ b[2] }} Qt</span>
-        </td>
+      <!-- ================= FARMER CROPS ================= -->
+      <div class="container mt-4">
+        <h5 class="section-title">
+          <i class="fa fa-seedling"></i> Farmer Crops
+        </h5>
         
-        <td>
-          <span class="badge bg-success">{{ b[3] }} Qt</span>
-        </td>
-        
-        <td>
-          {% if b[6] %}
-            <small>{{ b[6][:10] }}</small>
-          {% else %}
-            <span class="text-muted small">—</span>
-          {% endif %}
-        </td>
-
-        <!-- BILL COLUMN -->
-        <td>
-          {% if b[7] %}
-            {% if b[7].lower().endswith('.pdf') %}
-              <div class="text-center">
-                <i class="fa fa-file-pdf fa-2x text-danger d-block mb-1"></i>
-                <button type="button" 
-                        class="btn btn-sm btn-primary"
-                        data-bs-toggle="modal" 
-                        data-bs-target="#billModal{{ b[0] }}">
-                  <i class="fa fa-eye"></i> View
-                </button>
-              </div>
-            {% else %}
-              <div class="text-center">
-                <img src="/static/uploads/bills/{{ b[7] }}" 
-                     alt="Bill" 
-                     class="img-thumbnail mb-1" 
-                     style="max-width: 60px; max-height: 60px; cursor: pointer; object-fit: cover;"
-                     data-bs-toggle="modal" 
-                     data-bs-target="#billModal{{ b[0] }}">
-                <button type="button" 
-                        class="btn btn-sm btn-primary d-block w-100"
-                        data-bs-toggle="modal" 
-                        data-bs-target="#billModal{{ b[0] }}">
-                  <i class="fa fa-eye"></i> View
-                </button>
-              </div>
-            {% endif %}
-            
-            <!-- Bill View Modal -->
-            <div class="modal fade" id="billModal{{ b[0] }}" tabindex="-1" aria-labelledby="billModalLabel{{ b[0] }}" aria-hidden="true">
-              <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="billModalLabel{{ b[0] }}">Bill Document - {{ b[1] }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="row g-4">
+          {% for c in crops %}
+          <div class="col-md-6 col-lg-4">
+            <div class="market-card">
+              <img src="{{ url_for('static', filename='uploads/crops/' + c[7]) }}" 
+                   class="market-img-real" alt="{{ c[2] }}">
+              
+              <div class="market-body">
+                <h6 class="fw-bold mb-2">{{ c[2] }} for sale</h6>
+                
+                <p class="text-muted mb-2 small">
+                  <i class="fa fa-location-dot me-1"></i> {{ c[6] }}
+                </p>
+                
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <span class="fw-bold text-success fs-5">₹{{ c[4] }} / Kg</span>
+                  <span class="badge bg-secondary">{{ c[5] }} Qt</span>
+                </div>
+                
+                <div class="seller-box d-flex align-items-center">
+                  <i class="fa fa-user-circle fa-lg me-2 text-muted"></i>
+                  <div>
+                    <strong class="d-block">{{ c[8] }}</strong>
+                    <span class="badge bg-success small">Farmer</span>
                   </div>
-                  <div class="modal-body text-center">
-                    {% if b[7].lower().endswith('.pdf') %}
-                      <iframe src="/static/uploads/bills/{{ b[7] }}" 
-                              style="width: 100%; height: 600px; border: none;">
-                        <p>Your browser does not support PDFs. 
-                          <a href="/static/uploads/bills/{{ b[7] }}" target="_blank">Download the PDF</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- ================= MILLER STOCKS ================= -->
+      <div class="container mt-5">
+        <h5 class="section-title">
+          <i class="fa fa-industry"></i> Miller Stocks (Live)
+        </h5>
+        
+        <div class="table-responsive">
+          <table class="table table-striped align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Miller</th>
+                <th>Crop</th>
+                <th>Qty (Qt)</th>
+                <th>Price</th>
+                <th>Condition</th>
+                <th>Bag</th>
+                <th>Deduction</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            
+            <tbody>
+              {% for m in miller_stocks %}
+              <tr>
+                <td class="fw-600">
+                  <i class="fa fa-industry text-success me-2"></i>
+                  {{ m[10] }}
+                </td>
+                <td>{{ m[2] }}</td>
+                
+                <td>
+                  {% if m[3] > 0 %}
+                    <span class="badge bg-secondary">{{ m[3] }} Qt</span>
+                  {% else %}
+                    <span class="badge bg-danger">Sold Out</span>
+                  {% endif %}
+                </td>
+                
+                <td class="fw-bold text-success">₹{{ m[4] }}</td>
+                <td><span class="badge bg-info">{{ m[5] }}</span></td>
+                <td>{{ m[6] }}</td>
+                <td>₹{{ m[7] }}</td>
+                
+                <td style="min-width: 160px;">
+                  {% if m[3] > 0 %}
+                  <form method="POST" action="/book_miller_stock/{{ m[0] }}">
+                    <input type="number" 
+                           name="quantity" 
+                           min="1" 
+                           max="{{ m[3] }}"
+                           class="form-control form-control-sm mb-2" 
+                           placeholder="Qty" 
+                           required>
+                    <button type="submit" class="btn btn-success btn-sm w-100">
+                      <i class="fa fa-shopping-cart me-1"></i> Book
+                    </button>
+                  </form>
+                  {% else %}
+                    <span class="text-muted small">Unavailable</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ================= ACTIVE ORDERS ================= -->
+      {% if my_bookings %}
+      <div class="container mt-5">
+        <h5 class="section-title">
+          <i class="fa fa-clock"></i> Active Orders
+          <span class="pill ms-3">{{ my_bookings|length }} Active</span>
+        </h5>
+        
+        <!-- Summary Stats -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-4">
+            <div class="card border-primary shadow-sm">
+              <div class="card-body text-center py-3">
+                <h6 class="text-muted mb-2 small">
+                  <i class="fa fa-shopping-cart me-1"></i> Total Booked
+                </h6>
+                <h4 class="text-primary mb-0 fw-bold">{{ total_booked }} Qt</h4>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card border-success shadow-sm">
+              <div class="card-body text-center py-3">
+                <h6 class="text-muted mb-2 small">
+                  <i class="fa fa-check-circle me-1"></i> Total Loaded
+                </h6>
+                <h4 class="text-success mb-0 fw-bold">{{ total_loaded }} Qt</h4>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card border-warning shadow-sm">
+              <div class="card-body text-center py-3">
+                <h6 class="text-muted mb-2 small">
+                  <i class="fa fa-clock me-1"></i> Total Remaining
+                </h6>
+                <h4 class="text-warning mb-0 fw-bold">{{ total_remaining }} Qt</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Search Bar -->
+        <div class="orders-toolbar">
+          <div class="search">
+            <input type="text" 
+                   id="orderSearch" 
+                   class="form-control" 
+                   placeholder="Search by Order ID or Crop...">
+          </div>
+        </div>
+        
+        <!-- Orders Accordion -->
+        <div class="accordion" id="ordersAccordion">
+          {% for b in my_bookings %}
+          {% set order_id = b[9] if b[9] else 'N/A' %}
+          {% set crop = b[1] %}
+          {% set booked_qty = b[2] or 0 %}
+          {% set loaded_qty = b[3] or 0 %}
+          {% set remaining_qty = b[4] or 0 %}
+          {% set loading_status = b[8] %}
+          {% set bill_status = b[7] %}
+          {% set booking_status = b[10] if b[10] else 'pending' %}
+          {% set payment_status = b[17] %}
+          {% set final_invoice = b[18] %}
+          {% set payment_at = b[19] %}
+          {% set progress = ((loaded_qty / booked_qty) * 100) | round if booked_qty > 0 else 0 %}
+          
+          <div class="order-card" data-search="{{ order_id|lower }} {{ crop|lower }}">
+            <div class="accordion-item border-0">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" 
+                        data-bs-toggle="collapse" 
+                        data-bs-target="#collapse{{ loop.index }}">
+                  <div class="order-card-header">
+                    <div class="order-main">
+                      <span class="order-id">{{ order_id }}</span>
+                      <span class="order-crop">{{ crop }}</span>
+                      
+                      <div class="order-meta-row">
+                        <span><i class="fa fa-box"></i> {{ booked_qty }} Qt Booked</span>
+                        <span><i class="fa fa-truck"></i> {{ loaded_qty }} Qt Loaded</span>
+                        <span><i class="fa fa-hourglass-half"></i> {{ remaining_qty }} Qt Remaining</span>
+                      </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center gap-3">
+                      {% if payment_status == 'paid' %}
+                        <span class="order-status status-paid">
+                          <i class="fa fa-circle-check"></i> Paid
+                        </span>
+                      {% elif loading_status == 'loaded' %}
+                        <span class="order-status status-active">
+                          <i class="fa fa-hourglass-half"></i> Payment Pending
+                        </span>
+                      {% else %}
+                        <span class="order-status status-active">
+                          <i class="fa fa-truck"></i> Active
+                        </span>
+                      {% endif %}
+                      
+                      <i class="fa fa-chevron-down order-expand"></i>
+                    </div>
+                  </div>
+                </button>
+              </h2>
+              
+              <div id="collapse{{ loop.index }}" class="accordion-collapse collapse" 
+                   data-bs-parent="#ordersAccordion">
+                <div class="accordion-body">
+                  <div class="order-body-grid">
+                    
+                    <!-- Left Column: Order Details -->
+                    <div class="soft-card">
+                      <div class="kv">
+                        <span>Booked Quantity</span>
+                        <span>{{ booked_qty }} Qt</span>
+                      </div>
+                      <div class="kv">
+                        <span>Loaded Quantity</span>
+                        <span>{{ loaded_qty }} Qt</span>
+                      </div>
+                      <div class="kv">
+                        <span>Remaining Quantity</span>
+                        <span>{{ remaining_qty }} Qt</span>
+                      </div>
+                      <div class="kv">
+                        <span>Status</span>
+                        <span>
+                          {% if loading_status == 'pending' %}
+                            Waiting for Truck
+                          {% elif loading_status == 'partial_closed' %}
+                            Closed by Buyer (Partial)
+                          {% elif loading_status == 'loaded' %}
+                            Fully Loaded
+                          {% elif loading_status == 'rejected' %}
+                            Rejected
+                          {% endif %}
+                        </span>
+                      </div>
+                      <div class="kv">
+                        <span>Progress</span>
+                        <div class="d-flex flex-column w-100">
+                          <div class="progress mb-1">
+                            <div class="progress-bar bg-success" 
+                                 style="width: {{ progress }}%"></div>
+                          </div>
+                          <small class="text-muted">{{ progress }}% Loaded</small>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Right Column: Actions -->
+                    <div class="soft-card">
+                      {% if booking_status == 'approved' and remaining_qty > 0 and loading_status != 'partial_closed' %}
+                      <!-- Close Remaining Button -->
+                      <button class="btn btn-warning btn-sm w-100 mb-3" 
+                              data-bs-toggle="modal" 
+                              data-bs-target="#closeRemainingModal{{ b[0] }}">
+                        <i class="fa fa-lock me-1"></i> Close Remaining Qty
+                      </button>
+                      
+                      <!-- Upload Loading Form -->
+                      <form method="POST" action="/buyer/update_loading/{{ b[0] }}" 
+                            enctype="multipart/form-data">
+                        <div class="mb-3">
+                          <label class="form-label small fw-bold">Quantity to Load</label>
+                          <input type="number" 
+                                 name="load_qty" 
+                                 min="1" 
+                                 max="{{ remaining_qty }}"
+                                 class="form-control" 
+                                 placeholder="Qty to load" 
+                                 required>
+                        </div>
+                        
+                        <div class="mb-3">
+                          <label class="form-label small fw-bold">Upload Invoice</label>
+                          <input type="file" 
+                                 name="invoice" 
+                                 accept="image/*,.pdf"
+                                 class="form-control" 
+                                 required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success btn-sm w-100">
+                          <i class="fa fa-truck me-1"></i> Upload & Update Loading
+                        </button>
+                      </form>
+                      {% endif %}
+                      
+                      <!-- Payment Info -->
+                      <div class="mt-4">
+                        {% if payment_status == 'paid' and final_invoice %}
+                          <a href="/static/uploads/bills/{{ final_invoice }}" 
+                             target="_blank"
+                             class="btn btn-primary btn-sm w-100 mb-2">
+                            <i class="fa fa-file-invoice me-1"></i> View Final Invoice
+                          </a>
+                          
+                          {% if payment_at %}
+                            <small class="text-muted d-block text-center">
+                              <i class="fa fa-clock me-1"></i>
+                              Paid on {{ payment_at[:16] }}
+                            </small>
+                          {% endif %}
+                        {% elif loading_status == 'loaded' %}
+                          <p class="text-muted small text-center">
+                            Payment pending from miller
+                          </p>
+                        {% endif %}
+                      </div>
+                    </div>
+                    
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- ================= PARTIALLY CLOSED ORDERS ================= -->
+      {% if partial_closed_bookings %}
+      <div class="container mt-5">
+        <h5 class="section-title text-warning">
+          <i class="fa fa-lock"></i> Partially Closed Orders
+          <span class="pill ms-3">{{ partial_closed_bookings|length }} Orders</span>
+        </h5>
+        
+        <div class="accordion" id="partialClosedAccordion">
+          {% for b in partial_closed_bookings %}
+          {% set order_id = b[9] %}
+          {% set crop = b[1] %}
+          {% set booked_qty = b[2] or 0 %}
+          {% set loaded_qty = b[3] or 0 %}
+          {% set remaining_qty = b[4] or 0 %}
+          
+          <div class="order-card">
+            <div class="accordion-item border-0">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" 
+                        data-bs-toggle="collapse" 
+                        data-bs-target="#pc{{ b[0] }}">
+                  <div class="order-card-header">
+                    <div class="order-main">
+                      <span class="order-id">{{ order_id }}</span>
+                      <span class="order-crop">{{ crop }}</span>
+                      
+                      <div class="order-meta-row">
+                        <span><i class="fa fa-box"></i> {{ booked_qty }} Qt Booked</span>
+                        <span><i class="fa fa-check"></i> {{ loaded_qty }} Qt Loaded</span>
+                      </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center gap-3">
+                      <span class="order-status status-partial">
+                        <i class="fa fa-lock"></i> Partially Closed
+                      </span>
+                      <i class="fa fa-chevron-down order-expand"></i>
+                    </div>
+                  </div>
+                </button>
+              </h2>
+              
+              <div id="pc{{ b[0] }}" class="accordion-collapse collapse" 
+                   data-bs-parent="#partialClosedAccordion">
+                <div class="accordion-body">
+                  <div class="order-body-grid">
+                    
+                    <!-- Order Details -->
+                    <div class="soft-card">
+                      <div class="kv">
+                        <span>Booked Quantity</span>
+                        <span>{{ booked_qty }} Qt</span>
+                      </div>
+                      <div class="kv">
+                        <span>Loaded Quantity</span>
+                        <span>{{ loaded_qty }} Qt</span>
+                      </div>
+                      <div class="kv">
+                        <span>Closed Quantity</span>
+                        <span>{{ remaining_qty }} Qt</span>
+                      </div>
+                      
+                      {% if b[11] %}
+                      <div class="kv">
+                        <span>Reason for Closure</span>
+                        <span class="text-muted">{{ b[11] }}</span>
+                      </div>
+                      {% endif %}
+                    </div>
+                    
+                    <!-- Mill Details -->
+                    <div class="soft-card">
+                      <div class="mb-3">
+                        <h6 class="fw-bold">
+                          <i class="fa fa-balance-scale me-1"></i> Final Mill Details
+                        </h6>
+                      </div>
+                      
+                      {% if b[14] == 'verified' %}
+                        <div class="kv">
+                          <span>Final Weight</span>
+                          <span>{{ b[11] or loaded_qty }} Qt</span>
+                        </div>
+                        <div class="kv">
+                          <span>Moisture</span>
+                          <span>{{ b[12] }}%</span>
+                        </div>
+                        
+                        {% if b[13] %}
+                        <div class="kv">
+                          <span>Remarks</span>
+                          <span>{{ b[13] }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if b[15] %}
+                        <small class="text-muted d-block mt-3">
+                          Verified on {{ b[15][:16] }}
+                        </small>
+                        {% endif %}
+                      {% else %}
+                        <p class="text-muted small">
+                          Waiting for miller quality verification.
                         </p>
-                      </iframe>
+                      {% endif %}
+                    </div>
+                    
+                  </div>
+                  
+                  <!-- Loading Invoices -->
+                  <div class="soft-card mt-3">
+                    <h6 class="fw-bold mb-3">
+                      <i class="fa fa-file-invoice me-1"></i> Loading Invoices
+                    </h6>
+                    
+                    {% set invs = invoices_map.get(b[0]) %}
+                    {% if invs %}
+                      <div class="list-group">
+                        {% for inv in invs %}
+                          <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                              <strong>{{ inv.qty }} Qt</strong>
+                              <br>
+                              <small class="text-muted">{{ inv.date[:16] if inv.date else '' }}</small>
+                            </div>
+                            <a href="/static/uploads/bills/{{ inv.file }}" 
+                               target="_blank"
+                               class="btn btn-sm btn-outline-primary">
+                              <i class="fa fa-eye me-1"></i> View
+                            </a>
+                          </div>
+                        {% endfor %}
+                      </div>
                     {% else %}
-                      <img src="/static/uploads/bills/{{ b[7] }}" 
-                           alt="Bill" 
-                           class="img-fluid" 
-                           style="max-height: 70vh;">
+                      <p class="text-muted small mb-0">No invoices uploaded.</p>
                     {% endif %}
                   </div>
-                  <div class="modal-footer">
-                    <a href="/static/uploads/bills/{{ b[7] }}" 
-                       target="_blank" 
-                       class="btn btn-primary">
-                      <i class="fa fa-download"></i> Download
-                    </a>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- ================= LOADED ORDERS ================= -->
+      {% if loaded_bookings %}
+      <div class="container mt-5 mb-5">
+        <h5 class="section-title text-success">
+          <i class="fa fa-check-circle"></i> Loaded Orders
+          <span class="pill ms-3">{{ loaded_bookings|length }} Loaded</span>
+        </h5>
+        
+        <!-- Search Bar -->
+        <div class="orders-toolbar">
+          <div class="search">
+            <input type="text" 
+                   id="loadedSearch" 
+                   class="form-control" 
+                   placeholder="Search loaded orders...">
+          </div>
+        </div>
+        
+        <div class="accordion" id="loadedAccordion">
+          {% for b in loaded_bookings %}
+          {% set order_id = b[9] if b[9] else 'N/A' %}
+          {% set crop = b[1] %}
+          {% set booked_qty = b[2] or 0 %}
+          {% set loaded_qty = b[3] or 0 %}
+          {% set loaded_date = b[6] %}
+          {% set bill_file = b[7] %}
+          {% set qc_weight = b[11] %}
+          {% set qc_moisture = b[12] %}
+          {% set qc_remarks = b[13] %}
+          {% set qc_status = b[14] %}
+          {% set qc_at = b[15] %}
+          
+          <div class="order-card" data-search="{{ order_id|lower }} {{ crop|lower }}">
+            <div class="accordion-item border-0">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" 
+                        data-bs-toggle="collapse" 
+                        data-bs-target="#loaded{{ loop.index }}">
+                  <div class="order-card-header">
+                    <div class="order-main">
+                      <span class="order-id">{{ order_id }}</span>
+                      <span class="order-crop">{{ crop }}</span>
+                      
+                      <div class="order-meta-row">
+                        <span><i class="fa fa-box"></i> {{ booked_qty }} Qt Booked</span>
+                        <span><i class="fa fa-check"></i> {{ loaded_qty }} Qt Loaded</span>
+                        {% if loaded_date %}
+                        <span><i class="fa fa-calendar"></i> {{ loaded_date[:10] }}</span>
+                        {% endif %}
+                      </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center gap-3">
+                      <span class="order-status status-loaded">
+                        <i class="fa fa-check-circle"></i> Loaded
+                      </span>
+                      <i class="fa fa-chevron-down order-expand"></i>
+                    </div>
+                  </div>
+                </button>
+              </h2>
+              
+              <div id="loaded{{ loop.index }}" class="accordion-collapse collapse" 
+                   data-bs-parent="#loadedAccordion">
+                <div class="accordion-body">
+                  <div class="order-body-grid">
+                    
+                    <!-- Order Details -->
+                    <div class="soft-card">
+                      <div class="kv">
+                        <span>Booked Quantity</span>
+                        <span>{{ booked_qty }} Qt</span>
+                      </div>
+                      <div class="kv">
+                        <span>Loaded Quantity</span>
+                        <span>{{ loaded_qty }} Qt</span>
+                      </div>
+                      <div class="kv">
+                        <span>Loaded Date</span>
+                        <span>{{ loaded_date[:16] if loaded_date else '—' }}</span>
+                      </div>
+                      <div class="kv">
+                        <span>QC Status</span>
+                        <span>
+                          {% if qc_status == 'verified' %}
+                            ✅ Verified by miller
+                          {% else %}
+                            ⏳ Pending at miller
+                          {% endif %}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <!-- Mill Details -->
+                    <div class="soft-card">
+                      <h6 class="fw-bold mb-3">
+                        <i class="fa fa-balance-scale me-1"></i> Final Mill Details
+                      </h6>
+                      
+                      {% if qc_status == 'verified' %}
+                        <div class="kv">
+                          <span>Net Weight</span>
+                          <span>{{ qc_weight or loaded_qty }} Qt</span>
+                        </div>
+                        <div class="kv">
+                          <span>Moisture</span>
+                          <span>{{ qc_moisture or '-' }}%</span>
+                        </div>
+                        
+                        {% if qc_remarks %}
+                        <div class="kv">
+                          <span>Remarks</span>
+                          <span>{{ qc_remarks }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if qc_at %}
+                        <small class="text-muted d-block mt-3">
+                          Verified on {{ qc_at[:16] }}
+                        </small>
+                        {% endif %}
+                      {% else %}
+                        <p class="text-muted small mb-0">
+                          Waiting for miller to verify weight & moisture.
+                        </p>
+                      {% endif %}
+                    </div>
+                  </div>
+                  
+                  <!-- Loading Invoices -->
+                  <div class="soft-card mt-3">
+                    <h6 class="fw-bold mb-3">
+                      <i class="fa fa-file-invoice me-1"></i> Loading Invoices
+                    </h6>
+                    
+                    {% set invs = invoices_map.get(b[0]) if invoices_map else None %}
+                    {% if invs %}
+                      <div class="list-group">
+                        {% for inv in invs %}
+                          <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                              <strong>{{ inv.qty }} Qt</strong>
+                              <br>
+                              <small class="text-muted">{{ inv.date[:16] if inv.date else '' }}</small>
+                            </div>
+                            <a href="/static/uploads/bills/{{ inv.file }}" 
+                               target="_blank"
+                               class="btn btn-sm btn-outline-primary">
+                              <i class="fa fa-eye me-1"></i> View Invoice
+                            </a>
+                          </div>
+                        {% endfor %}
+                      </div>
+                    {% else %}
+                      <p class="text-muted small mb-0">No loading invoices found.</p>
+                    {% endif %}
                   </div>
                 </div>
               </div>
             </div>
-          {% else %}
-            <span class="text-muted small">No bill uploaded</span>
-          {% endif %}
-        </td>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+      
+    </div> <!-- data-scroll -->
+  </div> <!-- market-frame -->
+</div> <!-- app-shell -->
 
-        <!-- INVOICE -->
-        <td>
-          <a href="/invoice/{{ b[0] }}"
-             class="btn btn-sm btn-success">
-            <i class="fa fa-download"></i> Download Invoice
-          </a>
-        </td>
-      </tr>
-      {% endfor %}
-    </table>
-  </div>
-  {% else %}
-    <p class="text-muted">No completed orders yet.</p>
-  {% endif %}
-</div>
-
-<!-- ================= BOTTOM NAV ================= -->
-<div class="bottom-nav">
-  <div class="nav-item active">
-    <i class="fa fa-store"></i><br>Market
-  </div>
-  <div class="nav-item">
-    <a href="/logout">
-      <i class="fa fa-right-from-bracket"></i><br>Logout
-    </a>
-  </div>
-</div>
-
+<!-- JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Search functionality for active orders
+  const orderSearchInput = document.getElementById('orderSearch');
+  if (orderSearchInput) {
+    orderSearchInput.addEventListener('input', function() {
+      const term = this.value.toLowerCase().trim();
+      document.querySelectorAll('#ordersAccordion .order-card').forEach(card => {
+        const searchText = card.dataset.search || '';
+        card.style.display = searchText.includes(term) ? '' : 'none';
+      });
+    });
+  }
 
+  // Search functionality for loaded orders
+  const loadedSearchInput = document.getElementById('loadedSearch');
+  if (loadedSearchInput) {
+    loadedSearchInput.addEventListener('input', function() {
+      const term = this.value.toLowerCase().trim();
+      document.querySelectorAll('#loadedAccordion .order-card').forEach(card => {
+        const searchText = card.dataset.search || '';
+        card.style.display = searchText.includes(term) ? '' : 'none';
+      });
+    });
+  }
 
+  // Initialize progress bars
+  document.querySelectorAll('.progress-bar').forEach(bar => {
+    const width = bar.style.width;
+    bar.style.width = '0';
+    setTimeout(() => {
+      bar.style.width = width;
+    }, 100);
+  });
+</script>
 </body>
 </html>

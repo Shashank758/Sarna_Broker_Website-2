@@ -1,15 +1,47 @@
 /* =========================
-   GLOBAL
+   GLOBAL THEME (MANDI / MILLER)
 ========================= */
-body {
-    font-family: 'Segoe UI', sans-serif;
-    background: #f5f7f6;
-  }
+:root{
+  --mandi-brown:#8b6f47;
+  --mandi-dark:#6b5638;
+  --mandi-light:#d4c4a8;
+  --mandi-bg:#f5f3f0;
+  --mandi-card:#ffffff;
+  --mandi-text:#3a3429;
+  --mandi-border:#d4c4a8;
+  --mandi-success:#6b8e23;
+  --radius:8px;
+}
+
+body{
+  font-family:'Segoe UI', sans-serif;
+  background:var(--mandi-bg);
+  color:var(--mandi-text);
+}
   
   a {
     text-decoration: none;
     color: inherit;
   }
+
+/* Shared “miller” look helpers */
+.section-card{
+  background:var(--mandi-card);
+  border-radius:var(--radius);
+  border:1px solid var(--mandi-border);
+}
+
+.btn-agri{
+  background:var(--mandi-brown);
+  color:#fff;
+  border:none;
+  font-weight:600;
+  border-radius:6px;
+}
+.btn-agri:hover{
+  background:var(--mandi-dark);
+  color:#fff;
+}
   
   /* =========================
      HEADER
