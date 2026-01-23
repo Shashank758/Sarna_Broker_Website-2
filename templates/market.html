@@ -395,7 +395,21 @@
     font-weight: 600;
     font-size: 0.9rem;
   }
+  /* FOOTER */
+.footer{
+  background:#0b1c2d;
+  color:#cfd6df;
+  padding:40px 0 20px;
+  margin-top:auto;
+}
 
+.footer-bottom{
+  border-top:1px solid rgba(255,255,255,.1);
+  margin-top:20px;
+  padding-top:15px;
+  font-size:.85rem;
+  text-align:center;
+}
   /* ---------- MODAL STYLES ---------- */
   .modal-content {
     border-radius: var(--radius);
@@ -454,77 +468,32 @@
 
 <body class="bg-light">
 <div class="app-shell">
-  
-  <!-- NAVBAR -->
-  <nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container-fluid">
-      <!-- LEFT: TITLE + LOCATION -->
-      <div class="d-flex flex-column">
-        <span class="navbar-brand mb-0">Market Dashboard</span>
-        <small class="text-light opacity-75">
-          <i class="fa fa-location-dot me-1"></i> Choose location
-        </small>
-      </div>
+<!-- NAVBAR -->
 
-      <!-- RIGHT: ROLE + PROFILE -->
-      <div class="d-flex align-items-center gap-3">
-        <span class="badge bg-light text-success px-3 py-2 fw-600">Trader</span>
-
-        <a href="/buyer/profile" class="btn btn-light btn-sm fw-600">
-          <i class="fa fa-user me-1"></i> My Profile
-        </a>
-
-        <a href="/buyer/payments" class="btn btn-light btn-sm fw-600">
-          <i class="fa fa-money-check me-1"></i> Payments
-        </a>
-      </div>
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+  <div class="container">
+    <a class="navbar-brand" href="/market">
+      <i class="fa fa-seedling"></i> Sarna Mandi
+    </a>
+    <div class="collapse navbar-collapse show">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link active" href="/buyer/active">Active</a></li>
+        <li class="nav-item"><a class="nav-link" href="/buyer/partial">Partial closed</a></li>
+        <li class="nav-item"><a class="nav-link" href="/buyer/loaded">Loaded</a></li>
+        <li class="nav-item"><a class="nav-link" href="/buyer/payments">Payments</a></li>
+        <li class="nav-item"><a class="nav-link" href="/buyer/profile">Profile</a></li>
+        <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+      </ul>
     </div>
-  </nav>
+  </div>
+</nav>
+
 
   <!-- MAIN CONTENT -->
   <div class="market-frame">
     <div class="data-scroll">
-      
-      <!-- ================= FARMER CROPS ================= -->
-      <div class="container mt-4">
-        <h5 class="section-title">
-          <i class="fa fa-seedling"></i> Farmer Crops
-        </h5>
-        
-        <div class="row g-4">
-          {% for c in crops %}
-          <div class="col-md-6 col-lg-4">
-            <div class="market-card">
-              <img src="{{ url_for('static', filename='uploads/crops/' + c[7]) }}" 
-                   class="market-img-real" alt="{{ c[2] }}">
-              
-              <div class="market-body">
-                <h6 class="fw-bold mb-2">{{ c[2] }} for sale</h6>
-                
-                <p class="text-muted mb-2 small">
-                  <i class="fa fa-location-dot me-1"></i> {{ c[6] }}
-                </p>
-                
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <span class="fw-bold text-success fs-5">₹{{ c[4] }} / Kg</span>
-                  <span class="badge bg-secondary">{{ c[5] }} Qt</span>
-                </div>
-                
-                <div class="seller-box d-flex align-items-center">
-                  <i class="fa fa-user-circle fa-lg me-2 text-muted"></i>
-                  <div>
-                    <strong class="d-block">{{ c[8] }}</strong>
-                    <span class="badge bg-success small">Farmer</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-
-      <!-- ================= MILLER STOCKS ================= -->
+       <!-- ================= MILLER STOCKS ================= -->
       <div class="container mt-5">
         <h5 class="section-title">
           <i class="fa fa-industry"></i> Miller Stocks (Live)
@@ -1132,6 +1101,67 @@
     </div> <!-- data-scroll -->
   </div> <!-- market-frame -->
 </div> <!-- app-shell -->
+<!-- FOOTER -->
+<!-- ================= ENHANCED FOOTER ================= -->
+<footer class="footer mt-5">
+  <div class="container">
+
+    <div class="row g-4">
+
+      <!-- BRAND -->
+      <div class="col-md-4">
+        <h5 class="fw-bold text-white mb-2">
+          <i class="fa fa-seedling"></i> Sarna Mandi
+        </h5>
+        <p class="small">
+          Digital mandi platform connecting
+          <b>farmers, traders and millers</b>
+          with transparency, trust and speed.
+        </p>
+      </div>
+
+      <!-- QUICK LINKS -->
+      <div class="col-md-4">
+        <h6 class="fw-bold text-white mb-2">Trader Pages</h6>
+        <ul class="list-unstyled small">
+          <li><a href="/market">Market</a></li>
+          <li><a href="/buyer/active">Active Orders</a></li>
+          <li><a href="/buyer/partial">Partially Closed</a></li>
+          <li><a href="/buyer/loaded">Loaded Orders</a></li>
+          <li><a href="/buyer/payments">Payments</a></li>
+        </ul>
+      </div>
+
+      <!-- CONTACT -->
+      <div class="col-md-4">
+        <h6 class="fw-bold text-white mb-2">Contact</h6>
+        <p class="small mb-1">
+          <i class="fa fa-phone me-2"></i> +91 XXXXX XXXXX
+        </p>
+        <p class="small mb-1">
+          <i class="fa fa-envelope me-2"></i> support@sarnamandi.com
+        </p>
+        <p class="small">
+          <i class="fa fa-location-dot me-2"></i> India
+        </p>
+
+        <!-- SOCIAL -->
+        <div class="mt-2">
+          <a href="#" class="footer-icon"><i class="fab fa-linkedin"></i></a>
+          <a href="#" class="footer-icon"><i class="fab fa-whatsapp"></i></a>
+          <a href="#" class="footer-icon"><i class="fab fa-twitter"></i></a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BOTTOM -->
+    <div class="footer-bottom text-center mt-4 pt-3">
+      © 2026 <b>Sarna Mandi</b> · All Rights Reserved
+    </div>
+
+  </div>
+</footer>
 
 <!-- JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

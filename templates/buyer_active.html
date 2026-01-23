@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Active Orders | Sarna Mandi</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+  body{
+    background:linear-gradient(135deg,#f4f6f9,#eef1f6);
+    font-family:Inter,Segoe UI,sans-serif;
+  
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+  
+
+/* NAVBAR */
+.navbar{background:linear-gradient(90deg,#0d6efd,#0b5ed7)}
+.navbar-brand{font-weight:900}
+.nav-link{font-weight:700;color:#fff!important}
+
+/* CARD */
+.order-card{
+  background:#fff;
+  border-radius:18px;
+  border:1px solid #e6e9ef;
+  box-shadow:0 10px 28px rgba(0,0,0,.08);
+  margin-bottom:18px;
+  overflow:hidden;
+}
+.order-header{
+  padding:16px 22px;
+  background:#f8f9fb;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  cursor:pointer;
+}
+.order-header:hover{background:#eef2f7}
+.order-id{font-weight:900;font-size:1.05rem}
+.order-sub{font-size:.85rem;color:#6c757d}
+
+.badge-active{
+  background:#0d6efd;
+  color:#fff;
+  padding:6px 14px;
+  border-radius:20px;
+  font-weight:800;
+  font-size:.75rem;
+}
+
+/* BODY */
+.order-body{padding:22px}
+.section-title{
+  font-weight:900;
+  font-size:.8rem;
+  text-transform:uppercase;
+  margin-bottom:10px;
+}
+.kv{
+  display:flex;
+  justify-content:space-between;
+  background:#f8f9fa;
+  padding:10px 14px;
+  border-radius:10px;
+  margin-bottom:10px;
+  font-weight:600;
+}
+.invoice-item{
+  display:flex;
+  justify-content:space-between;
+  background:#fff;
+  border:1px solid #eee;
+  padding:10px 14px;
+  border-radius:10px;
+  margin-bottom:8px;
+}
+
+/* UPDATE BAR */
+.update-bar{
+  background:#ffffff;
+  border:1px solid #e6e9ef;
+  padding:14px;
+  border-radius:14px;
+  margin-top:18px;
+}
+.update-btn{
+  background:linear-gradient(135deg,#198754,#157347);
+  border:none;
+  color:#fff;
+  font-weight:900;
+  border-radius:14px;
+  padding:12px 18px;
+}
+
+/* PAGINATION */
+.pagination .page-link{
+  border-radius:10px;
+  font-weight:700;
+}
+
+/* FOOTER */
+.footer{
+  background:#0b1c2d;
+  color:#cfd6df;
+  padding:40px 0 20px;
+  margin-top:auto;
+}
+
+.footer-bottom{
+  border-top:1px solid rgba(255,255,255,.1);
+  margin-top:20px;
+  padding-top:15px;
+  font-size:.85rem;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+  <div class="container">
+    <a class="navbar-brand" href="/market">
+      <i class="fa fa-seedling"></i> Sarna Mandi
+    </a>
+    <div class="collapse navbar-collapse show">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link active" href="/buyer/active">Active</a></li>
+        <li class="nav-item"><a class="nav-link" href="/buyer/partial">Partial closed</a></li>
+        <li class="nav-item"><a class="nav-link" href="/buyer/loaded">Loaded</a></li>
+        <li class="nav-item"><a class="nav-link" href="/buyer/payments">Payments</a></li>
+        <li class="nav-item"><a class="nav-link" href="/buyer/profile">Profile</a></li>
+        <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main class="flex-fill">
+<div class="container mt-4 mb-5">
+
+
+<h4 class="fw-bold mb-4">
+  <i class="fa fa-truck-moving text-primary"></i> Active Orders
+</h4>
+
+{% set per_page = 5 %}
+{% set page = request.args.get('page', 1, type=int) %}
+{% set total = orders|length %}
+{% set pages = (total // per_page) + (1 if total % per_page else 0) %}
+{% set start = (page - 1) * per_page %}
+{% set end = start + per_page %}
+
+{% if orders %}
+{% for o in orders[start:end] %}
+
+<div class="order-card">
+
+  <!-- HEADER -->
+  <div class="order-header"
+       data-bs-toggle="collapse"
+       data-bs-target="#order{{ o.id }}">
+    <div>
+      <div class="order-id">{{ o.order_id }}</div>
+      <div class="order-sub">{{ o.crop }} · {{ o.booked }} Qt</div>
+      <div class="order-sub">Miller: {{ o.miller_name }}</div>
+    </div>
+    <span class="badge-active">ACTIVE</span>
+  </div>
+
+  <!-- BODY -->
+  <div id="order{{ o.id }}" class="collapse">
+    <div class="order-body">
+
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="section-title">Order Summary</div>
+          <div class="kv"><span>Booked</span><span>{{ o.booked }} Qt</span></div>
+          <div class="kv"><span>Loaded</span><span>{{ o.loaded }} Qt</span></div>
+          <div class="kv"><span>Date</span><span>{{ o.loaded_at or '-' }}</span></div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="section-title">Mill QC</div>
+          {% if o.qc_status == 'verified' %}
+            <div class="kv"><span>Net</span><span>{{ o.qc_weight }} Qt</span></div>
+            <div class="kv"><span>Moisture</span><span>{{ o.qc_moisture }}%</span></div>
+            <small class="text-muted">Verified on {{ o.qc_at }}</small>
+          {% else %}
+            <span class="text-muted">Waiting for QC verification</span>
+          {% endif %}
+        </div>
+
+        <div class="col-12">
+          <div class="section-title">Loading Invoices</div>
+          {% if o.invoices %}
+            {% for inv in o.invoices %}
+            <div class="invoice-item">
+              <span>{{ inv.qty }} Qt</span>
+              <a href="/static/uploads/bills/{{ inv.file }}" target="_blank">View</a>
+            </div>
+            {% endfor %}
+          {% else %}
+            <span class="text-muted">No invoices uploaded</span>
+          {% endif %}
+        </div>
+
+        <!-- 🔥 UPDATE LOADING BAR (ADDED) -->
+        {% if o.loaded < o.booked %}
+        <div class="col-12">
+          <form method="POST"
+                action="/buyer/update_loading/{{ o.id }}"
+                enctype="multipart/form-data"
+                class="update-bar row g-2 align-items-center">
+
+            <div class="col-md-3">
+              <input type="number"
+                     name="load_qty"
+                     class="form-control"
+                     min="1"
+                     max="{{ o.booked - o.loaded }}"
+                     placeholder="Qty to load"
+                     required>
+            </div>
+
+            <div class="col-md-6">
+              <input type="file"
+                     name="invoice"
+                     class="form-control"
+                     required>
+            </div>
+
+            <div class="col-md-3 d-grid">
+              <button class="update-btn">
+                <i class="fa fa-truck"></i> Update
+              </button>
+            </div>
+
+          </form>
+        </div>
+        {% endif %}
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endfor %}
+{% else %}
+<p class="text-muted">No active orders</p>
+{% endif %}
+
+<!-- PAGINATION -->
+{% if pages > 1 %}
+<nav class="mt-4">
+  <ul class="pagination justify-content-center">
+    {% for p in range(1, pages+1) %}
+    <li class="page-item {% if p==page %}active{% endif %}">
+      <a class="page-link" href="?page={{ p }}">{{ p }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+</nav>
+{% endif %}
+
+</div>
+</main>
+<!-- FOOTER -->
+<!-- ================= ENHANCED FOOTER ================= -->
+<footer class="footer mt-5">
+  <div class="container">
+
+    <div class="row g-4">
+
+      <!-- BRAND -->
+      <div class="col-md-4">
+        <h5 class="fw-bold text-white mb-2">
+          <i class="fa fa-seedling"></i> Sarna Mandi
+        </h5>
+        <p class="small">
+          Digital mandi platform connecting
+          <b>farmers, traders and millers</b>
+          with transparency, trust and speed.
+        </p>
+      </div>
+
+      <!-- QUICK LINKS -->
+      <div class="col-md-4">
+        <h6 class="fw-bold text-white mb-2">Trader Pages</h6>
+        <ul class="list-unstyled small">
+          <li><a href="/market">Market</a></li>
+          <li><a href="/buyer/active">Active Orders</a></li>
+          <li><a href="/buyer/partial">Partially Closed</a></li>
+          <li><a href="/buyer/loaded">Loaded Orders</a></li>
+          <li><a href="/buyer/payments">Payments</a></li>
+        </ul>
+      </div>
+
+      <!-- CONTACT -->
+      <div class="col-md-4">
+        <h6 class="fw-bold text-white mb-2">Contact</h6>
+        <p class="small mb-1">
+          <i class="fa fa-phone me-2"></i> +91 XXXXX XXXXX
+        </p>
+        <p class="small mb-1">
+          <i class="fa fa-envelope me-2"></i> support@sarnamandi.com
+        </p>
+        <p class="small">
+          <i class="fa fa-location-dot me-2"></i> India
+        </p>
+
+        <!-- SOCIAL -->
+        <div class="mt-2">
+          <a href="#" class="footer-icon"><i class="fab fa-linkedin"></i></a>
+          <a href="#" class="footer-icon"><i class="fab fa-whatsapp"></i></a>
+          <a href="#" class="footer-icon"><i class="fab fa-twitter"></i></a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BOTTOM -->
+    <div class="footer-bottom text-center mt-4 pt-3">
+      © 2026 <b>Sarna Mandi</b> · All Rights Reserved
+    </div>
+
+  </div>
+</footer>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -592,6 +592,7 @@ def login():
 
     return render_template("login.html")
 
+
 @app.route("/register", methods=["GET","POST"])
 def register():
     if request.method == "POST":
@@ -1345,6 +1346,124 @@ ORDER BY mb.created_at DESC
         total_remaining=total_remaining,
         cancelled_bookings=cancelled_bookings
     )
+# ================= BUYER ORDER PAGES =================
+
+def get_buyer_orders(filter_type):
+    con = get_db()
+    cur = con.cursor()
+
+    where = ""
+    if filter_type == "active":
+        where = "AND mb.loading_status IN ('pending','partial')"
+    elif filter_type == "partial":
+        where = "AND mb.loading_status='partial_closed'"
+    elif filter_type == "loaded":
+        where = "AND mb.loading_status='loaded'"
+
+    cur.execute(f"""
+        SELECT
+            mb.id,
+            mb.order_id,
+            ms.crop,
+            mb.quantity,
+            IFNULL(mb.loaded_qty,0),
+            mb.loaded_at,
+            mb.loading_status,
+
+            mb.qc_weight,
+            mb.qc_moisture,
+            mb.qc_remarks,
+            mb.qc_status,
+            mb.qc_at,
+
+            IFNULL(p.status,'na') AS payment_status,
+            p.invoice_file,
+            p.paid_at,
+
+            u.name AS miller_name,
+            mb.close_reason
+
+        FROM miller_bookings mb
+JOIN miller_stock ms ON mb.stock_id = ms.id
+JOIN users u ON ms.miller_id = u.id
+LEFT JOIN payments p ON p.booking_id = mb.id
+
+        WHERE mb.buyer_id=?
+        {where}
+        ORDER BY mb.created_at DESC
+    """, (session["user_id"],))
+
+    rows = cur.fetchall()
+
+    cur.execute("""
+        SELECT booking_id, loaded_qty, invoice_file, created_at
+        FROM loading_invoices
+    """)
+    invs = cur.fetchall()
+
+    invoices_map = {}
+    for i in invs:
+        invoices_map.setdefault(i[0], []).append({
+            "qty": i[1],
+            "file": i[2],
+            "date": i[3]
+        })
+
+    orders = []
+    for r in rows:
+        orders.append({
+            "id": r[0],
+            "order_id": r[1],
+            "crop": r[2],
+            "booked": r[3],
+            "loaded": r[4],
+            "loaded_at": r[5],
+            "loading_status": r[6],
+
+            "qc_weight": r[7],
+            "qc_moisture": r[8],
+            "qc_remarks": r[9],
+            "qc_status": r[10],
+            "qc_at": r[11],
+
+            "payment_status": r[12],
+            "final_invoice": r[13],
+            "payment_at": r[14],
+
+            "miller_name": r[15],
+            "close_reason": r[16],
+
+            "invoices": invoices_map.get(r[0], [])
+        })
+
+    con.close()
+    return orders
+
+
+@app.route("/buyer/active")
+def buyer_active():
+    if session.get("role") != "buyer":
+        return redirect("/")
+    orders = get_buyer_orders("active")
+    return render_template("buyer_active.html", page_title="Active Orders", orders=orders)
+
+
+@app.route("/buyer/partial")
+def buyer_partial():
+    if session.get("role") != "buyer":
+        return redirect("/")
+    orders = get_buyer_orders("partial")
+    return render_template("buyer_partial.html", page_title="Partially Closed Orders", orders=orders)
+
+
+@app.route("/buyer/loaded")
+def buyer_loaded():
+    if session.get("role") != "buyer":
+        return redirect("/")
+    orders = get_buyer_orders("loaded")
+    return render_template("buyer_loaded.html", page_title="Loaded Orders", orders=orders)
+
+   
 @app.route("/buyer/payments")
 def buyer_payments():
     if session.get("role") != "buyer":
