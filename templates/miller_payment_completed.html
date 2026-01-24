@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Payment Completed | Miller</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+<style>
+body{
+  background:#f4f7f6;
+  font-family:Inter,Segoe UI,sans-serif;
+}
+
+/* NAVBAR */
+.navbar{
+  background:linear-gradient(90deg,#1e6f5c,#145a48);
+}
+.navbar-brand{font-weight:900}
+
+/* SECTION */
+.section-card{
+  background:#fff;
+  border-radius:18px;
+  box-shadow:0 10px 28px rgba(0,0,0,.08);
+  border:1px solid #e5e9ec;
+  padding:20px;
+}
+
+/* SCROLL */
+.qc-scroll-container{
+  max-height:70vh;
+  overflow-y:auto;
+}
+
+/* FOOTER */
+.footer{
+  background:#0b1c2d;
+  color:#cfd6df;
+  padding:20px;
+  margin-top:40px;
+  text-align:center;
+  font-size:.85rem;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container">
+    <a class="navbar-brand" href="/miller">
+      <i class="fa fa-industry"></i> Miller Dashboard
+    </a>
+    <a href="/miller" class="btn btn-sm btn-light">
+      <i class="fa fa-arrow-left"></i> Back
+    </a>
+  </div>
+</nav>
+
+<div class="container my-4">
+
+<!-- ================= PAYMENT COMPLETED ================= -->
+{% if payment_completed %}
+<div class="section-card">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h6 class="fw-bold mb-0">
+      <i class="fa fa-check-circle text-success"></i>
+      Payment Completed
+    </h6>
+    <span class="badge bg-success">
+      {{ payment_completed|length }} Orders
+    </span>
+  </div>
+
+  <div class="qc-scroll-container">
+    <div class="row g-3">
+
+      {% for b in payment_completed %}
+      {% set booking_id = b[0] %}
+      {% set booked = b[3] %}
+      {% set loaded = b[7] %}
+      {% set order_id = b[10] %}
+      {% set buyer_name = b[1] %}
+      {% set crop_name = b[2] %}
+      {% set final_invoice = b[17] %}
+      {% set payment_at = b[18] %}
+
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <h6 class="mb-1 text-primary fw-bold">{{ order_id }}</h6>
+                <p class="mb-1 text-muted small">
+                  {{ buyer_name }} • {{ crop_name|capitalize }}
+                </p>
+                <div class="d-flex gap-2 mt-2">
+                  <span class="badge bg-primary">{{ booked }} Qt Booked</span>
+                  <span class="badge bg-success">{{ loaded }} Qt Loaded</span>
+                </div>
+              </div>
+              <span class="badge bg-success">✅ Payment Completed</span>
+            </div>
+
+            <div class="border-top pt-3">
+              {% if final_invoice %}
+                <a href="/static/uploads/bills/{{ final_invoice }}"
+                   target="_blank"
+                   class="btn btn-sm btn-outline-primary w-100 mb-2">
+                  <i class="fa fa-eye"></i> View Final Invoice
+                </a>
+
+                <button class="btn btn-sm btn-warning w-100 mb-2"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editFinalInvoicePaid{{ booking_id }}">
+                  <i class="fa fa-edit"></i> Edit / Replace Invoice
+                </button>
+
+                <!-- EDIT MODAL -->
+                <div class="modal fade" id="editFinalInvoicePaid{{ booking_id }}" tabindex="-1">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">Edit Final Invoice</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                      </div>
+                      <form method="POST"
+                            action="/miller/edit_final_invoice/{{ booking_id }}"
+                            enctype="multipart/form-data">
+                        <div class="modal-body">
+                          <input type="file"
+                                 name="final_invoice"
+                                 class="form-control"
+                                 accept=".pdf,image/*"
+                                 required>
+                        </div>
+                        <div class="modal-footer">
+                          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                          <button class="btn btn-warning">
+                            <i class="fa fa-upload"></i> Replace
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+
+              {% if payment_at %}
+                <small class="text-muted d-block text-center">
+                  Paid on {{ payment_at[:16] }}
+                </small>
+              {% endif %}
+            </div>
+
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+
+    </div>
+  </div>
+</div>
+{% else %}
+<p class="text-muted text-center">No completed payments yet.</p>
+{% endif %}
+
+</div>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+  © 2026 <b>Sarna Mandi</b> · Payment Completed
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

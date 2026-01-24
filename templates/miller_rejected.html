@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Rejected Orders | Miller</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+<style>
+body{
+  background:#f4f7f6;
+  font-family:Inter,Segoe UI,sans-serif;
+}
+
+/* NAVBAR */
+.navbar{
+  background:linear-gradient(90deg,#1e6f5c,#145a48);
+}
+.navbar-brand{font-weight:900}
+
+/* SECTION */
+.section-card{
+  background:#fff;
+  border-radius:16px;
+  box-shadow:0 10px 25px rgba(0,0,0,.08);
+  padding:20px;
+}
+
+/* TABLE */
+.table th{
+  background:#f8f9fa;
+}
+
+/* FOOTER */
+.footer{
+  background:#0b1c2d;
+  color:#cfd6df;
+  padding:20px;
+  margin-top:40px;
+  text-align:center;
+  font-size:.85rem;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container">
+    <a class="navbar-brand" href="/miller">
+      <i class="fa fa-industry"></i> Miller Dashboard
+    </a>
+    <a href="/miller" class="btn btn-sm btn-light">
+      <i class="fa fa-arrow-left"></i> Back
+    </a>
+  </div>
+</nav>
+
+<div class="container my-4">
+
+<!-- ================= REJECTED ORDERS ================= -->
+<div class="section-card" id="rejected-orders">
+  <h6 class="fw-bold mb-3">
+    <i class="fa fa-times-circle text-danger"></i>
+    Rejected Orders
+  </h6>
+
+  {% if rejected %}
+  <div class="table-responsive">
+    <table class="table table-bordered align-middle">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Buyer</th>
+          <th>Crop</th>
+          <th>Qty</th>
+          <th>Reason</th>
+        </tr>
+      </thead>
+
+      <tbody>
+      {% for b in rejected %}
+      <tr class="booking-row"
+          data-status="declined"
+          data-buyer="{{ b[1]|lower }}"
+          data-crop="{{ b[2]|lower }}">
+
+        <td>
+          <strong class="text-primary">
+            {{ b[10] if b[10] else 'N/A' }}
+          </strong>
+        </td>
+        <td>{{ b[1] }}</td>
+        <td class="text-capitalize">{{ b[2] }}</td>
+        <td>
+          <span class="badge bg-danger">{{ b[3] }} Qt</span>
+        </td>
+        <td>
+          <span class="text-muted">{{ b[5] or '—' }}</span>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p class="text-muted mb-0">No rejected orders.</p>
+  {% endif %}
+</div>
+
+</div>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+  © 2026 <b>Sarna Mandi</b> · Rejected Orders
+</footer>
+
+</body>
+</html>

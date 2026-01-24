@@ -26,6 +26,9 @@
     font-family:"Segoe UI", "Roboto", sans-serif;
     color:var(--mandi-text);
     line-height:1.6;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
   }
   
   /* ---------- HEADER ---------- */
@@ -265,29 +268,149 @@
     flex:1;
     min-width:200px;
   }
+
+  /* ---------- NAVBAR ---------- */
+  .navbar{
+    background:linear-gradient(90deg,#8b6f47,#6b5638);
+    border-radius:0;
+  }
+  .navbar-brand{
+    font-weight:900;
+    color:#fff !important;
+  }
+  .nav-link{
+    font-weight:700;
+    color:#fff !important;
+    transition:all .2s;
+  }
+  .nav-link:hover{
+    background:rgba(255,255,255,.1);
+    border-radius:6px;
+  }
+  .nav-link.active{
+    background:rgba(255,255,255,.2);
+    border-radius:6px;
+  }
+
+  /* ---------- FOOTER ---------- */
+  .footer{
+    background:#0b1c2d;
+    color:#cfd6df;
+    padding:40px 0 20px;
+    margin-top:auto;
+  }
+  .footer h6{
+    color:#fff;
+    font-weight:800;
+  }
+  .footer a{
+    color:#cfd6df;
+    text-decoration:none;
+  }
+  .footer a:hover{
+    color:#fff;
+  }
+  .footer-bottom{
+    border-top:1px solid rgba(255,255,255,.1);
+    margin-top:20px;
+    padding-top:15px;
+    font-size:.85rem;
+    text-align:center;
+  }
+
+  /* ---------- SCROLL TO SECTION ---------- */
+  html{
+    scroll-behavior:smooth;
+  }
   </style>
   
 </head>
 
 <body class="bg-light">
+<div style="display:flex; flex-direction:column; min-height:100vh;">
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+  <div class="container">
+    <a class="navbar-brand" href="/miller">
+      <i class="fa fa-industry"></i> Miller Dashboard
+    </a>
+
+    <button class="navbar-toggler" type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#millerNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="millerNav">
+      <ul class="navbar-nav ms-auto">
+
+        {% if session['is_staff'] %}
+        <li class="nav-item">
+          <span class="nav-link"
+                style="background:#d4a574;
+                       color:#3a3429 !important;
+                       border-radius:6px;
+                       margin-right:10px;">
+            <i class="fa fa-user-shield me-1"></i> STAFF MODE
+          </span>
+        </li>
+        {% endif %}
+
+        <!-- 🔁 REDIRECTING LINKS -->
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/miller/approved' %}active{% endif %}"
+             href="/miller/approved">
+            <i class="fa fa-clock me-1"></i> Approved Orders
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/miller/qc' %}active{% endif %}"
+             href="/miller/qc">
+            <i class="fa fa-clipboard-check me-1"></i> Quality Check
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/miller/final-hisab' %}active{% endif %}"
+             href="/miller/final-hisab">
+            <i class="fa fa-file-invoice me-1"></i> Final Hisab
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/miller/payment-completed' %}active{% endif %}"
+             href="/miller/payment-completed">
+            <i class="fa fa-check-circle me-1"></i> Payment Completed
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/miller/rejected' %}active{% endif %}"
+             href="/miller/rejected">
+            <i class="fa fa-times-circle me-1"></i> Rejected
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/miller/profile' %}active{% endif %}"
+             href="/miller/profile">
+            <i class="fa fa-user me-1"></i> Profile
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+<main class="flex-fill">
 <div class="container mb-5" style="max-width:1200px;">
 
-<!-- ================= HEADER ================= -->
-<div class="mandi-header position-relative">
+<!-- ================= DASHBOARD HEADER ================= -->
+<div class="mandi-header position-relative mt-4">
   <div class="d-flex justify-content-between align-items-center">
     <div>
       <h4><i class="fa fa-industry me-2"></i> Miller Trading Dashboard</h4>
       <small><i class="fa fa-chart-line me-1"></i> Manage stock, approve orders & view trade status</small>
-    </div>
-    <div class="d-flex align-items-center gap-2">
-      {% if session['is_staff'] %}
-      <span class="badge" style="background:#d4a574; color:#3a3429; font-size:11px; padding:6px 12px;">
-        <i class="fa fa-user-shield me-1"></i> STAFF MODE
-      </span>
-      {% endif %}
-      <a href="/miller/profile" class="profile-btn">
-        <i class="fa fa-user me-1"></i> Profile
-      </a>
     </div>
   </div>
 </div>
@@ -296,7 +419,7 @@
 {% set total_stocks = stocks|length %}
 {% set total_pending = pending|length %}
 {% set total_approved = approved|length %}
-{% set total_completed = completed_loading|length if completed_loading else 0 %}
+{% set total_completed = completed_loading_qc|length if completed_loading_qc else 0 %}
 
 <div class="row g-3 mt-3 mb-4">
   <div class="col-md-3">
@@ -427,31 +550,6 @@
     </div>
   </form>
 </div>
-
-
-{% if not session.is_staff %}
-<div class="section-card">
-  <h6 class="section-title">
-    <i class="fa fa-users" style="color:#8b6f47;"></i> Staff Management
-  </h6>
-
-  <form method="POST" action="/miller/create_staff" class="row g-2">
-    <div class="col-md-4">
-      <input name="name" class="form-control" placeholder="Staff Name" required>
-    </div>
-    <div class="col-md-4">
-      <input name="email" class="form-control" placeholder="Staff Email" required>
-    </div>
-    <div class="col-md-4">
-      <input name="password" class="form-control" placeholder="Password" required>
-    </div>
-    <div class="col-12">
-      <button class="btn btn-primary w-100">Create Staff</button>
-    </div>
-  </form>
-</div>
-{% endif %}
-
 <!-- ================= LIVE STOCK ================= -->
 <div class="section-card">
   <h6 class="section-title">
@@ -589,18 +687,26 @@
 </div>
 <!-- APPROVED (Still Loading) -->
 {% set approved_loading = [] %}
-{% set completed_loading = [] %}
+{% set completed_loading_qc = [] %}
+{% set final_invoice_uploaded = [] %}
+{% set payment_completed = [] %}
 {% for b in approved %}
   {% set booked = b[3] %}
   {% set loaded = b[7] %}
+  {% set payment_status = b[16] %}
+  {% set final_invoice = b[17] %}
   {% if loaded < booked and b[8] != 'partial_closed' %}
     {% set _ = approved_loading.append(b) %}
+  {% elif payment_status == 'paid' %}
+    {% set _ = payment_completed.append(b) %}
+  {% elif final_invoice and payment_status != 'paid' %}
+    {% set _ = final_invoice_uploaded.append(b) %}
   {% else %}
-    {% set _ = completed_loading.append(b) %}
+    {% set _ = completed_loading_qc.append(b) %}
   {% endif %}
 {% endfor %}
 
-<div class="section-card">
+<div class="section-card" id="approved-loading">
   <h6 class="section-title">
     <i class="fa fa-check-circle" style="color:#6b8e23;"></i> Approved Orders (Still Loading)
   </h6>
@@ -687,15 +793,15 @@
 </div>
 
 <!-- COMPLETED LOADING (QC Section) -->
-<div class="section-card">
+<div class="section-card" id="quality-check">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h6 class="section-title mb-0">
       <i class="fa fa-truck" style="color:#8b7355;"></i> Completed Loading - Quality Check
     </h6>
-    <span class="badge bg-info" id="qcCount">{{ completed_loading|length }} Orders</span>
+    <span class="badge bg-info" id="qcCount">{{ completed_loading_qc|length }} Orders</span>
   </div>
 
-  {% if completed_loading %}
+  {% if completed_loading_qc %}
   <!-- Filter & Search Bar -->
   <div class="qc-filter-bar">
     <button class="qc-filter-btn active" data-filter="all" onclick="filterQC('all')">
@@ -719,7 +825,7 @@
   <!-- Scrollable Cards Container -->
   <div class="qc-scroll-container">
     <div class="row g-3" id="qcCardsContainer">
-      {% for b in completed_loading %}
+      {% for b in completed_loading_qc %}
       {% set booking_id = b[0] %}
       {% set booked = b[3] %}
       {% set loaded = b[7] %}
@@ -736,7 +842,6 @@
       {% set payment_at = b[18] %}
 
       <div class="col-md-6 qc-card-item" 
-           data-qc-status="{{ qc_status or 'pending' }}"
            data-search="{{ (order_id|string + ' ' + buyer_name|lower + ' ' + crop_name|lower) }}">
         <div class="card border-0 shadow-sm h-100 completed-loading-card">
         <div class="card-body">
@@ -749,134 +854,137 @@
                 <span class="badge bg-success">{{ loaded }} Qt Loaded</span>
               </div>
             </div>
-            {% if qc_status == 'verified' %}
-              <span class="badge bg-success">✅ Verified</span>
-            {% else %}
-              <span class="badge bg-warning">⏳ Pending QC</span>
-            {% endif %}
           </div>
 
-          {% if qc_status == 'verified' %}
-          
-            <!-- Show verified details -->
+          <!-- Per-Truck Quality Checks -->
+          {% if invoices_map.get(booking_id) %}
             <div class="border-top pt-3">
-              <div class="row g-2 mb-2">
-                <div class="col-6">
-                  <small class="text-muted d-block">Net Weight</small>
-                  <strong>{{ qc_weight or loaded }} Qt</strong>
+              <small class="text-muted d-block mb-2 fw-semibold">
+                <i class="fa fa-truck"></i> Truck Quality Checks:
+              </small>
+              
+              {% for inv in invoices_map[booking_id] %}
+                <div class="mb-3 p-2 border rounded" style="background:#f8f9fa;">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                      <strong class="text-primary">Truck #{{ loop.index }}</strong>
+                      <span class="badge bg-info ms-2">{{ inv.qty }} Qt</span>
+                      <a href="/static/uploads/bills/{{ inv.file }}"
+                         target="_blank"
+                         class="btn btn-sm btn-outline-primary ms-2">
+                        <i class="fa fa-file-invoice"></i> Invoice
+                      </a>
+                    </div>
+                    {% if inv.qc_status == 'verified' %}
+                      <span class="badge bg-success">✅ Verified</span>
+                    {% else %}
+                      <span class="badge bg-warning">⏳ Pending QC</span>
+                    {% endif %}
+                  </div>
+
+                  {% if inv.qc_status == 'verified' %}
+                    <!-- Show verified QC details for this truck -->
+                    <div class="row g-2 mb-2">
+                      <div class="col-6">
+                        <small class="text-muted d-block">Net Weight</small>
+                        <strong>{{ inv.qc_weight or inv.qty }} Qt</strong>
+                      </div>
+                      <div class="col-6">
+                        <small class="text-muted d-block">Moisture</small>
+                        <strong>{{ inv.qc_moisture or '-' }}%</strong>
+                      </div>
+                    </div>
+                    {% if inv.qc_remarks %}
+                      <div class="mb-2">
+                        <small class="text-muted d-block">Remarks</small>
+                        <small>{{ inv.qc_remarks }}</small>
+                      </div>
+                    {% endif %}
+                    {% if inv.qc_at %}
+                      <small class="text-muted">Verified on {{ inv.qc_at[:16] }}</small>
+                    {% endif %}
+                  {% else %}
+                    <!-- QC Form for this truck -->
+                    <form method="POST" action="/miller/update_qc/{{ inv.id }}" class="mt-2">
+                      <div class="row g-2 mb-2">
+                        <div class="col-6">
+                          <label class="form-label small mb-1">Net Weight (Qt)</label>
+                          <input type="number"
+                                 name="qc_weight"
+                                 class="form-control form-control-sm"
+                                 placeholder="Net Qt"
+                                 value="{{ inv.qty }}"
+                                 required>
+                        </div>
+                        <div class="col-6">
+                          <label class="form-label small mb-1">Moisture (%)</label>
+                          <input type="number"
+                                 step="0.1"
+                                 name="qc_moisture"
+                                 class="form-control form-control-sm"
+                                 placeholder="%"
+                                 required>
+                        </div>
+                      </div>
+                      <div class="mb-2">
+                        <label class="form-label small mb-1">Remarks (Optional)</label>
+                        <textarea name="qc_remarks"
+                                  class="form-control form-control-sm"
+                                  rows="2"
+                                  placeholder="Quality notes, deductions, etc."></textarea>
+                      </div>
+                      <button class="btn btn-sm btn-success w-100">
+                        <i class="fa fa-clipboard-check"></i> Save QC for This Truck
+                      </button>
+                    </form>
+                  {% endif %}
                 </div>
-                <div class="col-6">
-                  <small class="text-muted d-block">Moisture</small>
-                  <strong>{{ qc_moisture or '-' }}%</strong>
-                </div>
-              </div>
-              {% if qc_remarks %}
-                <div class="mb-2">
-                  <small class="text-muted d-block">Remarks</small>
-                  <small>{{ qc_remarks }}</small>
-                </div>
-              {% endif %}
-              {% if qc_at %}
-                <small class="text-muted">Verified on {{ qc_at[:16] }}</small>
-              {% endif %}
+              {% endfor %}
             </div>
-            <!-- ================= PAYMENT & FINAL INVOICE ================= -->
-<div class="border-top mt-3 pt-3">
-
-  {% if payment_status == 'paid' %}
-    <!-- PAYMENT DONE -->
-    <span class="badge bg-success mb-2">
-      <i class="fa fa-check-circle"></i> Payment Completed
-    </span>
-
-    {% if final_invoice %}
-      <a href="/static/uploads/bills/{{ final_invoice }}"
-         target="_blank"
-         class="btn btn-sm btn-outline-primary w-100 mt-2">
-        <i class="fa fa-file-invoice"></i> View Final Invoice
-      </a>
-    {% endif %}
-
-    {% if payment_at %}
-      <small class="text-muted d-block mt-2">
-        Paid on {{ payment_at[:16] }}
-      </small>
-    {% endif %}
-
-  {% else %}
-    <!-- PAYMENT PENDING -->
-    <form method="POST"
-          action="/miller/complete_payment/{{ booking_id }}"
-          enctype="multipart/form-data">
-
-      <label class="form-label small fw-semibold mb-1">
-        Upload Final Invoice (Required)
-      </label>
-
-      <input type="file"
-             name="final_invoice"
-             class="form-control form-control-sm mb-2"
-             accept=".pdf,image/*"
-             required>
-
-      <button class="btn btn-success btn-sm w-100">
-        <i class="fa fa-rupee-sign"></i> Mark Payment Done
-      </button>
-    </form>
-  {% endif %}
-
-</div>
-
           {% else %}
-          
-            <!-- QC Form -->
-            <form method="POST" action="/miller/update_qc/{{ booking_id }}" class="border-top pt-3">
-              <div class="row g-2 mb-2">
-                <div class="col-6">
-                  <label class="form-label small mb-1">Net Weight (Qt)</label>
-                  <input type="number"
-                         name="qc_weight"
-                         class="form-control form-control-sm"
-                         placeholder="Net Qt"
-                         value="{{ loaded }}"
-                         required>
-                </div>
-                <div class="col-6">
-                  <label class="form-label small mb-1">Moisture (%)</label>
-                  <input type="number"
-                         step="0.1"
-                         name="qc_moisture"
-                         class="form-control form-control-sm"
-                         placeholder="%"
-                         required>
-                </div>
-              </div>
-              <div class="mb-2">
-                <label class="form-label small mb-1">Remarks (Optional)</label>
-                <textarea name="qc_remarks"
-                          class="form-control form-control-sm"
-                          rows="2"
-                          placeholder="Quality notes, deductions, etc."></textarea>
-              </div>
-              <button class="btn btn-sm btn-success w-100">
-                <i class="fa fa-clipboard-check"></i> Save Quality Check
-              </button>
-            </form>
+            <div class="border-top pt-3">
+              <p class="text-muted small mb-0">No loading invoices yet.</p>
+            </div>
           {% endif %}
 
-          <!-- Invoices -->
+          <!-- ================= UPLOAD FINAL INVOICE ================= -->
+          {% set all_trucks_verified = true %}
           {% if invoices_map.get(booking_id) %}
+            {% for inv in invoices_map[booking_id] %}
+              {% if inv.qc_status != 'verified' %}
+                {% set all_trucks_verified = false %}
+              {% endif %}
+            {% endfor %}
+          {% else %}
+            {% set all_trucks_verified = false %}
+          {% endif %}
+
+          {% if all_trucks_verified %}
             <div class="border-top mt-3 pt-3">
-              <small class="text-muted d-block mb-1">Loading Invoices:</small>
-              <div class="d-flex flex-wrap gap-1">
-                {% for inv in invoices_map[booking_id] %}
-                  <a href="/static/uploads/bills/{{ inv.file }}"
-                     target="_blank"
-                     class="btn btn-sm btn-outline-primary">
-                    <i class="fa fa-file-invoice"></i> {{ inv.qty }} Qt
-                  </a>
-                {% endfor %}
-              </div>
+              <form method="POST"
+                    action="/miller/upload_final_invoice/{{ booking_id }}"
+                    enctype="multipart/form-data">
+
+                <label class="form-label small fw-semibold mb-1">
+                  <i class="fa fa-file-invoice"></i> Upload Final Invoice (Final Hisab)
+                </label>
+
+                <input type="file"
+                       name="final_invoice"
+                       class="form-control form-control-sm mb-2"
+                       accept=".pdf,image/*"
+                       required>
+
+                <button class="btn btn-primary btn-sm w-100">
+                  <i class="fa fa-upload"></i> Upload Final Invoice
+                </button>
+              </form>
+            </div>
+          {% else %}
+            <div class="border-top mt-3 pt-3">
+              <p class="text-muted small mb-0">
+                <i class="fa fa-info-circle"></i> Complete all truck quality checks to upload final invoice.
+              </p>
             </div>
           {% endif %}
         </div>
@@ -891,8 +999,250 @@
   {% endif %}
 </div>
 
-<!-- REJECTED -->
+<!-- FINAL HISAB UPLOADED - PAYMENT PENDING -->
+<div class="section-card" id="final-hisab">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h6 class="section-title mb-0">
+      <i class="fa fa-file-invoice" style="color:#ffc107;"></i> Final Hisab Uploaded - Payment Pending
+    </h6>
+    <span class="badge bg-warning" id="finalInvoiceCount">{{ final_invoice_uploaded|length }} Orders</span>
+  </div>
+
+  {% if final_invoice_uploaded %}
+  <div class="qc-scroll-container">
+    <div class="row g-3">
+      {% for b in final_invoice_uploaded %}
+      {% set booking_id = b[0] %}
+      {% set booked = b[3] %}
+      {% set loaded = b[7] %}
+      {% set order_id = b[10] %}
+      {% set buyer_name = b[1] %}
+      {% set crop_name = b[2] %}
+      {% set payment_status = b[16] %}
+      {% set final_invoice = b[17] %}
+      {% set payment_at = b[18] %}
+
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100 completed-loading-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <h6 class="mb-1"><strong class="text-primary">{{ b[10] }}</strong></h6>
+                <p class="mb-1 text-muted small">{{ b[1] }} • <span class="text-capitalize">{{ b[2] }}</span></p>
+                <div class="d-flex gap-2 mt-2">
+                  <span class="badge bg-primary">{{ booked }} Qt Booked</span>
+                  <span class="badge bg-success">{{ loaded }} Qt Loaded</span>
+                </div>
+              </div>
+              <span class="badge bg-warning">💰 Payment Pending</span>
+            </div>
+
+            <!-- Final Invoice Info -->
+            <div class="border-top pt-3">
+              <div class="mb-3">
+                <span class="badge bg-info mb-2">
+                  <i class="fa fa-file-invoice"></i> Final Invoice Uploaded
+                </span>
+                {% if final_invoice %}
+                  <a href="/static/uploads/bills/{{ final_invoice }}"
+                     target="_blank"
+                     class="btn btn-sm btn-outline-primary w-100 mt-2 mb-2">
+                    <i class="fa fa-eye"></i> View Final Invoice
+                  </a>
+                  
+                  <!-- Edit Final Invoice -->
+                  <button class="btn btn-sm btn-warning w-100 mb-2"
+                          data-bs-toggle="modal"
+                          data-bs-target="#editFinalInvoice{{ booking_id }}">
+                    <i class="fa fa-edit"></i> Edit/Replace Invoice
+                  </button>
+                  
+                  <!-- Edit Modal -->
+                  <div class="modal fade" id="editFinalInvoice{{ booking_id }}" tabindex="-1">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title">Edit Final Invoice</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form method="POST"
+                              action="/miller/edit_final_invoice/{{ booking_id }}"
+                              enctype="multipart/form-data">
+                          <div class="modal-body">
+                            <div class="mb-3">
+                              <label class="form-label">Upload New Invoice</label>
+                              <input type="file"
+                                     name="final_invoice"
+                                     class="form-control"
+                                     accept=".pdf,image/*"
+                                     required>
+                              <small class="text-muted">This will replace the existing invoice.</small>
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-warning">
+                              <i class="fa fa-upload"></i> Replace Invoice
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+
+              <!-- Mark Payment Done -->
+              <form method="POST"
+                    action="/miller/mark_payment_done/{{ booking_id }}">
+                <button class="btn btn-success btn-sm w-100">
+                  <i class="fa fa-check-circle"></i> Mark Payment Done
+                </button>
+              </form>
+            </div>
+
+            <!-- Per-Truck QC Summary -->
+            {% if invoices_map.get(booking_id) %}
+              <div class="border-top mt-3 pt-3">
+                <small class="text-muted d-block mb-2 fw-semibold">
+                  <i class="fa fa-truck"></i> Truck QC Summary:
+                </small>
+                {% for inv in invoices_map[booking_id] %}
+                  <div class="mb-2 p-2 border rounded" style="background:#f8f9fa;">
+                    <div class="d-flex justify-content-between">
+                      <span><strong>Truck #{{ loop.index }}</strong> - {{ inv.qty }} Qt</span>
+                      {% if inv.qc_status == 'verified' %}
+                        <span class="badge bg-success">✅</span>
+                      {% else %}
+                        <span class="badge bg-warning">⏳</span>
+                      {% endif %}
+                    </div>
+                    {% if inv.qc_status == 'verified' %}
+                      <small class="text-muted">
+                        Net: {{ inv.qc_weight or inv.qty }} Qt | 
+                        Moisture: {{ inv.qc_moisture or '-' }}%
+                      </small>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  
+  {% else %}
+  <p class="text-muted">No orders with final invoice uploaded yet.</p>
+  {% endif %}
+</div>
+
+<!-- PAYMENT COMPLETED -->
+{% if payment_completed %}
 <div class="section-card">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h6 class="section-title mb-0">
+      <i class="fa fa-check-circle" style="color:#198754;"></i> Payment Completed
+    </h6>
+    <span class="badge bg-success">{{ payment_completed|length }} Orders</span>
+  </div>
+
+  <div class="qc-scroll-container">
+    <div class="row g-3">
+      {% for b in payment_completed %}
+      {% set booking_id = b[0] %}
+      {% set booked = b[3] %}
+      {% set loaded = b[7] %}
+      {% set order_id = b[10] %}
+      {% set buyer_name = b[1] %}
+      {% set crop_name = b[2] %}
+      {% set payment_status = b[16] %}
+      {% set final_invoice = b[17] %}
+      {% set payment_at = b[18] %}
+
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100 completed-loading-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <h6 class="mb-1"><strong class="text-primary">{{ b[10] }}</strong></h6>
+                <p class="mb-1 text-muted small">{{ b[1] }} • <span class="text-capitalize">{{ b[2] }}</span></p>
+                <div class="d-flex gap-2 mt-2">
+                  <span class="badge bg-primary">{{ booked }} Qt Booked</span>
+                  <span class="badge bg-success">{{ loaded }} Qt Loaded</span>
+                </div>
+              </div>
+              <span class="badge bg-success">✅ Payment Completed</span>
+            </div>
+
+            <div class="border-top pt-3">
+              {% if final_invoice %}
+                <a href="/static/uploads/bills/{{ final_invoice }}"
+                   target="_blank"
+                   class="btn btn-sm btn-outline-primary w-100 mb-2">
+                  <i class="fa fa-eye"></i> View Final Invoice
+                </a>
+                
+                <!-- Edit Final Invoice -->
+                <button class="btn btn-sm btn-warning w-100 mb-2"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editFinalInvoicePaid{{ booking_id }}">
+                  <i class="fa fa-edit"></i> Edit/Replace Invoice
+                </button>
+                
+                <!-- Edit Modal -->
+                <div class="modal fade" id="editFinalInvoicePaid{{ booking_id }}" tabindex="-1">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">Edit Final Invoice</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                      </div>
+                      <form method="POST"
+                            action="/miller/edit_final_invoice/{{ booking_id }}"
+                            enctype="multipart/form-data">
+                        <div class="modal-body">
+                          <div class="mb-3">
+                            <label class="form-label">Upload New Invoice</label>
+                            <input type="file"
+                                   name="final_invoice"
+                                   class="form-control"
+                                   accept=".pdf,image/*"
+                                   required>
+                            <small class="text-muted">This will replace the existing invoice.</small>
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                          <button type="submit" class="btn btn-warning">
+                            <i class="fa fa-upload"></i> Replace Invoice
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+
+              {% if payment_at %}
+                <small class="text-muted d-block text-center">
+                  Paid on {{ payment_at[:16] }}
+                </small>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- REJECTED -->
+<div class="section-card" id="rejected-orders">
   <h6 class="section-title">
     <i class="fa fa-times-circle" style="color:#8b6f47;"></i> Rejected Orders
   </h6>
@@ -928,7 +1278,8 @@
 {% endif %}
 
 </div>
-</div>
+<!-- End of Rejected Orders Section -->
+
 <script>
   function applyFilters() {
     const status = document.getElementById("statusFilter").value;
@@ -993,13 +1344,21 @@
     let visibleCount = 0;
     
     cards.forEach(card => {
-      const cardStatus = card.dataset.qcStatus || 'pending';
       const searchText = card.dataset.search || '';
       
-      // Status filter
-      const statusMatch = currentQCFilter === 'all' || 
-                         (currentQCFilter === 'pending' && cardStatus !== 'verified') ||
-                         (currentQCFilter === 'verified' && cardStatus === 'verified');
+      // Check if this card has any pending trucks
+      const pendingBadges = card.querySelectorAll('.badge.bg-warning');
+      const verifiedBadges = card.querySelectorAll('.badge.bg-success');
+      const hasPending = pendingBadges.length > 0;
+      const allVerified = verifiedBadges.length > 0 && pendingBadges.length === 0;
+      
+      // Status filter - check per-truck status
+      let statusMatch = true;
+      if (currentQCFilter === 'pending') {
+        statusMatch = hasPending;
+      } else if (currentQCFilter === 'verified') {
+        statusMatch = allVerified && verifiedBadges.length > 0;
+      }
       
       // Search filter
       const searchMatch = !searchTerm || searchText.includes(searchTerm);
@@ -1024,8 +1383,70 @@
   if(qcSearchInput) {
     qcSearchInput.addEventListener('input', searchQC);
   }
+
+ 
   </script>
   
+</div> <!-- container -->
+</main> <!-- flex-fill -->
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+  <div class="container">
+    <div class="row g-4">
+      <!-- BRAND -->
+      <div class="col-md-4">
+        <h5 class="fw-bold text-white mb-2">
+          <i class="fa fa-industry"></i> Sarna Mandi - Miller
+        </h5>
+        <p class="small">
+          Digital mandi platform for <b>millers</b> to manage stock,
+          approve orders, and process payments with transparency and efficiency.
+        </p>
+      </div>
+
+      <!-- QUICK LINKS -->
+      <div class="col-md-4">
+        <h6 class="fw-bold text-white mb-2">Quick Links</h6>
+        <ul class="list-unstyled small">
+          <li><a href="#approved-loading">Approved Orders</a></li>
+          <li><a href="#quality-check">Quality Check</a></li>
+          <li><a href="#final-hisab">Final Hisab</a></li>
+          <li><a href="#rejected-orders">Rejected Orders</a></li>
+          <li><a href="/miller/profile">Profile</a></li>
+        </ul>
+      </div>
+
+      <!-- CONTACT -->
+      <div class="col-md-4">
+        <h6 class="fw-bold text-white mb-2">Contact</h6>
+        <p class="small mb-1">
+          <i class="fa fa-phone me-2"></i> +91 XXXXX XXXXX
+        </p>
+        <p class="small mb-1">
+          <i class="fa fa-envelope me-2"></i> support@sarnamandi.com
+        </p>
+        <p class="small">
+          <i class="fa fa-location-dot me-2"></i> India
+        </p>
+
+        <!-- SOCIAL -->
+        <div class="mt-2">
+          <a href="#" class="footer-icon"><i class="fab fa-linkedin"></i></a>
+          <a href="#" class="footer-icon"><i class="fab fa-whatsapp"></i></a>
+          <a href="#" class="footer-icon"><i class="fab fa-twitter"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM -->
+    <div class="footer-bottom text-center mt-4 pt-3">
+      © 2026 <b>Sarna Mandi</b> · All Rights Reserved
+    </div>
+  </div>
+</footer>
+
+</div> <!-- flex container -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

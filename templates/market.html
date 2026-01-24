@@ -755,6 +755,9 @@
                       <!-- Payment Info -->
                       <div class="mt-4">
                         {% if payment_status == 'paid' and final_invoice %}
+                          <span class="badge bg-success mb-2 w-100 d-block text-center">
+                            <i class="fa fa-check-circle"></i> Payment Completed
+                          </span>
                           <a href="/static/uploads/bills/{{ final_invoice }}" 
                              target="_blank"
                              class="btn btn-primary btn-sm w-100 mb-2">
@@ -767,9 +770,21 @@
                               Paid on {{ payment_at[:16] }}
                             </small>
                           {% endif %}
+                        {% elif final_invoice and payment_status != 'paid' %}
+                          <span class="badge bg-warning mb-2 w-100 d-block text-center">
+                            <i class="fa fa-file-invoice"></i> Final Invoice Uploaded - Payment Pending
+                          </span>
+                          <a href="/static/uploads/bills/{{ final_invoice }}" 
+                             target="_blank"
+                             class="btn btn-outline-primary btn-sm w-100">
+                            <i class="fa fa-eye me-1"></i> View Final Invoice
+                          </a>
+                          <p class="text-muted small text-center mt-2 mb-0">
+                            Waiting for miller to mark payment done
+                          </p>
                         {% elif loading_status == 'loaded' %}
                           <p class="text-muted small text-center">
-                            Payment pending from miller
+                            Waiting for miller to upload final invoice
                           </p>
                         {% endif %}
                       </div>
@@ -856,39 +871,60 @@
                       {% endif %}
                     </div>
                     
-                    <!-- Mill Details -->
+                    <!-- Per-Truck Quality Checks -->
                     <div class="soft-card">
                       <div class="mb-3">
                         <h6 class="fw-bold">
-                          <i class="fa fa-balance-scale me-1"></i> Final Mill Details
+                          <i class="fa fa-balance-scale me-1"></i> Truck Quality Checks
                         </h6>
                       </div>
                       
-                      {% if b[14] == 'verified' %}
-                        <div class="kv">
-                          <span>Final Weight</span>
-                          <span>{{ b[11] or loaded_qty }} Qt</span>
-                        </div>
-                        <div class="kv">
-                          <span>Moisture</span>
-                          <span>{{ b[12] }}%</span>
-                        </div>
-                        
-                        {% if b[13] %}
-                        <div class="kv">
-                          <span>Remarks</span>
-                          <span>{{ b[13] }}</span>
-                        </div>
-                        {% endif %}
-                        
-                        {% if b[15] %}
-                        <small class="text-muted d-block mt-3">
-                          Verified on {{ b[15][:16] }}
-                        </small>
-                        {% endif %}
+                      {% set invs = invoices_map.get(b[0]) %}
+                      {% if invs %}
+                        {% for inv in invs %}
+                          <div class="mb-3 p-2 border rounded" style="background:#f8f9fa;">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                              <div>
+                                <strong class="text-primary">Truck #{{ loop.index }}</strong>
+                                <span class="badge bg-info ms-2">{{ inv.qty }} Qt</span>
+                              </div>
+                              {% if inv.qc_status == 'verified' %}
+                                <span class="badge bg-success">✅ Verified</span>
+                              {% else %}
+                                <span class="badge bg-warning">⏳ Pending QC</span>
+                              {% endif %}
+                            </div>
+                            
+                            {% if inv.qc_status == 'verified' %}
+                              <div class="kv">
+                                <span>Net Weight</span>
+                                <span>{{ inv.qc_weight or inv.qty }} Qt</span>
+                              </div>
+                              <div class="kv">
+                                <span>Moisture</span>
+                                <span>{{ inv.qc_moisture or '-' }}%</span>
+                              </div>
+                              {% if inv.qc_remarks %}
+                              <div class="kv">
+                                <span>Remarks</span>
+                                <span>{{ inv.qc_remarks }}</span>
+                              </div>
+                              {% endif %}
+                              {% if inv.qc_at %}
+                              <small class="text-muted d-block mt-2">
+                                Verified on {{ inv.qc_at[:16] }}
+                              </small>
+                              {% endif %}
+                            {% else %}
+                              <p class="text-muted small mb-0">
+                                Waiting for miller quality verification.
+                              </p>
+                            {% endif %}
+                          </div>
+                        {% endfor %}
                       {% else %}
-                        <p class="text-muted small">
-                          Waiting for miller quality verification.
+                        <p class="text-muted small mb-0">
+                          No loading invoices found.
                         </p>
                       {% endif %}
                     </div>
@@ -911,11 +947,51 @@
                               <br>
                               <small class="text-muted">{{ inv.date[:16] if inv.date else '' }}</small>
                             </div>
-                            <a href="/static/uploads/bills/{{ inv.file }}" 
-                               target="_blank"
-                               class="btn btn-sm btn-outline-primary">
-                              <i class="fa fa-eye me-1"></i> View
-                            </a>
+                            <div class="d-flex gap-1">
+                              <a href="/static/uploads/bills/{{ inv.file }}" 
+                                 target="_blank"
+                                 class="btn btn-sm btn-outline-primary">
+                                <i class="fa fa-eye me-1"></i> View
+                              </a>
+                              <button class="btn btn-sm btn-warning"
+                                      data-bs-toggle="modal"
+                                      data-bs-target="#editInvoiceList{{ inv.id }}">
+                                <i class="fa fa-edit"></i> Edit
+                              </button>
+                              
+                              <!-- Edit Invoice Modal -->
+                              <div class="modal fade" id="editInvoiceList{{ inv.id }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <h5 class="modal-title">Edit Loading Invoice</h5>
+                                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form method="POST"
+                                          action="/buyer/edit_loading_invoice/{{ inv.id }}"
+                                          enctype="multipart/form-data">
+                                      <div class="modal-body">
+                                        <div class="mb-3">
+                                          <label class="form-label">Upload New Invoice</label>
+                                          <input type="file"
+                                                 name="invoice"
+                                                 class="form-control"
+                                                 accept=".pdf,image/*"
+                                                 required>
+                                          <small class="text-muted">This will replace the existing invoice for {{ inv.qty }} Qt.</small>
+                                        </div>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-warning">
+                                          <i class="fa fa-upload"></i> Replace Invoice
+                                        </button>
+                                      </div>
+                                    </form>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         {% endfor %}
                       </div>
@@ -963,6 +1039,9 @@
           {% set qc_remarks = b[13] %}
           {% set qc_status = b[14] %}
           {% set qc_at = b[15] %}
+          {% set payment_status = b[17] %}
+          {% set final_invoice = b[18] %}
+          {% set payment_at = b[19] %}
           
           <div class="order-card" data-search="{{ order_id|lower }} {{ crop|lower }}">
             <div class="accordion-item border-0">
@@ -1016,77 +1095,167 @@
                       <div class="kv">
                         <span>QC Status</span>
                         <span>
-                          {% if qc_status == 'verified' %}
-                            ✅ Verified by miller
+                          {% set invs = invoices_map.get(b[0]) if invoices_map else None %}
+                          {% if invs %}
+                            {% set all_verified = invs | selectattr('qc_status', 'equalto', 'verified') | list | length == invs | length %}
+                            {% if all_verified and invs | length > 0 %}
+                              ✅ All Trucks Verified
+                            {% else %}
+                              ⏳ {{ invs | selectattr('qc_status', 'ne', 'verified') | list | length }} Truck(s) Pending QC
+                            {% endif %}
                           {% else %}
-                            ⏳ Pending at miller
+                            ⏳ No QC Data Available
                           {% endif %}
                         </span>
                       </div>
                     </div>
                     
-                    <!-- Mill Details -->
+                    <!-- Per-Truck Quality Checks -->
                     <div class="soft-card">
                       <h6 class="fw-bold mb-3">
-                        <i class="fa fa-balance-scale me-1"></i> Final Mill Details
+                        <i class="fa fa-balance-scale me-1"></i> Truck Quality Checks
                       </h6>
                       
-                      {% if qc_status == 'verified' %}
-                        <div class="kv">
-                          <span>Net Weight</span>
-                          <span>{{ qc_weight or loaded_qty }} Qt</span>
-                        </div>
-                        <div class="kv">
-                          <span>Moisture</span>
-                          <span>{{ qc_moisture or '-' }}%</span>
-                        </div>
-                        
-                        {% if qc_remarks %}
-                        <div class="kv">
-                          <span>Remarks</span>
-                          <span>{{ qc_remarks }}</span>
-                        </div>
-                        {% endif %}
-                        
-                        {% if qc_at %}
-                        <small class="text-muted d-block mt-3">
-                          Verified on {{ qc_at[:16] }}
-                        </small>
-                        {% endif %}
+                      {% set invs = invoices_map.get(b[0]) if invoices_map else None %}
+                      {% if invs %}
+                        {% for inv in invs %}
+                          <div class="mb-3 p-2 border rounded" style="background:#f8f9fa;">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                              <div>
+                                <strong class="text-primary">Truck #{{ loop.index }}</strong>
+                                <span class="badge bg-info ms-2">{{ inv.qty }} Qt</span>
+                                <a href="/static/uploads/bills/{{ inv.file }}" 
+                                   target="_blank"
+                                   class="btn btn-sm btn-outline-primary ms-2">
+                                  <i class="fa fa-eye"></i> View Invoice
+                                </a>
+                                <button class="btn btn-sm btn-warning ms-1"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editInvoice{{ inv.id }}">
+                                  <i class="fa fa-edit"></i> Edit
+                                </button>
+                                
+                                <!-- Edit Invoice Modal -->
+                                <div class="modal fade" id="editInvoice{{ inv.id }}" tabindex="-1">
+                                  <div class="modal-dialog">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title">Edit Loading Invoice - Truck #{{ loop.index }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                      </div>
+                                      <form method="POST"
+                                            action="/buyer/edit_loading_invoice/{{ inv.id }}"
+                                            enctype="multipart/form-data">
+                                        <div class="modal-body">
+                                          <div class="mb-3">
+                                            <label class="form-label">Upload New Invoice</label>
+                                            <input type="file"
+                                                   name="invoice"
+                                                   class="form-control"
+                                                   accept=".pdf,image/*"
+                                                   required>
+                                            <small class="text-muted">This will replace the existing invoice for {{ inv.qty }} Qt.</small>
+                                          </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                          <button type="submit" class="btn btn-warning">
+                                            <i class="fa fa-upload"></i> Replace Invoice
+                                          </button>
+                                        </div>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              {% if inv.qc_status == 'verified' %}
+                                <span class="badge bg-success">✅ Verified</span>
+                              {% else %}
+                                <span class="badge bg-warning">⏳ Pending QC</span>
+                              {% endif %}
+                            </div>
+                            
+                            {% if inv.qc_status == 'verified' %}
+                              <div class="kv">
+                                <span>Net Weight</span>
+                                <span>{{ inv.qc_weight or inv.qty }} Qt</span>
+                              </div>
+                              <div class="kv">
+                                <span>Moisture</span>
+                                <span>{{ inv.qc_moisture or '-' }}%</span>
+                              </div>
+                              {% if inv.qc_remarks %}
+                              <div class="kv">
+                                <span>Remarks</span>
+                                <span>{{ inv.qc_remarks }}</span>
+                              </div>
+                              {% endif %}
+                              {% if inv.qc_at %}
+                              <small class="text-muted d-block mt-2">
+                                Verified on {{ inv.qc_at[:16] }}
+                              </small>
+                              {% endif %}
+                            {% else %}
+                              <p class="text-muted small mb-0">
+                                Waiting for miller to verify weight & moisture.
+                              </p>
+                            {% endif %}
+                          </div>
+                        {% endfor %}
                       {% else %}
                         <p class="text-muted small mb-0">
-                          Waiting for miller to verify weight & moisture.
+                          No loading invoices found.
                         </p>
                       {% endif %}
                     </div>
                   </div>
                   
-                  <!-- Loading Invoices -->
+                  <!-- Payment Status -->
                   <div class="soft-card mt-3">
                     <h6 class="fw-bold mb-3">
-                      <i class="fa fa-file-invoice me-1"></i> Loading Invoices
+                      <i class="fa fa-money-bill me-1"></i> Payment Status
                     </h6>
                     
-                    {% set invs = invoices_map.get(b[0]) if invoices_map else None %}
-                    {% if invs %}
-                      <div class="list-group">
-                        {% for inv in invs %}
-                          <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                              <strong>{{ inv.qty }} Qt</strong>
-                              <br>
-                              <small class="text-muted">{{ inv.date[:16] if inv.date else '' }}</small>
-                            </div>
-                            <a href="/static/uploads/bills/{{ inv.file }}" 
-                               target="_blank"
-                               class="btn btn-sm btn-outline-primary">
-                              <i class="fa fa-eye me-1"></i> View Invoice
-                            </a>
-                          </div>
-                        {% endfor %}
+                    {% set payment_status = b[17] %}
+                    {% set final_invoice = b[18] %}
+                    {% set payment_at = b[19] %}
+                    
+                    {% if payment_status == 'paid' and final_invoice %}
+                      <div class="kv">
+                        <span>Status</span>
+                        <span class="badge bg-success">✅ Payment Completed</span>
                       </div>
+                      <a href="/static/uploads/bills/{{ final_invoice }}" 
+                         target="_blank"
+                         class="btn btn-primary btn-sm w-100 mt-2">
+                        <i class="fa fa-file-invoice me-1"></i> View Final Invoice
+                      </a>
+                      {% if payment_at %}
+                      <small class="text-muted d-block text-center mt-2">
+                        Paid on {{ payment_at[:16] }}
+                      </small>
+                      {% endif %}
+                    {% elif final_invoice and payment_status != 'paid' %}
+                      <div class="kv">
+                        <span>Status</span>
+                        <span class="badge bg-warning">💰 Final Invoice Uploaded - Payment Pending</span>
+                      </div>
+                      <a href="/static/uploads/bills/{{ final_invoice }}" 
+                         target="_blank"
+                         class="btn btn-outline-primary btn-sm w-100 mt-2">
+                        <i class="fa fa-eye me-1"></i> View Final Invoice
+                      </a>
+                      <p class="text-muted small text-center mt-2 mb-0">
+                        Waiting for miller to mark payment done
+                      </p>
                     {% else %}
-                      <p class="text-muted small mb-0">No loading invoices found.</p>
+                      <div class="kv">
+                        <span>Status</span>
+                        <span class="badge bg-secondary">⏳ Waiting for Final Invoice</span>
+                      </div>
+                      <p class="text-muted small text-center mt-2 mb-0">
+                        Waiting for miller to upload final invoice
+                      </p>
                     {% endif %}
                   </div>
                 </div>
