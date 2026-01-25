@@ -2,26 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Active Orders | Sarna Mandi</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/style.css">
 
 <style>
   body{
-    background:linear-gradient(135deg,#f4f6f9,#eef1f6);
-    font-family:Inter,Segoe UI,sans-serif;
-  
+    background: var(--bg);
     min-height:100vh;
     display:flex;
     flex-direction:column;
   }
-  
-
-/* NAVBAR */
-.navbar{background:linear-gradient(90deg,#0d6efd,#0b5ed7)}
-.navbar-brand{font-weight:900}
-.nav-link{font-weight:700;color:#fff!important}
 
 /* CARD */
 .order-card{
@@ -124,23 +119,7 @@
 <body>
 
 <!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
-  <div class="container">
-    <a class="navbar-brand" href="/market">
-      <i class="fa fa-seedling"></i> Sarna Mandi
-    </a>
-    <div class="collapse navbar-collapse show">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link active" href="/buyer/active">Active</a></li>
-        <li class="nav-item"><a class="nav-link" href="/buyer/partial">Partial closed</a></li>
-        <li class="nav-item"><a class="nav-link" href="/buyer/loaded">Loaded</a></li>
-        <li class="nav-item"><a class="nav-link" href="/buyer/payments">Payments</a></li>
-        <li class="nav-item"><a class="nav-link" href="/buyer/profile">Profile</a></li>
-        <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
+{% include '_navbar.html' %}
 
 <main class="flex-fill">
 <div class="container mt-4 mb-5">
@@ -193,7 +172,13 @@
               <div class="mb-3 p-2 border rounded" style="background:#f8f9fa;">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                   <div>
-                    <strong class="text-primary">Truck #{{ loop.index }}</strong>
+                    <strong class="text-primary">
+                      {% if inv.truck_number %}
+                        Truck {{ inv.truck_number }}
+                      {% else %}
+                        Truck #{{ loop.index }}
+                      {% endif %}
+                    </strong>
                     <span class="badge bg-info ms-2">{{ inv.qty }} Qt</span>
                   </div>
                   {% if inv.qc_status == 'verified' %}
@@ -227,7 +212,13 @@
           {% if o.invoices %}
             {% for inv in o.invoices %}
             <div class="invoice-item">
-              <span>{{ inv.qty }} Qt</span>
+              <span>
+                {% if inv.truck_number %}
+                  <strong>{{ inv.truck_number }}</strong> – {{ inv.qty }} Qt
+                {% else %}
+                  Truck #{{ loop.index }} – {{ inv.qty }} Qt
+                {% endif %}
+              </span>
               <div class="d-flex gap-1">
                 <a href="/static/uploads/bills/{{ inv.file }}" target="_blank" class="btn btn-sm btn-outline-primary">
                   <i class="fa fa-eye"></i> View
@@ -250,6 +241,14 @@
                             action="/buyer/edit_loading_invoice/{{ inv.id }}"
                             enctype="multipart/form-data">
                         <div class="modal-body">
+                          <div class="mb-3">
+                            <label class="form-label">Truck Number</label>
+                            <input type="text"
+                                   name="truck_number"
+                                   class="form-control"
+                                   value="{{ inv.truck_number or '' }}"
+                                   placeholder="e.g. MH12AB1234">
+                          </div>
                           <div class="mb-3">
                             <label class="form-label">Upload New Invoice</label>
                             <input type="file"
@@ -325,6 +324,52 @@
         <!-- 🔥 UPDATE LOADING BAR (ADDED) -->
         {% if o.loaded < o.booked %}
         <div class="col-12">
+          <!-- Close Remaining Button -->
+          <button class="btn btn-warning btn-sm w-100 mb-3"
+                  data-bs-toggle="modal"
+                  data-bs-target="#closeRemainingModal{{ o.id }}">
+            <i class="fa fa-lock me-1"></i> Close Remaining Qty
+          </button>
+          
+          <!-- Close Remaining Modal -->
+          <div class="modal fade" id="closeRemainingModal{{ o.id }}" tabindex="-1">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">
+                    <i class="fa fa-lock me-2"></i>Close Remaining Quantity
+                  </h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="POST" action="/buyer/close_remaining/{{ o.id }}">
+                  <div class="modal-body">
+                    <div class="alert alert-warning">
+                      <i class="fa fa-exclamation-triangle me-2"></i>
+                      <strong>Warning:</strong> This will close the order with {{ o.booked - o.loaded }} Qt remaining unloaded.
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-bold">Reason for Closure <span class="text-danger">*</span></label>
+                      <textarea name="reason"
+                                class="form-control"
+                                rows="3"
+                                placeholder="Please provide a reason for closing the remaining quantity..."
+                                required></textarea>
+                      <small class="text-muted">This information will be shared with the miller.</small>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                      <i class="fa fa-times me-1"></i>Cancel
+                    </button>
+                    <button type="submit" class="btn btn-warning">
+                      <i class="fa fa-lock me-1"></i>Close Remaining Qty
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          
           <form method="POST"
                 action="/buyer/update_loading/{{ o.id }}"
                 enctype="multipart/form-data"
@@ -340,14 +385,22 @@
                      required>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-3">
+              <input type="text"
+                     name="truck_number"
+                     class="form-control"
+                     placeholder="Truck number"
+                     required>
+            </div>
+
+            <div class="col-md-4">
               <input type="file"
                      name="invoice"
                      class="form-control"
                      required>
             </div>
 
-            <div class="col-md-3 d-grid">
+            <div class="col-md-2 d-grid">
               <button class="update-btn">
                 <i class="fa fa-truck"></i> Update
               </button>
@@ -384,66 +437,7 @@
 </div>
 </main>
 <!-- FOOTER -->
-<!-- ================= ENHANCED FOOTER ================= -->
-<footer class="footer mt-5">
-  <div class="container">
-
-    <div class="row g-4">
-
-      <!-- BRAND -->
-      <div class="col-md-4">
-        <h5 class="fw-bold text-white mb-2">
-          <i class="fa fa-seedling"></i> Sarna Mandi
-        </h5>
-        <p class="small">
-          Digital mandi platform connecting
-          <b>farmers, traders and millers</b>
-          with transparency, trust and speed.
-        </p>
-      </div>
-
-      <!-- QUICK LINKS -->
-      <div class="col-md-4">
-        <h6 class="fw-bold text-white mb-2">Trader Pages</h6>
-        <ul class="list-unstyled small">
-          <li><a href="/market">Market</a></li>
-          <li><a href="/buyer/active">Active Orders</a></li>
-          <li><a href="/buyer/partial">Partially Closed</a></li>
-          <li><a href="/buyer/loaded">Loaded Orders</a></li>
-          <li><a href="/buyer/payments">Payments</a></li>
-        </ul>
-      </div>
-
-      <!-- CONTACT -->
-      <div class="col-md-4">
-        <h6 class="fw-bold text-white mb-2">Contact</h6>
-        <p class="small mb-1">
-          <i class="fa fa-phone me-2"></i> +91 XXXXX XXXXX
-        </p>
-        <p class="small mb-1">
-          <i class="fa fa-envelope me-2"></i> support@sarnamandi.com
-        </p>
-        <p class="small">
-          <i class="fa fa-location-dot me-2"></i> India
-        </p>
-
-        <!-- SOCIAL -->
-        <div class="mt-2">
-          <a href="#" class="footer-icon"><i class="fab fa-linkedin"></i></a>
-          <a href="#" class="footer-icon"><i class="fab fa-whatsapp"></i></a>
-          <a href="#" class="footer-icon"><i class="fab fa-twitter"></i></a>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- BOTTOM -->
-    <div class="footer-bottom text-center mt-4 pt-3">
-      © 2026 <b>Sarna Mandi</b> · All Rights Reserved
-    </div>
-
-  </div>
-</footer>
+{% include '_footer.html' %}
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

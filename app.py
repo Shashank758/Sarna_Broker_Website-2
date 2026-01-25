@@ -20,6 +20,128 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.config["BILL_FOLDER"] = BILL_FOLDER
 app.config["PROFILE_FOLDER"] = PROFILE_FOLDER 
 
+# ---------------- SMS CONFIG ----------------
+# Twilio credentials - set these as environment variables or hardcode below
+# Option 1: Use environment variables (recommended for production)
+TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID', '')
+TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN', '')
+TWILIO_PHONE_NUMBER = os.environ.get('TWILIO_PHONE_NUMBER', '')
+
+# Option 2: Hardcode credentials directly (for testing - NOT recommended for production)
+# Uncomment and fill in your credentials if not using environment variables:
+if not TWILIO_ACCOUNT_SID:
+    TWILIO_ACCOUNT_SID = 'AC2c246686986b3541694856ea9f89f126'
+if not TWILIO_AUTH_TOKEN:
+    TWILIO_AUTH_TOKEN = 'ca266fd170ae0255f2487d7cc8a658c7'
+if not TWILIO_PHONE_NUMBER:
+    TWILIO_PHONE_NUMBER = '+16285009154'
+
+# ---------------- SMS HELPER FUNCTION ----------------
+def send_sms(to_phone, message_text):
+    """Send SMS using Twilio. Returns True if successful, False otherwise."""
+    # Check if credentials are configured
+    if not TWILIO_ACCOUNT_SID or not TWILIO_AUTH_TOKEN or not TWILIO_PHONE_NUMBER:
+        print(f"⚠️ SMS not configured. Missing credentials.")
+        print(f"   Account SID: {'Set' if TWILIO_ACCOUNT_SID else 'Missing'}")
+        print(f"   Auth Token: {'Set' if TWILIO_AUTH_TOKEN else 'Missing'}")
+        print(f"   Phone Number: {'Set' if TWILIO_PHONE_NUMBER else 'Missing'}")
+        print(f"   Would send to {to_phone}: {message_text}")
+        return False
+    
+    if not to_phone:
+        print("⚠️ No phone number provided for SMS")
+        return False
+    
+    try:
+        # Ensure phone number has country code (assume +91 for India if not present)
+        original_phone = to_phone
+        if not to_phone.startswith('+'):
+            if to_phone.startswith('91'):
+                to_phone = '+' + to_phone
+            else:
+                to_phone = '+91' + to_phone.lstrip('0')
+        
+        print(f"📱 Attempting to send SMS to {to_phone} (original: {original_phone})")
+        print(f"   From: {TWILIO_PHONE_NUMBER}")
+        print(f"   Message: {message_text[:50]}...")
+        
+        client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+        message = client.messages.create(
+            body=message_text,
+            from_=TWILIO_PHONE_NUMBER,
+            to=to_phone
+        )
+        print(f"✅ SMS sent successfully to {to_phone}")
+        print(f"   Message SID: {message.sid}")
+        print(f"   Status: {message.status}")
+        return True
+    except Exception as e:
+        print(f"❌ Failed to send SMS to {to_phone}")
+        print(f"   Error Type: {type(e).__name__}")
+        print(f"   Error Message: {str(e)}")
+        # Print more details for common errors
+        if "Invalid" in str(e) or "not found" in str(e).lower():
+            print(f"   ⚠️ Check your Twilio credentials (Account SID, Auth Token)")
+        if "phone number" in str(e).lower() or "number" in str(e).lower():
+            print(f"   ⚠️ Check the phone number format: {to_phone}")
+        return False
+
+def clean_phone_number(phone):
+    """Clean phone number by removing spaces, dashes, and other non-digit characters except +."""
+    if not phone:
+        return None
+    phone_str = str(phone).strip()
+    # Remove all characters except digits and +
+    cleaned = ''.join(c for c in phone_str if c.isdigit() or c == '+')
+    # Ensure + is at the beginning if present
+    if '+' in cleaned and not cleaned.startswith('+'):
+        cleaned = '+' + cleaned.replace('+', '')
+    return cleaned if cleaned else None
+
+def get_buyer_phone(buyer_id):
+    """Get buyer phone number from buyer_profiles."""
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT phone FROM buyer_profiles WHERE buyer_id=?", (buyer_id,))
+    result = cur.fetchone()
+    con.close()
+    phone = result[0] if result and result[0] else None
+    if phone:
+        phone = clean_phone_number(phone)
+        print(f"📞 Retrieved buyer phone for buyer_id {buyer_id}: {phone}")
+    else:
+        print(f"⚠️ No phone number found for buyer_id {buyer_id}")
+    return phone
+
+def get_miller_phone(miller_id):
+    """Get miller phone number from miller_profiles (prefer owner_phone, fallback to phone)."""
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT owner_phone, phone FROM miller_profiles WHERE miller_id=?", (miller_id,))
+    result = cur.fetchone()
+    con.close()
+    phone = None
+    if result:
+        phone = result[0] if result[0] else (result[1] if result[1] else None)
+    if phone:
+        phone = clean_phone_number(phone)
+        print(f"📞 Retrieved miller phone for miller_id {miller_id}: {phone}")
+    else:
+        print(f"⚠️ No phone number found for miller_id {miller_id}")
+    return phone
+
+def get_all_buyer_phones():
+    """Get all buyer phone numbers."""
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT DISTINCT phone FROM buyer_profiles WHERE phone IS NOT NULL AND phone != ''")
+    results = cur.fetchall()
+    con.close()
+    phones = [clean_phone_number(r[0]) for r in results if r[0]]
+    phones = [p for p in phones if p]  # Remove None values
+    print(f"📞 Retrieved {len(phones)} buyer phone numbers for broadcast")
+    return phones
+
 # ---------------- DATABASE ----------------
 def get_db():
     return sqlite3.connect("database.db", timeout=10, check_same_thread=False)
@@ -196,14 +318,19 @@ def upgrade_loading_invoices():
         booking_id INTEGER,
         loaded_qty INTEGER,
         invoice_file TEXT,
+        truck_number TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
     """)
 
-    # Add QC fields to loading_invoices if they don't exist
+    # Add new fields to loading_invoices if they don't exist
     cur.execute("PRAGMA table_info(loading_invoices)")
     cols = [c[1] for c in cur.fetchall()]
-    
+
+    if "truck_number" not in cols:
+        cur.execute("ALTER TABLE loading_invoices ADD COLUMN truck_number TEXT")
+
+    # QC fields
     if "qc_weight" not in cols:
         cur.execute("ALTER TABLE loading_invoices ADD COLUMN qc_weight INTEGER")
     if "qc_moisture" not in cols:
@@ -214,6 +341,14 @@ def upgrade_loading_invoices():
         cur.execute("ALTER TABLE loading_invoices ADD COLUMN qc_status TEXT DEFAULT 'pending'")
     if "qc_at" not in cols:
         cur.execute("ALTER TABLE loading_invoices ADD COLUMN qc_at DATETIME")
+    
+    # Per-truck final invoice fields
+    if "final_invoice_file" not in cols:
+        cur.execute("ALTER TABLE loading_invoices ADD COLUMN final_invoice_file TEXT")
+    if "payment_status" not in cols:
+        cur.execute("ALTER TABLE loading_invoices ADD COLUMN payment_status TEXT DEFAULT 'pending'")
+    if "payment_at" not in cols:
+        cur.execute("ALTER TABLE loading_invoices ADD COLUMN payment_at DATETIME")
 
     con.commit()
     con.close()
@@ -572,6 +707,9 @@ def upgrade_miller_profile_table():
     con.commit()
     con.close()
 
+# Call the upgrade function after it's defined
+upgrade_miller_profile_table()
+
 # ---------------- AUTH ----------------
 @app.route("/", methods=["GET", "POST"])
 def login():
@@ -725,6 +863,15 @@ def miller_dashboard():
         # Ensure the stock is visible in buyer market (market filters status='open')
         cur.execute("UPDATE miller_stock SET status='open' WHERE id=last_insert_rowid()")
         con.commit()
+        
+        # 📱 Send SMS to all buyers about new stock
+        crop = request.form["crop"]
+        quantity = request.form["quantity"]
+        price = request.form["price"]
+        buyer_phones = get_all_buyer_phones()
+        message = f"🆕 New stock available! {crop} - Qty: {quantity}, Price: ₹{price}/unit. Check the market for details."
+        for phone in buyer_phones:
+            send_sms(phone, message)
 
 
 # ✅ LIVE STOCKS
@@ -769,28 +916,33 @@ ORDER BY mb.created_at DESC
 """, (miller_id,))
     bookings = cur.fetchall()
 
-    # 🔹 FETCH PER-TRUCK LOADING INVOICES WITH QC DATA
+    # 🔹 FETCH PER-TRUCK LOADING INVOICES WITH QC DATA AND FINAL INVOICE
     cur.execute("""
-    SELECT id, booking_id, loaded_qty, invoice_file, created_at,
-           qc_weight, qc_moisture, qc_remarks, qc_status, qc_at
+    SELECT id, booking_id, loaded_qty, invoice_file, truck_number, created_at,
+           qc_weight, qc_moisture, qc_remarks, qc_status, qc_at,
+           final_invoice_file, payment_status, payment_at
     FROM loading_invoices
     ORDER BY created_at ASC
 """)
     rows = cur.fetchall()
 
-# Group invoices by booking_id with QC data
+# Group invoices by booking_id with QC data and final invoice
     invoices_map = {}
     for r in rows:
      invoices_map.setdefault(r[1], []).append({
         "id": r[0],  # invoice id
         "qty": r[2],
         "file": r[3],
-        "date": r[4],
-        "qc_weight": r[5],
-        "qc_moisture": r[6],
-        "qc_remarks": r[7],
-        "qc_status": r[8] or "pending",
-        "qc_at": r[9]
+        "truck_number": r[4],
+        "date": r[5],
+        "qc_weight": r[6],
+        "qc_moisture": r[7],
+        "qc_remarks": r[8],
+        "qc_status": r[9] or "pending",
+        "qc_at": r[10],
+        "final_invoice_file": r[11],
+        "payment_status": r[12] or "pending",
+        "payment_at": r[13]
     })
 
     con.close()
@@ -846,10 +998,12 @@ def miller_approved_page():
 
     approved = cur.fetchall()
 
-    # ✅ Fetch per-truck invoices
+    # ✅ Fetch per-truck invoices (WITH QC AND FINAL INVOICE)
     cur.execute("""
         SELECT
-            id, booking_id, loaded_qty, invoice_file, created_at
+            id, booking_id, loaded_qty, invoice_file, truck_number, created_at,
+            qc_weight, qc_moisture, qc_remarks, qc_status, qc_at,
+            final_invoice_file, payment_status, payment_at
         FROM loading_invoices
         ORDER BY created_at ASC
     """)
@@ -861,7 +1015,16 @@ def miller_approved_page():
             "id": r[0],
             "qty": r[2],
             "file": r[3],
-            "date": r[4]
+            "truck_number": r[4],
+            "date": r[5],
+            "qc_weight": r[6],
+            "qc_moisture": r[7],
+            "qc_remarks": r[8],
+            "qc_status": r[9] or "pending",
+            "qc_at": r[10],
+            "final_invoice_file": r[11],
+            "payment_status": r[12] or "pending",
+            "payment_at": r[13]
         })
 
     con.close()
@@ -907,10 +1070,11 @@ def miller_qc_page():
 
     bookings = cur.fetchall()
 
-    # 2️⃣ Fetch per-truck invoices (WITH QC)
+    # 2️⃣ Fetch per-truck invoices (WITH QC AND FINAL INVOICE)
     cur.execute("""
-    SELECT id, booking_id, loaded_qty, invoice_file, created_at,
-           qc_weight, qc_moisture, qc_remarks, qc_status, qc_at
+    SELECT id, booking_id, loaded_qty, invoice_file, truck_number, created_at,
+           qc_weight, qc_moisture, qc_remarks, qc_status, qc_at,
+           final_invoice_file, payment_status, payment_at
     FROM loading_invoices
     ORDER BY created_at ASC
     """)
@@ -922,12 +1086,16 @@ def miller_qc_page():
             "id": r[0],
             "qty": r[2],
             "file": r[3],
-            "date": r[4],
-            "qc_weight": r[5],
-            "qc_moisture": r[6],
-            "qc_remarks": r[7],
-            "qc_status": r[8] or "pending",
-            "qc_at": r[9]
+            "truck_number": r[4],
+            "date": r[5],
+            "qc_weight": r[6],
+            "qc_moisture": r[7],
+            "qc_remarks": r[8],
+            "qc_status": r[9] or "pending",
+            "qc_at": r[10],
+            "final_invoice_file": r[11],
+            "payment_status": r[12] or "pending",
+            "payment_at": r[13]
         })
 
     # 3️⃣ FILTER ONLY COMPLETED LOADING → QC REQUIRED
@@ -959,7 +1127,7 @@ def miller_final_hisab_page():
     con = get_db()
     cur = con.cursor()
 
-    # ✅ Fetch orders where final invoice is uploaded but payment pending
+    # ✅ Fetch all bookings with loaded trucks for this miller
     cur.execute("""
         SELECT
             mb.id,              -- 0 booking_id
@@ -982,37 +1150,44 @@ def miller_final_hisab_page():
 
             IFNULL(p.status,'pending') AS payment_status, -- 16
             p.invoice_file                 AS final_invoice, -- 17
-            p.paid_at                      AS payment_at     -- 18
+            p.paid_at                      AS payment_at,    -- 18
+            ms.price                       AS price          -- 19
 
         FROM miller_bookings mb
         JOIN users u ON mb.buyer_id = u.id
         JOIN miller_stock ms ON mb.stock_id = ms.id
-        JOIN payments p ON p.booking_id = mb.id
+        LEFT JOIN payments p ON p.booking_id = mb.id
         WHERE
             ms.miller_id = ?
-            AND p.invoice_file IS NOT NULL
-            AND p.status = 'pending'
+            AND mb.loading_status IN ('loaded', 'partial')
         ORDER BY mb.created_at DESC
     """, (miller_id,))
 
-    final_invoice_uploaded = cur.fetchall()
+    all_bookings = cur.fetchall()
 
-    # ✅ Fetch per-truck invoices + QC
+    # ✅ Fetch per-truck invoices + QC + FINAL INVOICE
     cur.execute("""
         SELECT
-            id,
-            booking_id,
-            loaded_qty,
-            invoice_file,
-            created_at,
-            qc_weight,
-            qc_moisture,
-            qc_remarks,
-            qc_status,
-            qc_at
-        FROM loading_invoices
-        ORDER BY created_at ASC
-    """)
+            li.id,
+            li.booking_id,
+            li.loaded_qty,
+            li.invoice_file,
+            li.truck_number,
+            li.created_at,
+            li.qc_weight,
+            li.qc_moisture,
+            li.qc_remarks,
+            li.qc_status,
+            li.qc_at,
+            li.final_invoice_file,
+            li.payment_status,
+            li.payment_at
+        FROM loading_invoices li
+        JOIN miller_bookings mb ON li.booking_id = mb.id
+        JOIN miller_stock ms ON mb.stock_id = ms.id
+        WHERE ms.miller_id = ?
+        ORDER BY li.created_at ASC
+    """, (miller_id,))
     rows = cur.fetchall()
 
     invoices_map = {}
@@ -1021,19 +1196,23 @@ def miller_final_hisab_page():
             "id": r[0],
             "qty": r[2],
             "file": r[3],
-            "date": r[4],
-            "qc_weight": r[5],
-            "qc_moisture": r[6],
-            "qc_remarks": r[7],
-            "qc_status": r[8] or "pending",
-            "qc_at": r[9]
+            "truck_number": r[4],
+            "date": r[5],
+            "qc_weight": r[6],
+            "qc_moisture": r[7],
+            "qc_remarks": r[8],
+            "qc_status": r[9] or "pending",
+            "qc_at": r[10],
+            "final_invoice_file": r[11],
+            "payment_status": r[12] or "pending",
+            "payment_at": r[13]
         })
 
     con.close()
 
     return render_template(
         "miller_final_hisab.html",
-        final_invoice_uploaded=final_invoice_uploaded,
+        all_bookings=all_bookings,
         invoices_map=invoices_map
     )
 
@@ -1182,6 +1361,22 @@ def miller_upload_final_invoice(booking_id):
             JOIN miller_stock ms ON mb.stock_id = ms.id
             WHERE mb.id=?
         """, (filename, booking_id))
+    
+    # 📱 Send SMS to buyer about final invoice
+    cur.execute("""
+        SELECT mb.buyer_id, mb.order_id, mb.loaded_qty, ms.price
+        FROM miller_bookings mb
+        JOIN miller_stock ms ON mb.stock_id = ms.id
+        WHERE mb.id=?
+    """, (booking_id,))
+    invoice_info = cur.fetchone()
+    if invoice_info:
+        buyer_id, order_id, loaded_qty, price = invoice_info
+        buyer_phone = get_buyer_phone(buyer_id)
+        if buyer_phone:
+            total_amount = loaded_qty * price
+            message = f"📄 Final invoice uploaded for Order {order_id}. Amount: ₹{total_amount}. Please review and proceed with payment."
+            send_sms(buyer_phone, message)
 
     con.commit()
     con.close()
@@ -1218,6 +1413,21 @@ def miller_mark_payment_done(booking_id):
             paid_at=CURRENT_TIMESTAMP
         WHERE booking_id=?
     """, (booking_id,))
+    
+    # 📱 Send SMS to buyer about payment completion
+    cur.execute("""
+        SELECT mb.buyer_id, mb.order_id, p.amount
+        FROM miller_bookings mb
+        JOIN payments p ON p.booking_id = mb.id
+        WHERE mb.id=?
+    """, (booking_id,))
+    payment_info = cur.fetchone()
+    if payment_info:
+        buyer_id, order_id, amount = payment_info
+        buyer_phone = get_buyer_phone(buyer_id)
+        if buyer_phone:
+            message = f"✅ Payment received for Order {order_id}. Amount: ₹{amount}. Thank you!"
+            send_sms(buyer_phone, message)
 
     con.commit()
     con.close()
@@ -1258,11 +1468,199 @@ def miller_edit_final_invoice(booking_id):
         SET invoice_file=?
         WHERE booking_id=?
     """, (filename, booking_id))
+    
+    # 📱 Send SMS to buyer about invoice update
+    cur.execute("""
+        SELECT mb.buyer_id, mb.order_id
+        FROM miller_bookings mb
+        WHERE mb.id=?
+    """, (booking_id,))
+    invoice_info = cur.fetchone()
+    if invoice_info:
+        buyer_id, order_id = invoice_info
+        buyer_phone = get_buyer_phone(buyer_id)
+        if buyer_phone:
+            message = f"📄 Final invoice updated for Order {order_id}. Please review the updated invoice."
+            send_sms(buyer_phone, message)
 
     con.commit()
     con.close()
 
     return redirect("/miller")
+
+@app.route("/miller/upload_truck_final_invoice/<int:invoice_id>", methods=["POST"])
+def miller_upload_truck_final_invoice(invoice_id):
+    """Upload final invoice (final hisab) for a specific truck/loading invoice."""
+    if session.get("role") != "miller":
+        return redirect("/")
+
+    final_invoice = request.files.get("truck_final_invoice")
+    if not final_invoice or final_invoice.filename == "":
+        return redirect(request.referrer or "/miller")
+
+    filename = secure_filename(final_invoice.filename)
+    final_invoice.save(os.path.join(app.config["BILL_FOLDER"], filename))
+
+    con = get_db()
+    cur = con.cursor()
+
+    # ✅ Verify this invoice belongs to this miller and QC is verified
+    cur.execute("""
+        SELECT li.id, li.booking_id, li.truck_number, li.loaded_qty, mb.order_id
+        FROM loading_invoices li
+        JOIN miller_bookings mb ON li.booking_id = mb.id
+        JOIN miller_stock ms ON mb.stock_id = ms.id
+        WHERE li.id=? AND ms.miller_id=? AND li.qc_status='verified'
+    """, (invoice_id, get_effective_user_id()))
+
+    row = cur.fetchone()
+    if not row:
+        con.close()
+        return redirect(request.referrer or "/miller")
+
+    invoice_db_id, booking_id, truck_number, loaded_qty, order_id = row
+
+    # ✅ Update truck final invoice
+    cur.execute("""
+        UPDATE loading_invoices
+        SET final_invoice_file=?,
+            payment_status='pending'
+        WHERE id=?
+    """, (filename, invoice_id))
+
+    # 📱 Send SMS to buyer about truck final invoice
+    cur.execute("""
+        SELECT mb.buyer_id, ms.crop, ms.price
+        FROM miller_bookings mb
+        JOIN miller_stock ms ON mb.stock_id = ms.id
+        WHERE mb.id=?
+    """, (booking_id,))
+    invoice_info = cur.fetchone()
+    if invoice_info:
+        buyer_id, crop, price = invoice_info
+        buyer_phone = get_buyer_phone(buyer_id)
+        if buyer_phone:
+            truck_info = f" (Truck: {truck_number})" if truck_number else ""
+            total_amount = loaded_qty * price
+            message = f"📄 Final invoice uploaded for Order {order_id}{truck_info}. Qty: {loaded_qty}, Amount: ₹{total_amount}. Please review."
+            send_sms(buyer_phone, message)
+
+    con.commit()
+    con.close()
+
+    return redirect(request.referrer or "/miller")
+
+@app.route("/miller/edit_truck_final_invoice/<int:invoice_id>", methods=["POST"])
+def miller_edit_truck_final_invoice(invoice_id):
+    """Edit/replace final invoice for a specific truck."""
+    if session.get("role") != "miller":
+        return redirect("/")
+
+    final_invoice = request.files.get("truck_final_invoice")
+    if not final_invoice or final_invoice.filename == "":
+        return redirect(request.referrer or "/miller")
+
+    filename = secure_filename(final_invoice.filename)
+    final_invoice.save(os.path.join(app.config["BILL_FOLDER"], filename))
+
+    con = get_db()
+    cur = con.cursor()
+
+    # ✅ Verify this invoice belongs to this miller
+    cur.execute("""
+        SELECT li.id, li.booking_id, mb.order_id
+        FROM loading_invoices li
+        JOIN miller_bookings mb ON li.booking_id = mb.id
+        JOIN miller_stock ms ON mb.stock_id = ms.id
+        WHERE li.id=? AND ms.miller_id=?
+    """, (invoice_id, get_effective_user_id()))
+
+    row = cur.fetchone()
+    if not row:
+        con.close()
+        return redirect(request.referrer or "/miller")
+
+    invoice_db_id, booking_id, order_id = row
+
+    # ✅ Update truck final invoice (keep payment status as is)
+    cur.execute("""
+        UPDATE loading_invoices
+        SET final_invoice_file=?
+        WHERE id=?
+    """, (filename, invoice_id))
+
+    # 📱 Send SMS to buyer about invoice update
+    cur.execute("""
+        SELECT mb.buyer_id
+        FROM miller_bookings mb
+        WHERE mb.id=?
+    """, (booking_id,))
+    invoice_info = cur.fetchone()
+    if invoice_info:
+        buyer_id = invoice_info[0]
+        buyer_phone = get_buyer_phone(buyer_id)
+        if buyer_phone:
+            message = f"📄 Final invoice updated for Order {order_id}. Please review the updated invoice."
+            send_sms(buyer_phone, message)
+
+    con.commit()
+    con.close()
+
+    return redirect(request.referrer or "/miller")
+
+@app.route("/miller/mark_truck_payment_done/<int:invoice_id>", methods=["POST"])
+def miller_mark_truck_payment_done(invoice_id):
+    """Mark payment as done for a specific truck."""
+    if session.get("role") != "miller":
+        return redirect("/")
+
+    con = get_db()
+    cur = con.cursor()
+
+    # ✅ Verify this invoice belongs to this miller and has final invoice
+    cur.execute("""
+        SELECT li.id, li.booking_id, li.final_invoice_file, li.loaded_qty, mb.order_id
+        FROM loading_invoices li
+        JOIN miller_bookings mb ON li.booking_id = mb.id
+        JOIN miller_stock ms ON mb.stock_id = ms.id
+        WHERE li.id=? AND ms.miller_id=? AND li.final_invoice_file IS NOT NULL
+    """, (invoice_id, get_effective_user_id()))
+
+    row = cur.fetchone()
+    if not row:
+        con.close()
+        return redirect(request.referrer or "/miller")
+
+    invoice_db_id, booking_id, final_invoice_file, loaded_qty, order_id = row
+
+    # ✅ Update payment status to 'paid'
+    cur.execute("""
+        UPDATE loading_invoices
+        SET payment_status='paid',
+            payment_at=CURRENT_TIMESTAMP
+        WHERE id=?
+    """, (invoice_id,))
+
+    # 📱 Send SMS to buyer about payment completion
+    cur.execute("""
+        SELECT mb.buyer_id, ms.price
+        FROM miller_bookings mb
+        JOIN miller_stock ms ON mb.stock_id = ms.id
+        WHERE mb.id=?
+    """, (booking_id,))
+    payment_info = cur.fetchone()
+    if payment_info:
+        buyer_id, price = payment_info
+        buyer_phone = get_buyer_phone(buyer_id)
+        if buyer_phone:
+            amount = loaded_qty * price
+            message = f"✅ Payment received for Order {order_id} (Truck). Amount: ₹{amount}. Thank you!"
+            send_sms(buyer_phone, message)
+
+    con.commit()
+    con.close()
+
+    return redirect(request.referrer or "/miller")
 
   
 @app.route("/miller/upload_bill/<int:booking_id>", methods=["POST"])
@@ -1319,6 +1717,9 @@ def miller_profile():
     if session.get("role") != "miller" or session.get("is_staff"):
         return redirect("/")
 
+    # Ensure database is upgraded
+    upgrade_miller_profile_table()
+
     miller_id = get_effective_user_id()
 
 
@@ -1333,66 +1734,81 @@ def miller_profile():
     profile = cur.fetchone()
 
     if request.method == "POST":
-        mill_name = request.form["mill_name"]
-        owner_phone = request.form.get("owner_phone", "")
-        accountant_phone = request.form.get("accountant_phone", "")
-        staff_phone = request.form.get("staff_phone", "")
-        address = request.form["address"]
+        try:
+            mill_name = request.form.get("mill_name", "").strip()
+            owner_phone = request.form.get("owner_phone", "").strip()
+            accountant_phone = request.form.get("accountant_phone", "").strip()
+            staff_phone = request.form.get("staff_phone", "").strip()
+            address = request.form.get("address", "").strip()
+            
+            if not mill_name or not address:
+                con.close()
+                return render_template("miller_profile.html", profile=profile, error="Mill name and address are required")
 
-        # Handle multiple document uploads
-        gst_doc = request.files.get("gst_doc")
-        mandi_doc = request.files.get("mandi_doc")
-        other_doc = request.files.get("other_doc")
-        
-        # Get existing filenames if profile exists
-        # Column order: id(0), miller_id(1), mill_name(2), phone(3), address(4), document(5), 
-        # created_at(6), owner_phone(7), accountant_phone(8), staff_phone(9), 
-        # gst_doc(10), mandi_doc(11), other_doc(12)
-        gst_filename = profile[10] if profile and len(profile) > 10 and profile[10] else None
-        mandi_filename = profile[11] if profile and len(profile) > 11 and profile[11] else None
-        other_filename = profile[12] if profile and len(profile) > 12 and profile[12] else None
-        
-        # Save GST document (only if new file is uploaded)
-        if gst_doc and gst_doc.filename:
-            gst_filename = secure_filename(gst_doc.filename)
-            name, ext = os.path.splitext(gst_filename)
-            gst_filename = f"gst_{miller_id}_{name}{ext}"
-            gst_doc.save(os.path.join(app.config["PROFILE_FOLDER"], gst_filename))
-        
-        # Save Mandi document (only if new file is uploaded)
-        if mandi_doc and mandi_doc.filename:
-            mandi_filename = secure_filename(mandi_doc.filename)
-            name, ext = os.path.splitext(mandi_filename)
-            mandi_filename = f"mandi_{miller_id}_{name}{ext}"
-            mandi_doc.save(os.path.join(app.config["PROFILE_FOLDER"], mandi_filename))
-        
-        # Save Other document (only if new file is uploaded)
-        if other_doc and other_doc.filename:
-            other_filename = secure_filename(other_doc.filename)
-            name, ext = os.path.splitext(other_filename)
-            other_filename = f"other_{miller_id}_{name}{ext}"
-            other_doc.save(os.path.join(app.config["PROFILE_FOLDER"], other_filename))
+            # Handle multiple document uploads
+            gst_doc = request.files.get("gst_doc")
+            mandi_doc = request.files.get("mandi_doc")
+            other_doc = request.files.get("other_doc")
+            
+            # Get existing filenames if profile exists
+            # Column order: id(0), miller_id(1), mill_name(2), phone(3), address(4), document(5), 
+            # created_at(6), owner_phone(7), accountant_phone(8), staff_phone(9), 
+            # gst_doc(10), mandi_doc(11), other_doc(12)
+            gst_filename = None
+            mandi_filename = None
+            other_filename = None
+            
+            if profile and len(profile) > 12:
+                gst_filename = profile[10] if profile[10] else None
+                mandi_filename = profile[11] if profile[11] else None
+                other_filename = profile[12] if profile[12] else None
+            
+            # Save GST document (only if new file is uploaded)
+            if gst_doc and gst_doc.filename:
+                gst_filename = secure_filename(gst_doc.filename)
+                name, ext = os.path.splitext(gst_filename)
+                gst_filename = f"gst_{miller_id}_{name}{ext}"
+                gst_doc.save(os.path.join(app.config["PROFILE_FOLDER"], gst_filename))
+            
+            # Save Mandi document (only if new file is uploaded)
+            if mandi_doc and mandi_doc.filename:
+                mandi_filename = secure_filename(mandi_doc.filename)
+                name, ext = os.path.splitext(mandi_filename)
+                mandi_filename = f"mandi_{miller_id}_{name}{ext}"
+                mandi_doc.save(os.path.join(app.config["PROFILE_FOLDER"], mandi_filename))
+            
+            # Save Other document (only if new file is uploaded)
+            if other_doc and other_doc.filename:
+                other_filename = secure_filename(other_doc.filename)
+                name, ext = os.path.splitext(other_filename)
+                other_filename = f"other_{miller_id}_{name}{ext}"
+                other_doc.save(os.path.join(app.config["PROFILE_FOLDER"], other_filename))
 
-        if profile:
-            cur.execute("""
-                UPDATE miller_profiles
-                SET mill_name=?, owner_phone=?, accountant_phone=?, staff_phone=?, 
-                    address=?, gst_doc=?, mandi_doc=?, other_doc=?
-                WHERE miller_id=?
-            """, (mill_name, owner_phone, accountant_phone, staff_phone, address, 
-                  gst_filename, mandi_filename, other_filename, miller_id))
-        else:
-            cur.execute("""
-                INSERT INTO miller_profiles
-                (miller_id, mill_name, owner_phone, accountant_phone, staff_phone, 
-                 address, gst_doc, mandi_doc, other_doc)
-                VALUES (?,?,?,?,?,?,?,?,?)
-            """, (miller_id, mill_name, owner_phone, accountant_phone, staff_phone, 
-                  address, gst_filename, mandi_filename, other_filename))
+            if profile:
+                cur.execute("""
+                    UPDATE miller_profiles
+                    SET mill_name=?, owner_phone=?, accountant_phone=?, staff_phone=?, 
+                        address=?, gst_doc=?, mandi_doc=?, other_doc=?
+                    WHERE miller_id=?
+                """, (mill_name, owner_phone, accountant_phone, staff_phone, address, 
+                      gst_filename, mandi_filename, other_filename, miller_id))
+            else:
+                cur.execute("""
+                    INSERT INTO miller_profiles
+                    (miller_id, mill_name, owner_phone, accountant_phone, staff_phone, 
+                     address, gst_doc, mandi_doc, other_doc)
+                    VALUES (?,?,?,?,?,?,?,?,?)
+                """, (miller_id, mill_name, owner_phone, accountant_phone, staff_phone, 
+                      address, gst_filename, mandi_filename, other_filename))
 
-        con.commit()
-        con.close()
-        return redirect("/miller/profile")
+            con.commit()
+            con.close()
+            return redirect("/miller/profile")
+        except Exception as e:
+            con.rollback()
+            con.close()
+            print(f"Error saving miller profile: {str(e)}")
+            return render_template("miller_profile.html", profile=profile, error=f"Error saving profile: {str(e)}")
 
     con.close()
     return render_template("miller_profile.html", profile=profile)
@@ -1510,7 +1926,8 @@ def buyer_close_remaining(booking_id):
 
     reason = request.form.get("reason", "").strip()
     if not reason:
-        return redirect("/market")
+        # Redirect back to referring page or default to /market
+        return redirect(request.referrer or "/market")
 
     con = get_db()
     cur = con.cursor()
@@ -1525,7 +1942,7 @@ def buyer_close_remaining(booking_id):
     row = cur.fetchone()
     if not row:
         con.close()
-        return redirect("/market")
+        return redirect(request.referrer or "/market")
 
     stock_id, booked_qty, loaded_qty, status = row
     loaded_qty = loaded_qty or 0
@@ -1549,11 +1966,28 @@ def buyer_close_remaining(booking_id):
             decision_at=CURRENT_TIMESTAMP
         WHERE id=?
     """, (reason, booking_id))
+    
+    # 📱 Send SMS to miller about partial closure
+    cur.execute("""
+        SELECT ms.miller_id, mb.order_id, ms.crop, mb.quantity, mb.loaded_qty
+        FROM miller_bookings mb
+        JOIN miller_stock ms ON mb.stock_id = ms.id
+        WHERE mb.id=?
+    """, (booking_id,))
+    close_info = cur.fetchone()
+    if close_info:
+        miller_id, order_id, crop, total_qty, loaded_qty = close_info
+        miller_phone = get_miller_phone(miller_id)
+        if miller_phone:
+            remaining = total_qty - (loaded_qty or 0)
+            message = f"⚠️ Order {order_id} partially closed. {crop} - Remaining: {remaining} qty. Reason: {reason}"
+            send_sms(miller_phone, message)
 
     con.commit()
     con.close()
 
-    return redirect("/market")
+    # Redirect back to referring page or default to /market
+    return redirect(request.referrer or "/market")
 
 @app.route("/miller/approve_booking/<int:id>")
 def miller_approve_booking(id):
@@ -1581,6 +2015,21 @@ def miller_approve_booking(id):
             decision_at=CURRENT_TIMESTAMP
         WHERE id=?
     """, (id,))
+    
+    # 📱 Send SMS to buyer about approval
+    cur.execute("""
+        SELECT mb.buyer_id, mb.order_id, ms.crop, mb.quantity
+        FROM miller_bookings mb
+        JOIN miller_stock ms ON mb.stock_id = ms.id
+        WHERE mb.id=?
+    """, (id,))
+    booking_info = cur.fetchone()
+    if booking_info:
+        buyer_id, order_id, crop, qty = booking_info
+        buyer_phone = get_buyer_phone(buyer_id)
+        if buyer_phone:
+            message = f"✅ Order {order_id} approved! {crop} - Qty: {qty}. Please proceed with loading."
+            send_sms(buyer_phone, message)
 
     con.commit()
     con.close()
@@ -1615,6 +2064,21 @@ def miller_decline_booking(id):
     SET status='declined', reason=?, decision_at=CURRENT_TIMESTAMP
     WHERE id=?
     """, (reason, id))
+    
+    # 📱 Send SMS to buyer about decline
+    cur.execute("""
+        SELECT mb.buyer_id, mb.order_id, ms.crop
+        FROM miller_bookings mb
+        JOIN miller_stock ms ON mb.stock_id = ms.id
+        WHERE mb.id=?
+    """, (id,))
+    booking_info = cur.fetchone()
+    if booking_info:
+        buyer_id, order_id, crop = booking_info
+        buyer_phone = get_buyer_phone(buyer_id)
+        if buyer_phone:
+            message = f"❌ Order {order_id} declined. {crop} - Reason: {reason}"
+            send_sms(buyer_phone, message)
 
     con.commit()
     con.close()
@@ -1662,6 +2126,19 @@ def update_miller_stock(id):
     ))
 
     con.commit()
+    
+    # 📱 Send SMS to all buyers about stock update
+    cur.execute("SELECT crop FROM miller_stock WHERE id=?", (id,))
+    crop_result = cur.fetchone()
+    if crop_result:
+        crop = crop_result[0]
+        new_price = request.form["price"]
+        new_qty = request.form["quantity"]
+        buyer_phones = get_all_buyer_phones()
+        message = f"📢 Stock updated! {crop} - New Qty: {new_qty}, New Price: ₹{new_price}/unit. Check the market for details."
+        for phone in buyer_phones:
+            send_sms(phone, message)
+    
     con.close()
     return redirect("/miller")
 
@@ -1743,14 +2220,15 @@ ORDER BY mb.created_at DESC
         if b[10] == 'cancelled'
     ]
 
-    # Fetch per-truck loading invoices WITH QC DATA
+    # Fetch per-truck loading invoices WITH QC DATA AND FINAL INVOICE
     all_booking_ids = [b[0] for b in my_bookings]
     invoices_map = {}
     if all_booking_ids:
         placeholders = ",".join(["?"] * len(all_booking_ids))
         cur.execute(f"""
-        SELECT id, booking_id, loaded_qty, invoice_file, created_at,
-               qc_weight, qc_moisture, qc_remarks, qc_status, qc_at
+        SELECT id, booking_id, loaded_qty, invoice_file, truck_number, created_at,
+               qc_weight, qc_moisture, qc_remarks, qc_status, qc_at,
+               final_invoice_file, payment_status, payment_at
         FROM loading_invoices
         WHERE booking_id IN ({placeholders})
         ORDER BY created_at ASC
@@ -1761,12 +2239,16 @@ ORDER BY mb.created_at DESC
                 "id": r[0],  # invoice id
                 "qty": r[2],
                 "file": r[3],
-                "date": r[4],
-                "qc_weight": r[5],
-                "qc_moisture": r[6],
-                "qc_remarks": r[7],
-                "qc_status": r[8] or "pending",
-                "qc_at": r[9]
+                "truck_number": r[4],
+                "date": r[5],
+                "qc_weight": r[6],
+                "qc_moisture": r[7],
+                "qc_remarks": r[8],
+                "qc_status": r[9] or "pending",
+                "qc_at": r[10],
+                "final_invoice_file": r[11],
+                "payment_status": r[12] or "pending",
+                "payment_at": r[13]
             })
 
     # Calculate totals
@@ -1849,8 +2331,9 @@ LEFT JOIN payments p ON p.booking_id = mb.id
     rows = cur.fetchall()
 
     cur.execute("""
-        SELECT id, booking_id, loaded_qty, invoice_file, created_at,
-               qc_weight, qc_moisture, qc_remarks, qc_status, qc_at
+        SELECT id, booking_id, loaded_qty, invoice_file, truck_number, created_at,
+               qc_weight, qc_moisture, qc_remarks, qc_status, qc_at,
+               final_invoice_file, payment_status, payment_at
         FROM loading_invoices
         ORDER BY created_at ASC
     """)
@@ -1862,12 +2345,16 @@ LEFT JOIN payments p ON p.booking_id = mb.id
             "id": i[0],  # invoice id
             "qty": i[2],
             "file": i[3],
-            "date": i[4],
-            "qc_weight": i[5],
-            "qc_moisture": i[6],
-            "qc_remarks": i[7],
-            "qc_status": i[8] or "pending",
-            "qc_at": i[9]
+            "truck_number": i[4],
+            "date": i[5],
+            "qc_weight": i[6],
+            "qc_moisture": i[7],
+            "qc_remarks": i[8],
+            "qc_status": i[9] or "pending",
+            "qc_at": i[10],
+            "final_invoice_file": i[11],
+            "payment_status": i[12] or "pending",
+            "payment_at": i[13]
         })
 
     orders = []
@@ -1941,10 +2428,11 @@ def get_miller_orders_by_type(filter_type):
 
     rows = cur.fetchall()
 
-    # 🔹 Fetch per-truck invoices
+    # 🔹 Fetch per-truck invoices WITH FINAL INVOICE
     cur.execute("""
-        SELECT id, booking_id, loaded_qty, invoice_file, created_at,
-               qc_weight, qc_moisture, qc_remarks, qc_status, qc_at
+        SELECT id, booking_id, loaded_qty, invoice_file, truck_number, created_at,
+               qc_weight, qc_moisture, qc_remarks, qc_status, qc_at,
+               final_invoice_file, payment_status, payment_at
         FROM loading_invoices
         ORDER BY created_at ASC
     """)
@@ -1956,12 +2444,16 @@ def get_miller_orders_by_type(filter_type):
             "id": i[0],
             "qty": i[2],
             "file": i[3],
-            "date": i[4],
-            "qc_weight": i[5],
-            "qc_moisture": i[6],
-            "qc_remarks": i[7],
-            "qc_status": i[8] or "pending",
-            "qc_at": i[9]
+            "truck_number": i[4],
+            "date": i[5],
+            "qc_weight": i[6],
+            "qc_moisture": i[7],
+            "qc_remarks": i[8],
+            "qc_status": i[9] or "pending",
+            "qc_at": i[10],
+            "final_invoice_file": i[11],
+            "payment_status": i[12] or "pending",
+            "payment_at": i[13]
         })
 
     orders = []
@@ -2072,6 +2564,8 @@ def book_miller_stock(stock_id):
             VALUES (?, ?, ?, 'pending', ?)
         """, (stock_id, session["user_id"], qty, order_id))
         
+        booking_id = cur.lastrowid
+        
         # DEDUCT quantity immediately from stock
         cur.execute("""
             UPDATE miller_stock
@@ -2085,6 +2579,20 @@ def book_miller_stock(stock_id):
             SET status='closed'
             WHERE id=? AND quantity <= 0
         """, (stock_id,))
+        
+        # 📱 Send SMS to miller about new booking
+        cur.execute("""
+            SELECT ms.miller_id, ms.crop
+            FROM miller_stock ms
+            WHERE ms.id = ?
+        """, (stock_id,))
+        stock_info = cur.fetchone()
+        if stock_info:
+            miller_id, crop = stock_info
+            miller_phone = get_miller_phone(miller_id)
+            if miller_phone:
+                message = f"🆕 New booking received! Order {order_id}: {crop} - Qty: {qty}. Please review and approve."
+                send_sms(miller_phone, message)
         
         con.commit()
 
@@ -2126,6 +2634,21 @@ def cancel_booking(id):
                 decision_at=CURRENT_TIMESTAMP
             WHERE id=?
         """, (id,))
+        
+        # 📱 Send SMS to miller about cancellation
+        cur.execute("""
+            SELECT ms.miller_id, mb.order_id, ms.crop, mb.quantity
+            FROM miller_bookings mb
+            JOIN miller_stock ms ON mb.stock_id = ms.id
+            WHERE mb.id=?
+        """, (id,))
+        cancel_info = cur.fetchone()
+        if cancel_info:
+            miller_id, order_id, crop, qty = cancel_info
+            miller_phone = get_miller_phone(miller_id)
+            if miller_phone:
+                message = f"❌ Order {order_id} cancelled by buyer. {crop} - Qty: {qty}. Stock returned to inventory."
+                send_sms(miller_phone, message)
 
         con.commit()
 
@@ -2138,6 +2661,7 @@ def buyer_update_loading(id):
         return redirect("/market")
 
     load_qty = int(request.form.get("load_qty", 0))
+    truck_number = (request.form.get("truck_number") or "").strip()
     invoice = request.files.get("invoice")
 
     if load_qty <= 0 or not invoice:
@@ -2185,11 +2709,12 @@ def buyer_update_loading(id):
     """, (new_loaded, loading_status, truck_status, id, session["user_id"]))
 
     # 🔹 Save per-truck invoice
+    truck_number_val = truck_number if truck_number else None
     cur.execute("""
         INSERT INTO loading_invoices
-        (booking_id, loaded_qty, invoice_file)
-        VALUES (?, ?, ?)
-    """, (id, load_qty, filename))
+        (booking_id, loaded_qty, invoice_file, truck_number)
+        VALUES (?, ?, ?, ?)
+    """, (id, load_qty, filename, truck_number_val))
 
     # 🔹 MOVE RESERVED → USED STOCK
     cur.execute("""
@@ -2206,6 +2731,22 @@ def buyer_update_loading(id):
         SET status='closed'
         WHERE quantity <= 0
     """)
+    
+    # 📱 Send SMS to miller about loading update
+    cur.execute("""
+        SELECT ms.miller_id, mb.order_id, ms.crop, mb.loaded_qty, mb.quantity
+        FROM miller_bookings mb
+        JOIN miller_stock ms ON mb.stock_id = ms.id
+        WHERE mb.id=?
+    """, (id,))
+    loading_info = cur.fetchone()
+    if loading_info:
+        miller_id, order_id, crop, loaded_qty, total_qty = loading_info
+        miller_phone = get_miller_phone(miller_id)
+        if miller_phone:
+            truck_part = f" Truck: {truck_number}" if truck_number else ""
+            message = f"🚚 Loading update for Order {order_id}: {crop} - Loaded: {loaded_qty}/{total_qty}.{truck_part} Invoice uploaded."
+            send_sms(miller_phone, message)
 
     con.commit()
     con.close()
@@ -2217,6 +2758,8 @@ def buyer_edit_loading_invoice(invoice_id):
     """Edit/replace a loading invoice (per-truck invoice)."""
     if session.get("role") != "buyer":
         return redirect("/market")
+
+    truck_number = (request.form.get("truck_number") or "").strip()
 
     invoice = request.files.get("invoice")
     if not invoice or invoice.filename == "":
@@ -2241,12 +2784,14 @@ def buyer_edit_loading_invoice(invoice_id):
         con.close()
         return redirect("/market")
 
-    # ✅ Update the invoice file
+    # ✅ Update the invoice file (+ truck number)
+    truck_number_val = truck_number if truck_number else None
     cur.execute("""
         UPDATE loading_invoices
-        SET invoice_file=?
+        SET invoice_file=?,
+            truck_number=?
         WHERE id=?
-    """, (filename, invoice_id))
+    """, (filename, truck_number_val, invoice_id))
 
     con.commit()
     con.close()
@@ -2310,7 +2855,7 @@ def miller_update_qc(invoice_id):
     """, (invoice_id, miller_id))
     if not cur.fetchone():
         con.close()
-        return redirect("/miller")
+        return redirect(request.referrer or "/miller")
 
     qc_weight = request.form.get("qc_weight") or None
     qc_moisture = request.form.get("qc_moisture") or None
@@ -2336,11 +2881,28 @@ def miller_update_qc(invoice_id):
             qc_at=CURRENT_TIMESTAMP
         WHERE id=?
     """, (qc_weight_val, qc_moisture_val, qc_remarks, invoice_id))
+    
+    # 📱 Send SMS to buyer about QC update
+    cur.execute("""
+        SELECT mb.buyer_id, mb.order_id, li.loaded_qty, li.truck_number
+        FROM loading_invoices li
+        JOIN miller_bookings mb ON li.booking_id = mb.id
+        WHERE li.id=?
+    """, (invoice_id,))
+    qc_info = cur.fetchone()
+    if qc_info:
+        buyer_id, order_id, loaded_qty, truck_number = qc_info
+        buyer_phone = get_buyer_phone(buyer_id)
+        if buyer_phone:
+            qc_details = f"Weight: {qc_weight_val or 'N/A'}, Moisture: {qc_moisture_val or 'N/A'}"
+            truck_part = f" Truck: {truck_number}." if truck_number else ""
+            message = f"✅ QC verified for Order {order_id},{truck_part} Truck Qty: {loaded_qty}. {qc_details}"
+            send_sms(buyer_phone, message)
 
     con.commit()
     con.close()
 
-    return redirect("/miller")
+    return redirect(request.referrer or "/miller")
 
 
 # ---------------- ADMIN ----------------
@@ -2419,9 +2981,11 @@ def admin():
             mp.id,
             u.name,
             mp.mill_name,
-            mp.phone,
+            mp.owner_phone,
             mp.address,
-            mp.document,
+            mp.gst_doc,
+            mp.mandi_doc,
+            mp.other_doc,
             mp.created_at
         FROM miller_profiles mp
         JOIN users u ON mp.miller_id = u.id
@@ -2822,7 +3386,7 @@ def admin_view_miller(miller_id):
     cur = con.cursor()
 
     cur.execute("""
-        SELECT u.name, u.email, p.mill_name, p.phone, p.address, p.document
+        SELECT u.name, u.email, p.mill_name, p.owner_phone, p.address, p.gst_doc
         FROM users u
         LEFT JOIN miller_profiles p ON u.id = p.miller_id
         WHERE u.id=?
@@ -2869,6 +3433,71 @@ def admin_decline_booking(id):
     con.commit()
     con.close()
     return redirect("/admin/bookings")
+
+# ---------------- SMS TEST ROUTE ----------------
+@app.route("/test_sms", methods=["GET", "POST"])
+def test_sms():
+    """Test SMS functionality - for debugging only"""
+    result = {"success": False, "message": "", "details": {}}
+    
+    if request.method == "POST":
+        test_phone = request.form.get("phone", "")
+        test_message = request.form.get("message", "Test SMS from Sarna Broker")
+        
+        result["details"]["phone"] = test_phone
+        result["details"]["message"] = test_message
+        result["details"]["twilio_account_sid"] = "Set" if TWILIO_ACCOUNT_SID else "Missing"
+        result["details"]["twilio_auth_token"] = "Set" if TWILIO_AUTH_TOKEN else "Missing"
+        result["details"]["twilio_phone_number"] = TWILIO_PHONE_NUMBER if TWILIO_PHONE_NUMBER else "Missing"
+        
+        if test_phone:
+            success = send_sms(test_phone, test_message)
+            result["success"] = success
+            result["message"] = "SMS sent successfully!" if success else "Failed to send SMS. Check console for details."
+        else:
+            result["message"] = "Please provide a phone number"
+    
+    return f"""
+    <html>
+    <head><title>SMS Test</title></head>
+    <body style="font-family: Arial; padding: 20px;">
+        <h2>SMS Test Page</h2>
+        <form method="POST">
+            <p>
+                <label>Phone Number (with country code):</label><br>
+                <input type="text" name="phone" placeholder="+919876543210" style="width: 300px; padding: 5px;" required>
+            </p>
+            <p>
+                <label>Test Message:</label><br>
+                <textarea name="message" style="width: 300px; padding: 5px; height: 60px;">Test SMS from Sarna Broker</textarea>
+            </p>
+            <p>
+                <button type="submit" style="padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer;">Send Test SMS</button>
+            </p>
+        </form>
+        {f'''
+        <div style="margin-top: 20px; padding: 15px; background: {'#d4edda' if result['success'] else '#f8d7da'}; border: 1px solid {'#c3e6cb' if result['success'] else '#f5c6cb'};">
+            <h3>{'✅ Success' if result['success'] else '❌ Failed'}</h3>
+            <p><strong>Message:</strong> {result['message']}</p>
+            <p><strong>Details:</strong></p>
+            <ul>
+                <li>Phone: {result['details'].get('phone', 'N/A')}</li>
+                <li>Account SID: {result['details'].get('twilio_account_sid', 'N/A')}</li>
+                <li>Auth Token: {result['details'].get('twilio_auth_token', 'N/A')}</li>
+                <li>Twilio Phone: {result['details'].get('twilio_phone_number', 'N/A')}</li>
+            </ul>
+        </div>
+        ''' if request.method == "POST" else ""}
+        <hr>
+        <p><strong>Current Configuration:</strong></p>
+        <ul>
+            <li>Account SID: {'✅ Set' if TWILIO_ACCOUNT_SID else '❌ Missing'}</li>
+            <li>Auth Token: {'✅ Set' if TWILIO_AUTH_TOKEN else '❌ Missing'}</li>
+            <li>Phone Number: {TWILIO_PHONE_NUMBER if TWILIO_PHONE_NUMBER else '❌ Missing'}</li>
+        </ul>
+    </body>
+    </html>
+    """
     
 # ---------------- RUN ----------------
 if __name__ == "__main__":

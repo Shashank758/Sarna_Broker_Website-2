@@ -6,54 +6,120 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/style.css">
 
 <style>
 body{
-  background:#f4f7f6;
+  background:var(--bg-light);
   font-family:Inter,Segoe UI,sans-serif;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
 }
 
-/* NAVBAR */
-.navbar{
-  background:linear-gradient(90deg,#1e6f5c,#145a48);
+/* PAGE HEADER */
+.page-header{
+  background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);
+  color:#fff;
+  padding:25px 0;
+  margin-bottom:30px;
 }
-.navbar-brand{font-weight:900}
+.page-header h4{
+  font-weight:700;
+  margin:0;
+}
+.page-header .breadcrumb{
+  margin:0;
+  background:none;
+  padding:0;
+}
+.page-header .breadcrumb a{
+  color:rgba(255,255,255,0.8);
+  text-decoration:none;
+}
+.page-header .breadcrumb a:hover{
+  color:#fff;
+}
 
 /* SECTION */
 .section-card{
   background:#fff;
   border-radius:16px;
-  box-shadow:0 10px 25px rgba(0,0,0,.08);
-  padding:20px;
+  box-shadow:var(--shadow-md);
+  padding:25px;
+  border:1px solid rgba(0,0,0,.05);
 }
 
-/* FOOTER */
-.footer{
-  background:#0b1c2d;
-  color:#cfd6df;
-  padding:20px;
-  margin-top:40px;
-  text-align:center;
-  font-size:.85rem;
+/* TABLE ENHANCEMENTS */
+.table{
+  margin-bottom:0;
+}
+.table th{
+  background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);
+  font-weight:600;
+  font-size:0.85rem;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  color:#495057;
+  border-bottom:2px solid var(--primary);
+}
+.table td{
+  vertical-align:middle;
+  padding:15px 12px;
+}
+.table tbody tr{
+  transition:all 0.2s ease;
+}
+.table tbody tr:hover{
+  background:rgba(15,155,95,0.05);
+  transform:scale(1.005);
+}
+
+/* INVOICE ITEM */
+.invoice-item{
+  padding:8px 12px;
+  background:linear-gradient(135deg,#f8f9fa 0%,#fff 100%);
+  border-radius:8px;
+  margin-bottom:8px;
+  border:1px solid #e9ecef;
+  transition:all 0.2s ease;
+}
+.invoice-item:hover{
+  box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+main{
+  flex:1;
 }
 </style>
 </head>
 
 <body>
 
-<!-- ================= NAVBAR ================= -->
-<nav class="navbar navbar-expand-lg navbar-dark">
-  <div class="container">
-    <a class="navbar-brand" href="/miller">
-      <i class="fa fa-industry"></i> Miller Dashboard
-    </a>
-    <a href="/miller" class="btn btn-sm btn-light">
-      <i class="fa fa-arrow-left"></i> Back
-    </a>
-  </div>
-</nav>
+{% include '_navbar.html' %}
 
-<div class="container my-4">
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <nav class="breadcrumb mb-2">
+          <a href="/miller"><i class="fa fa-home"></i> Dashboard</a>
+          <span class="mx-2">/</span>
+          <span>Approved Orders</span>
+        </nav>
+        <h4><i class="fa fa-check-circle me-2"></i>Approved Orders</h4>
+      </div>
+      <a href="/miller" class="btn btn-light">
+        <i class="fa fa-arrow-left me-1"></i> Back
+      </a>
+    </div>
+  </div>
+</div>
+
+<main>
+<div class="container mb-5">
 
 <!-- ================= DATA SPLIT ================= -->
 {% set approved_loading = [] %}
@@ -64,11 +130,32 @@ body{
 {% endfor %}
 
 <!-- ================= APPROVED LOADING ================= -->
-<div class="section-card" id="approved-loading">
-  <h6 class="fw-bold mb-3">
-    <i class="fa fa-check-circle text-success"></i>
-    Approved Orders (Still Loading)
-  </h6>
+<div class="section-card" data-aos="fade-up" id="approved-loading">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h5 class="fw-bold mb-0">
+      <i class="fa fa-check-circle text-success me-2"></i>
+      Approved Orders (Still Loading)
+    </h5>
+    <span class="badge bg-success fs-6" id="approvedLoadingCount">{{ approved_loading|length }} Orders</span>
+  </div>
+
+  <!-- Filter & Search (QC pending trucks) -->
+  <div class="row g-2 align-items-center mb-3">
+    <div class="col-md-6">
+      <div class="btn-group" role="group" aria-label="QC Filter">
+        <button type="button" class="btn btn-sm btn-success approved-loading-filter-btn" data-filter="all" onclick="filterApprovedLoading('all')">All</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary approved-loading-filter-btn" data-filter="pending" onclick="filterApprovedLoading('pending')">QC Pending</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary approved-loading-filter-btn" data-filter="verified" onclick="filterApprovedLoading('verified')">QC Verified</button>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <input type="text"
+             id="approvedLoadingSearchInput"
+             class="form-control form-control-sm"
+             placeholder="Search by Order ID, Buyer, Crop, Truck..."
+             onkeyup="searchApprovedLoading()">
+    </div>
+  </div>
 
   {% if approved_loading %}
   <div class="table-responsive">
@@ -93,7 +180,21 @@ body{
       {% set loaded = b[7] %}
       {% set remaining = booked - loaded %}
 
-      <tr>
+      {% set invs = invoices_map.get(booking_id) %}
+      {% set ns = namespace(pending=0, search=(b[10]|string + ' ' + b[1] + ' ' + b[2])|lower) %}
+      {% if invs %}
+        {% for inv in invs %}
+          {% if inv.qc_status != 'verified' %}
+            {% set ns.pending = ns.pending + 1 %}
+          {% endif %}
+          {% if inv.truck_number %}
+            {% set ns.search = ns.search + ' ' + (inv.truck_number|string|lower) %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      {% set qc_row_status = 'none' if not invs else ('pending' if ns.pending > 0 else 'verified') %}
+
+      <tr class="approved-loading-row" data-qc="{{ qc_row_status }}" data-search="{{ ns.search }}">
         <td><strong class="text-primary">{{ b[10] }}</strong></td>
         <td>{{ b[1] }}</td>
         <td class="text-capitalize">{{ b[2] }}</td>
@@ -102,18 +203,120 @@ body{
         <td><span class="badge bg-success">{{ loaded }} Qt</span></td>
         <td><span class="badge bg-warning text-dark">{{ remaining }} Qt</span></td>
 
-        <!-- Invoices -->
+        <!-- Invoices + QC (for loaded trucks even if order still loading) -->
         <td>
-          {% if invoices_map.get(booking_id) %}
-            {% for inv in invoices_map[booking_id] %}
-              <div class="mb-1">
-                <span class="badge bg-info">{{ inv.qty }} Qt</span>
-                <a href="/static/uploads/bills/{{ inv.file }}"
-                   target="_blank"
-                   class="btn btn-sm btn-outline-primary ms-1">
-                   <i class="fa fa-file-invoice"></i>
-                </a>
-                <small class="text-muted d-block">{{ inv.date[:16] }}</small>
+          {% if invs %}
+            {% if ns.pending > 0 %}
+              <span class="badge bg-warning text-dark mb-2 d-inline-block">QC Pending: {{ ns.pending }}</span>
+            {% else %}
+              <span class="badge bg-success mb-2 d-inline-block">QC Verified</span>
+            {% endif %}
+
+            {% for inv in invs %}
+              <div class="mb-2 p-2 border rounded" style="background:#f8f9fa;">
+                <div class="d-flex justify-content-between align-items-start gap-2">
+                  <div>
+                    <div class="fw-semibold">
+                      {% if inv.truck_number %}
+                        Truck {{ inv.truck_number }}
+                      {% else %}
+                        Truck #{{ loop.index }}
+                      {% endif %}
+                      <span class="badge bg-info ms-2">{{ inv.qty }} Qt</span>
+                    </div>
+
+                    <a href="/static/uploads/bills/{{ inv.file }}"
+                       target="_blank"
+                       class="btn btn-sm btn-outline-primary mt-1">
+                      <i class="fa fa-file-invoice"></i> Invoice
+                    </a>
+
+                    <small class="text-muted d-block">{{ inv.date[:16] }}</small>
+                  </div>
+
+                  <div class="text-end">
+                    {% if inv.qc_status == 'verified' %}
+                      <span class="badge bg-success">✅ QC Verified</span>
+                    {% else %}
+                      <span class="badge bg-warning text-dark">⏳ QC Pending</span>
+                    {% endif %}
+
+                    {% if inv.qc_status != 'verified' %}
+                      <button type="button" class="btn btn-sm btn-success mt-2"
+                              data-bs-toggle="collapse"
+                              data-bs-target="#qcCollapse{{ inv.id }}"
+                              aria-expanded="false">
+                        <i class="fa fa-clipboard-check"></i> Do QC
+                      </button>
+                    {% endif %}
+                  </div>
+                </div>
+
+                {% if inv.qc_status == 'verified' %}
+                  <div class="mt-2">
+                    <small class="text-muted d-block">Net: {{ inv.qc_weight or inv.qty }} Qt • Moisture: {{ inv.qc_moisture or '-' }}%</small>
+                    {% if inv.qc_remarks %}
+                      <small class="text-muted d-block">Remarks: {{ inv.qc_remarks }}</small>
+                    {% endif %}
+                    {% if inv.qc_at %}
+                      <small class="text-muted d-block">Verified on {{ inv.qc_at[:16] }}</small>
+                    {% endif %}
+                  </div>
+                {% endif %}
+
+                {% if inv.qc_status != 'verified' %}
+                  <!-- QC Collapse (more reliable than modal inside tables) -->
+                  <div class="collapse mt-2" id="qcCollapse{{ inv.id }}">
+                    <div class="card card-body">
+                      <div class="fw-semibold mb-2">
+                        Quality Check -
+                        {% if inv.truck_number %}
+                          Truck {{ inv.truck_number }}
+                        {% else %}
+                          Truck #{{ loop.index }}
+                        {% endif %}
+                      </div>
+
+                      <form method="POST" action="/miller/update_qc/{{ inv.id }}">
+                        <div class="row g-2 mb-2">
+                          <div class="col-6">
+                            <label class="form-label small mb-1">Net Weight (Qt)</label>
+                            <input type="number"
+                                   name="qc_weight"
+                                   class="form-control form-control-sm"
+                                   value="{{ inv.qty }}"
+                                   required>
+                          </div>
+                          <div class="col-6">
+                            <label class="form-label small mb-1">Moisture (%)</label>
+                            <input type="number"
+                                   step="0.1"
+                                   name="qc_moisture"
+                                   class="form-control form-control-sm"
+                                   required>
+                          </div>
+                        </div>
+                        <div class="mb-2">
+                          <label class="form-label small mb-1">Remarks (Optional)</label>
+                          <textarea name="qc_remarks"
+                                    class="form-control form-control-sm"
+                                    rows="2"
+                                    placeholder="Quality notes, deductions, etc."></textarea>
+                        </div>
+                        <div class="d-flex gap-2">
+                          <button type="button" class="btn btn-sm btn-outline-secondary"
+                                  data-bs-toggle="collapse"
+                                  data-bs-target="#qcCollapse{{ inv.id }}">
+                            Cancel
+                          </button>
+                          <button type="submit" class="btn btn-sm btn-success">
+                            <i class="fa fa-clipboard-check"></i> Save QC
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                {% endif %}
               </div>
             {% endfor %}
           {% else %}
@@ -142,11 +345,65 @@ body{
   {% endif %}
 </div>
 </div>
+</main>
 
-<!-- ================= FOOTER ================= -->
-<footer class="footer">
-  © 2026 <b>Sarna Mandi</b> · Approved Orders
-</footer>
+{% include '_footer.html' %}
 
+<script>
+  // ================= Approved Loading Filter & Search =================
+  let currentApprovedLoadingFilter = 'all';
+
+  function setApprovedLoadingButtonState(activeFilter) {
+    document.querySelectorAll('.approved-loading-filter-btn').forEach(btn => {
+      const isActive = btn.dataset.filter === activeFilter;
+      btn.classList.toggle('btn-success', isActive);
+      btn.classList.toggle('btn-outline-secondary', !isActive);
+    });
+  }
+
+  function filterApprovedLoading(status) {
+    currentApprovedLoadingFilter = status;
+    setApprovedLoadingButtonState(status);
+    applyApprovedLoadingFilter();
+  }
+
+  function searchApprovedLoading() {
+    applyApprovedLoadingFilter();
+  }
+
+  function applyApprovedLoadingFilter() {
+    const searchTerm = (document.getElementById('approvedLoadingSearchInput')?.value || '').toLowerCase();
+    const rows = document.querySelectorAll('.approved-loading-row');
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+      const qc = row.dataset.qc || 'none';
+      const searchText = row.dataset.search || '';
+
+      const statusMatch = (currentApprovedLoadingFilter === 'all') || (qc === currentApprovedLoadingFilter);
+      const searchMatch = !searchTerm || searchText.includes(searchTerm);
+
+      if (statusMatch && searchMatch) {
+        row.style.display = '';
+        visibleCount++;
+      } else {
+        row.style.display = 'none';
+      }
+    });
+
+    const countBadge = document.getElementById('approvedLoadingCount');
+    if (countBadge) {
+      countBadge.textContent = `${visibleCount} Orders`;
+    }
+  }
+
+  // Init
+  setApprovedLoadingButtonState('all');
+  window.addEventListener('load', applyApprovedLoadingFilter);
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>AOS.init({duration:600,once:true});</script>
 </body>
 </html>

@@ -6,26 +6,49 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/style.css">
 
 <style>
 body{
-  background:#f4f7f6;
+  background:var(--bg-light);
   font-family:Inter,Segoe UI,sans-serif;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
 }
 
-/* NAVBAR */
-.navbar{
-  background:linear-gradient(90deg,#1e6f5c,#145a48);
+/* PAGE HEADER */
+.page-header{
+  background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);
+  color:#fff;
+  padding:25px 0;
+  margin-bottom:30px;
 }
-.navbar-brand{font-weight:900}
+.page-header h4{
+  font-weight:700;
+  margin:0;
+}
+.page-header .breadcrumb{
+  margin:0;
+  background:none;
+  padding:0;
+}
+.page-header .breadcrumb a{
+  color:rgba(255,255,255,0.8);
+  text-decoration:none;
+}
+.page-header .breadcrumb a:hover{
+  color:#fff;
+}
 
 /* SECTION */
 .section-card{
   background:#fff;
   border-radius:18px;
-  box-shadow:0 10px 28px rgba(0,0,0,.08);
-  border:1px solid #e5e9ec;
-  padding:20px;
+  box-shadow:var(--shadow-md);
+  border:1px solid rgba(0,0,0,.05);
+  padding:25px;
 }
 
 /* SCROLL */
@@ -34,37 +57,52 @@ body{
   overflow-y:auto;
 }
 
-/* FOOTER */
-.footer{
-  background:#0b1c2d;
-  color:#cfd6df;
-  padding:20px;
-  margin-top:40px;
-  text-align:center;
-  font-size:.85rem;
+/* PAYMENT CARD */
+.payment-card{
+  border-radius:14px;
+  transition:all 0.3s ease;
+  border:1px solid rgba(0,0,0,.08);
+}
+.payment-card:hover{
+  transform:translateY(-5px);
+  box-shadow:var(--shadow-lg);
+}
+
+main{
+  flex:1;
 }
 </style>
 </head>
 
 <body>
 
-<!-- ================= NAVBAR ================= -->
-<nav class="navbar navbar-expand-lg navbar-dark">
-  <div class="container">
-    <a class="navbar-brand" href="/miller">
-      <i class="fa fa-industry"></i> Miller Dashboard
-    </a>
-    <a href="/miller" class="btn btn-sm btn-light">
-      <i class="fa fa-arrow-left"></i> Back
-    </a>
-  </div>
-</nav>
+{% include '_navbar.html' %}
 
-<div class="container my-4">
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <nav class="breadcrumb mb-2">
+          <a href="/miller"><i class="fa fa-home"></i> Dashboard</a>
+          <span class="mx-2">/</span>
+          <span>Payment Completed</span>
+        </nav>
+        <h4><i class="fa fa-check-circle me-2"></i>Payment Completed</h4>
+      </div>
+      <a href="/miller" class="btn btn-light">
+        <i class="fa fa-arrow-left me-1"></i> Back
+      </a>
+    </div>
+  </div>
+</div>
+
+<main>
+<div class="container mb-5">
 
 <!-- ================= PAYMENT COMPLETED ================= -->
 {% if payment_completed %}
-<div class="section-card">
+<div class="section-card" data-aos="fade-up">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h6 class="fw-bold mb-0">
       <i class="fa fa-check-circle text-success"></i>
@@ -88,8 +126,8 @@ body{
       {% set final_invoice = b[17] %}
       {% set payment_at = b[18] %}
 
-      <div class="col-md-6">
-        <div class="card border-0 shadow-sm h-100">
+      <div class="col-md-6" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
+        <div class="card border-0 shadow-sm h-100 payment-card">
           <div class="card-body">
 
             <div class="d-flex justify-content-between align-items-start mb-3">
@@ -166,16 +204,19 @@ body{
   </div>
 </div>
 {% else %}
-<p class="text-muted text-center">No completed payments yet.</p>
+<div class="section-card text-center py-5" data-aos="fade-up">
+  <i class="fa fa-check-circle fa-3x text-muted mb-3"></i>
+  <p class="text-muted mb-0">No completed payments yet.</p>
+</div>
 {% endif %}
 
 </div>
+</main>
 
-<!-- ================= FOOTER ================= -->
-<footer class="footer">
-  © 2026 <b>Sarna Mandi</b> · Payment Completed
-</footer>
+{% include '_footer.html' %}
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>AOS.init({duration:600,once:true});</script>
 </body>
 </html>

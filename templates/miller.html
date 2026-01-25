@@ -2,418 +2,455 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Miller Dashboard | Sarna Broker</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Miller Dashboard | Sarna Mandi</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/style.css">
 
 <style>
-  :root{
-    --mandi-brown:#8b6f47;
-    --mandi-dark:#6b5638;
-    --mandi-light:#d4c4a8;
-    --mandi-bg:#f5f3f0;
-    --mandi-card:#ffffff;
-    --mandi-text:#3a3429;
-    --mandi-border:#d4c4a8;
-    --mandi-success:#6b8e23;
-    --radius:8px;
-  }
-  
-  /* ---------- GLOBAL ---------- */
-  body{
-    background:var(--mandi-bg);
-    font-family:"Segoe UI", "Roboto", sans-serif;
-    color:var(--mandi-text);
-    line-height:1.6;
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
-  }
-  
-  /* ---------- HEADER ---------- */
-  .mandi-header{
-    background:#8b6f47;
-    color:#fff;
-    padding:24px 28px;
-    border-radius:var(--radius);
-    margin-top:20px;
-    box-shadow:0 2px 8px rgba(0,0,0,.1);
-    border-bottom:3px solid #6b5638;
-  }
-  .mandi-header h4{
-    font-weight:700;
-    letter-spacing:.5px;
-    font-size:24px;
-    margin:0;
-  }
-  .mandi-header small{
-    opacity:.95;
-    font-size:14px;
-    display:block;
-    margin-top:4px;
-  }
-  
-  /* ---------- PROFILE BUTTON ---------- */
-  .profile-btn{
-    position:absolute;
-    right:24px;
-    top:50%;
-    transform:translateY(-50%);
-    border-radius:6px;
-    padding:8px 16px;
-    font-weight:600;
-    background:rgba(255,255,255,.15);
-    border:1px solid rgba(255,255,255,.3);
-    color:#fff;
-    transition:all .2s;
-  }
-  .profile-btn:hover{
-    background:rgba(255,255,255,.25);
-    color:#fff;
-  }
-  
-  /* ---------- CARDS ---------- */
-  .section-card{
-    background:var(--mandi-card);
-    border-radius:var(--radius);
-    padding:24px;
-    margin-bottom:24px;
-    box-shadow:0 1px 3px rgba(0,0,0,.1);
-    border:1px solid var(--mandi-border);
-  }
-  
-  /* ---------- TITLES ---------- */
-  .section-title{
-    font-weight:700;
-    margin-bottom:20px;
-    font-size:18px;
-    display:flex;
-    align-items:center;
-    gap:10px;
-    color:var(--mandi-dark);
-    padding-bottom:12px;
-    border-bottom:2px solid var(--mandi-border);
-  }
-  
-  /* ---------- FILTER CARD ---------- */
-  .card{
-    border-radius:var(--radius);
-    border:1px solid var(--mandi-border);
-    box-shadow:0 1px 3px rgba(0,0,0,.08);
-    background:var(--mandi-card);
-  }
-  
-  /* ---------- TABLE ---------- */
-  .table{
-    margin-bottom:0;
-    border-color:var(--mandi-border);
-  }
-  .table th{
-    background:#f5f3f0;
-    text-align:center;
-    font-size:13px;
-    font-weight:700;
-    border:1px solid var(--mandi-border);
-    color:var(--mandi-dark);
-    padding:12px 8px;
-  }
-  .table td{
-    text-align:center;
-    vertical-align:middle;
-    font-size:14px;
-    border:1px solid var(--mandi-border);
-    padding:10px 8px;
-  }
-  .table tr:hover{
-    background:#faf9f7;
-  }
-  
-  /* ---------- BADGES ---------- */
-  .badge{
-    font-size:12px;
-    padding:5px 10px;
-    border-radius:4px;
-    font-weight:600;
-  }
-  .qty-badge{
-    font-weight:700;
-  }
-  
-  /* ---------- BUTTONS ---------- */
-  .btn-agri{
-    background:var(--mandi-brown);
-    color:#fff;
-    border:none;
-    font-weight:600;
-    border-radius:6px;
-    padding:12px 20px;
-    transition:all .2s;
-  }
-  .btn-agri:hover{
-    background:var(--mandi-dark);
-    color:#fff;
-  }
-  
-  .btn-success{
-    background:var(--mandi-success);
-    border:none;
-    border-radius:6px;
-    font-weight:600;
-  }
-  .btn-success:hover{
-    background:#556b2f;
-  }
-  
-  .btn-danger{
-    border-radius:6px;
-    font-weight:600;
-  }
-  
-  /* ---------- ALERT STATS ---------- */
-  .alert{
-    border-radius:var(--radius);
-    font-weight:600;
-    border:1px solid var(--mandi-border);
-    background:#fff;
-  }
-  
-  /* ---------- INPUTS ---------- */
-  .form-control, .form-select{
-    border-radius:6px;
-    padding:10px 12px;
-    border:1px solid var(--mandi-border);
-    background:#fff;
-  }
-  .form-control:focus, .form-select:focus{
-    border-color:var(--mandi-brown);
-    box-shadow:0 0 0 .2rem rgba(139,111,71,.15);
-    background:#fff;
-  }
-  .form-label{
-    font-weight:600;
-    color:var(--mandi-dark);
-    margin-bottom:6px;
-    font-size:14px;
-  }
-  
-  /* ---------- ACTION AREA ---------- */
-  td form input{
-    border-radius:8px;
-  }
-  
-  /* ---------- MOBILE ---------- */
-  @media(max-width:768px){
-    .profile-btn{
-      position:static;
-      margin-top:12px;
-    }
-  }
+:root{
+  --primary:#0f9b5f;
+  --primary-dark:#0d8a54;
+  --primary-darker:#0a7548;
+  --primary-light:#12b36e;
+  --bg-light:#f4f7f6;
+  --card-bg:#ffffff;
+  --text-primary:#1e293b;
+  --text-muted:#64748b;
+  --border-color:#e2e8f0;
+  --success:#10b981;
+  --warning:#f59e0b;
+  --danger:#ef4444;
+  --info:#3b82f6;
+  --radius:16px;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.05);
+  --shadow-md:0 4px 15px rgba(0,0,0,.08);
+  --shadow-lg:0 10px 40px rgba(0,0,0,.12);
+}
 
-  /* ---------- COMPLETED LOADING CARDS ---------- */
-  .completed-loading-card{
-    transition:transform .2s ease, box-shadow .2s ease;
-  }
-  .completed-loading-card:hover{
-    transform:translateY(-2px);
-    box-shadow:0 12px 30px rgba(0,0,0,.12) !important;
-  }
-  .qc-scroll-container{
-    max-height:65vh;
-    overflow-y:auto;
-    padding-right:8px;
-  }
-  .qc-scroll-container::-webkit-scrollbar{
-    width:10px;
-  }
-  .qc-scroll-container::-webkit-scrollbar-thumb{
-    background:#cbd5e0;
-    border-radius:999px;
-    border:3px solid transparent;
-    background-clip:content-box;
-  }
-  .qc-scroll-container::-webkit-scrollbar-track{
-    background:#f1f5f9;
-    border-radius:999px;
-  }
-  .qc-filter-bar{
-    display:flex;
-    gap:10px;
-    align-items:center;
-    flex-wrap:wrap;
-    margin-bottom:16px;
-    padding:12px;
-    background:#f8f9fa;
-    border-radius:12px;
-  }
-  .qc-filter-btn{
-    padding:6px 14px;
-    border-radius:20px;
-    font-weight:600;
-    font-size:13px;
-    border:2px solid transparent;
-    background:#fff;
-    cursor:pointer;
-    transition:all .2s;
-  }
-  .qc-filter-btn.active{
-    background:var(--green);
-    color:#fff;
-    border-color:var(--green);
-  }
-  .qc-filter-btn:hover:not(.active){
-    background:#e9ecef;
-  }
-  .qc-search-box{
-    flex:1;
-    min-width:200px;
-  }
+/* ========== GLOBAL ========== */
+body{
+  background:var(--bg-light);
+  font-family:'Segoe UI','Inter',sans-serif;
+  color:var(--text-primary);
+  line-height:1.6;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
 
-  /* ---------- NAVBAR ---------- */
-  .navbar{
-    background:linear-gradient(90deg,#8b6f47,#6b5638);
-    border-radius:0;
-  }
-  .navbar-brand{
-    font-weight:900;
-    color:#fff !important;
-  }
-  .nav-link{
-    font-weight:700;
-    color:#fff !important;
-    transition:all .2s;
-  }
-  .nav-link:hover{
-    background:rgba(255,255,255,.1);
-    border-radius:6px;
-  }
-  .nav-link.active{
-    background:rgba(255,255,255,.2);
-    border-radius:6px;
-  }
+main{
+  flex:1;
+}
 
-  /* ---------- FOOTER ---------- */
-  .footer{
-    background:#0b1c2d;
-    color:#cfd6df;
-    padding:40px 0 20px;
-    margin-top:auto;
-  }
-  .footer h6{
-    color:#fff;
-    font-weight:800;
-  }
-  .footer a{
-    color:#cfd6df;
-    text-decoration:none;
-  }
-  .footer a:hover{
-    color:#fff;
-  }
-  .footer-bottom{
-    border-top:1px solid rgba(255,255,255,.1);
-    margin-top:20px;
-    padding-top:15px;
-    font-size:.85rem;
-    text-align:center;
-  }
+/* ========== HERO DASHBOARD HEADER ========== */
+.dashboard-hero{
+  background:linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 50%, var(--primary-darker) 100%);
+  color:#fff;
+  padding:40px 0;
+  position:relative;
+  overflow:hidden;
+}
+.dashboard-hero::before{
+  content:'';
+  position:absolute;
+  top:-100px;
+  right:-100px;
+  width:400px;
+  height:400px;
+  background:radial-gradient(circle,rgba(255,255,255,0.1) 0%,transparent 70%);
+  pointer-events:none;
+}
+.dashboard-hero::after{
+  content:'';
+  position:absolute;
+  bottom:-50px;
+  left:-50px;
+  width:200px;
+  height:200px;
+  background:radial-gradient(circle,rgba(255,255,255,0.08) 0%,transparent 70%);
+  pointer-events:none;
+}
+.dashboard-hero h1{
+  font-weight:800;
+  font-size:2rem;
+  margin-bottom:8px;
+}
+.dashboard-hero p{
+  opacity:0.9;
+  font-size:1rem;
+  margin:0;
+}
 
-  /* ---------- SCROLL TO SECTION ---------- */
-  html{
-    scroll-behavior:smooth;
-  }
-  </style>
-  
+/* ========== STAT CARDS ========== */
+.stat-card{
+  background:#fff;
+  border-radius:var(--radius);
+  padding:24px;
+  box-shadow:var(--shadow-md);
+  border:1px solid rgba(0,0,0,.05);
+  transition:all 0.3s ease;
+  position:relative;
+  overflow:hidden;
+}
+.stat-card:hover{
+  transform:translateY(-5px);
+  box-shadow:var(--shadow-lg);
+}
+.stat-card .stat-icon{
+  width:56px;
+  height:56px;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:24px;
+  color:#fff;
+}
+.stat-card .stat-icon.stocks{background:linear-gradient(135deg,var(--primary),var(--primary-dark));}
+.stat-card .stat-icon.pending{background:linear-gradient(135deg,var(--warning),#d97706);}
+.stat-card .stat-icon.approved{background:linear-gradient(135deg,var(--success),#059669);}
+.stat-card .stat-icon.completed{background:linear-gradient(135deg,var(--info),#2563eb);}
+.stat-card .stat-value{
+  font-size:2rem;
+  font-weight:800;
+  color:var(--text-primary);
+  line-height:1;
+}
+.stat-card .stat-label{
+  font-size:0.85rem;
+  color:var(--text-muted);
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+}
+.stat-card::before{
+  content:'';
+  position:absolute;
+  top:0;
+  left:0;
+  width:4px;
+  height:100%;
+  border-radius:var(--radius) 0 0 var(--radius);
+}
+.stat-card.stocks::before{background:var(--primary);}
+.stat-card.pending::before{background:var(--warning);}
+.stat-card.approved::before{background:var(--success);}
+.stat-card.completed::before{background:var(--info);}
+
+/* ========== QUICK ACTIONS ========== */
+.quick-actions{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:20px;
+}
+.quick-action-btn{
+  background:rgba(255,255,255,0.15);
+  border:1px solid rgba(255,255,255,0.3);
+  color:#fff;
+  padding:10px 20px;
+  border-radius:10px;
+  font-weight:600;
+  font-size:0.9rem;
+  transition:all 0.3s ease;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+}
+.quick-action-btn:hover{
+  background:rgba(255,255,255,0.25);
+  color:#fff;
+  transform:translateY(-2px);
+}
+
+/* ========== SECTION CARDS ========== */
+.section-card{
+  background:var(--card-bg);
+  border-radius:var(--radius);
+  padding:28px;
+  margin-bottom:28px;
+  box-shadow:var(--shadow-md);
+  border:1px solid rgba(0,0,0,.05);
+}
+
+.section-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:24px;
+  padding-bottom:16px;
+  border-bottom:2px solid var(--border-color);
+}
+.section-title{
+  font-weight:700;
+  font-size:1.15rem;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  color:var(--text-primary);
+  margin:0;
+}
+.section-title .icon-box{
+  width:40px;
+  height:40px;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+}
+.section-title .icon-box.green{background:rgba(15,155,95,0.1);color:var(--primary);}
+.section-title .icon-box.yellow{background:rgba(245,158,11,0.1);color:var(--warning);}
+.section-title .icon-box.blue{background:rgba(59,130,246,0.1);color:var(--info);}
+.section-title .icon-box.red{background:rgba(239,68,68,0.1);color:var(--danger);}
+
+.section-badge{
+  font-size:0.85rem;
+  padding:8px 16px;
+  border-radius:30px;
+  font-weight:600;
+}
+
+/* ========== FORM STYLING ========== */
+.form-group{
+  margin-bottom:20px;
+}
+.form-label{
+  font-weight:600;
+  color:var(--text-primary);
+  margin-bottom:8px;
+  font-size:0.9rem;
+}
+.form-control,.form-select{
+  border-radius:10px;
+  padding:12px 16px;
+  border:2px solid var(--border-color);
+  font-size:0.95rem;
+  transition:all 0.3s ease;
+}
+.form-control:focus,.form-select:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 4px rgba(15,155,95,0.15);
+}
+.form-control-sm{
+  padding:8px 12px;
+  font-size:0.85rem;
+}
+
+/* ========== BUTTONS ========== */
+.btn-primary-custom{
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  color:#fff;
+  border:none;
+  font-weight:600;
+  border-radius:10px;
+  padding:14px 28px;
+  font-size:1rem;
+  transition:all 0.3s ease;
+}
+.btn-primary-custom:hover{
+  background:linear-gradient(135deg,var(--primary-dark),var(--primary-darker));
+  color:#fff;
+  transform:translateY(-2px);
+  box-shadow:0 8px 25px rgba(15,155,95,0.3);
+}
+
+/* ========== TABLE STYLING ========== */
+.table-modern{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+}
+.table-modern thead th{
+  background:linear-gradient(135deg,#f8fafc,#f1f5f9);
+  padding:16px 14px;
+  font-size:0.8rem;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  color:var(--text-muted);
+  border-bottom:2px solid var(--primary);
+  text-align:center;
+}
+.table-modern tbody td{
+  padding:16px 14px;
+  text-align:center;
+  vertical-align:middle;
+  border-bottom:1px solid var(--border-color);
+  font-size:0.9rem;
+}
+.table-modern tbody tr{
+  transition:all 0.2s ease;
+}
+.table-modern tbody tr:hover{
+  background:rgba(15,155,95,0.03);
+}
+
+/* ========== ORDER CARDS ========== */
+.order-card{
+  background:#fff;
+  border-radius:14px;
+  border:1px solid rgba(0,0,0,.08);
+  padding:20px;
+  transition:all 0.3s ease;
+  height:100%;
+}
+.order-card:hover{
+  transform:translateY(-5px);
+  box-shadow:var(--shadow-lg);
+  border-color:var(--primary);
+}
+.order-card .order-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  margin-bottom:16px;
+}
+.order-card .order-id{
+  font-weight:700;
+  color:var(--primary);
+  font-size:1rem;
+}
+.order-card .order-meta{
+  color:var(--text-muted);
+  font-size:0.85rem;
+}
+.order-card .order-badges{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin:12px 0;
+}
+
+/* ========== TRUCK QC ITEM ========== */
+.truck-qc-item{
+  background:linear-gradient(135deg,#f8fafc,#fff);
+  border:1px solid var(--border-color);
+  border-radius:12px;
+  padding:16px;
+  margin-bottom:12px;
+  transition:all 0.2s ease;
+}
+.truck-qc-item:hover{
+  border-color:var(--primary);
+  box-shadow:0 4px 15px rgba(15,155,95,0.1);
+}
+
+/* ========== FILTER BAR ========== */
+.filter-bar{
+  background:linear-gradient(135deg,#f8fafc,#fff);
+  border:1px solid var(--border-color);
+  border-radius:14px;
+  padding:20px;
+  margin-bottom:24px;
+}
+.filter-pill{
+  padding:8px 18px;
+  border-radius:25px;
+  font-weight:600;
+  font-size:0.85rem;
+  border:2px solid var(--border-color);
+  background:#fff;
+  color:var(--text-muted);
+  cursor:pointer;
+  transition:all 0.2s ease;
+}
+.filter-pill:hover{
+  border-color:var(--primary);
+  color:var(--primary);
+}
+.filter-pill.active{
+  background:var(--primary);
+  color:#fff;
+  border-color:var(--primary);
+}
+
+/* ========== SCROLL CONTAINER ========== */
+.scroll-container{
+  max-height:70vh;
+  overflow-y:auto;
+  padding-right:10px;
+}
+.scroll-container::-webkit-scrollbar{
+  width:8px;
+}
+.scroll-container::-webkit-scrollbar-thumb{
+  background:var(--primary);
+  border-radius:10px;
+}
+.scroll-container::-webkit-scrollbar-track{
+  background:#f1f5f9;
+  border-radius:10px;
+}
+
+/* ========== EMPTY STATE ========== */
+.empty-state{
+  text-align:center;
+  padding:40px 20px;
+}
+.empty-state i{
+  font-size:48px;
+  color:var(--border-color);
+  margin-bottom:16px;
+}
+.empty-state p{
+  color:var(--text-muted);
+  margin:0;
+}
+
+/* ========== RESPONSIVE ========== */
+@media(max-width:768px){
+  .dashboard-hero h1{font-size:1.5rem;}
+  .stat-card{padding:18px;}
+  .stat-card .stat-value{font-size:1.5rem;}
+  .quick-actions{justify-content:center;}
+}
+
+/* ========== SMOOTH SCROLL ========== */
+html{
+  scroll-behavior:smooth;
+}
+</style>
 </head>
 
-<body class="bg-light">
-<div style="display:flex; flex-direction:column; min-height:100vh;">
-<!-- ================= NAVBAR ================= -->
-<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+<body>
+
+{% include '_navbar.html' %}
+
+<!-- ================= DASHBOARD HERO ================= -->
+<section class="dashboard-hero">
   <div class="container">
-    <a class="navbar-brand" href="/miller">
-      <i class="fa fa-industry"></i> Miller Dashboard
-    </a>
-
-    <button class="navbar-toggler" type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#millerNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="millerNav">
-      <ul class="navbar-nav ms-auto">
-
-        {% if session['is_staff'] %}
-        <li class="nav-item">
-          <span class="nav-link"
-                style="background:#d4a574;
-                       color:#3a3429 !important;
-                       border-radius:6px;
-                       margin-right:10px;">
-            <i class="fa fa-user-shield me-1"></i> STAFF MODE
-          </span>
-        </li>
-        {% endif %}
-
-        <!-- 🔁 REDIRECTING LINKS -->
-        <li class="nav-item">
-          <a class="nav-link {% if request.path == '/miller/approved' %}active{% endif %}"
-             href="/miller/approved">
-            <i class="fa fa-clock me-1"></i> Approved Orders
+    <div class="row align-items-center">
+      <div class="col-lg-8" data-aos="fade-right">
+        <h1><i class="fa fa-industry me-3"></i>Miller Trading Dashboard</h1>
+        <p><i class="fa fa-chart-line me-2"></i>Manage your stock, approve orders, track quality & process payments — all in one place</p>
+        
+        <div class="quick-actions">
+          <a href="#post-stock" class="quick-action-btn">
+            <i class="fa fa-plus-circle"></i> Post Stock
           </a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link {% if request.path == '/miller/qc' %}active{% endif %}"
-             href="/miller/qc">
-            <i class="fa fa-clipboard-check me-1"></i> Quality Check
+          <a href="#pending-orders" class="quick-action-btn">
+            <i class="fa fa-clock"></i> Pending Orders
           </a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link {% if request.path == '/miller/final-hisab' %}active{% endif %}"
-             href="/miller/final-hisab">
-            <i class="fa fa-file-invoice me-1"></i> Final Hisab
+          <a href="#quality-check" class="quick-action-btn">
+            <i class="fa fa-clipboard-check"></i> Quality Check
           </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link {% if request.path == '/miller/payment-completed' %}active{% endif %}"
-             href="/miller/payment-completed">
-            <i class="fa fa-check-circle me-1"></i> Payment Completed
+          <a href="/miller/profile" class="quick-action-btn">
+            <i class="fa fa-user-cog"></i> Profile
           </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link {% if request.path == '/miller/rejected' %}active{% endif %}"
-             href="/miller/rejected">
-            <i class="fa fa-times-circle me-1"></i> Rejected
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link {% if request.path == '/miller/profile' %}active{% endif %}"
-             href="/miller/profile">
-            <i class="fa fa-user me-1"></i> Profile
-          </a>
-        </li>
-      </ul>
+        </div>
+      </div>
     </div>
   </div>
-</nav>
+</section>
 
-
-<main class="flex-fill">
-<div class="container mb-5" style="max-width:1200px;">
-
-<!-- ================= DASHBOARD HEADER ================= -->
-<div class="mandi-header position-relative mt-4">
-  <div class="d-flex justify-content-between align-items-center">
-    <div>
-      <h4><i class="fa fa-industry me-2"></i> Miller Trading Dashboard</h4>
-      <small><i class="fa fa-chart-line me-1"></i> Manage stock, approve orders & view trade status</small>
-    </div>
-  </div>
-</div>
+<main>
+<div class="container py-4" style="max-width:1200px;">
 
 <!-- ================= QUICK STATS ================= -->
 {% set total_stocks = stocks|length %}
@@ -421,63 +458,58 @@
 {% set total_approved = approved|length %}
 {% set total_completed = completed_loading_qc|length if completed_loading_qc else 0 %}
 
-<div class="row g-3 mt-3 mb-4">
-  <div class="col-md-3">
-    <div class="card border-0" style="background:#fff; border-left:3px solid #8b6f47 !important; box-shadow:0 1px 3px rgba(0,0,0,.1);">
-      <div class="card-body p-3">
-        <div class="d-flex justify-content-between align-items-center">
-          <div>
-            <small class="text-muted d-block" style="font-size:11px; text-transform:uppercase; font-weight:600;">Active Stocks</small>
-            <h5 class="mb-0 mt-1" style="font-weight:700; color:#3a3429;">{{ total_stocks }}</h5>
-          </div>
-          <div style="width:40px; height:40px; background:#f5f3f0; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#8b6f47;">
-            <i class="fa fa-warehouse"></i>
-          </div>
+<div class="row g-4 mb-4" style="margin-top:-60px;">
+  <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="0">
+    <div class="stat-card stocks">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <div class="stat-label mb-2">Active Stocks</div>
+          <div class="stat-value">{{ total_stocks }}</div>
+        </div>
+        <div class="stat-icon stocks">
+          <i class="fa fa-warehouse"></i>
         </div>
       </div>
     </div>
   </div>
-  <div class="col-md-3">
-    <div class="card border-0" style="background:#fff; border-left:3px solid #d4a574 !important; box-shadow:0 1px 3px rgba(0,0,0,.1);">
-      <div class="card-body p-3">
-        <div class="d-flex justify-content-between align-items-center">
-          <div>
-            <small class="text-muted d-block" style="font-size:11px; text-transform:uppercase; font-weight:600;">Pending</small>
-            <h5 class="mb-0 mt-1" style="font-weight:700; color:#3a3429;">{{ total_pending }}</h5>
-          </div>
-          <div style="width:40px; height:40px; background:#f5f3f0; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#d4a574;">
-            <i class="fa fa-clock"></i>
-          </div>
+  
+  <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+    <div class="stat-card pending">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <div class="stat-label mb-2">Pending Requests</div>
+          <div class="stat-value">{{ total_pending }}</div>
+        </div>
+        <div class="stat-icon pending">
+          <i class="fa fa-clock"></i>
         </div>
       </div>
     </div>
   </div>
-  <div class="col-md-3">
-    <div class="card border-0" style="background:#fff; border-left:3px solid #6b8e23 !important; box-shadow:0 1px 3px rgba(0,0,0,.1);">
-      <div class="card-body p-3">
-        <div class="d-flex justify-content-between align-items-center">
-          <div>
-            <small class="text-muted d-block" style="font-size:11px; text-transform:uppercase; font-weight:600;">Approved</small>
-            <h5 class="mb-0 mt-1" style="font-weight:700; color:#3a3429;">{{ total_approved }}</h5>
-          </div>
-          <div style="width:40px; height:40px; background:#f5f3f0; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#6b8e23;">
-            <i class="fa fa-check-circle"></i>
-          </div>
+  
+  <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
+    <div class="stat-card approved">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <div class="stat-label mb-2">Approved Orders</div>
+          <div class="stat-value">{{ total_approved }}</div>
+        </div>
+        <div class="stat-icon approved">
+          <i class="fa fa-check-circle"></i>
         </div>
       </div>
     </div>
   </div>
-  <div class="col-md-3">
-    <div class="card border-0" style="background:#fff; border-left:3px solid #8b7355 !important; box-shadow:0 1px 3px rgba(0,0,0,.1);">
-      <div class="card-body p-3">
-        <div class="d-flex justify-content-between align-items-center">
-          <div>
-            <small class="text-muted d-block" style="font-size:11px; text-transform:uppercase; font-weight:600;">Completed</small>
-            <h5 class="mb-0 mt-1" style="font-weight:700; color:#3a3429;">{{ total_completed }}</h5>
-          </div>
-          <div style="width:40px; height:40px; background:#f5f3f0; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#8b7355;">
-            <i class="fa fa-truck"></i>
-          </div>
+  
+  <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
+    <div class="stat-card completed">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <div class="stat-label mb-2">QC Pending</div>
+          <div class="stat-value">{{ total_completed }}</div>
+        </div>
+        <div class="stat-icon completed">
+          <i class="fa fa-truck"></i>
         </div>
       </div>
     </div>
@@ -485,115 +517,142 @@
 </div>
 
 <!-- ================= POST STOCK ================= -->
-<div class="section-card">
-  <h6 class="section-title">
-    <i class="fa fa-plus-circle" style="color:#8b6f47;"></i> Post New Stock
-  </h6>
+<div class="section-card" id="post-stock" data-aos="fade-up">
+  <div class="section-header">
+    <h5 class="section-title">
+      <span class="icon-box green"><i class="fa fa-plus-circle"></i></span>
+      Post New Stock
+    </h5>
+  </div>
 
   <form method="POST">
     <div class="row g-3">
-
       <div class="col-md-4">
-        <label class="form-label">Crop</label>
-        <select name="crop" class="form-control" required>
+        <label class="form-label"><i class="fa fa-seedling me-2 text-success"></i>Crop Type</label>
+        <select name="crop" class="form-select" required>
           <option value="">Select Crop</option>
-          <option>wheat</option>
-          <option>chawal</option>
-          <option>sarso</option>
-          <option>maize</option>
-          <option>paddy</option>
-          <option>mustard oil cake</option>
+          <option value="wheat">🌾 Wheat</option>
+          <option value="chawal">🍚 Chawal (Rice)</option>
+          <option value="sarso">🌻 Sarso (Mustard)</option>
+          <option value="maize">🌽 Maize</option>
+          <option value="paddy">🌾 Paddy</option>
+          <option value="mustard oil cake">🧈 Mustard Oil Cake</option>
         </select>
       </div>
 
       <div class="col-md-4">
-        <label class="form-label">Quantity (Quintal)</label>
-        <input type="number" name="quantity" class="form-control" min="1" required>
+        <label class="form-label"><i class="fa fa-weight-hanging me-2 text-info"></i>Quantity (Quintal)</label>
+        <input type="number" name="quantity" class="form-control" min="1" placeholder="e.g. 100" required>
       </div>
 
       <div class="col-md-4">
-        <label class="form-label">Price / Quintal</label>
-        <input type="number" name="price" class="form-control" min="1" required>
+        <label class="form-label"><i class="fa fa-indian-rupee-sign me-2 text-warning"></i>Price / Quintal</label>
+        <input type="number" name="price" class="form-control" min="1" placeholder="e.g. 2500" required>
       </div>
 
       <div class="col-md-4">
-        <label class="form-label">Condition</label>
-        <select name="condition" class="form-control">
-          <option>Net</option>
-          <option>Full</option>
+        <label class="form-label"><i class="fa fa-scale-balanced me-2 text-secondary"></i>Condition</label>
+        <select name="condition" class="form-select">
+          <option value="Net">Net Weight</option>
+          <option value="Full">Full Weight</option>
         </select>
       </div>
 
       <div class="col-md-4">
-        <label class="form-label">Bag Type</label>
-        <select name="bag_type" class="form-control">
-          <option>Jute</option>
-          <option>Plastic</option>
-          <option>Jute/Plastic</option>
+        <label class="form-label"><i class="fa fa-box me-2 text-primary"></i>Bag Type</label>
+        <select name="bag_type" class="form-select">
+          <option value="Jute">Jute Bag</option>
+          <option value="Plastic">Plastic Bag</option>
+          <option value="Jute/Plastic">Jute / Plastic</option>
         </select>
       </div>
 
       <div class="col-md-4">
-        <label class="form-label">Deduction</label>
-        <input type="text"
-               name="deduction"
-               placeholder="Enter deduction note"
-               class="form-control form-control-sm">
+        <label class="form-label"><i class="fa fa-minus-circle me-2 text-danger"></i>Deduction Note</label>
+        <input type="text" name="deduction" placeholder="e.g. 2% moisture cut" class="form-control">
       </div>
-      
 
-      <div class="col-12">
-        <button class="btn btn-agri w-100">
-          <i class="fa fa-upload"></i> Post Stock
+      <div class="col-12 mt-3">
+        <button class="btn btn-primary-custom w-100">
+          <i class="fa fa-upload me-2"></i> Post Stock to Market
         </button>
       </div>
     </div>
   </form>
 </div>
+
 <!-- ================= LIVE STOCK ================= -->
-<div class="section-card">
-  <h6 class="section-title">
-    <i class="fa fa-warehouse" style="color:#8b6f47;"></i> Live Stock
-  </h6>
+<div class="section-card" data-aos="fade-up">
+  <div class="section-header">
+    <h5 class="section-title">
+      <span class="icon-box green"><i class="fa fa-warehouse"></i></span>
+      Your Live Stock
+    </h5>
+    <span class="section-badge bg-success">{{ stocks|length }} Active</span>
+  </div>
 
+  {% if stocks %}
   <div class="table-responsive">
-    <table class="table table-bordered table-hover">
-      <tr>
-        <th>Crop</th>
-        <th>Qty</th>
-        <th>Price</th>
-        <th>Condition</th>
-        <th>Bag</th>
-        <th>Deduction</th>
-        <th>Update</th>
-      </tr>
-
-      {% for s in stocks %}
-      <form method="POST" action="/update_miller_stock/{{ s[0] }}">
-      <tr>
-        <td><b>{{ s[2] }}</b></td>
-        <td><input type="number" name="quantity" value="{{ s[3] }}" class="form-control form-control-sm"></td>
-        <td><input type="number" name="price" value="{{ s[4] }}" class="form-control form-control-sm"></td>
-        <td>
-          <select name="condition" class="form-control form-control-sm">
-            <option {{ 'selected' if s[5]=='Net' }}>Net</option>
-            <option {{ 'selected' if s[5]=='Full' }}>Full</option>
-          </select>
-        </td>
-        <td>
-          <select name="bag_type" class="form-control form-control-sm">
-            <option {{ 'selected' if s[6]=='Jute' }}>Jute</option>
-            <option {{ 'selected' if s[6]=='Plastic' }}>Plastic</option>
-          <option {{ 'selected' if s[6]=='Jute/Plastic' }}>Jute/Plastic</option>
-          </select>
-        </td>
-        <td><input type="text" name="deduction" value="{{ s[7] }}" class="form-control form-control-sm"></td>
-        <td><button class="btn btn-sm btn-primary w-100">Update</button></td>
-      </tr>
-      </form>
-      {% endfor %}
+    <table class="table-modern">
+      <thead>
+        <tr>
+          <th>Crop</th>
+          <th>Quantity</th>
+          <th>Price/Qt</th>
+          <th>Condition</th>
+          <th>Bag Type</th>
+          <th>Deduction</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in stocks %}
+        <form method="POST" action="/update_miller_stock/{{ s[0] }}">
+        <tr>
+          <td>
+            <span class="fw-bold text-capitalize">
+              <i class="fa fa-seedling text-success me-2"></i>{{ s[2] }}
+            </span>
+          </td>
+          <td>
+            <input type="number" name="quantity" value="{{ s[3] }}" class="form-control form-control-sm" style="width:80px;margin:auto;">
+          </td>
+          <td>
+            <input type="number" name="price" value="{{ s[4] }}" class="form-control form-control-sm" style="width:90px;margin:auto;">
+          </td>
+          <td>
+            <select name="condition" class="form-select form-select-sm" style="width:90px;margin:auto;">
+              <option {{ 'selected' if s[5]=='Net' }}>Net</option>
+              <option {{ 'selected' if s[5]=='Full' }}>Full</option>
+            </select>
+          </td>
+          <td>
+            <select name="bag_type" class="form-select form-select-sm" style="width:110px;margin:auto;">
+              <option {{ 'selected' if s[6]=='Jute' }}>Jute</option>
+              <option {{ 'selected' if s[6]=='Plastic' }}>Plastic</option>
+              <option {{ 'selected' if s[6]=='Jute/Plastic' }}>Jute/Plastic</option>
+            </select>
+          </td>
+          <td>
+            <input type="text" name="deduction" value="{{ s[7] }}" class="form-control form-control-sm" style="width:120px;margin:auto;">
+          </td>
+          <td>
+            <button class="btn btn-sm btn-success">
+              <i class="fa fa-save me-1"></i> Update
+            </button>
+          </td>
+        </tr>
+        </form>
+        {% endfor %}
+      </tbody>
     </table>
   </div>
+  {% else %}
+  <div class="empty-state">
+    <i class="fa fa-warehouse"></i>
+    <p>No stock posted yet. Use the form above to add your first stock!</p>
+  </div>
+  {% endif %}
 </div>
 
 <!-- ================= ORDERS ================= -->
@@ -602,87 +661,86 @@
 {% set rejected = bookings | selectattr(4,'equalto','declined') | list %}
 
 <!-- ================= BOOKING FILTER ================= -->
-<div class="card mb-4 shadow-sm">
-  <div class="card-body">
-    <div class="row g-2 align-items-end">
-
-      <div class="col-md-3">
-        <label class="form-label fw-semibold">Filter by Status</label>
-        <select id="statusFilter" class="form-select">
-          <option value="all">All</option>
-          <option value="pending">Pending</option>
-          <option value="approved">Approved</option>
-          <option value="declined">Rejected</option>
-        </select>
-      </div>
-
-      <div class="col-md-3">
-        <label class="form-label fw-semibold">Buyer Name</label>
-        <input type="text" id="buyerFilter"
-               class="form-control"
-               placeholder="Search buyer">
-      </div>
-
-      <div class="col-md-3">
-        <label class="form-label fw-semibold">Crop</label>
-        <input type="text" id="cropFilter"
-               class="form-control"
-               placeholder="Search crop">
-      </div>
-
-      <div class="col-md-3">
-        <button onclick="clearFilters()"
-                class="btn btn-outline-secondary w-100">
-          Clear Filters
-        </button>
-      </div>
-
+<div class="filter-bar" data-aos="fade-up">
+  <div class="row g-3 align-items-end">
+    <div class="col-md-3">
+      <label class="form-label"><i class="fa fa-filter me-2"></i>Filter Status</label>
+      <select id="statusFilter" class="form-select">
+        <option value="all">All Orders</option>
+        <option value="pending">Pending</option>
+        <option value="approved">Approved</option>
+        <option value="declined">Rejected</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label"><i class="fa fa-user me-2"></i>Buyer Name</label>
+      <input type="text" id="buyerFilter" class="form-control" placeholder="Search buyer...">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label"><i class="fa fa-seedling me-2"></i>Crop</label>
+      <input type="text" id="cropFilter" class="form-control" placeholder="Search crop...">
+    </div>
+    <div class="col-md-3">
+      <button onclick="clearFilters()" class="btn btn-outline-secondary w-100">
+        <i class="fa fa-times me-2"></i>Clear Filters
+      </button>
     </div>
   </div>
 </div>
 
-<!-- PENDING -->
-<div class="section-card">
-  <h6 class="section-title">
-    <i class="fa fa-clock" style="color:#d4a574;"></i> Order Requests
-  </h6>
+<!-- ================= PENDING ORDERS ================= -->
+<div class="section-card" id="pending-orders" data-aos="fade-up">
+  <div class="section-header">
+    <h5 class="section-title">
+      <span class="icon-box yellow"><i class="fa fa-clock"></i></span>
+      Pending Order Requests
+    </h5>
+    <span class="section-badge bg-warning text-dark">{{ pending|length }} Pending</span>
+  </div>
 
   {% if pending %}
-  <table class="table table-bordered">
-    <tr>
-      <th>Order ID</th><th>Buyer</th><th>Crop</th><th>Qty</th><th>Action</th>
-    </tr>
-
+  <div class="row g-3">
     {% for b in pending %}
-    <tr class="booking-row"
-        data-status="pending"
-        data-buyer="{{ b[1]|lower }}"
-        data-crop="{{ b[2]|lower }}">
-
-      <td><strong class="text-primary">{{ b[10] if b[10] else 'N/A' }}</strong></td>
-      <td>{{ b[1] }}</td>
-      <td>{{ b[2] }}</td>
-      <td><span class="badge bg-success qty-badge">{{ b[3] }} Qt</span></td>
-      <td>
-        <a href="/miller/approve_booking/{{ b[0] }}"
-           class="btn btn-sm btn-success w-100 mb-1">
-           Approve
-        </a>
-
-        <form method="POST" action="/miller/decline_booking/{{ b[0] }}">
-          <input name="reason"
-                 class="form-control form-control-sm mb-1"
-                 placeholder="Reject reason"
-                 required>
-          <button class="btn btn-sm btn-danger w-100">Reject</button>
-        </form>
-      </td>
-    </tr>
+    <div class="col-md-6 col-lg-4 booking-row" 
+         data-status="pending" 
+         data-buyer="{{ b[1]|lower }}" 
+         data-crop="{{ b[2]|lower }}">
+      <div class="order-card">
+        <div class="order-header">
+          <div>
+            <div class="order-id">{{ b[10] if b[10] else 'N/A' }}</div>
+            <div class="order-meta">{{ b[1] }} • <span class="text-capitalize">{{ b[2] }}</span></div>
+          </div>
+          <span class="badge bg-warning text-dark">
+            <i class="fa fa-clock me-1"></i>Pending
+          </span>
+        </div>
+        
+        <div class="order-badges">
+          <span class="badge bg-primary"><i class="fa fa-weight-hanging me-1"></i>{{ b[3] }} Quintal</span>
+        </div>
+        
+        <div class="d-grid gap-2 mt-3">
+          <a href="/miller/approve_booking/{{ b[0] }}" class="btn btn-success btn-sm">
+            <i class="fa fa-check me-2"></i>Approve Order
+          </a>
+          
+          <form method="POST" action="/miller/decline_booking/{{ b[0] }}">
+            <input name="reason" class="form-control form-control-sm mb-2" placeholder="Rejection reason..." required>
+            <button class="btn btn-outline-danger btn-sm w-100">
+              <i class="fa fa-times me-2"></i>Reject
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
     {% endfor %}
-
-  </table>
+  </div>
   {% else %}
-    <p class="text-muted">No pending orders.</p>
+  <div class="empty-state">
+    <i class="fa fa-inbox"></i>
+    <p>No pending orders at the moment. New requests will appear here.</p>
+  </div>
   {% endif %}
 </div>
 <!-- APPROVED (Still Loading) -->
@@ -706,13 +764,51 @@
   {% endif %}
 {% endfor %}
 
-<div class="section-card" id="approved-loading">
-  <h6 class="section-title">
-    <i class="fa fa-check-circle" style="color:#6b8e23;"></i> Approved Orders (Still Loading)
-  </h6>
+<div class="section-card" id="approved-loading" data-aos="fade-up">
+  <div class="section-header">
+    <h5 class="section-title">
+      <span class="icon-box green"><i class="fa fa-check-circle"></i></span>
+      Approved Orders (Still Loading)
+    </h5>
+    <span class="section-badge bg-success" id="approvedLoadingCount">{{ approved_loading|length }} Active</span>
+  </div>
+
+  <!-- Filter & Search (QC pending trucks) -->
+  <div class="filter-bar mb-4">
+    <div class="d-flex gap-2 flex-wrap align-items-center">
+      <button type="button"
+              class="btn btn-sm btn-success approved-loading-filter-btn"
+              data-filter="all"
+              onclick="filterApprovedLoading('all')">
+        <i class="fa fa-list me-1"></i> All
+      </button>
+      <button type="button"
+              class="btn btn-sm btn-outline-secondary approved-loading-filter-btn"
+              data-filter="pending"
+              onclick="filterApprovedLoading('pending')">
+        <i class="fa fa-clock me-1"></i> QC Pending
+      </button>
+      <button type="button"
+              class="btn btn-sm btn-outline-secondary approved-loading-filter-btn"
+              data-filter="verified"
+              onclick="filterApprovedLoading('verified')">
+        <i class="fa fa-check-circle me-1"></i> QC Verified
+      </button>
+
+      <div class="flex-grow-1" style="min-width:260px;">
+        <input type="text"
+               id="approvedLoadingSearchInput"
+               class="form-control"
+               placeholder="🔍 Search by Order ID, Buyer, Crop, Truck..."
+               onkeyup="searchApprovedLoading()">
+      </div>
+    </div>
+  </div>
 
   {% if approved_loading %}
-  <table class="table table-bordered">
+  <div class="table-responsive">
+  <table class="table-modern">
+    <thead>
     <tr>
       <th>Order ID</th>
       <th>Buyer</th>
@@ -720,17 +816,33 @@
       <th>Booked</th>
       <th>Loaded</th>
       <th>Remaining</th>
-      <th>Invoices (Per Truck)</th>
-      <th>Close Reason</th>
+      <th>Invoices</th>
+      <th>Status</th>
     </tr>
+    </thead>
+    <tbody>
   
     {% for b in approved_loading %}
     {% set booking_id = b[0] %}
     {% set booked = b[3] %}
     {% set loaded = b[7] %}
     {% set remaining = booked - loaded %}
-  
-    <tr>
+
+    {% set invs = invoices_map.get(booking_id) %}
+    {% set ns = namespace(pending=0, search=(b[10]|string + ' ' + b[1] + ' ' + b[2])|lower) %}
+    {% if invs %}
+      {% for inv in invs %}
+        {% if inv.qc_status != 'verified' %}
+          {% set ns.pending = ns.pending + 1 %}
+        {% endif %}
+        {% if inv.truck_number %}
+          {% set ns.search = ns.search + ' ' + (inv.truck_number|string|lower) %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+    {% set qc_row_status = 'none' if not invs else ('pending' if ns.pending > 0 else 'verified') %}
+
+    <tr class="approved-loading-row" data-qc="{{ qc_row_status }}" data-search="{{ ns.search }}">
       <td><strong class="text-primary">{{ b[10] }}</strong></td>
       <td>{{ b[1] }}</td>
       <td>{{ b[2] }}</td>
@@ -744,38 +856,127 @@
       <td>
         <span class="badge bg-warning">{{ remaining }} Qt</span>
       </td>
+
+      <!-- QC Summary -->
       <td>
-        {% if b[8] == 'partial_closed' and b[9] %}
-          <span class="badge bg-warning text-dark">
-            <i class="fa fa-lock"></i> Closed
-          </span>
-          <div class="small text-muted mt-1">
-            {{ b[9] }}
-          </div>
+        {% if not invs %}
+          <span class="badge bg-secondary">No Trucks</span>
+        {% elif ns.pending > 0 %}
+          <span class="badge bg-warning text-dark">QC Pending: {{ ns.pending }}</span>
         {% else %}
-          <span class="text-muted small">—</span>
+          <span class="badge bg-success">QC Verified</span>
         {% endif %}
       </td>
       
-      <!-- 🔴 PER LOADING INVOICES -->
+      <!-- 🔴 PER LOADING INVOICES + QC (for loaded trucks even if order still loading) -->
       <td>
-        {% if invoices_map.get(booking_id) %}
+        {% if invs %}
           <ul class="list-unstyled mb-0">
-            {% for inv in invoices_map[booking_id] %}
-              <li class="mb-1">
-                <span class="badge bg-info">
-                  {{ inv.qty }} Qt
-                </span>
-  
-                <a href="/static/uploads/bills/{{ inv.file }}"
-                   target="_blank"
-                   class="btn btn-sm btn-outline-primary ms-1">
-                  <i class="fa fa-file-invoice"></i> Invoice
-                </a>
-  
-                <small class="text-muted d-block">
-                  {{ inv.date[:16] }}
-                </small>
+            {% for inv in invs %}
+              <li class="mb-2 p-2 border rounded" style="background:#f8f9fa;">
+                <div class="d-flex justify-content-between align-items-start gap-2">
+                  <div>
+                    <div class="fw-semibold">
+                      {% if inv.truck_number %}
+                        Truck {{ inv.truck_number }}
+                      {% else %}
+                        Truck #{{ loop.index }}
+                      {% endif %}
+                      <span class="badge bg-info ms-2">{{ inv.qty }} Qt</span>
+                    </div>
+
+                    <a href="/static/uploads/bills/{{ inv.file }}"
+                       target="_blank"
+                       class="btn btn-sm btn-outline-primary mt-1">
+                      <i class="fa fa-file-invoice"></i> Invoice
+                    </a>
+
+                    <small class="text-muted d-block">{{ inv.date[:16] }}</small>
+                  </div>
+
+                  <div class="text-end">
+                    {% if inv.qc_status == 'verified' %}
+                      <span class="badge bg-success">✅ QC Verified</span>
+                    {% else %}
+                      <span class="badge bg-warning text-dark">⏳ QC Pending</span>
+                    {% endif %}
+
+                    {% if inv.qc_status != 'verified' %}
+                      <button type="button" class="btn btn-sm btn-success mt-2"
+                              data-bs-toggle="collapse"
+                              data-bs-target="#qcCollapse{{ inv.id }}"
+                              aria-expanded="false">
+                        <i class="fa fa-clipboard-check"></i> Do QC
+                      </button>
+                    {% endif %}
+                  </div>
+                </div>
+
+                {% if inv.qc_status == 'verified' %}
+                  <div class="mt-2">
+                    <small class="text-muted d-block">Net: {{ inv.qc_weight or inv.qty }} Qt • Moisture: {{ inv.qc_moisture or '-' }}%</small>
+                    {% if inv.qc_remarks %}
+                      <small class="text-muted d-block">Remarks: {{ inv.qc_remarks }}</small>
+                    {% endif %}
+                    {% if inv.qc_at %}
+                      <small class="text-muted d-block">Verified on {{ inv.qc_at[:16] }}</small>
+                    {% endif %}
+                  </div>
+                {% endif %}
+
+                {% if inv.qc_status != 'verified' %}
+                  <!-- QC Collapse (more reliable than modal inside tables) -->
+                  <div class="collapse mt-2" id="qcCollapse{{ inv.id }}">
+                    <div class="card card-body">
+                      <div class="fw-semibold mb-2">
+                        Quality Check -
+                        {% if inv.truck_number %}
+                          Truck {{ inv.truck_number }}
+                        {% else %}
+                          Truck #{{ loop.index }}
+                        {% endif %}
+                      </div>
+
+                      <form method="POST" action="/miller/update_qc/{{ inv.id }}">
+                        <div class="row g-2 mb-2">
+                          <div class="col-6">
+                            <label class="form-label small mb-1">Net Weight (Qt)</label>
+                            <input type="number"
+                                   name="qc_weight"
+                                   class="form-control form-control-sm"
+                                   value="{{ inv.qty }}"
+                                   required>
+                          </div>
+                          <div class="col-6">
+                            <label class="form-label small mb-1">Moisture (%)</label>
+                            <input type="number"
+                                   step="0.1"
+                                   name="qc_moisture"
+                                   class="form-control form-control-sm"
+                                   required>
+                          </div>
+                        </div>
+                        <div class="mb-2">
+                          <label class="form-label small mb-1">Remarks (Optional)</label>
+                          <textarea name="qc_remarks"
+                                    class="form-control form-control-sm"
+                                    rows="2"
+                                    placeholder="Quality notes, deductions, etc."></textarea>
+                        </div>
+                        <div class="d-flex gap-2">
+                          <button type="button" class="btn btn-sm btn-outline-secondary"
+                                  data-bs-toggle="collapse"
+                                  data-bs-target="#qcCollapse{{ inv.id }}">
+                            Cancel
+                          </button>
+                          <button type="submit" class="btn btn-sm btn-success">
+                            <i class="fa fa-clipboard-check"></i> Save QC
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                {% endif %}
               </li>
             {% endfor %}
           </ul>
@@ -785,40 +986,47 @@
       </td>
     </tr>
     {% endfor %}
+    </tbody>
   </table>
-  
+  </div>
   {% else %}
-  <p class="text-muted">No orders currently loading.</p>
+  <div class="empty-state">
+    <i class="fa fa-truck"></i>
+    <p>No orders currently being loaded.</p>
+  </div>
   {% endif %}
 </div>
 
 <!-- COMPLETED LOADING (QC Section) -->
-<div class="section-card" id="quality-check">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h6 class="section-title mb-0">
-      <i class="fa fa-truck" style="color:#8b7355;"></i> Completed Loading - Quality Check
-    </h6>
-    <span class="badge bg-info" id="qcCount">{{ completed_loading_qc|length }} Orders</span>
+<div class="section-card" id="quality-check" data-aos="fade-up">
+  <div class="section-header">
+    <h5 class="section-title">
+      <span class="icon-box blue"><i class="fa fa-clipboard-check"></i></span>
+      Completed Loading - Quality Check
+    </h5>
+    <span class="section-badge bg-info" id="qcCount">{{ completed_loading_qc|length }} Orders</span>
   </div>
 
   {% if completed_loading_qc %}
   <!-- Filter & Search Bar -->
-  <div class="qc-filter-bar">
-    <button class="qc-filter-btn active" data-filter="all" onclick="filterQC('all')">
-      <i class="fa fa-list"></i> All
-    </button>
-    <button class="qc-filter-btn" data-filter="pending" onclick="filterQC('pending')">
-      <i class="fa fa-clock"></i> Pending QC
-    </button>
-    <button class="qc-filter-btn" data-filter="verified" onclick="filterQC('verified')">
-      <i class="fa fa-check-circle"></i> Verified
-    </button>
-    <div class="qc-search-box">
-      <input type="text" 
-             id="qcSearchInput" 
-             class="form-control form-control-sm" 
-             placeholder="Search by Order ID, Buyer, or Crop..."
-             onkeyup="searchQC()">
+  <div class="filter-bar mb-4">
+    <div class="d-flex gap-2 flex-wrap align-items-center">
+      <button class="filter-pill active" data-filter="all" onclick="filterQC('all')">
+        <i class="fa fa-list me-1"></i> All
+      </button>
+      <button class="filter-pill" data-filter="pending" onclick="filterQC('pending')">
+        <i class="fa fa-clock me-1"></i> Pending QC
+      </button>
+      <button class="filter-pill" data-filter="verified" onclick="filterQC('verified')">
+        <i class="fa fa-check-circle me-1"></i> Verified
+      </button>
+      <div class="flex-grow-1" style="min-width:200px;">
+        <input type="text" 
+               id="qcSearchInput" 
+               class="form-control" 
+               placeholder="🔍 Search by Order ID, Buyer, or Crop..."
+               onkeyup="searchQC()">
+      </div>
     </div>
   </div>
 
@@ -867,7 +1075,13 @@
                 <div class="mb-3 p-2 border rounded" style="background:#f8f9fa;">
                   <div class="d-flex justify-content-between align-items-center mb-2">
                     <div>
-                      <strong class="text-primary">Truck #{{ loop.index }}</strong>
+                      <strong class="text-primary">
+                        {% if inv.truck_number %}
+                          Truck {{ inv.truck_number }}
+                        {% else %}
+                          Truck #{{ loop.index }}
+                        {% endif %}
+                      </strong>
                       <span class="badge bg-info ms-2">{{ inv.qty }} Qt</span>
                       <a href="/static/uploads/bills/{{ inv.file }}"
                          target="_blank"
@@ -1000,12 +1214,13 @@
 </div>
 
 <!-- FINAL HISAB UPLOADED - PAYMENT PENDING -->
-<div class="section-card" id="final-hisab">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h6 class="section-title mb-0">
-      <i class="fa fa-file-invoice" style="color:#ffc107;"></i> Final Hisab Uploaded - Payment Pending
-    </h6>
-    <span class="badge bg-warning" id="finalInvoiceCount">{{ final_invoice_uploaded|length }} Orders</span>
+<div class="section-card" id="final-hisab" data-aos="fade-up">
+  <div class="section-header">
+    <h5 class="section-title">
+      <span class="icon-box yellow"><i class="fa fa-file-invoice-dollar"></i></span>
+      Final Hisab - Payment Pending
+    </h5>
+    <span class="section-badge bg-warning text-dark" id="finalInvoiceCount">{{ final_invoice_uploaded|length }} Pending</span>
   </div>
 
   {% if final_invoice_uploaded %}
@@ -1110,7 +1325,16 @@
                 {% for inv in invoices_map[booking_id] %}
                   <div class="mb-2 p-2 border rounded" style="background:#f8f9fa;">
                     <div class="d-flex justify-content-between">
-                      <span><strong>Truck #{{ loop.index }}</strong> - {{ inv.qty }} Qt</span>
+                      <span>
+                        <strong>
+                          {% if inv.truck_number %}
+                            Truck {{ inv.truck_number }}
+                          {% else %}
+                            Truck #{{ loop.index }}
+                          {% endif %}
+                        </strong>
+                        - {{ inv.qty }} Qt
+                      </span>
                       {% if inv.qc_status == 'verified' %}
                         <span class="badge bg-success">✅</span>
                       {% else %}
@@ -1242,20 +1466,28 @@
 {% endif %}
 
 <!-- REJECTED -->
-<div class="section-card" id="rejected-orders">
-  <h6 class="section-title">
-    <i class="fa fa-times-circle" style="color:#8b6f47;"></i> Rejected Orders
-  </h6>
+<div class="section-card" id="rejected-orders" data-aos="fade-up">
+  <div class="section-header">
+    <h5 class="section-title">
+      <span class="icon-box red"><i class="fa fa-times-circle"></i></span>
+      Rejected Orders
+    </h5>
+    <span class="section-badge bg-danger">{{ rejected|length }} Rejected</span>
+  </div>
 
   {% if rejected %}
-<table class="table table-bordered">
+<div class="table-responsive">
+<table class="table-modern">
+  <thead>
   <tr>
     <th>Order ID</th>
     <th>Buyer</th>
     <th>Crop</th>
-    <th>Qty</th>
-    <th>Reason</th>
+    <th>Quantity</th>
+    <th>Rejection Reason</th>
   </tr>
+  </thead>
+  <tbody>
 
   {% for b in rejected %}
   <tr class="booking-row"
@@ -1272,9 +1504,14 @@
     <td>{{ b[5] }}</td>
   </tr>
   {% endfor %}
+  </tbody>
 </table>
+</div>
 {% else %}
-<p class="text-muted">No rejected orders.</p>
+<div class="empty-state">
+  <i class="fa fa-check-circle text-success"></i>
+  <p>No rejected orders. Great!</p>
+</div>
 {% endif %}
 
 </div>
@@ -1323,7 +1560,7 @@
     currentQCFilter = status;
     
     // Update button states
-    document.querySelectorAll('.qc-filter-btn').forEach(btn => {
+    document.querySelectorAll('.filter-pill').forEach(btn => {
       btn.classList.remove('active');
       if(btn.dataset.filter === status) {
         btn.classList.add('active');
@@ -1384,69 +1621,71 @@
     qcSearchInput.addEventListener('input', searchQC);
   }
 
- 
+  // ================= Approved Loading Filter & Search =================
+  let currentApprovedLoadingFilter = 'all';
+
+  function setApprovedLoadingButtonState(activeFilter) {
+    document.querySelectorAll('.approved-loading-filter-btn').forEach(btn => {
+      const isActive = btn.dataset.filter === activeFilter;
+      btn.classList.toggle('btn-success', isActive);
+      btn.classList.toggle('btn-outline-secondary', !isActive);
+    });
+  }
+
+  function filterApprovedLoading(status) {
+    currentApprovedLoadingFilter = status;
+    setApprovedLoadingButtonState(status);
+    applyApprovedLoadingFilter();
+  }
+
+  function searchApprovedLoading() {
+    applyApprovedLoadingFilter();
+  }
+
+  function applyApprovedLoadingFilter() {
+    const searchTerm = (document.getElementById('approvedLoadingSearchInput')?.value || '').toLowerCase();
+    const rows = document.querySelectorAll('.approved-loading-row');
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+      const qc = row.dataset.qc || 'none';
+      const searchText = row.dataset.search || '';
+
+      const statusMatch = (currentApprovedLoadingFilter === 'all') || (qc === currentApprovedLoadingFilter);
+      const searchMatch = !searchTerm || searchText.includes(searchTerm);
+
+      if (statusMatch && searchMatch) {
+        row.style.display = '';
+        visibleCount++;
+      } else {
+        row.style.display = 'none';
+      }
+    });
+
+    const countBadge = document.getElementById('approvedLoadingCount');
+    if (countBadge) {
+      countBadge.textContent = `${visibleCount} Active`;
+    }
+  }
+
+  const approvedLoadingSearchInput = document.getElementById('approvedLoadingSearchInput');
+  if (approvedLoadingSearchInput) {
+    approvedLoadingSearchInput.addEventListener('input', searchApprovedLoading);
+  }
+
+  // Initialize approved-loading filters
+  setApprovedLoadingButtonState('all');
+  applyApprovedLoadingFilter();
+
   </script>
   
 </div> <!-- container -->
-</main> <!-- flex-fill -->
+</main>
 
-<!-- ================= FOOTER ================= -->
-<footer class="footer">
-  <div class="container">
-    <div class="row g-4">
-      <!-- BRAND -->
-      <div class="col-md-4">
-        <h5 class="fw-bold text-white mb-2">
-          <i class="fa fa-industry"></i> Sarna Mandi - Miller
-        </h5>
-        <p class="small">
-          Digital mandi platform for <b>millers</b> to manage stock,
-          approve orders, and process payments with transparency and efficiency.
-        </p>
-      </div>
+{% include '_footer.html' %}
 
-      <!-- QUICK LINKS -->
-      <div class="col-md-4">
-        <h6 class="fw-bold text-white mb-2">Quick Links</h6>
-        <ul class="list-unstyled small">
-          <li><a href="#approved-loading">Approved Orders</a></li>
-          <li><a href="#quality-check">Quality Check</a></li>
-          <li><a href="#final-hisab">Final Hisab</a></li>
-          <li><a href="#rejected-orders">Rejected Orders</a></li>
-          <li><a href="/miller/profile">Profile</a></li>
-        </ul>
-      </div>
-
-      <!-- CONTACT -->
-      <div class="col-md-4">
-        <h6 class="fw-bold text-white mb-2">Contact</h6>
-        <p class="small mb-1">
-          <i class="fa fa-phone me-2"></i> +91 XXXXX XXXXX
-        </p>
-        <p class="small mb-1">
-          <i class="fa fa-envelope me-2"></i> support@sarnamandi.com
-        </p>
-        <p class="small">
-          <i class="fa fa-location-dot me-2"></i> India
-        </p>
-
-        <!-- SOCIAL -->
-        <div class="mt-2">
-          <a href="#" class="footer-icon"><i class="fab fa-linkedin"></i></a>
-          <a href="#" class="footer-icon"><i class="fab fa-whatsapp"></i></a>
-          <a href="#" class="footer-icon"><i class="fab fa-twitter"></i></a>
-        </div>
-      </div>
-    </div>
-
-    <!-- BOTTOM -->
-    <div class="footer-bottom text-center mt-4 pt-3">
-      © 2026 <b>Sarna Mandi</b> · All Rights Reserved
-    </div>
-  </div>
-</footer>
-
-</div> <!-- flex container -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>AOS.init({duration:600,once:true});</script>
 </body>
 </html>

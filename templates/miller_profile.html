@@ -6,92 +6,134 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 <link rel="stylesheet" href="/static/css/style.css">
 
 <style>
 body{
-  background:var(--mandi-bg);
+  background:var(--bg-light);
   font-family:"Segoe UI", sans-serif;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
 }
 
-/* HEADER */
-.profile-header{
-  background:var(--mandi-brown);
+/* PAGE HEADER */
+.page-header{
+  background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);
   color:#fff;
-  padding:16px 20px;
-  border-radius:8px;
-  margin-top:25px;
-  margin-bottom:25px;
+  padding:25px 0;
+  margin-bottom:30px;
 }
-.profile-header h4{
+.page-header h4{
+  font-weight:700;
   margin:0;
-  font-weight:600;
 }
-.profile-header small{
-  opacity:.9;
+.page-header .breadcrumb{
+  margin:0;
+  background:none;
+  padding:0;
+}
+.page-header .breadcrumb a{
+  color:rgba(255,255,255,0.8);
+  text-decoration:none;
+}
+.page-header .breadcrumb a:hover{
+  color:#fff;
 }
 
 /* CARD */
 .profile-card{
   background:#fff;
-  border-radius:10px;
-  padding:25px;
-  box-shadow:0 2px 10px rgba(0,0,0,.06);
+  border-radius:16px;
+  padding:30px;
+  box-shadow:var(--shadow-md);
+  border:1px solid rgba(0,0,0,.05);
 }
 
 /* FORM */
 .form-label{
   font-weight:600;
   font-size:14px;
+  color:#495057;
+}
+.form-control{
+  border-radius:10px;
+  padding:12px 15px;
+  border:1px solid #e0e0e0;
+  transition:all 0.3s ease;
+}
+.form-control:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(15,155,95,0.15);
 }
 
 /* DOCUMENT */
 .doc-box{
-  border:2px dashed #cfd8dc;
+  border:2px dashed var(--primary);
   padding:15px;
-  border-radius:8px;
+  border-radius:12px;
   text-align:center;
-  background:#fafafa;
+  background:linear-gradient(135deg,rgba(15,155,95,0.03) 0%,rgba(15,155,95,0.01) 100%);
 }
 
-/* BUTTON */
-.btn-save{
-  background:var(--mandi-brown);
-  color:#fff;
+/* STAFF SECTION */
+.staff-section{
+  background:linear-gradient(135deg,#f8f9fa 0%,#fff 100%);
+  border-radius:12px;
+  padding:20px;
+  border:1px solid #e9ecef;
 }
-.btn-save:hover{
-  background:var(--mandi-dark);
-  color:#fff;
+
+main{
+  flex:1;
 }
 </style>
 </head>
 
-<body class="container mb-5">
+<body>
 
-  {% if session.is_staff %}
-  <div class="alert alert-danger">
-    Staff members cannot edit miller profile.
-  </div>
-  {% endif %}
-  
-<!-- ================= HEADER ================= -->
-<div class="profile-header d-flex justify-content-between align-items-center">
-  <div>
-    <h4 class="mb-1"><i class="fa fa-user-check"></i> Miller Profile & Verification</h4>
-    <small>Complete your profile for smooth mandi trading approval</small>
-  </div>
-  <div class="d-flex gap-2">
-    <a href="/miller" class="btn btn-light btn-sm">
-      <i class="fa fa-arrow-left"></i> Back
-    </a>
-    <a href="/logout" class="btn btn-danger btn-sm">
-      <i class="fa fa-right-from-bracket"></i> Logout
-    </a>
+{% include '_navbar.html' %}
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <nav class="breadcrumb mb-2">
+          <a href="/miller"><i class="fa fa-home"></i> Dashboard</a>
+          <span class="mx-2">/</span>
+          <span>Profile</span>
+        </nav>
+        <h4><i class="fa fa-user-check me-2"></i>Miller Profile & Verification</h4>
+      </div>
+      <a href="/miller" class="btn btn-light">
+        <i class="fa fa-arrow-left me-1"></i> Back
+      </a>
+    </div>
   </div>
 </div>
 
+<main>
+<div class="container mb-5">
+
+{% if session.is_staff %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert" data-aos="fade-down">
+  <i class="fa fa-exclamation-triangle me-2"></i>
+  Staff members cannot edit miller profile.
+  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endif %}
+
 <!-- ================= PROFILE FORM ================= -->
-<div class="profile-card">
+<div class="profile-card" data-aos="fade-up">
+
+    {% if error %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error:</strong> {{ error }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endif %}
 
     <form method="POST" enctype="multipart/form-data" class="card p-4 shadow-sm">
 
@@ -180,42 +222,35 @@ body{
       </form>
       <hr class="my-4">
 
-<h5>👷 Create Staff Account</h5>
+      <div class="staff-section" data-aos="fade-up" data-aos-delay="100">
+        <h5 class="mb-3">👷 Create Staff Account</h5>
 
-<form method="POST" action="/miller/create_staff" class="row g-3">
-
-  <div class="col-md-4">
-    <input class="form-control"
-           name="name"
-           placeholder="Staff Name"
-           required>
-  </div>
-
-  <div class="col-md-4">
-    <input class="form-control"
-           name="email"
-           type="email"
-           placeholder="Staff Email"
-           required>
-  </div>
-
-  <div class="col-md-4">
-    <input class="form-control"
-           name="password"
-           type="password"
-           placeholder="Password"
-           required>
-  </div>
-
-  <div class="col-12">
-    <button class="btn btn-success">
-      ➕ Create Staff
-    </button>
-  </div>
-
-</form>
+        <form method="POST" action="/miller/create_staff" class="row g-3">
+          <div class="col-md-4">
+            <input class="form-control" name="name" placeholder="Staff Name" required>
+          </div>
+          <div class="col-md-4">
+            <input class="form-control" name="email" type="email" placeholder="Staff Email" required>
+          </div>
+          <div class="col-md-4">
+            <input class="form-control" name="password" type="password" placeholder="Password" required>
+          </div>
+          <div class="col-12">
+            <button class="btn btn-success">
+              ➕ Create Staff
+            </button>
+          </div>
+        </form>
+      </div>
 
 </div>
+</div>
+</main>
 
+{% include '_footer.html' %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>AOS.init({duration:600,once:true});</script>
 </body>
 </html>

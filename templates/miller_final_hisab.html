@@ -7,36 +7,56 @@
 <!-- Bootstrap & Icons -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/style.css">
 
 <style>
 /* ================= GLOBAL ================= */
 body{
-  background:#f4f7f6;
+  background:var(--bg-light);
   font-family:Inter,Segoe UI,sans-serif;
   min-height:100vh;
   display:flex;
   flex-direction:column;
 }
 
-/* ================= NAVBAR ================= */
-.navbar{
-  background:linear-gradient(90deg,#1e6f5c,#145a48);
+/* PAGE HEADER */
+.page-header{
+  background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);
+  color:#fff;
+  padding:25px 0;
+  margin-bottom:30px;
 }
-.navbar-brand{font-weight:900}
+.page-header h4{
+  font-weight:700;
+  margin:0;
+}
+.page-header .breadcrumb{
+  margin:0;
+  background:none;
+  padding:0;
+}
+.page-header .breadcrumb a{
+  color:rgba(255,255,255,0.8);
+  text-decoration:none;
+}
+.page-header .breadcrumb a:hover{
+  color:#fff;
+}
 
 /* ================= SECTION CARD ================= */
 .section-card{
   background:#fff;
   border-radius:18px;
-  box-shadow:0 10px 28px rgba(0,0,0,.08);
-  border:1px solid #e5e9ec;
-  padding:20px;
+  box-shadow:var(--shadow-md);
+  border:1px solid rgba(0,0,0,.05);
+  padding:25px;
   margin-bottom:30px;
 }
 
 .section-title{
   font-weight:800;
-  font-size:.95rem;
+  font-size:1rem;
   text-transform:uppercase;
   letter-spacing:.4px;
 }
@@ -51,6 +71,12 @@ body{
 /* ================= CARDS ================= */
 .completed-loading-card{
   border-radius:14px;
+  transition:all 0.3s ease;
+  border:1px solid rgba(0,0,0,.08);
+}
+.completed-loading-card:hover{
+  transform:translateY(-5px);
+  box-shadow:var(--shadow-lg);
 }
 
 .completed-loading-card h6{
@@ -58,202 +84,306 @@ body{
 }
 
 .completed-loading-card .badge{
-  font-size:.7rem;
+  font-size:.75rem;
 }
 
-/* ================= FOOTER ================= */
-.footer{
-  background:#0b1c2d;
-  color:#cfd6df;
-  padding:30px 0;
-  margin-top:auto;
-  font-size:.85rem;
-  text-align:center;
+/* TRUCK QC SUMMARY */
+.truck-summary-item{
+  padding:12px;
+  background:linear-gradient(135deg,#f8f9fa 0%,#fff 100%);
+  border-radius:10px;
+  border:1px solid #e9ecef;
+  transition:all 0.2s ease;
+}
+.truck-summary-item:hover{
+  border-color:var(--primary);
+}
+
+main{
+  flex:1;
+}
+
+/* ================= MODAL FIX ================= */
+.modal{
+  z-index:1055 !important;
+}
+.modal-backdrop{
+  z-index:1050 !important;
 }
 </style>
 </head>
 
 <body>
 
-<!-- ================= NAVBAR ================= -->
-<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+{% include '_navbar.html' %}
+
+<!-- PAGE HEADER -->
+<div class="page-header">
   <div class="container">
-    <a class="navbar-brand" href="/miller">
-      <i class="fa fa-industry"></i> Miller Dashboard
-    </a>
-    <div class="ms-auto">
-      <a href="/miller" class="btn btn-sm btn-light">
-        <i class="fa fa-arrow-left"></i> Back
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <nav class="breadcrumb mb-2">
+          <a href="/miller"><i class="fa fa-home"></i> Dashboard</a>
+          <span class="mx-2">/</span>
+          <span>Final Hisab</span>
+        </nav>
+        <h4><i class="fa fa-file-invoice-dollar me-2"></i>Final Hisab & Payments</h4>
+      </div>
+      <a href="/miller" class="btn btn-light">
+        <i class="fa fa-arrow-left me-1"></i> Back
       </a>
     </div>
   </div>
-</nav>
+</div>
 
 <!-- ================= CONTENT ================= -->
-<div class="container my-4">
+<main>
+<div class="container mb-5">
 
-<!-- FINAL HISAB UPLOADED - PAYMENT PENDING -->
+<!-- PER-TRUCK FINAL HISAB -->
 <div class="section-card" id="final-hisab">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h6 class="section-title mb-0">
       <i class="fa fa-file-invoice" style="color:#ffc107;"></i>
-      Final Hisab Uploaded – Payment Pending
+      Per-Truck Final Hisab & Payments
     </h6>
-    <span class="badge bg-warning">
-      {{ final_invoice_uploaded|length }} Orders
+    <span class="badge bg-info">
+      {{ all_bookings|length }} Bookings
     </span>
   </div>
 
-  {% if final_invoice_uploaded %}
+  {% if all_bookings %}
   <div class="qc-scroll-container">
-    <div class="row g-3">
-
-      {% for b in final_invoice_uploaded %}
+    
+    {% for b in all_bookings %}
       {% set booking_id = b[0] %}
       {% set booked = b[3] %}
       {% set loaded = b[7] %}
       {% set order_id = b[10] %}
       {% set buyer_name = b[1] %}
       {% set crop_name = b[2] %}
-      {% set final_invoice = b[17] %}
+      {% set price = b[19] %}
+      {% set trucks = invoices_map.get(booking_id, []) %}
 
-      <div class="col-md-6">
-        <div class="card border-0 shadow-sm h-100 completed-loading-card">
-          <div class="card-body">
-
-            <!-- HEADER -->
-            <div class="d-flex justify-content-between align-items-start mb-3">
-              <div>
-                <h6 class="mb-1 text-primary">{{ order_id }}</h6>
-                <p class="mb-1 text-muted small">
-                  {{ buyer_name }} • {{ crop_name|capitalize }}
-                </p>
-                <div class="d-flex gap-2 mt-2">
-                  <span class="badge bg-primary">{{ booked }} Qt Booked</span>
-                  <span class="badge bg-success">{{ loaded }} Qt Loaded</span>
-                </div>
-              </div>
-              <span class="badge bg-warning">💰 Payment Pending</span>
+      {% if trucks %}
+      <!-- BOOKING HEADER -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="mb-0"><i class="fa fa-shopping-cart me-2"></i>{{ order_id }}</h6>
+              <small>{{ buyer_name }} • {{ crop_name|capitalize }} • ₹{{ price }}/Qt</small>
             </div>
+            <div class="d-flex gap-2">
+              <span class="badge bg-light text-dark">{{ booked }} Qt Booked</span>
+              <span class="badge bg-success">{{ loaded }} Qt Loaded</span>
+              <span class="badge bg-info">{{ trucks|length }} Truck(s)</span>
+            </div>
+          </div>
+        </div>
 
-            <!-- FINAL INVOICE -->
-            <div class="border-top pt-3">
-              <span class="badge bg-info mb-2">
-                <i class="fa fa-file-invoice"></i> Final Invoice Uploaded
-              </span>
+        <div class="card-body">
+          <div class="row g-3">
+            
+            {% for truck in trucks %}
+              {% set truck_id = truck.id %}
+              {% set truck_num = truck.truck_number or loop.index %}
+              {% set truck_qty = truck.qty %}
+              {% set qc_status = truck.qc_status %}
+              {% set final_invoice = truck.final_invoice_file %}
+              {% set payment_status = truck.payment_status %}
+              {% set amount = truck_qty * price %}
 
-              {% if final_invoice %}
-                <a href="/static/uploads/bills/{{ final_invoice }}"
-                   target="_blank"
-                   class="btn btn-sm btn-outline-primary w-100 mb-2">
-                  <i class="fa fa-eye"></i> View Final Invoice
-                </a>
-
-                <!-- EDIT FINAL INVOICE -->
-                <button class="btn btn-sm btn-warning w-100 mb-2"
-                        data-bs-toggle="modal"
-                        data-bs-target="#editFinalInvoice{{ booking_id }}">
-                  <i class="fa fa-edit"></i> Edit / Replace Invoice
-                </button>
-
-                <!-- EDIT MODAL -->
-                <div class="modal fade" id="editFinalInvoice{{ booking_id }}" tabindex="-1">
-                  <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title">Edit Final Invoice</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              <div class="col-md-6">
+                <div class="card border h-100 completed-loading-card">
+                  <div class="card-body">
+                    
+                    <!-- TRUCK HEADER -->
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                      <div>
+                        <h6 class="mb-1">
+                          <i class="fa fa-truck text-primary me-1"></i>
+                          Truck {{ truck_num }}
+                        </h6>
+                        <small class="text-muted">{{ truck_qty }} Qt • ₹{{ amount }}</small>
                       </div>
-                      <form method="POST"
-                            action="/miller/edit_final_invoice/{{ booking_id }}"
-                            enctype="multipart/form-data">
-                        <div class="modal-body">
-                          <label class="form-label">Upload New Invoice</label>
-                          <input type="file"
-                                 name="final_invoice"
-                                 class="form-control"
-                                 accept=".pdf,image/*"
-                                 required>
-                          <small class="text-muted">
-                            This will replace the existing invoice.
-                          </small>
-                        </div>
-                        <div class="modal-footer">
-                          <button type="button"
-                                  class="btn btn-secondary"
-                                  data-bs-dismiss="modal">
-                            Cancel
-                          </button>
-                          <button type="submit" class="btn btn-warning">
-                            <i class="fa fa-upload"></i> Replace
-                          </button>
-                        </div>
-                      </form>
+                      <div>
+                        {% if payment_status == 'paid' %}
+                          <span class="badge bg-success">✔ Paid</span>
+                        {% elif final_invoice %}
+                          <span class="badge bg-warning">⏳ Payment Pending</span>
+                        {% elif qc_status == 'verified' %}
+                          <span class="badge bg-info">Upload Final Invoice</span>
+                        {% else %}
+                          <span class="badge bg-secondary">QC Pending</span>
+                        {% endif %}
+                      </div>
                     </div>
+
+                    <!-- QC INFO -->
+                    {% if qc_status == 'verified' %}
+                    <div class="border-bottom pb-2 mb-2">
+                      <small class="text-success fw-semibold">
+                        <i class="fa fa-check-circle"></i> QC Verified
+                      </small>
+                      <div class="mt-1">
+                        <small class="text-muted">
+                          Net: {{ truck.qc_weight or truck_qty }} Qt |
+                          Moisture: {{ truck.qc_moisture or '-' }}%
+                        </small>
+                      </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- LOADING INVOICE -->
+                    <div class="mb-2">
+                      <a href="/static/uploads/bills/{{ truck.file }}"
+                         target="_blank"
+                         class="btn btn-sm btn-outline-secondary w-100">
+                        <i class="fa fa-file"></i> View Loading Invoice
+                      </a>
+                    </div>
+
+                    <!-- FINAL INVOICE SECTION -->
+                    {% if qc_status == 'verified' %}
+                      {% if final_invoice %}
+                        <!-- VIEW FINAL INVOICE -->
+                        <a href="/static/uploads/bills/{{ final_invoice }}"
+                           target="_blank"
+                           class="btn btn-sm btn-outline-primary w-100 mb-2">
+                          <i class="fa fa-file-invoice"></i> View Final Invoice
+                        </a>
+
+                        <!-- EDIT FINAL INVOICE -->
+                        {% if payment_status != 'paid' %}
+                        <button class="btn btn-sm btn-warning w-100 mb-2"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editTruckFinal{{ truck_id }}">
+                          <i class="fa fa-edit"></i> Edit Final Invoice
+                        </button>
+                        
+                        <!-- EDIT MODAL -->
+                        <div class="modal fade" id="editTruckFinal{{ truck_id }}" tabindex="-1">
+                          <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title">Edit Truck {{ truck_num }} Final Invoice</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                              </div>
+                              <form method="POST"
+                                    action="/miller/edit_truck_final_invoice/{{ truck_id }}"
+                                    enctype="multipart/form-data">
+                                <div class="modal-body">
+                                  <label class="form-label">Upload New Invoice</label>
+                                  <input type="file"
+                                         name="truck_final_invoice"
+                                         class="form-control"
+                                         accept=".pdf,image/*"
+                                         required>
+                                  <small class="text-muted">
+                                    This will replace the existing final invoice.
+                                  </small>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    Cancel
+                                  </button>
+                                  <button type="submit" class="btn btn-warning">
+                                    <i class="fa fa-upload"></i> Replace
+                                  </button>
+                                </div>
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <!-- MARK PAYMENT DONE -->
+                        <form method="POST" action="/miller/mark_truck_payment_done/{{ truck_id }}">
+                          <button class="btn btn-success btn-sm w-100">
+                            <i class="fa fa-check-circle"></i> Mark Payment Done
+                          </button>
+                        </form>
+                        {% endif %}
+                      {% else %}
+                        <!-- UPLOAD FINAL INVOICE -->
+                        <button class="btn btn-sm btn-primary w-100 mb-2"
+                                data-bs-toggle="modal"
+                                data-bs-target="#uploadTruckFinal{{ truck_id }}">
+                          <i class="fa fa-upload"></i> Upload Final Invoice
+                        </button>
+
+                        <!-- UPLOAD MODAL -->
+                        <div class="modal fade" id="uploadTruckFinal{{ truck_id }}" tabindex="-1">
+                          <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title">Upload Final Invoice - Truck {{ truck_num }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                              </div>
+                              <form method="POST"
+                                    action="/miller/upload_truck_final_invoice/{{ truck_id }}"
+                                    enctype="multipart/form-data">
+                                <div class="modal-body">
+                                  <div class="mb-3">
+                                    <label class="form-label fw-bold">Order Details</label>
+                                    <p class="mb-1"><small>Order: {{ order_id }}</small></p>
+                                    <p class="mb-1"><small>Truck: {{ truck_num }}</small></p>
+                                    <p class="mb-1"><small>Quantity: {{ truck_qty }} Qt</small></p>
+                                    <p class="mb-0"><small>Amount: ₹{{ amount }}</small></p>
+                                  </div>
+                                  <label class="form-label">Upload Final Invoice</label>
+                                  <input type="file"
+                                         name="truck_final_invoice"
+                                         class="form-control"
+                                         accept=".pdf,image/*"
+                                         required>
+                                  <small class="text-muted">
+                                    Upload the final hisab (final invoice) for this truck.
+                                  </small>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    Cancel
+                                  </button>
+                                  <button type="submit" class="btn btn-primary">
+                                    <i class="fa fa-upload"></i> Upload
+                                  </button>
+                                </div>
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+                      {% endif %}
+                    {% endif %}
+
                   </div>
                 </div>
-              {% endif %}
-
-              <!-- MARK PAYMENT DONE -->
-              <form method="POST"
-                    action="/miller/mark_payment_done/{{ booking_id }}">
-                <button class="btn btn-success btn-sm w-100 mt-2">
-                  <i class="fa fa-check-circle"></i> Mark Payment Done
-                </button>
-              </form>
-            </div>
-
-            <!-- TRUCK QC SUMMARY -->
-            {% if invoices_map.get(booking_id) %}
-            <div class="border-top mt-3 pt-3">
-              <small class="text-muted fw-semibold d-block mb-2">
-                <i class="fa fa-truck"></i> Truck QC Summary
-              </small>
-              {% for inv in invoices_map[booking_id] %}
-              <div class="mb-2 p-2 border rounded bg-light">
-                <div class="d-flex justify-content-between">
-                  <span>
-                    <strong>Truck #{{ loop.index }}</strong> – {{ inv.qty }} Qt
-                  </span>
-                  {% if inv.qc_status == 'verified' %}
-                    <span class="badge bg-success">✔</span>
-                  {% else %}
-                    <span class="badge bg-warning">⏳</span>
-                  {% endif %}
-                </div>
-                {% if inv.qc_status == 'verified' %}
-                  <small class="text-muted">
-                    Net: {{ inv.qc_weight or inv.qty }} Qt |
-                    Moisture: {{ inv.qc_moisture or '-' }}%
-                  </small>
-                {% endif %}
               </div>
-              {% endfor %}
-            </div>
-            {% endif %}
+            {% endfor %}
 
           </div>
         </div>
       </div>
-      {% endfor %}
+      {% endif %}
 
-    </div>
+    {% endfor %}
+
   </div>
 
   {% else %}
   <p class="text-muted mb-0">
-    No orders with final invoice uploaded yet.
+    No loaded bookings found.
   </p>
   {% endif %}
 </div>
 
 </div>
+</main>
 
-<!-- ================= FOOTER ================= -->
-<footer class="footer">
-  © 2026 <b>Sarna Mandi</b> · Final Hisab & Payments
-</footer>
+{% include '_footer.html' %}
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>AOS.init({duration:600,once:true});</script>
 </body>
 </html>

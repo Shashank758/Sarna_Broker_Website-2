@@ -3,613 +3,948 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Market | Sarna Broker</title>
+<title>Buyer Market | Sarna Mandi</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/style.css">
+
 <style>
-  :root {
-    --primary: #1e6f5c;
-    --primary-dark: #145a48;
-    --bg: #f4f7f6;
-    --card: #ffffff;
-    --text: #2c3e50;
-    --muted: #7f8c8d;
-    --border: #e5e9ec;
-    --success: #198754;
-    --warning: #ffc107;
-    --danger: #dc3545;
-    --info: #0dcaf0;
-    --radius: 14px;
-  }
+:root {
+  --primary: #0f9b5f;
+  --primary-dark: #0d8a54;
+  --primary-darker: #0a7548;
+  --primary-light: #12b36e;
+  --bg-light: #f4f7f6;
+  --card-bg: #ffffff;
+  --text-primary: #1e293b;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+  --purple: #8b5cf6;
+  --radius: 16px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
+  --shadow-md: 0 4px 15px rgba(0,0,0,.08);
+  --shadow-lg: 0 10px 40px rgba(0,0,0,.12);
+  --shadow-xl: 0 20px 50px rgba(0,0,0,.15);
+}
 
-  /* ---------- GLOBAL ---------- */
-  body {
-    background: var(--bg);
-    font-family: 'Inter', 'Segoe UI', sans-serif;
-    color: var(--text);
-    font-weight: 400;
-    line-height: 1.6;
-  }
+/* ========== GLOBAL ========== */
+body {
+  background: var(--bg-light);
+  font-family: 'Segoe UI', 'Inter', sans-serif;
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
-  .app-shell {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
+main {
+  flex: 1;
+}
 
-  /* ---------- NAVBAR ---------- */
-  .navbar {
-    border-radius: var(--radius);
-    margin: 16px;
-    box-shadow: 0 10px 28px rgba(0,0,0,.08);
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-  }
+/* ========== HERO SECTION ========== */
+.market-hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 50%, var(--primary-darker) 100%);
+  color: #fff;
+  padding: 45px 0;
+  position: relative;
+  overflow: hidden;
+}
+.market-hero::before {
+  content: '';
+  position: absolute;
+  top: -100px;
+  right: -100px;
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%);
+  pointer-events: none;
+  animation: float 6s ease-in-out infinite;
+}
+.market-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -80px;
+  left: -80px;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+  pointer-events: none;
+  animation: float 8s ease-in-out infinite reverse;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(5deg); }
+}
+.market-hero h1 {
+  font-weight: 800;
+  font-size: 2rem;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.market-hero p {
+  opacity: 0.95;
+  font-size: 1rem;
+  margin: 0;
+}
 
-  .navbar-brand {
-    font-weight: 800;
-    font-size: 1.25rem;
-  }
+/* ========== QUICK ACTIONS ========== */
+.quick-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+.quick-action-btn {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  backdrop-filter: blur(10px);
+}
+.quick-action-btn:hover {
+  background: rgba(255,255,255,0.25);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
 
-  /* ---------- MARKET FRAME ---------- */
-  .market-frame {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
+/* ========== STAT CARDS ========== */
+.stat-card {
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(0,0,0,.05);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+.stat-card .stat-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #fff;
+}
+.stat-card .stat-icon.stocks { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
+.stat-card .stat-icon.booked { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
+.stat-card .stat-icon.loaded { background: linear-gradient(135deg, var(--success), #059669); }
+.stat-card .stat-icon.remaining { background: linear-gradient(135deg, var(--warning), #d97706); }
+.stat-card .stat-icon.paid { background: linear-gradient(135deg, var(--purple), #7c3aed); }
+.stat-card .stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+}
+.stat-card .stat-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  border-radius: var(--radius) 0 0 var(--radius);
+}
+.stat-card.stocks::before { background: var(--primary); }
+.stat-card.booked::before { background: var(--primary); }
+.stat-card.loaded::before { background: var(--success); }
+.stat-card.remaining::before { background: var(--warning); }
+.stat-card.paid::before { background: var(--purple); }
 
-  .data-scroll {
-    flex: 1;
-    overflow-y: auto;
-    padding: 0 16px 80px 16px;
-    scrollbar-width: thin;
-    scrollbar-color: #c1c1c1 transparent;
-  }
+/* ========== SECTION CARDS ========== */
+.section-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 28px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(0,0,0,.05);
+}
 
-  .data-scroll::-webkit-scrollbar {
-    width: 6px;
-  }
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--border-color);
+}
+.section-title {
+  font-weight: 700;
+  font-size: 1.15rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-primary);
+  margin: 0;
+}
+.section-title .icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+.section-title .icon-box.green { background: rgba(15,155,95,0.1); color: var(--primary); }
+.section-title .icon-box.yellow { background: rgba(245,158,11,0.1); color: var(--warning); }
+.section-title .icon-box.blue { background: rgba(59,130,246,0.1); color: var(--info); }
+.section-title .icon-box.red { background: rgba(239,68,68,0.1); color: var(--danger); }
+.section-title .icon-box.purple { background: rgba(139,92,246,0.1); color: var(--purple); }
 
-  .data-scroll::-webkit-scrollbar-track {
-    background: transparent;
-  }
+.section-badge {
+  font-size: 0.85rem;
+  padding: 8px 16px;
+  border-radius: 30px;
+  font-weight: 600;
+}
 
-  .data-scroll::-webkit-scrollbar-thumb {
-    background-color: #c1c1c1;
-    border-radius: 20px;
-  }
+/* ========== TABLE STYLING ========== */
+.table-modern {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.table-modern thead th {
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  padding: 16px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  border-bottom: 2px solid var(--primary);
+  text-align: center;
+}
+.table-modern tbody td {
+  padding: 16px 14px;
+  text-align: center;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.9rem;
+}
+.table-modern tbody tr {
+  transition: all 0.2s ease;
+}
+.table-modern tbody tr:hover {
+  background: rgba(15,155,95,0.03);
+}
 
-  /* ---------- SECTION TITLES ---------- */
-  .section-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 1.25rem;
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+/* ========== STOCK CARDS ========== */
+.stock-card {
+  background: #fff;
+  border-radius: var(--radius);
+  border: 1px solid rgba(0,0,0,.08);
+  padding: 0;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  overflow: hidden;
+  height: 100%;
+  position: relative;
+}
+.stock-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(15,155,95,0.02) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.stock-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--primary);
+}
+.stock-card:hover::after {
+  opacity: 1;
+}
+.stock-card-header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: #fff;
+  padding: 18px 20px;
+  position: relative;
+  overflow: hidden;
+}
+.stock-card-header::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 80px;
+  height: 80px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+}
+.stock-card-header h6 {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.05rem;
+  position: relative;
+}
+.stock-card-header small {
+  opacity: 0.95;
+  position: relative;
+}
+.stock-card-body {
+  padding: 20px;
+}
+.stock-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.9rem;
+}
+.stock-detail:last-child {
+  border-bottom: none;
+}
+.stock-detail .label {
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.stock-detail .value {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.stock-card-footer {
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #f8fafc, #fff);
+  border-top: 1px solid #f1f5f9;
+}
 
-  .section-title i {
-    color: var(--primary);
-  }
+/* ========== FILTER BAR ========== */
+.filter-bar {
+  background: linear-gradient(135deg, #f8fafc, #fff);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+.filter-pill {
+  padding: 8px 18px;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border: 2px solid var(--border-color);
+  background: #fff;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.filter-pill:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.filter-pill.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
 
-  /* ---------- CARD STYLES ---------- */
-  .card-box {
-    background: var(--card);
-    border-radius: var(--radius);
-    box-shadow: 0 8px 24px rgba(0,0,0,.06);
-    border: 1px solid var(--border);
-    padding: 1.25rem;
-  }
+/* ========== ORDER CARDS ========== */
+.order-card {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+.order-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
+}
+.order-card .accordion-button {
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+.order-card .accordion-button:not(.collapsed) {
+  background: transparent;
+  box-shadow: none;
+}
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  width: 100%;
+}
+.order-main {
+  flex: 1;
+  text-align: left;
+}
+.order-id {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--primary);
+  display: block;
+  margin-bottom: 4px;
+}
+.order-crop {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 1rem;
+  text-transform: capitalize;
+}
+.order-meta-row {
+  display: flex;
+  gap: 16px;
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+.order-meta-row span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.order-expand {
+  color: var(--text-muted);
+  transition: transform 0.3s ease;
+}
+.accordion-button:not(.collapsed) .order-expand {
+  transform: rotate(180deg);
+}
 
-  .market-card {
-    background: white;
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: 0 6px 20px rgba(0,0,0,.06);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border: 1px solid var(--border);
-  }
+/* ========== ORDER STATUS BADGES ========== */
+.order-status {
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.status-approved { background: rgba(15,155,95,0.1); color: var(--primary); }
+.status-active { background: rgba(245,158,11,0.1); color: var(--warning); }
+.status-loaded { background: rgba(16,185,129,0.1); color: var(--success); }
+.status-partial { background: rgba(239,68,68,0.1); color: var(--danger); }
+.status-paid { background: rgba(139,92,246,0.15); color: var(--purple); }
+.status-pending { background: rgba(245,158,11,0.1); color: var(--warning); }
 
-  .market-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 28px rgba(0,0,0,.1);
-  }
-
-  .market-img-real {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-  }
-
-  .market-body {
-    padding: 1rem;
-  }
-
-  /* ---------- TABLE STYLES ---------- */
-  .table-responsive {
-    border-radius: var(--radius);
-    overflow: hidden;
-    border: 1px solid var(--border);
-  }
-
-  .table {
-    margin-bottom: 0;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.9rem;
-  }
-
-  .table thead th {
-    background-color: #f8f9fa;
-    border: none;
-    font-weight: 700;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    color: var(--muted);
-    padding: 1rem 0.75rem;
-    white-space: nowrap;
-  }
-
-  .table tbody tr {
-    transition: background-color 0.2s ease;
-  }
-
-  .table tbody tr:hover {
-    background-color: #f8fafb;
-  }
-
-  .table tbody td {
-    border: none;
-    padding: 1rem 0.75rem;
-    vertical-align: middle;
-    font-weight: 500;
-    border-top: 1px solid var(--border);
-  }
-
-  .table-striped tbody tr:nth-of-type(odd) {
-    background-color: rgba(0,0,0,.02);
-  }
-
-  /* ---------- BADGES ---------- */
-  .badge {
-    font-weight: 600;
-    padding: 0.4em 0.8em;
-    border-radius: 20px;
-    font-size: 0.75rem;
-  }
-
-  .badge.bg-success {
-    background-color: #d1e7dd !important;
-    color: #0f5132 !important;
-  }
-
-  .badge.bg-secondary {
-    background-color: #e2e3e5 !important;
-    color: #383d41 !important;
-  }
-
-  .badge.bg-danger {
-    background-color: #f8d7da !important;
-    color: #842029 !important;
-  }
-
-  .badge.bg-info {
-    background-color: #cff4fc !important;
-    color: #055160 !important;
-  }
-
-  /* ---------- ORDER STATUS ---------- */
-  .order-status {
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-weight: 700;
-    font-size: 0.75rem;
-    white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-  }
-
-  .status-approved { background: #e7f0ff; color: #0d6efd; }
-  .status-active { background: #fff3cd; color: #856404; }
-  .status-loaded { background: #e9f7ef; color: #157347; }
-  .status-partial { background: #fdecea; color: #842029; }
-  .status-paid { background: #d4edda; color: #155724; }
-
-  /* ---------- ORDER CARDS ---------- */
-  .order-card {
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    margin-bottom: 1rem;
-    overflow: hidden;
-    box-shadow: 0 6px 18px rgba(0,0,0,.06);
-    transition: all 0.2s ease;
-  }
-
-  .order-card:hover {
-    box-shadow: 0 10px 28px rgba(0,0,0,.08);
-  }
-
-  .order-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 1.25rem;
-  }
-
-  .order-main {
-    flex: 1;
-  }
-
-  .order-id {
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: var(--primary);
-    display: block;
-    margin-bottom: 0.25rem;
-  }
-
-  .order-crop {
-    font-weight: 700;
-    color: var(--text);
-    font-size: 0.95rem;
-  }
-
-  .order-meta-row {
-    display: flex;
-    gap: 1rem;
-    margin-top: 0.5rem;
-    font-size: 0.8rem;
-    color: var(--muted);
-  }
-
-  .order-meta-row span {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .order-expand {
-    color: var(--muted);
-    transition: transform 0.3s ease;
-  }
-
-  .accordion-button:not(.collapsed) .order-expand {
-    transform: rotate(180deg);
-  }
-
-  /* ---------- ACCORDION BODY ---------- */
-  .accordion-body {
-    padding: 1.25rem;
-    background-color: #f8fafb;
-  }
-
+/* ========== ACCORDION BODY ========== */
+.accordion-body {
+  padding: 24px;
+  background: linear-gradient(135deg, #f8fafc 0%, #fff 100%);
+  border-top: 1px solid var(--border-color);
+}
+.order-body-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+@media (min-width: 768px) {
   .order-body-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1rem;
+    grid-template-columns: 1fr 1fr;
   }
-
-  @media (min-width: 768px) {
-    .order-body-grid {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-
-  .soft-card {
-    background: white;
-    border-radius: calc(var(--radius) - 4px);
-    padding: 1rem;
-    border: 1px solid var(--border);
-  }
-
-  .kv {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid #f1f3f5;
-  }
-
-  .kv:last-child {
-    border-bottom: none;
-  }
-
-  .kv span:first-child {
-    color: var(--muted);
-    font-weight: 500;
-    font-size: 0.9rem;
-  }
-
-  .kv span:last-child {
-    font-weight: 600;
-    color: var(--text);
-  }
-
-  /* ---------- BUTTONS ---------- */
-  .btn {
-    border-radius: 10px;
-    font-weight: 600;
-    padding: 0.5rem 1rem;
-    transition: all 0.2s ease;
-  }
-
-  .btn-primary {
-    background: var(--primary);
-    border: none;
-  }
-
-  .btn-primary:hover {
-    background: var(--primary-dark);
-    transform: translateY(-2px);
-  }
-
-  .btn-sm {
-    padding: 0.375rem 0.75rem;
-    font-size: 0.875rem;
-  }
-
-  /* ---------- PROGRESS BAR ---------- */
-  .progress {
-    height: 8px;
-    border-radius: 10px;
-    background-color: #e9ecef;
-  }
-
-  .progress-bar {
-    border-radius: 10px;
-    transition: width 0.6s ease;
-  }
-
-  /* ---------- SEARCH & FILTERS ---------- */
-  .orders-toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-
-  .search {
-    flex: 1;
-    min-width: 250px;
-  }
-
-  .search input {
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-  }
-
-  .pill {
-    background: #e9ecef;
-    color: var(--text);
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 0.9rem;
-  }
-  /* FOOTER */
-.footer{
-  background:#0b1c2d;
-  color:#cfd6df;
-  padding:40px 0 20px;
-  margin-top:auto;
+}
+.soft-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+.kv {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+.kv:last-child {
+  border-bottom: none;
+}
+.kv span:first-child {
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+.kv span:last-child {
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
-.footer-bottom{
-  border-top:1px solid rgba(255,255,255,.1);
-  margin-top:20px;
-  padding-top:15px;
-  font-size:.85rem;
-  text-align:center;
+/* ========== BUTTONS ========== */
+.btn-primary-custom {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 12px 24px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
 }
-  /* ---------- MODAL STYLES ---------- */
-  .modal-content {
-    border-radius: var(--radius);
-    border: none;
-    box-shadow: 0 20px 40px rgba(0,0,0,.15);
-  }
+.btn-primary-custom:hover {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary-darker));
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(15,155,95,0.3);
+}
 
-  /* ---------- RESPONSIVE ---------- */
-  @media (max-width: 768px) {
-    .data-scroll {
-      padding: 0 12px 60px 12px;
-    }
-    
-    .navbar {
-      margin: 12px;
-    }
-    
-    .table-responsive {
-      font-size: 0.85rem;
-    }
-    
-    .order-card-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 1rem;
-    }
-    
-    .order-meta-row {
-      flex-wrap: wrap;
-    }
-    
-    .orders-toolbar {
-      flex-direction: column;
-      align-items: stretch;
-    }
-    
-    .search {
-      min-width: 100%;
-    }
-  }
+/* ========== PROGRESS BAR ========== */
+.progress {
+  height: 10px;
+  border-radius: 10px;
+  background-color: #e9ecef;
+  overflow: hidden;
+}
+.progress-bar {
+  border-radius: 10px;
+  transition: width 0.8s ease;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+}
 
-  /* ---------- UTILITY ---------- */
-  .text-muted {
-    color: var(--muted) !important;
-  }
+/* ========== FORM STYLING ========== */
+.form-control, .form-select {
+  border-radius: 10px;
+  padding: 12px 16px;
+  border: 2px solid var(--border-color);
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(15,155,95,0.15);
+}
+.form-control-sm {
+  padding: 8px 12px;
+  font-size: 0.85rem;
+}
 
-  .fw-bold {
-    font-weight: 700 !important;
-  }
+/* ========== MODAL ========== */
+.modal-content {
+  border-radius: var(--radius);
+  border: none;
+  box-shadow: 0 25px 50px rgba(0,0,0,.2);
+}
+.modal-header {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #fff;
+  border-radius: var(--radius) var(--radius) 0 0;
+  padding: 20px 24px;
+}
+.modal-header .btn-close {
+  filter: brightness(0) invert(1);
+}
 
-  .fw-800 {
-    font-weight: 800 !important;
-  }
+/* ========== EMPTY STATE ========== */
+.empty-state {
+  text-align: center;
+  padding: 50px 20px;
+}
+.empty-state i {
+  font-size: 56px;
+  color: var(--border-color);
+  margin-bottom: 20px;
+}
+.empty-state p {
+  color: var(--text-muted);
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* ========== SCROLL CONTAINER ========== */
+.scroll-container {
+  max-height: 70vh;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+.scroll-container::-webkit-scrollbar {
+  width: 8px;
+}
+.scroll-container::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 10px;
+}
+.scroll-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+/* ========== TRUCK QC ITEM ========== */
+.truck-qc-item {
+  background: linear-gradient(135deg, #f8fafc, #fff);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: all 0.2s ease;
+}
+.truck-qc-item:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 15px rgba(15,155,95,0.1);
+}
+
+/* ========== STOCK GRID ========== */
+.stock-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+/* ========== PULSE ANIMATION ========== */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+.pulse-badge {
+  animation: pulse 2s infinite;
+}
+
+/* ========== GLOW EFFECT ========== */
+.glow-effect {
+  box-shadow: 0 0 20px rgba(15, 155, 95, 0.3);
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .market-hero h1 { font-size: 1.5rem; }
+  .stat-card { padding: 18px; }
+  .stat-card .stat-value { font-size: 1.5rem; }
+  .quick-actions { justify-content: center; }
+  .order-card-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .order-meta-row { flex-wrap: wrap; }
+  .stock-grid { grid-template-columns: 1fr; }
+}
+
+/* ========== SMOOTH SCROLL ========== */
+html {
+  scroll-behavior: smooth;
+}
 </style>
 </head>
 
-<body class="bg-light">
-<div class="app-shell">
-<!-- NAVBAR -->
+<body>
 
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+{% include '_navbar.html' %}
+
+<!-- ================= HERO SECTION ================= -->
+<section class="market-hero">
   <div class="container">
-    <a class="navbar-brand" href="/market">
-      <i class="fa fa-seedling"></i> Sarna Mandi
-    </a>
-    <div class="collapse navbar-collapse show">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link active" href="/buyer/active">Active</a></li>
-        <li class="nav-item"><a class="nav-link" href="/buyer/partial">Partial closed</a></li>
-        <li class="nav-item"><a class="nav-link" href="/buyer/loaded">Loaded</a></li>
-        <li class="nav-item"><a class="nav-link" href="/buyer/payments">Payments</a></li>
-        <li class="nav-item"><a class="nav-link" href="/buyer/profile">Profile</a></li>
-        <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
-
-
-  <!-- MAIN CONTENT -->
-  <div class="market-frame">
-    <div class="data-scroll">
-       <!-- ================= MILLER STOCKS ================= -->
-      <div class="container mt-5">
-        <h5 class="section-title">
-          <i class="fa fa-industry"></i> Miller Stocks (Live)
-        </h5>
+    <div class="row align-items-center">
+      <div class="col-lg-8" data-aos="fade-right">
+        <h1><i class="fa fa-store me-3"></i>Buyer Marketplace</h1>
+        <p><i class="fa fa-chart-line me-2"></i>Browse miller stocks, book orders, track shipments & manage payments — all in one place</p>
         
-        <div class="table-responsive">
-          <table class="table table-striped align-middle">
-            <thead class="table-light">
-              <tr>
-                <th>Miller</th>
-                <th>Crop</th>
-                <th>Qty (Qt)</th>
-                <th>Price</th>
-                <th>Condition</th>
-                <th>Bag</th>
-                <th>Deduction</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            
-            <tbody>
-              {% for m in miller_stocks %}
-              <tr>
-                <td class="fw-600">
-                  <i class="fa fa-industry text-success me-2"></i>
-                  {{ m[10] }}
-                </td>
-                <td>{{ m[2] }}</td>
-                
-                <td>
-                  {% if m[3] > 0 %}
-                    <span class="badge bg-secondary">{{ m[3] }} Qt</span>
-                  {% else %}
-                    <span class="badge bg-danger">Sold Out</span>
-                  {% endif %}
-                </td>
-                
-                <td class="fw-bold text-success">₹{{ m[4] }}</td>
-                <td><span class="badge bg-info">{{ m[5] }}</span></td>
-                <td>{{ m[6] }}</td>
-                <td>₹{{ m[7] }}</td>
-                
-                <td style="min-width: 160px;">
-                  {% if m[3] > 0 %}
-                  <form method="POST" action="/book_miller_stock/{{ m[0] }}">
-                    <input type="number" 
-                           name="quantity" 
-                           min="1" 
-                           max="{{ m[3] }}"
-                           class="form-control form-control-sm mb-2" 
-                           placeholder="Qty" 
-                           required>
-                    <button type="submit" class="btn btn-success btn-sm w-100">
-                      <i class="fa fa-shopping-cart me-1"></i> Book
-                    </button>
-                  </form>
-                  {% else %}
-                    <span class="text-muted small">Unavailable</span>
-                  {% endif %}
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+        <div class="quick-actions">
+          <a href="#miller-stocks" class="quick-action-btn">
+            <i class="fa fa-warehouse"></i> Browse Stocks
+          </a>
+          <a href="#active-orders" class="quick-action-btn">
+            <i class="fa fa-clock"></i> Active Orders
+          </a>
+          <a href="#loaded-orders" class="quick-action-btn">
+            <i class="fa fa-check-circle"></i> Loaded
+          </a>
+          <a href="/buyer/profile" class="quick-action-btn">
+            <i class="fa fa-user-cog"></i> Profile
+          </a>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<main>
+<div class="container py-4" style="max-width:1200px;">
+
+<!-- ================= QUICK STATS ================= -->
+{% set total_stocks = miller_stocks|length if miller_stocks else 0 %}
+{% set total_active = my_bookings|length if my_bookings else 0 %}
+{% set total_loaded = loaded_bookings|length if loaded_bookings else 0 %}
+{% set total_partial = partial_closed_bookings|length if partial_closed_bookings else 0 %}
+
+<div class="row g-4 mb-4" style="margin-top:-60px;">
+  <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="0">
+    <div class="stat-card stocks">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <div class="stat-label mb-2">Available Stocks</div>
+          <div class="stat-value">{{ total_stocks }}</div>
+        </div>
+        <div class="stat-icon stocks">
+          <i class="fa fa-warehouse"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+    <div class="stat-card remaining">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <div class="stat-label mb-2">Active Orders</div>
+          <div class="stat-value">{{ total_active }}</div>
+        </div>
+        <div class="stat-icon remaining">
+          <i class="fa fa-clock"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
+    <div class="stat-card loaded">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <div class="stat-label mb-2">Loaded Orders</div>
+          <div class="stat-value">{{ total_loaded }}</div>
+        </div>
+        <div class="stat-icon loaded">
+          <i class="fa fa-truck"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
+    <div class="stat-card paid">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <div class="stat-label mb-2">Partial Closed</div>
+          <div class="stat-value">{{ total_partial }}</div>
+        </div>
+        <div class="stat-icon paid">
+          <i class="fa fa-lock"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= MILLER STOCKS ================= -->
+<div class="section-card" id="miller-stocks" data-aos="fade-up">
+  <div class="section-header">
+    <h5 class="section-title">
+      <span class="icon-box green"><i class="fa fa-warehouse"></i></span>
+      Live Miller Stocks
+    </h5>
+    <span class="section-badge bg-success">{{ miller_stocks|length }} Available</span>
+  </div>
+  
+  <!-- Stock Filter Bar -->
+  <div class="filter-bar mb-4">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label small fw-bold"><i class="fa fa-seedling me-2"></i>Filter by Crop</label>
+        <select id="cropFilter" class="form-select form-select-sm">
+          <option value="all">All Crops</option>
+          <option value="wheat">🌾 Wheat</option>
+          <option value="chawal">🍚 Rice (Chawal)</option>
+          <option value="sarso">🌻 Mustard (Sarso)</option>
+          <option value="maize">🌽 Maize</option>
+          <option value="paddy">🌾 Paddy</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small fw-bold"><i class="fa fa-industry me-2"></i>Search Miller</label>
+        <input type="text" id="millerSearch" class="form-control form-control-sm" placeholder="Search miller name...">
+      </div>
+      <div class="col-md-4">
+        <button onclick="clearStockFilters()" class="btn btn-outline-secondary btn-sm w-100">
+          <i class="fa fa-times me-2"></i>Clear Filters
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  {% if miller_stocks %}
+  <div class="row g-4" id="stocksContainer">
+    {% for m in miller_stocks %}
+    <div class="col-md-6 col-lg-4 stock-item" 
+         data-crop="{{ m[2]|lower }}" 
+         data-miller="{{ m[10]|lower }}"
+         data-aos="fade-up" 
+         data-aos-delay="{{ (loop.index % 6) * 50 }}">
+      <div class="stock-card">
+        <div class="stock-card-header">
+          <h6><i class="fa fa-industry me-2"></i>{{ m[10] }}</h6>
+          <small><i class="fa fa-seedling me-1"></i>{{ m[2]|capitalize }}</small>
+        </div>
+        <div class="stock-card-body">
+          <div class="stock-detail">
+            <span class="label"><i class="fa fa-weight-hanging"></i>Quantity</span>
+            <span class="value">
+              {% if m[3] > 0 %}
+                <span class="badge bg-success">{{ m[3] }} Qt</span>
+              {% else %}
+                <span class="badge bg-danger">Sold Out</span>
+              {% endif %}
+            </span>
+          </div>
+          <div class="stock-detail">
+            <span class="label"><i class="fa fa-indian-rupee-sign"></i>Price</span>
+            <span class="value text-success fw-bold">₹{{ m[4] }}/Qt</span>
+          </div>
+          <div class="stock-detail">
+            <span class="label"><i class="fa fa-scale-balanced"></i>Condition</span>
+            <span class="value"><span class="badge bg-info">{{ m[5] }}</span></span>
+          </div>
+          <div class="stock-detail">
+            <span class="label"><i class="fa fa-box"></i>Bag Type</span>
+            <span class="value">{{ m[6] }}</span>
+          </div>
+          {% if m[7] %}
+          <div class="stock-detail">
+            <span class="label"><i class="fa fa-minus-circle"></i>Deduction</span>
+            <span class="value text-danger">{{ m[7] }}</span>
+          </div>
+          {% endif %}
+        </div>
+        <div class="stock-card-footer">
+          {% if m[3] > 0 %}
+          <form method="POST" action="/book_miller_stock/{{ m[0] }}">
+            <div class="input-group">
+              <input type="number" name="quantity" min="1" max="{{ m[3] }}" 
+                     class="form-control form-control-sm" placeholder="Qty (Qt)" required>
+              <button type="submit" class="btn btn-success btn-sm">
+                <i class="fa fa-shopping-cart me-1"></i> Book Now
+              </button>
+            </div>
+          </form>
+          {% else %}
+            <span class="text-muted text-center d-block"><i class="fa fa-ban me-1"></i>Currently Unavailable</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  
+  <!-- No Results Message -->
+  <div class="empty-state" id="noStocksMessage" style="display:none;">
+    <i class="fa fa-search"></i>
+    <p>No stocks match your filter criteria. Try adjusting your filters.</p>
+  </div>
+  
+  {% else %}
+  <div class="empty-state">
+    <i class="fa fa-warehouse"></i>
+    <p>No stocks available at the moment. Check back later!</p>
+  </div>
+  {% endif %}
+</div>
 
       <!-- ================= ACTIVE ORDERS ================= -->
       {% if my_bookings %}
-      <div class="container mt-5">
-        <h5 class="section-title">
-          <i class="fa fa-clock"></i> Active Orders
-          <span class="pill ms-3">{{ my_bookings|length }} Active</span>
-        </h5>
+      <div class="section-card" id="active-orders" data-aos="fade-up">
+        <div class="section-header">
+          <h5 class="section-title">
+            <span class="icon-box yellow"><i class="fa fa-clock"></i></span>
+            Your Active Orders
+          </h5>
+          <span class="section-badge bg-warning text-dark">{{ my_bookings|length }} Active</span>
+        </div>
         
         <!-- Summary Stats -->
-        <div class="row g-3 mb-4">
-          <div class="col-md-4">
-            <div class="card border-primary shadow-sm">
-              <div class="card-body text-center py-3">
-                <h6 class="text-muted mb-2 small">
-                  <i class="fa fa-shopping-cart me-1"></i> Total Booked
-                </h6>
-                <h4 class="text-primary mb-0 fw-bold">{{ total_booked }} Qt</h4>
+        <div class="row g-4 mb-4">
+          <div class="col-md-4" data-aos="fade-up" data-aos-delay="0">
+            <div class="stat-card booked">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="stat-label mb-2">Total Booked</div>
+                  <div class="stat-value" id="totalBooked">{{ total_booked }} Qt</div>
+                </div>
+                <div class="stat-icon booked">
+                  <i class="fa fa-shopping-cart"></i>
+                </div>
               </div>
             </div>
           </div>
-          <div class="col-md-4">
-            <div class="card border-success shadow-sm">
-              <div class="card-body text-center py-3">
-                <h6 class="text-muted mb-2 small">
-                  <i class="fa fa-check-circle me-1"></i> Total Loaded
-                </h6>
-                <h4 class="text-success mb-0 fw-bold">{{ total_loaded }} Qt</h4>
+          <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="stat-card loaded">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="stat-label mb-2">Total Loaded</div>
+                  <div class="stat-value" id="totalLoadedQty">{{ total_loaded }} Qt</div>
+                </div>
+                <div class="stat-icon loaded">
+                  <i class="fa fa-truck"></i>
+                </div>
               </div>
             </div>
           </div>
-          <div class="col-md-4">
-            <div class="card border-warning shadow-sm">
-              <div class="card-body text-center py-3">
-                <h6 class="text-muted mb-2 small">
-                  <i class="fa fa-clock me-1"></i> Total Remaining
-                </h6>
-                <h4 class="text-warning mb-0 fw-bold">{{ total_remaining }} Qt</h4>
+          <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="stat-card remaining">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="stat-label mb-2">Remaining</div>
+                  <div class="stat-value" id="totalRemaining">{{ total_remaining }} Qt</div>
+                </div>
+                <div class="stat-icon remaining">
+                  <i class="fa fa-hourglass-half"></i>
+                </div>
               </div>
             </div>
           </div>
         </div>
         
-        <!-- Search Bar -->
-        <div class="orders-toolbar">
-          <div class="search">
-            <input type="text" 
-                   id="orderSearch" 
-                   class="form-control" 
-                   placeholder="Search by Order ID or Crop...">
+        <!-- Filter & Search Bar -->
+        <div class="filter-bar">
+          <div class="d-flex gap-2 flex-wrap align-items-center mb-3">
+            <button class="filter-pill active" data-filter="all" onclick="filterOrders('all')">
+              <i class="fa fa-list me-1"></i> All
+            </button>
+            <button class="filter-pill" data-filter="pending" onclick="filterOrders('pending')">
+              <i class="fa fa-clock me-1"></i> Pending Payment
+            </button>
+            <button class="filter-pill" data-filter="paid" onclick="filterOrders('paid')">
+              <i class="fa fa-check-circle me-1"></i> Paid
+            </button>
+          </div>
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <input type="text" id="orderSearch" class="form-control" 
+                     placeholder="🔍 Search by Order ID or Crop...">
+            </div>
+            <div class="col-md-4 text-end d-none d-md-block">
+              <small class="text-muted" id="orderCount">Showing {{ my_bookings|length }} orders</small>
+            </div>
           </div>
         </div>
         
@@ -723,6 +1058,45 @@
                         <i class="fa fa-lock me-1"></i> Close Remaining Qty
                       </button>
                       
+                      <!-- Close Remaining Modal -->
+                      <div class="modal fade" id="closeRemainingModal{{ b[0] }}" tabindex="-1">
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title">
+                                <i class="fa fa-lock me-2"></i>Close Remaining Quantity
+                              </h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form method="POST" action="/buyer/close_remaining/{{ b[0] }}">
+                              <div class="modal-body">
+                                <div class="alert alert-warning">
+                                  <i class="fa fa-exclamation-triangle me-2"></i>
+                                  <strong>Warning:</strong> This will close the order with {{ remaining_qty }} Qt remaining unloaded.
+                                </div>
+                                <div class="mb-3">
+                                  <label class="form-label fw-bold">Reason for Closure <span class="text-danger">*</span></label>
+                                  <textarea name="reason" 
+                                            class="form-control" 
+                                            rows="3" 
+                                            placeholder="Please provide a reason for closing the remaining quantity..."
+                                            required></textarea>
+                                  <small class="text-muted">This information will be shared with the miller.</small>
+                                </div>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                  <i class="fa fa-times me-1"></i>Cancel
+                                </button>
+                                <button type="submit" class="btn btn-warning">
+                                  <i class="fa fa-lock me-1"></i>Close Remaining Qty
+                                </button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                      
                       <!-- Upload Loading Form -->
                       <form method="POST" action="/buyer/update_loading/{{ b[0] }}" 
                             enctype="multipart/form-data">
@@ -734,6 +1108,15 @@
                                  max="{{ remaining_qty }}"
                                  class="form-control" 
                                  placeholder="Qty to load" 
+                                 required>
+                        </div>
+
+                        <div class="mb-3">
+                          <label class="form-label small fw-bold">Truck Number</label>
+                          <input type="text"
+                                 name="truck_number"
+                                 class="form-control"
+                                 placeholder="e.g. MH12AB1234"
                                  required>
                         </div>
                         
@@ -802,11 +1185,14 @@
 
       <!-- ================= PARTIALLY CLOSED ORDERS ================= -->
       {% if partial_closed_bookings %}
-      <div class="container mt-5">
-        <h5 class="section-title text-warning">
-          <i class="fa fa-lock"></i> Partially Closed Orders
-          <span class="pill ms-3">{{ partial_closed_bookings|length }} Orders</span>
-        </h5>
+      <div class="section-card" data-aos="fade-up">
+        <div class="section-header">
+          <h5 class="section-title">
+            <span class="icon-box red"><i class="fa fa-lock"></i></span>
+            Partially Closed Orders
+          </h5>
+          <span class="section-badge bg-danger">{{ partial_closed_bookings|length }} Orders</span>
+        </div>
         
         <div class="accordion" id="partialClosedAccordion">
           {% for b in partial_closed_bookings %}
@@ -885,7 +1271,13 @@
                           <div class="mb-3 p-2 border rounded" style="background:#f8f9fa;">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                               <div>
-                                <strong class="text-primary">Truck #{{ loop.index }}</strong>
+                                <strong class="text-primary">
+                                  {% if inv.truck_number %}
+                                    Truck {{ inv.truck_number }}
+                                  {% else %}
+                                    Truck #{{ loop.index }}
+                                  {% endif %}
+                                </strong>
                                 <span class="badge bg-info ms-2">{{ inv.qty }} Qt</span>
                               </div>
                               {% if inv.qc_status == 'verified' %}
@@ -943,6 +1335,10 @@
                         {% for inv in invs %}
                           <div class="list-group-item d-flex justify-content-between align-items-center">
                             <div>
+                              {% if inv.truck_number %}
+                                <strong>{{ inv.truck_number }}</strong>
+                                <br>
+                              {% endif %}
                               <strong>{{ inv.qty }} Qt</strong>
                               <br>
                               <small class="text-muted">{{ inv.date[:16] if inv.date else '' }}</small>
@@ -971,6 +1367,14 @@
                                           action="/buyer/edit_loading_invoice/{{ inv.id }}"
                                           enctype="multipart/form-data">
                                       <div class="modal-body">
+                                        <div class="mb-3">
+                                          <label class="form-label">Truck Number</label>
+                                          <input type="text"
+                                                 name="truck_number"
+                                                 class="form-control"
+                                                 value="{{ inv.truck_number or '' }}"
+                                                 placeholder="e.g. MH12AB1234">
+                                        </div>
                                         <div class="mb-3">
                                           <label class="form-label">Upload New Invoice</label>
                                           <input type="file"
@@ -1008,21 +1412,41 @@
       </div>
       {% endif %}
 
-      <!-- ================= LOADED ORDERS ================= -->
+<!-- ================= LOADED ORDERS ================= -->
       {% if loaded_bookings %}
-      <div class="container mt-5 mb-5">
-        <h5 class="section-title text-success">
-          <i class="fa fa-check-circle"></i> Loaded Orders
-          <span class="pill ms-3">{{ loaded_bookings|length }} Loaded</span>
-        </h5>
+      <div class="section-card" id="loaded-orders" data-aos="fade-up">
+        <div class="section-header">
+          <h5 class="section-title">
+            <span class="icon-box green"><i class="fa fa-check-circle"></i></span>
+            Loaded Orders
+          </h5>
+          <span class="section-badge bg-success">{{ loaded_bookings|length }} Loaded</span>
+        </div>
         
-        <!-- Search Bar -->
-        <div class="orders-toolbar">
-          <div class="search">
-            <input type="text" 
-                   id="loadedSearch" 
-                   class="form-control" 
-                   placeholder="Search loaded orders...">
+        <!-- Filter & Search Bar -->
+        <div class="filter-bar">
+          <div class="d-flex gap-2 flex-wrap align-items-center mb-3">
+            <button class="filter-pill active" data-filter="all" onclick="filterLoaded('all')">
+              <i class="fa fa-list me-1"></i> All
+            </button>
+            <button class="filter-pill" data-filter="qc_pending" onclick="filterLoaded('qc_pending')">
+              <i class="fa fa-hourglass-half me-1"></i> QC Pending
+            </button>
+            <button class="filter-pill" data-filter="qc_done" onclick="filterLoaded('qc_done')">
+              <i class="fa fa-clipboard-check me-1"></i> QC Done
+            </button>
+            <button class="filter-pill" data-filter="paid" onclick="filterLoaded('paid')">
+              <i class="fa fa-check-circle me-1"></i> Paid
+            </button>
+          </div>
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <input type="text" id="loadedSearch" class="form-control" 
+                     placeholder="🔍 Search loaded orders...">
+            </div>
+            <div class="col-md-4 text-end d-none d-md-block">
+              <small class="text-muted" id="loadedCount">Showing {{ loaded_bookings|length }} orders</small>
+            </div>
           </div>
         </div>
         
@@ -1122,7 +1546,13 @@
                           <div class="mb-3 p-2 border rounded" style="background:#f8f9fa;">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                               <div>
-                                <strong class="text-primary">Truck #{{ loop.index }}</strong>
+                                <strong class="text-primary">
+                                  {% if inv.truck_number %}
+                                    Truck {{ inv.truck_number }}
+                                  {% else %}
+                                    Truck #{{ loop.index }}
+                                  {% endif %}
+                                </strong>
                                 <span class="badge bg-info ms-2">{{ inv.qty }} Qt</span>
                                 <a href="/static/uploads/bills/{{ inv.file }}" 
                                    target="_blank"
@@ -1140,13 +1570,29 @@
                                   <div class="modal-dialog">
                                     <div class="modal-content">
                                       <div class="modal-header">
-                                        <h5 class="modal-title">Edit Loading Invoice - Truck #{{ loop.index }}</h5>
+                                        <h5 class="modal-title">
+                                          Edit Loading Invoice -
+                                          {% if inv.truck_number %}
+                                            Truck {{ inv.truck_number }}
+                                          {% else %}
+                                            Truck #{{ loop.index }}
+                                          {% endif %}
+                                        </h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                       </div>
                                       <form method="POST"
                                             action="/buyer/edit_loading_invoice/{{ inv.id }}"
                                             enctype="multipart/form-data">
                                         <div class="modal-body">
+                                          <div class="mb-3">
+                                            <label class="form-label">Truck Number</label>
+                                            <input type="text"
+                                                   name="truck_number"
+                                                   class="form-control"
+                                                   value="{{ inv.truck_number or '' }}"
+                                                   placeholder="e.g. MH12AB1234">
+                                          </div>
+
                                           <div class="mb-3">
                                             <label class="form-label">Upload New Invoice</label>
                                             <input type="file"
@@ -1267,105 +1713,196 @@
       </div>
       {% endif %}
       
-    </div> <!-- data-scroll -->
-  </div> <!-- market-frame -->
-</div> <!-- app-shell -->
-<!-- FOOTER -->
-<!-- ================= ENHANCED FOOTER ================= -->
-<footer class="footer mt-5">
-  <div class="container">
+</div> <!-- container -->
+</main>
 
-    <div class="row g-4">
-
-      <!-- BRAND -->
-      <div class="col-md-4">
-        <h5 class="fw-bold text-white mb-2">
-          <i class="fa fa-seedling"></i> Sarna Mandi
-        </h5>
-        <p class="small">
-          Digital mandi platform connecting
-          <b>farmers, traders and millers</b>
-          with transparency, trust and speed.
-        </p>
-      </div>
-
-      <!-- QUICK LINKS -->
-      <div class="col-md-4">
-        <h6 class="fw-bold text-white mb-2">Trader Pages</h6>
-        <ul class="list-unstyled small">
-          <li><a href="/market">Market</a></li>
-          <li><a href="/buyer/active">Active Orders</a></li>
-          <li><a href="/buyer/partial">Partially Closed</a></li>
-          <li><a href="/buyer/loaded">Loaded Orders</a></li>
-          <li><a href="/buyer/payments">Payments</a></li>
-        </ul>
-      </div>
-
-      <!-- CONTACT -->
-      <div class="col-md-4">
-        <h6 class="fw-bold text-white mb-2">Contact</h6>
-        <p class="small mb-1">
-          <i class="fa fa-phone me-2"></i> +91 XXXXX XXXXX
-        </p>
-        <p class="small mb-1">
-          <i class="fa fa-envelope me-2"></i> support@sarnamandi.com
-        </p>
-        <p class="small">
-          <i class="fa fa-location-dot me-2"></i> India
-        </p>
-
-        <!-- SOCIAL -->
-        <div class="mt-2">
-          <a href="#" class="footer-icon"><i class="fab fa-linkedin"></i></a>
-          <a href="#" class="footer-icon"><i class="fab fa-whatsapp"></i></a>
-          <a href="#" class="footer-icon"><i class="fab fa-twitter"></i></a>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- BOTTOM -->
-    <div class="footer-bottom text-center mt-4 pt-3">
-      © 2026 <b>Sarna Mandi</b> · All Rights Reserved
-    </div>
-
-  </div>
-</footer>
+{% include '_footer.html' %}
 
 <!-- JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
-  // Search functionality for active orders
-  const orderSearchInput = document.getElementById('orderSearch');
-  if (orderSearchInput) {
-    orderSearchInput.addEventListener('input', function() {
-      const term = this.value.toLowerCase().trim();
-      document.querySelectorAll('#ordersAccordion .order-card').forEach(card => {
-        const searchText = card.dataset.search || '';
-        card.style.display = searchText.includes(term) ? '' : 'none';
-      });
+  AOS.init({duration:600,once:true});
+  
+  // ========== STOCK FILTERING ==========
+  function applyStockFilters() {
+    const crop = document.getElementById('cropFilter')?.value || 'all';
+    const miller = document.getElementById('millerSearch')?.value.toLowerCase() || '';
+    const items = document.querySelectorAll('.stock-item');
+    let visibleCount = 0;
+    
+    items.forEach(item => {
+      const itemCrop = item.dataset.crop || '';
+      const itemMiller = item.dataset.miller || '';
+      
+      const matchCrop = crop === 'all' || itemCrop.includes(crop);
+      const matchMiller = !miller || itemMiller.includes(miller);
+      
+      if (matchCrop && matchMiller) {
+        item.style.display = '';
+        visibleCount++;
+      } else {
+        item.style.display = 'none';
+      }
     });
+    
+    // Show/hide no results message
+    const noResults = document.getElementById('noStocksMessage');
+    const container = document.getElementById('stocksContainer');
+    if (noResults && container) {
+      if (visibleCount === 0) {
+        noResults.style.display = 'block';
+        container.style.display = 'none';
+      } else {
+        noResults.style.display = 'none';
+        container.style.display = '';
+      }
+    }
   }
-
-  // Search functionality for loaded orders
-  const loadedSearchInput = document.getElementById('loadedSearch');
-  if (loadedSearchInput) {
-    loadedSearchInput.addEventListener('input', function() {
-      const term = this.value.toLowerCase().trim();
-      document.querySelectorAll('#loadedAccordion .order-card').forEach(card => {
-        const searchText = card.dataset.search || '';
-        card.style.display = searchText.includes(term) ? '' : 'none';
-      });
+  
+  function clearStockFilters() {
+    const cropFilter = document.getElementById('cropFilter');
+    const millerSearch = document.getElementById('millerSearch');
+    if (cropFilter) cropFilter.value = 'all';
+    if (millerSearch) millerSearch.value = '';
+    applyStockFilters();
+  }
+  
+  // Attach stock filter events
+  document.getElementById('cropFilter')?.addEventListener('change', applyStockFilters);
+  document.getElementById('millerSearch')?.addEventListener('input', applyStockFilters);
+  
+  // ========== ACTIVE ORDER FILTERING ==========
+  let currentOrderFilter = 'all';
+  
+  function filterOrders(status) {
+    currentOrderFilter = status;
+    
+    // Update button states
+    document.querySelectorAll('#active-orders .filter-pill').forEach(btn => {
+      btn.classList.remove('active');
+      if (btn.dataset.filter === status) {
+        btn.classList.add('active');
+      }
     });
+    
+    applyOrderFilters();
   }
+  
+  function applyOrderFilters() {
+    const searchTerm = document.getElementById('orderSearch')?.value.toLowerCase() || '';
+    const cards = document.querySelectorAll('#ordersAccordion .order-card');
+    let visibleCount = 0;
+    
+    cards.forEach(card => {
+      const searchText = card.dataset.search || '';
+      const paymentStatus = card.dataset.payment || '';
+      
+      // Status filter
+      let statusMatch = true;
+      if (currentOrderFilter === 'pending') {
+        statusMatch = paymentStatus !== 'paid';
+      } else if (currentOrderFilter === 'paid') {
+        statusMatch = paymentStatus === 'paid';
+      }
+      
+      // Search filter
+      const searchMatch = !searchTerm || searchText.includes(searchTerm);
+      
+      if (statusMatch && searchMatch) {
+        card.style.display = '';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+    
+    // Update count
+    const countEl = document.getElementById('orderCount');
+    if (countEl) {
+      countEl.textContent = `Showing ${visibleCount} orders`;
+    }
+  }
+  
+  // Attach order search event
+  document.getElementById('orderSearch')?.addEventListener('input', applyOrderFilters);
+  
+  // ========== LOADED ORDER FILTERING ==========
+  let currentLoadedFilter = 'all';
+  
+  function filterLoaded(status) {
+    currentLoadedFilter = status;
+    
+    // Update button states
+    document.querySelectorAll('#loaded-orders .filter-pill').forEach(btn => {
+      btn.classList.remove('active');
+      if (btn.dataset.filter === status) {
+        btn.classList.add('active');
+      }
+    });
+    
+    applyLoadedFilters();
+  }
+  
+  function applyLoadedFilters() {
+    const searchTerm = document.getElementById('loadedSearch')?.value.toLowerCase() || '';
+    const cards = document.querySelectorAll('#loadedAccordion .order-card');
+    let visibleCount = 0;
+    
+    cards.forEach(card => {
+      const searchText = card.dataset.search || '';
+      const qcStatus = card.dataset.qc || '';
+      const paymentStatus = card.dataset.payment || '';
+      
+      // Status filter
+      let statusMatch = true;
+      if (currentLoadedFilter === 'qc_pending') {
+        statusMatch = qcStatus !== 'verified';
+      } else if (currentLoadedFilter === 'qc_done') {
+        statusMatch = qcStatus === 'verified';
+      } else if (currentLoadedFilter === 'paid') {
+        statusMatch = paymentStatus === 'paid';
+      }
+      
+      // Search filter
+      const searchMatch = !searchTerm || searchText.includes(searchTerm);
+      
+      if (statusMatch && searchMatch) {
+        card.style.display = '';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+    
+    // Update count
+    const countEl = document.getElementById('loadedCount');
+    if (countEl) {
+      countEl.textContent = `Showing ${visibleCount} orders`;
+    }
+  }
+  
+  // Attach loaded search event
+  document.getElementById('loadedSearch')?.addEventListener('input', applyLoadedFilters);
 
-  // Initialize progress bars
+  // ========== PROGRESS BAR ANIMATION ==========
   document.querySelectorAll('.progress-bar').forEach(bar => {
     const width = bar.style.width;
     bar.style.width = '0';
     setTimeout(() => {
       bar.style.width = width;
-    }, 100);
+    }, 300);
+  });
+  
+  // ========== SMOOTH SCROLL FOR QUICK ACTIONS ==========
+  document.querySelectorAll('.quick-action-btn[href^="#"]').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
   });
 </script>
 </body>

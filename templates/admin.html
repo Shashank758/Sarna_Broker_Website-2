@@ -2,31 +2,183 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Admin Dashboard | Sarna Broker</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard | Sarna Mandi</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/css/style.css">
+
+<style>
+/* Admin specific enhancements */
+.admin-hero {
+  background: linear-gradient(135deg, #0f9b5f 0%, #0d8a54 50%, #0a7548 100%);
+  color: #fff;
+  padding: 30px;
+  border-radius: 16px;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 40px rgba(15, 155, 95, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -30%;
+  width: 60%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+}
+
+.admin-hero h5 {
+  font-weight: 800;
+  font-size: 1.5rem;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.admin-hero p {
+  opacity: 0.9;
+  margin: 5px 0 0;
+  position: relative;
+  z-index: 1;
+}
+
+.stat-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(135deg, #0f9b5f, #0d8a54);
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 32px rgba(15, 155, 95, 0.15);
+}
+
+.stat-card i {
+  width: 50px;
+  height: 50px;
+  background: #e8f5f0;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: #0f9b5f;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover i {
+  background: #0f9b5f;
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.stat-card h6 {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.stat-card p {
+  font-size: 28px;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 5px 0 0;
+}
+
+.table-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.table-card h6 {
+  font-weight: 700;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-sidebar {
+  background: linear-gradient(180deg, #0f9b5f 0%, #0a7548 100%);
+  min-height: calc(100vh - 80px);
+}
+
+.admin-sidebar h4 {
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.admin-sidebar ul li {
+  transition: all 0.2s ease;
+  border-radius: 10px;
+  margin-bottom: 6px;
+}
+
+.admin-sidebar ul li:hover,
+.admin-sidebar ul li.active {
+  background: rgba(255,255,255,0.15);
+  transform: translateX(5px);
+}
+
+.admin-sidebar ul li a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+}
+
+.admin-sidebar ul li i {
+  width: 20px;
+  text-align: center;
+}
+
+.admin-main {
+  background: #f4f7f6;
+  padding: 30px;
+}
+
+.admin-badge {
+  background: linear-gradient(135deg, #0f9b5f, #0d8a54);
+  color: #fff;
+  padding: 8px 20px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 700;
+}
+</style>
 </head>
 
 <body>
 
 <!-- ================= TOP NAVBAR ================= -->
-<nav class="admin-navbar">
-  <div class="nav-left">
-    <img src="static/image/Sarna broker.png" alt="Logo">
-    <span>Sarna Broker</span>
-  </div>
-
-  <center><b>JAI SHREE SHYAM</b></center>
-
-  <div class="nav-right">
-    <span class="admin-name">
-      <i class="fa fa-user-circle"></i> Admin
-    </span>
-    <img src="static/image/images.png" alt="Logo">
-  </div>
-</nav>
+{% include '_navbar.html' %}
 
 <div class="admin-container">
 

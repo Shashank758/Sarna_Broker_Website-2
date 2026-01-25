@@ -1,0 +1,119 @@
+<!-- ================= UNIFIED FOOTER - SARNA MANDI ================= -->
+<footer class="sarna-footer">
+  <div class="container">
+    <div class="row g-4">
+
+      <!-- BRAND & ABOUT -->
+      <div class="col-lg-4 col-md-6">
+        <h5 class="mb-3">
+          <i class="fa fa-seedling me-2"></i>Sarna Mandi
+        </h5>
+        <p>
+          India's trusted digital mandi platform connecting 
+          <strong>farmers, traders, and millers</strong> with 
+          transparency, trust, and speed.
+        </p>
+        <div class="footer-social">
+          <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+          <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+        </div>
+      </div>
+
+      <!-- QUICK LINKS -->
+      <div class="col-lg-2 col-md-6">
+        <h6>Quick Links</h6>
+        <ul>
+          <li><a href="/market"><i class="fa fa-chevron-right"></i> Market</a></li>
+          {% if session.role == 'buyer' %}
+          <li><a href="/buyer/active"><i class="fa fa-chevron-right"></i> Active Orders</a></li>
+          <li><a href="/buyer/loaded"><i class="fa fa-chevron-right"></i> Loaded Orders</a></li>
+          <li><a href="/buyer/payments"><i class="fa fa-chevron-right"></i> Payments</a></li>
+          {% elif session.role == 'miller' %}
+          <li><a href="/miller"><i class="fa fa-chevron-right"></i> Dashboard</a></li>
+          <li><a href="/miller/approved"><i class="fa fa-chevron-right"></i> Approved</a></li>
+          <li><a href="/miller/qc"><i class="fa fa-chevron-right"></i> Quality Check</a></li>
+          {% elif session.role == 'farmer' %}
+          <li><a href="/my_commodity"><i class="fa fa-chevron-right"></i> My Crops</a></li>
+          <li><a href="/post_crop"><i class="fa fa-chevron-right"></i> Post Crop</a></li>
+          {% endif %}
+        </ul>
+      </div>
+
+      <!-- SERVICES -->
+      <div class="col-lg-3 col-md-6">
+        <h6>Our Services</h6>
+        <ul>
+          <li><a href="#"><i class="fa fa-chevron-right"></i> Crop Trading</a></li>
+          <li><a href="#"><i class="fa fa-chevron-right"></i> Quality Assurance</a></li>
+          <li><a href="#"><i class="fa fa-chevron-right"></i> Secure Payments</a></li>
+          <li><a href="#"><i class="fa fa-chevron-right"></i> Real-time Tracking</a></li>
+          <li><a href="#"><i class="fa fa-chevron-right"></i> Miller Network</a></li>
+        </ul>
+      </div>
+
+      <!-- CONTACT -->
+      <div class="col-lg-3 col-md-6">
+        <h6>Contact Us</h6>
+        <ul class="list-unstyled">
+          <li class="mb-2">
+            <i class="fa fa-phone me-2" style="color: var(--accent);"></i>
+            +91 XXXXX XXXXX
+          </li>
+          <li class="mb-2">
+            <i class="fa fa-envelope me-2" style="color: var(--accent);"></i>
+            support@sarnamandi.com
+          </li>
+          <li class="mb-2">
+            <i class="fa fa-location-dot me-2" style="color: var(--accent);"></i>
+            Rajasthan, India
+          </li>
+          <li class="mb-2">
+            <i class="fa fa-clock me-2" style="color: var(--accent);"></i>
+            Mon - Sat: 9:00 AM - 6:00 PM
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- BOTTOM BAR -->
+    <div class="footer-bottom">
+      <div class="row align-items-center">
+        <div class="col-md-6 text-md-start text-center mb-2 mb-md-0">
+          © 2026 <strong>Sarna Mandi</strong>. All Rights Reserved.
+        </div>
+        <div class="col-md-6 text-md-end text-center">
+          <a href="#" class="me-3">Privacy Policy</a>
+          <a href="#" class="me-3">Terms of Service</a>
+          <a href="#">Support</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</footer>
+
+<!-- Optional: Back to Top Button -->
+<button id="backToTop" class="btn btn-enterprise" 
+        style="position:fixed; bottom:30px; right:30px; display:none; width:50px; height:50px; border-radius:50%; padding:0; z-index:999;"
+        onclick="window.scrollTo({top:0, behavior:'smooth'})">
+  <i class="fa fa-chevron-up"></i>
+</button>
+
+<script>
+// Back to Top Button Logic
+window.addEventListener('scroll', function() {
+  const btn = document.getElementById('backToTop');
+  if (btn) {
+    if (window.scrollY > 300) {
+      btn.style.display = 'flex';
+      btn.style.alignItems = 'center';
+      btn.style.justifyContent = 'center';
+    } else {
+      btn.style.display = 'none';
+    }
+  }
+});
+</script>
