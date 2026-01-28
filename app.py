@@ -1,6 +1,9 @@
-from flask import Flask, render_template, request, redirect, session, url_for
+from flask import Flask, render_template, request, redirect, session, url_for, flash
 import sqlite3
 import os
+import secrets
+import hashlib
+from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
 from twilio.rest import Client
 
@@ -129,6 +132,50 @@ def get_miller_phone(miller_id):
     else:
         print(f"⚠️ No phone number found for miller_id {miller_id}")
     return phone
+
+
+def get_phone_for_password_reset(user_id, role=None, is_staff=0, parent_miller_id=None):
+    """Get a phone number suitable for password reset SMS.
+
+    We try the user's own profile first, then fall back to parent miller profile (for staff).
+    """
+    # Buyer profile phone
+    phone = get_buyer_phone(user_id)
+    if phone:
+        return phone
+
+    # Miller profile phones (for miller + any other user types that still have a miller profile)
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT owner_phone, staff_phone, accountant_phone, phone FROM miller_profiles WHERE miller_id=?",
+        (user_id,),
+    )
+    r = cur.fetchone()
+    con.close()
+    if r:
+        for p in (r[0], r[1], r[2], r[3]):
+            p = clean_phone_number(p)
+            if p:
+                return p
+
+    # Staff user: try parent miller profile's staff_phone first
+    if parent_miller_id:
+        con = get_db()
+        cur = con.cursor()
+        cur.execute(
+            "SELECT staff_phone, accountant_phone, owner_phone, phone FROM miller_profiles WHERE miller_id=?",
+            (parent_miller_id,),
+        )
+        r = cur.fetchone()
+        con.close()
+        if r:
+            for p in (r[0], r[1], r[2], r[3]):
+                p = clean_phone_number(p)
+                if p:
+                    return p
+
+    return None
 
 def get_all_buyer_phones():
     """Get all buyer phone numbers."""
@@ -435,8 +482,30 @@ def upgrade_users_table():
     con.commit()
     con.close()
 
+
+def upgrade_password_resets_table():
+    """Create password reset token table."""
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS password_resets (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            token_hash TEXT NOT NULL,
+            expires_at DATETIME NOT NULL,
+            used INTEGER DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    con.commit()
+    con.close()
+
+
 upgrade_db()
 upgrade_users_table()
+upgrade_password_resets_table()
 upgrade_partial_loading()
 upgrade_staff_system()
 upgrade_miller_stock_status()
@@ -713,6 +782,13 @@ upgrade_miller_profile_table()
 # ---------------- AUTH ----------------
 @app.route("/", methods=["GET", "POST"])
 def login():
+    # Show a one-time success message after password reset
+    if request.method == "GET" and request.args.get("reset") == "1":
+        return render_template(
+            "login.html",
+            success="✅ Password updated successfully. Please login with your new password."
+        )
+
     if request.method == "POST":
 
         email = request.form.get("email")
@@ -760,6 +836,177 @@ def login():
             return redirect("/admin")
 
     return render_template("login.html")
+
+
+@app.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+    """Send OTP via SMS (to phone saved in user profile) for password reset."""
+    if request.method == "POST":
+        email = (request.form.get("email") or "").strip().lower()
+        if not email:
+            return render_template("forgot_password.html", error="Please enter your email")
+
+        con = get_db()
+        cur = con.cursor()
+        cur.execute(
+            "SELECT id, role, IFNULL(is_staff,0), parent_miller_id FROM users WHERE lower(email)=?",
+            (email,),
+        )
+        row = cur.fetchone()
+
+        # Avoid leaking whether the email exists
+        generic_success = "If the account exists, you will receive an OTP on SMS."
+
+        if not row:
+            con.close()
+            return render_template(
+                "forgot_password.html",
+                success=generic_success,
+                email=email,
+                show_otp_form=True,
+            )
+
+        user_id, role, is_staff, parent_miller_id = row
+
+        phone = get_phone_for_password_reset(
+            user_id=user_id,
+            role=role,
+            is_staff=is_staff,
+            parent_miller_id=parent_miller_id,
+        )
+
+        if not phone:
+            con.close()
+            return render_template(
+                "forgot_password.html",
+                error="Phone number not found in your profile. Please contact admin.",
+                email=email,
+            )
+
+        # Invalidate previous active OTPs
+        cur.execute("UPDATE password_resets SET used=1 WHERE user_id=? AND used=0", (user_id,))
+
+        otp = f"{secrets.randbelow(1000000):06d}"
+        otp_hash = hashlib.sha256(otp.encode("utf-8")).hexdigest()
+        expires_at = (datetime.utcnow() + timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")
+
+        # Reuse token_hash column to store OTP hash (no schema change)
+        cur.execute(
+            "INSERT INTO password_resets (user_id, token_hash, expires_at, used) VALUES (?,?,?,0)",
+            (user_id, otp_hash, expires_at),
+        )
+        con.commit()
+        con.close()
+
+        sms_text = f"Saarna Canvessars OTP for password reset: {otp}. Valid for 10 minutes."
+        sent = send_sms(phone, sms_text)
+        if not sent:
+            return render_template(
+                "forgot_password.html",
+                error="Could not send OTP SMS right now. Please try again later.",
+                email=email,
+            )
+
+        return render_template(
+            "forgot_password.html",
+            success=generic_success,
+            email=email,
+            show_otp_form=True,
+        )
+
+    return render_template("forgot_password.html")
+
+
+@app.route("/reset-password", methods=["GET", "POST"])
+def reset_password():
+    """Reset password using OTP (sent via SMS)."""
+    prefill_email = (request.args.get("email") or "").strip().lower()
+
+    if request.method == "POST":
+        email = (request.form.get("email") or "").strip().lower()
+        otp = (request.form.get("otp") or "").strip()
+        password = request.form.get("password") or ""
+        confirm = request.form.get("confirm_password") or ""
+
+        if not email or not otp:
+            return render_template(
+                "reset_password.html",
+                error="Please enter email and OTP.",
+                email=email,
+            )
+
+        if not password or not confirm:
+            return render_template(
+                "reset_password.html",
+                error="Please enter and confirm your new password.",
+                email=email,
+            )
+
+        if password != confirm:
+            return render_template(
+                "reset_password.html",
+                error="Passwords do not match.",
+                email=email,
+            )
+
+        con = get_db()
+        cur = con.cursor()
+        cur.execute("SELECT id FROM users WHERE lower(email)=?", (email,))
+        u = cur.fetchone()
+        if not u:
+            con.close()
+            return render_template(
+                "reset_password.html",
+                error="Invalid email or OTP.",
+                email=email,
+            )
+
+        user_id = u[0]
+
+        cur.execute(
+            """
+            SELECT id, token_hash
+            FROM password_resets
+            WHERE user_id=? AND used=0 AND expires_at > CURRENT_TIMESTAMP
+            ORDER BY id DESC
+            LIMIT 1
+            """,
+            (user_id,),
+        )
+        row = cur.fetchone()
+        if not row:
+            con.close()
+            return render_template(
+                "reset_password.html",
+                error="OTP is invalid or expired. Please request a new OTP.",
+                email=email,
+            )
+
+        reset_id, otp_hash = row
+        entered_hash = hashlib.sha256(otp.encode("utf-8")).hexdigest()
+
+        if entered_hash != otp_hash:
+            con.close()
+            return render_template(
+                "reset_password.html",
+                error="Invalid email or OTP.",
+                email=email,
+            )
+
+        cur.execute("UPDATE users SET password=? WHERE id=?", (password, user_id))
+        cur.execute("UPDATE password_resets SET used=1 WHERE id=?", (reset_id,))
+        con.commit()
+        con.close()
+
+        return redirect("/?reset=1")
+
+    return render_template("reset_password.html", email=prefill_email)
+
+
+# Backward-compatible old link route (no longer used):
+@app.route("/reset-password/<token>")
+def reset_password_link_fallback(token):
+    return redirect("/reset-password")
 
 
 @app.route("/register", methods=["GET","POST"])
@@ -1100,13 +1347,25 @@ def miller_qc_page():
 
     # 3️⃣ FILTER ONLY COMPLETED LOADING → QC REQUIRED
     completed_loading_qc = []
+    EPS = 1e-6
+
     for b in bookings:
         booked = b[3]
         loaded = b[7] or 0
         payment_status = b[16]
         final_invoice = b[17]
 
-        if loaded == booked and not final_invoice and payment_status != 'paid':
+        try:
+            booked_val = float(booked or 0)
+        except (TypeError, ValueError):
+            booked_val = 0
+
+        try:
+            loaded_val = float(loaded or 0)
+        except (TypeError, ValueError):
+            loaded_val = 0
+
+        if abs(loaded_val - booked_val) < EPS and not final_invoice and payment_status != 'paid':
             completed_loading_qc.append(b)
 
     con.close()
@@ -1432,7 +1691,7 @@ def miller_mark_payment_done(booking_id):
     con.commit()
     con.close()
 
-    return redirect("/miller")
+    return redirect(request.referrer or "/miller")
 
 @app.route("/miller/edit_final_invoice/<int:booking_id>", methods=["POST"])
 def miller_edit_final_invoice(booking_id):
@@ -2541,7 +2800,14 @@ def book_miller_stock(stock_id):
     if session.get("role") != "buyer":
         return redirect("/market")
 
-    qty = int(request.form["quantity"])
+    try:
+        qty = float(request.form["quantity"])
+    except (TypeError, ValueError):
+        return redirect("/market")
+
+    if qty <= 0:
+        return redirect("/market")
+
     con = get_db()
     cur = con.cursor()
 
@@ -2660,7 +2926,11 @@ def buyer_update_loading(id):
     if session.get("role") != "buyer":
         return redirect("/market")
 
-    load_qty = int(request.form.get("load_qty", 0))
+    try:
+        load_qty = float(request.form.get("load_qty", 0) or 0)
+    except (TypeError, ValueError):
+        load_qty = 0
+
     truck_number = (request.form.get("truck_number") or "").strip()
     invoice = request.files.get("invoice")
 
@@ -2687,7 +2957,17 @@ def buyer_update_loading(id):
         return redirect("/market")
 
     total_qty, loaded_qty, stock_id = row
-    loaded_qty = loaded_qty or 0
+
+    try:
+        total_qty = float(total_qty or 0)
+    except (TypeError, ValueError):
+        total_qty = 0
+
+    try:
+        loaded_qty = float(loaded_qty or 0)
+    except (TypeError, ValueError):
+        loaded_qty = 0
+
     remaining = total_qty - loaded_qty
 
     if load_qty > remaining:
@@ -2695,7 +2975,12 @@ def buyer_update_loading(id):
 
     new_loaded = loaded_qty + load_qty
 
-    loading_status = "loaded" if new_loaded == total_qty else "partial"
+    # Float-safe completion check
+    EPS = 1e-6
+    if abs(new_loaded - total_qty) < EPS:
+        new_loaded = total_qty
+
+    loading_status = "loaded" if new_loaded >= (total_qty - EPS) else "partial"
     truck_status = loading_status
 
     # 🔹 Update booking
@@ -2862,7 +3147,7 @@ def miller_update_qc(invoice_id):
     qc_remarks = request.form.get("qc_remarks") or ""
 
     try:
-        qc_weight_val = int(qc_weight) if qc_weight not in (None, "",) else None
+        qc_weight_val = float(qc_weight) if qc_weight not in (None, "",) else None
     except ValueError:
         qc_weight_val = None
 

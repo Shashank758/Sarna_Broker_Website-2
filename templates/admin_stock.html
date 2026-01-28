@@ -76,6 +76,7 @@
           <td>
             <form method="POST" action="/admin/update_deduction/{{ s[0] }}">
               <input type="number"
+                     step="0.01"
                      name="deduction"
                      value="{{ s[7] }}"
                      class="form-control form-control-sm"
