@@ -1,222 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<title>Payment Completed | Miller</title>
+  <meta charset="UTF-8">
+  <title>Payment Completed | Miller</title>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-<link rel="stylesheet" href="/static/css/style.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
 
-<style>
-body{
-  background:var(--bg-light);
-  font-family:Inter,Segoe UI,sans-serif;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-}
+  <style>
+    body {
+      background: var(--bg-light);
+      font-family: Inter, Segoe UI, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
-/* PAGE HEADER */
-.page-header{
-  background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);
-  color:#fff;
-  padding:25px 0;
-  margin-bottom:30px;
-}
-.page-header h4{
-  font-weight:700;
-  margin:0;
-}
-.page-header .breadcrumb{
-  margin:0;
-  background:none;
-  padding:0;
-}
-.page-header .breadcrumb a{
-  color:rgba(255,255,255,0.8);
-  text-decoration:none;
-}
-.page-header .breadcrumb a:hover{
-  color:#fff;
-}
+    /* PAGE HEADER */
+    .page-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: #fff;
+      padding: 25px 0;
+      margin-bottom: 30px;
+    }
 
-/* SECTION */
-.section-card{
-  background:#fff;
-  border-radius:18px;
-  box-shadow:var(--shadow-md);
-  border:1px solid rgba(0,0,0,.05);
-  padding:25px;
-}
+    .page-header h4 {
+      font-weight: 700;
+      margin: 0;
+    }
 
-/* SCROLL */
-.qc-scroll-container{
-  max-height:70vh;
-  overflow-y:auto;
-}
+    .page-header .breadcrumb {
+      margin: 0;
+      background: none;
+      padding: 0;
+    }
 
-/* PAYMENT CARD */
-.payment-card{
-  border-radius:14px;
-  transition:all 0.3s ease;
-  border:1px solid rgba(0,0,0,.08);
-}
-.payment-card:hover{
-  transform:translateY(-5px);
-  box-shadow:var(--shadow-lg);
-}
+    .page-header .breadcrumb a {
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+    }
 
-main{
-  flex:1;
-}
-</style>
+    .page-header .breadcrumb a:hover {
+      color: #fff;
+    }
+
+    /* SECTION */
+    .section-card {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid rgba(0, 0, 0, .05);
+      padding: 25px;
+    }
+
+    /* SCROLL */
+    .qc-scroll-container {
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    /* PAYMENT CARD */
+    .payment-card {
+      border-radius: 14px;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(0, 0, 0, .08);
+    }
+
+    .payment-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    main {
+      flex: 1;
+    }
+  </style>
 </head>
 
 <body>
 
-{% include '_navbar.html' %}
+  {% include '_navbar.html' %}
 
-<!-- PAGE HEADER -->
-<div class="page-header">
-  <div class="container">
-    <div class="d-flex justify-content-between align-items-center">
-      <div>
-        <nav class="breadcrumb mb-2">
-          <a href="/miller"><i class="fa fa-home"></i> Dashboard</a>
-          <span class="mx-2">/</span>
-          <span>Payment Completed</span>
-        </nav>
-        <h4><i class="fa fa-check-circle me-2"></i>Payment Completed</h4>
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <nav class="breadcrumb mb-2">
+            <a href="/miller"><i class="fa fa-home"></i> Dashboard</a>
+            <span class="mx-2">/</span>
+            <span>Payment Completed</span>
+          </nav>
+          <h4><i class="fa fa-check-circle me-2"></i>Payment Completed</h4>
+        </div>
+        <a href="/miller" class="btn btn-light">
+          <i class="fa fa-arrow-left me-1"></i> Back
+        </a>
       </div>
-      <a href="/miller" class="btn btn-light">
-        <i class="fa fa-arrow-left me-1"></i> Back
-      </a>
     </div>
   </div>
-</div>
 
-<main>
-<div class="container mb-5">
+  <main>
+    <div class="container mb-5">
 
-<!-- ================= PAYMENT COMPLETED ================= -->
-{% if payment_completed %}
-<div class="section-card" data-aos="fade-up">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h6 class="fw-bold mb-0">
-      <i class="fa fa-check-circle text-success"></i>
-      Payment Completed
-    </h6>
-    <span class="badge bg-success">
-      {{ payment_completed|length }} Orders
-    </span>
-  </div>
+      <!-- ================= PAYMENT COMPLETED ================= -->
+      {% if payment_completed %}
+      <div class="section-card" data-aos="fade-up">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="fw-bold mb-0">
+            <i class="fa fa-check-circle text-success"></i>
+            Payment Completed
+          </h6>
+          <span class="badge bg-success">
+            {{ payment_completed|length }} Orders
+          </span>
+        </div>
 
-  <div class="qc-scroll-container">
-    <div class="row g-3">
+        <div class="qc-scroll-container">
+          <div class="row g-3">
 
-      {% for b in payment_completed %}
-      {% set booking_id = b[0] %}
-      {% set booked = b[3] %}
-      {% set loaded = b[7] %}
-      {% set order_id = b[10] %}
-      {% set buyer_name = b[1] %}
-      {% set crop_name = b[2] %}
-      {% set final_invoice = b[17] %}
-      {% set payment_at = b[18] %}
+            {% for b in payment_completed %}
+            {% set booking_id = b[0] %}
+            {% set booked = b[3] %}
+            {% set loaded = b[7] %}
+            {% set order_id = b[10] %}
+            {% set buyer_name = b[1] %}
+            {% set crop_name = b[2] %}
+            {% set final_invoice = b[17] %}
+            {% set payment_at = b[18] %}
 
-      <div class="col-md-6" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
-        <div class="card border-0 shadow-sm h-100 payment-card">
-          <div class="card-body">
+            <div class="col-md-6" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
+              <div class="card border-0 shadow-sm h-100 payment-card">
+                <div class="card-body">
 
-            <div class="d-flex justify-content-between align-items-start mb-3">
-              <div>
-                <h6 class="mb-1 text-primary fw-bold">{{ order_id }}</h6>
-                <p class="mb-1 text-muted small">
-                  {{ buyer_name }} • {{ crop_name|capitalize }}
-                </p>
-                <div class="d-flex gap-2 mt-2">
-                  <span class="badge bg-primary">{{ booked }} Qt Booked</span>
-                  <span class="badge bg-success">{{ loaded }} Qt Loaded</span>
+                  <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                      <h6 class="mb-1 text-primary fw-bold">{{ order_id }}</h6>
+                      <p class="mb-1 text-muted small">
+                        {{ buyer_name }} • {{ crop_name|capitalize }}
+                      </p>
+                      <div class="d-flex gap-2 mt-2">
+                        <span class="badge bg-primary">{{ booked }} Qt Booked</span>
+                        <span class="badge bg-success">{{ loaded }} Qt Loaded</span>
+                        {% if b[8] == 'partial_closed' %}
+                        <span class="badge bg-warning text-dark"><i class="fa fa-lock"></i> Closed</span>
+                        {% endif %}
+                      </div>
+                    </div>
+                    <span class="badge bg-success">✅ Payment Completed</span>
+                  </div>
+
+                  <div class="border-top pt-3">
+                    {% if invoices_map.get(booking_id) %}
+                    <small class="text-muted fw-bold d-block mb-2"><i class="fa fa-truck"></i> Paid Trucks</small>
+                    {% for inv in invoices_map[booking_id] %}
+                    <div class="mb-2 p-2 border rounded bg-light">
+                      <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="fw-bold small">
+                          Truck {% if inv.truck_number %}{{ inv.truck_number }}{% else %}#{{ loop.index }}{% endif %}
+                        </span>
+                        <span class="badge bg-success" style="font-size:0.7rem;">Payment Received</span>
+                      </div>
+                      <div class="d-flex justify-content-between small text-muted">
+                        <span>Qty: {{ inv.qty }} Qt</span>
+                        <span>Amt: ₹{{ (inv.qty * b[19] if b[19] else 0) | round(2) }}</span>
+                      </div>
+                      {% if inv.final_invoice_file %}
+                      <a href="/static/uploads/bills/{{ inv.final_invoice_file }}" target="_blank"
+                        class="btn btn-sm btn-outline-primary w-100 mt-2">
+                        <i class="fa fa-file-invoice"></i> View Final Invoice
+                      </a>
+                      {% endif %}
+                      {% if inv.payment_at %}
+                      <small class="text-muted d-block text-center mt-1">Paid: {{ inv.payment_at[:16] }}</small>
+                      {% endif %}
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-muted small">No payment details found.</p>
+                    {% endif %}
+                  </div>
+
                 </div>
               </div>
-              <span class="badge bg-success">✅ Payment Completed</span>
             </div>
-
-            <div class="border-top pt-3">
-              {% if final_invoice %}
-                <a href="/static/uploads/bills/{{ final_invoice }}"
-                   target="_blank"
-                   class="btn btn-sm btn-outline-primary w-100 mb-2">
-                  <i class="fa fa-eye"></i> View Final Invoice
-                </a>
-
-                <button class="btn btn-sm btn-warning w-100 mb-2"
-                        data-bs-toggle="modal"
-                        data-bs-target="#editFinalInvoicePaid{{ booking_id }}">
-                  <i class="fa fa-edit"></i> Edit / Replace Invoice
-                </button>
-
-                <!-- EDIT MODAL -->
-                <div class="modal fade" id="editFinalInvoicePaid{{ booking_id }}" tabindex="-1">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title">Edit Final Invoice</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                      </div>
-                      <form method="POST"
-                            action="/miller/edit_final_invoice/{{ booking_id }}"
-                            enctype="multipart/form-data">
-                        <div class="modal-body">
-                          <input type="file"
-                                 name="final_invoice"
-                                 class="form-control"
-                                 accept=".pdf,image/*"
-                                 required>
-                        </div>
-                        <div class="modal-footer">
-                          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                          <button class="btn btn-warning">
-                            <i class="fa fa-upload"></i> Replace
-                          </button>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              {% endif %}
-
-              {% if payment_at %}
-                <small class="text-muted d-block text-center">
-                  Paid on {{ payment_at[:16] }}
-                </small>
-              {% endif %}
-            </div>
+            {% endfor %}
 
           </div>
         </div>
       </div>
-      {% endfor %}
+      {% else %}
+      <div class="section-card text-center py-5" data-aos="fade-up">
+        <i class="fa fa-check-circle fa-3x text-muted mb-3"></i>
+        <p class="text-muted mb-0">No completed payments yet.</p>
+      </div>
+      {% endif %}
 
     </div>
-  </div>
-</div>
-{% else %}
-<div class="section-card text-center py-5" data-aos="fade-up">
-  <i class="fa fa-check-circle fa-3x text-muted mb-3"></i>
-  <p class="text-muted mb-0">No completed payments yet.</p>
-</div>
-{% endif %}
+  </main>
 
-</div>
-</main>
+  {% include '_footer.html' %}
 
-{% include '_footer.html' %}
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-<script>AOS.init({duration:600,once:true});</script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>AOS.init({ duration: 600, once: true });</script>
 </body>
+
 </html>

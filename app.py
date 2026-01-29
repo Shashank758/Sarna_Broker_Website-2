@@ -291,6 +291,17 @@ CREATE TABLE IF NOT EXISTS users (
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
     """)
+    
+    # MILLER DEDUCTION OPTIONS
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS miller_deduction_options (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        miller_id INTEGER,
+        text TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
     # ---------------- MILLER PROFILE ----------------
     cur.execute("""
 CREATE TABLE IF NOT EXISTS miller_profiles (
@@ -1163,6 +1174,10 @@ ORDER BY mb.created_at DESC
 """, (miller_id,))
     bookings = cur.fetchall()
 
+    # ✅ FETCH DEDUCTION OPTIONS
+    cur.execute("SELECT id, text FROM miller_deduction_options WHERE miller_id=? ORDER BY created_at DESC", (miller_id,))
+    deduction_options = cur.fetchall()
+
     # 🔹 FETCH PER-TRUCK LOADING INVOICES WITH QC DATA AND FINAL INVOICE
     cur.execute("""
     SELECT id, booking_id, loaded_qty, invoice_file, truck_number, created_at,
@@ -1198,8 +1213,39 @@ ORDER BY mb.created_at DESC
     "miller.html",
     stocks=stocks,
     bookings=bookings,
-    invoices_map=invoices_map
+    invoices_map=invoices_map,
+    deduction_options=deduction_options
 )
+
+@app.route("/miller/add_deduction_option", methods=["POST"])
+def miller_add_deduction_option():
+    if session.get("role") != "miller":
+        return redirect("/")
+    
+    text = request.form.get("text")
+    if text:
+        con = get_db()
+        cur = con.cursor()
+        cur.execute("INSERT INTO miller_deduction_options (miller_id, text) VALUES (?,?)", 
+                   (get_effective_user_id(), text))
+        con.commit()
+        con.close()
+    
+    return redirect("/miller#post-stock") # Return to post stock section
+
+@app.route("/miller/delete_deduction_option/<int:id>", methods=["POST"])
+def miller_delete_deduction_option(id):
+    if session.get("role") != "miller":
+        return redirect("/")
+        
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("DELETE FROM miller_deduction_options WHERE id=? AND miller_id=?", 
+               (id, get_effective_user_id()))
+    con.commit()
+    con.close()
+    
+    return redirect("/miller#post-stock")
 @app.route("/miller/approved")
 def miller_approved_page():
     if session.get("role") != "miller":
@@ -1365,7 +1411,15 @@ def miller_qc_page():
         except (TypeError, ValueError):
             loaded_val = 0
 
-        if abs(loaded_val - booked_val) < EPS and not final_invoice and payment_status != 'paid':
+        # Calculate if all truck invoices are uploaded
+        listing_invoices = invoices_map.get(b[0], [])
+        all_trucks_invoiced = False
+        if listing_invoices:
+            all_trucks_invoiced = all(inv['final_invoice_file'] for inv in listing_invoices)
+        
+        # Logic: Show in QC list if (Fully Loaded OR Partial Closed) AND (Payment Pending) AND (Not All Truck Invoices Uploaded)
+        # removing 'not final_invoice' check as we don't use booking level invoice now
+        if (abs(loaded_val - booked_val) < EPS or b[8] == 'partial_closed') and payment_status != 'paid' and not all_trucks_invoiced:
             completed_loading_qc.append(b)
 
     con.close()
@@ -1418,7 +1472,6 @@ def miller_final_hisab_page():
         LEFT JOIN payments p ON p.booking_id = mb.id
         WHERE
             ms.miller_id = ?
-            AND mb.loading_status IN ('loaded', 'partial')
         ORDER BY mb.created_at DESC
     """, (miller_id,))
 
@@ -1467,11 +1520,35 @@ def miller_final_hisab_page():
             "payment_at": r[13]
         })
 
+    # Filter out orders where all trucks are paid
+    final_bookings = []
+    for b in all_bookings:
+        booking_id = b[0]
+        trucks = invoices_map.get(booking_id, [])
+        
+        # If no trucks, technically it shouldn't be here, but let's keep it safe or hide it?
+        # If no trucks but loaded_status is partial/loaded, it is waiting for invoices.
+        # But if it has trucks, check if ANY is pending payment.
+        
+        has_pending_payment = False
+        if not trucks:
+            # Maybe it appeared because of manual data? Or empty stock?
+            # Let's say if no trucks, we keep it if it's not paid at booking level (compatibility)
+            # But we moved to truck-wise. If no trucks, it can't be paid.
+            has_pending_payment = True
+        else:
+            # Check if ANY truck is NOT paid
+            if any(t['payment_status'] != 'paid' for t in trucks):
+                has_pending_payment = True
+        
+        if has_pending_payment:
+            final_bookings.append(b)
+
     con.close()
 
     return render_template(
         "miller_final_hisab.html",
-        all_bookings=all_bookings,
+        all_bookings=final_bookings,
         invoices_map=invoices_map
     )
 
@@ -1521,8 +1598,9 @@ def miller_payment_completed_page():
     con = get_db()
     cur = con.cursor()
 
+    # 1️⃣ Fetch bookings that have AT LEAST ONE truck marked as paid
     cur.execute("""
-        SELECT
+        SELECT DISTINCT
             mb.id,              -- 0 booking_id
             u.name,             -- 1 buyer
             ms.crop,            -- 2 crop
@@ -1541,25 +1619,61 @@ def miller_payment_completed_page():
             mb.qc_status,       -- 14
             mb.qc_at,           -- 15
 
-            p.status,           -- 16 payment_status
-            p.invoice_file,     -- 17 final_invoice
-            p.paid_at           -- 18 payment_at
+            -- columns 16-18 kept for compatibility but might be null
+            'paid' AS payment_status,   -- 16 (forcing 'paid' for display purposes)
+            NULL AS final_invoice,      -- 17
+            MAX(li.payment_at) AS payment_at -- 18 (latest payment)
+            
         FROM miller_bookings mb
         JOIN miller_stock ms ON mb.stock_id = ms.id
         JOIN users u ON mb.buyer_id = u.id
-        JOIN payments p ON p.booking_id = mb.id
+        JOIN loading_invoices li ON li.booking_id = mb.id
         WHERE
             ms.miller_id = ?
-            AND p.status = 'paid'
-        ORDER BY p.paid_at DESC
+            AND li.payment_status = 'paid'
+        GROUP BY mb.id
+        ORDER BY MAX(li.payment_at) DESC
     """, (miller_id,))
 
     payment_completed = cur.fetchall()
+
+    # 2️⃣ Fetch per-truck invoices for these bookings
+    cur.execute("""
+        SELECT li.id, li.booking_id, li.loaded_qty, li.invoice_file, li.truck_number, li.created_at,
+               li.qc_weight, li.qc_moisture, li.qc_remarks, li.qc_status, li.qc_at,
+               li.final_invoice_file, li.payment_status, li.payment_at
+        FROM loading_invoices li
+        JOIN miller_bookings mb ON li.booking_id = mb.id
+        JOIN miller_stock ms ON mb.stock_id = ms.id
+        WHERE ms.miller_id = ? AND li.payment_status = 'paid'
+        ORDER BY li.payment_at DESC
+    """, (miller_id,))
+    
+    rows = cur.fetchall()
+    invoices_map = {}
+    for r in rows:
+        invoices_map.setdefault(r[1], []).append({
+            "id": r[0],
+            "qty": r[2],
+            "file": r[3],
+            "truck_number": r[4],
+            "date": r[5],
+            "qc_weight": r[6],
+            "qc_moisture": r[7],
+            "qc_remarks": r[8],
+            "qc_status": r[9] or "pending",
+            "qc_at": r[10],
+            "final_invoice_file": r[11],
+            "payment_status": r[12] or "pending",
+            "payment_at": r[13]
+        })
+
     con.close()
 
     return render_template(
         "miller_payment_completed.html",
-        payment_completed=payment_completed
+        payment_completed=payment_completed,
+        invoices_map=invoices_map
     )
 
 
@@ -1584,7 +1698,7 @@ def miller_upload_final_invoice(booking_id):
         SELECT mb.loaded_qty, mb.quantity, ms.miller_id
         FROM miller_bookings mb
         JOIN miller_stock ms ON mb.stock_id = ms.id
-        WHERE mb.id=? AND ms.miller_id=? AND mb.loading_status='loaded'
+        WHERE mb.id=? AND ms.miller_id=? AND mb.loading_status IN ('loaded', 'partial_closed')
     """, (booking_id, get_effective_user_id()))
 
     row = cur.fetchone()
@@ -2211,9 +2325,10 @@ def buyer_close_remaining(booking_id):
     if remaining_qty > 0:
         cur.execute("""
             UPDATE miller_stock
-            SET quantity = quantity + ?
+            SET quantity = quantity + ?,
+                reserved_qty = reserved_qty - ?
             WHERE id=?
-        """, (remaining_qty, stock_id))
+        """, (remaining_qty, remaining_qty, stock_id))
 
     # Close booking partially
     cur.execute("""
@@ -2248,6 +2363,77 @@ def buyer_close_remaining(booking_id):
     # Redirect back to referring page or default to /market
     return redirect(request.referrer or "/market")
 
+@app.route("/miller/close_remaining/<int:booking_id>", methods=["POST"])
+def miller_close_remaining(booking_id):
+    if session.get("role") != "miller":
+        return redirect("/")
+
+    reason = request.form.get("reason", "").strip()
+    if not reason:
+        return redirect(request.referrer or "/miller")
+
+    miller_id = get_effective_user_id()
+    con = get_db()
+    cur = con.cursor()
+
+    # Fetch booking and verify ownership
+    cur.execute("""
+        SELECT mb.stock_id, mb.quantity, mb.loaded_qty, mb.status
+        FROM miller_bookings mb
+        JOIN miller_stock ms ON mb.stock_id = ms.id
+        WHERE mb.id=? AND ms.miller_id=? AND mb.status='approved'
+    """, (booking_id, miller_id))
+
+    row = cur.fetchone()
+    if not row:
+        con.close()
+        return redirect(request.referrer or "/miller")
+
+    stock_id, booked_qty, loaded_qty, status = row
+    loaded_qty = loaded_qty or 0
+    remaining_qty = booked_qty - loaded_qty
+
+    # Return remaining stock to miller (quantity + reserved_qty adjustment)
+    if remaining_qty > 0:
+        cur.execute("""
+            UPDATE miller_stock
+            SET quantity = quantity + ?,
+                reserved_qty = reserved_qty - ?
+            WHERE id=?
+        """, (remaining_qty, remaining_qty, stock_id))
+
+    # Close booking partially
+    cur.execute("""
+        UPDATE miller_bookings
+        SET
+            loading_status='partial_closed',
+            close_reason=?,
+            closed_by='miller',
+            decision_at=CURRENT_TIMESTAMP
+        WHERE id=?
+    """, (reason, booking_id))
+    
+    # 📱 Send SMS to buyer about partial closure
+    cur.execute("""
+        SELECT mb.buyer_id, mb.order_id, ms.crop, mb.quantity, mb.loaded_qty
+        FROM miller_bookings mb
+        JOIN miller_stock ms ON mb.stock_id = ms.id
+        WHERE mb.id=?
+    """, (booking_id,))
+    close_info = cur.fetchone()
+    if close_info:
+        buyer_id, order_id, crop, total_qty, loaded_qty = close_info
+        buyer_phone = get_buyer_phone(buyer_id)
+        if buyer_phone:
+            remaining = total_qty - (loaded_qty or 0)
+            message = f"⚠️ Order {order_id} close by miller. {crop} - Remaining: {remaining} qty. Reason: {reason}"
+            send_sms(buyer_phone, message)
+
+    con.commit()
+    con.close()
+
+    return redirect(request.referrer or "/miller")
+
 @app.route("/miller/approve_booking/<int:id>")
 def miller_approve_booking(id):
     if session.get("role") != "miller":
@@ -2271,8 +2457,8 @@ def miller_approve_booking(id):
     cur.execute("""
         UPDATE miller_bookings
         SET status='approved',
-            decision_at=CURRENT_TIMESTAMP
-        WHERE id=?
+        decision_at=CURRENT_TIMESTAMP
+    WHERE id=?
     """, (id,))
     
     # 📱 Send SMS to buyer about approval
@@ -2761,7 +2947,22 @@ def buyer_loaded():
     if session.get("role") != "buyer":
         return redirect("/")
     orders = get_buyer_orders("loaded")
-    return render_template("buyer_loaded.html", page_title="Loaded Orders", orders=orders)
+    
+    # Filter out orders where all invoices are paid AND loaded quantity is fully covered
+    filtered_orders = []
+    for o in orders:
+        invoices = o.get("invoices", [])
+        loaded_qty = float(o.get("loaded") or 0)
+        invoiced_qty = sum(float(i.get("qty") or 0) for i in invoices)
+        
+        # Check if fully paid
+        all_paid = invoices and all(i.get("payment_status") == "paid" for i in invoices)
+        fully_invoiced = abs(loaded_qty - invoiced_qty) < 1.0 # 1 Qt tolerance
+        
+        if not (all_paid and fully_invoiced):
+            filtered_orders.append(o)
+            
+    return render_template("buyer_loaded.html", page_title="Loaded Orders", orders=filtered_orders)
 
    
 @app.route("/buyer/payments")
@@ -2776,18 +2977,19 @@ def buyer_payments():
     SELECT
         mb.order_id,
         ms.crop,
-        mb.loaded_qty,
+        li.loaded_qty,
         ms.price,
-        (mb.loaded_qty * ms.price) AS total_amount,
-        p.invoice_file,
-        p.paid_at,
-        u.name AS miller_name
-    FROM payments p
-    JOIN miller_bookings mb ON p.booking_id = mb.id
+        (li.loaded_qty * ms.price) AS total_amount,
+        li.final_invoice_file,
+        li.payment_at,
+        u.name AS miller_name,
+        li.truck_number
+    FROM loading_invoices li
+    JOIN miller_bookings mb ON li.booking_id = mb.id
     JOIN miller_stock ms ON mb.stock_id = ms.id
     JOIN users u ON ms.miller_id = u.id
-    WHERE p.buyer_id=? AND p.status='paid'
-    ORDER BY p.paid_at DESC
+    WHERE mb.buyer_id=? AND li.payment_status='paid'
+    ORDER BY li.payment_at DESC
     """, (session["user_id"],))
 
     payments = cur.fetchall()
