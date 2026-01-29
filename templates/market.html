@@ -1442,24 +1442,48 @@
                             </strong>
                             <span class="badge bg-info ms-2">{{ inv.qty }} Qt</span>
                           </div>
-                          {% if inv.qc_status == 'verified' %}
-                          <span class="badge bg-success">✅ Verified</span>
-                          {% else %}
-                          <span class="badge bg-warning">⏳ Pending QC</span>
-                          {% endif %}
+                          <div>
+                            {% if inv.qc_status == 'verified' %}
+                            <span class="badge bg-success me-1">✅ Verified</span>
+                            {% else %}
+                            <span class="badge bg-warning me-1">⏳ Pending QC</span>
+                            {% endif %}
+
+                            <!-- Payment Status Badge -->
+                            {% if inv.payment_status == 'paid' %}
+                            <span class="badge bg-success">Paid</span>
+                            {% elif inv.final_invoice_file %}
+                            <span class="badge bg-warning text-dark">Unpaid</span>
+                            {% else %}
+                            <span class="badge bg-secondary">No Bill</span>
+                            {% endif %}
+                          </div>
                         </div>
 
                         {% if inv.qc_status == 'verified' %}
-                        <div class="kv">
-                          <span>Net Weight</span>
-                          <span>{{ inv.qc_weight or inv.qty }} Qt</span>
+                        <div class="d-flex justify-content-between flex-wrap">
+                          <div class="kv mb-0 flex-grow-1 me-2">
+                            <span>Net Weight</span>
+                            <span>{{ inv.qc_weight or inv.qty }} Qt</span>
+                          </div>
+                          <div class="kv mb-0 flex-grow-1">
+                            <span>Moisture</span>
+                            <span>{{ inv.qc_moisture or '-' }}%</span>
+                          </div>
                         </div>
-                        <div class="kv">
-                          <span>Moisture</span>
-                          <span>{{ inv.qc_moisture or '-' }}%</span>
+
+                        <!-- Final Invoice Link -->
+                        {% if inv.final_invoice_file %}
+                        <div class="mt-2 text-end">
+                          <a href="/static/uploads/bills/{{ inv.final_invoice_file }}" target="_blank"
+                            class="text-primary fw-bold text-decoration-none small">
+                            <i class="fa fa-file-invoice"></i> View Final Bill
+                          </a>
                         </div>
+                        {% endif %}
+
                         {% if inv.qc_remarks %}
-                        <div class="kv">
+                        <div class="kv mt-2">
                           <span>Remarks</span>
                           <span>{{ inv.qc_remarks }}</span>
                         </div>
