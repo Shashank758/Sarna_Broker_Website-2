@@ -3747,11 +3747,43 @@ def admin_bookings():
     JOIN miller_stock ms ON mb.stock_id = ms.id
     JOIN users miller ON ms.miller_id = miller.id
     ORDER BY mb.created_at DESC
-""")
+    """)
     bookings = cur.fetchall()
+
+    # Fetch per-truck invoices
+    invoices_map = {}
+    if bookings:
+        booking_ids = [b[0] for b in bookings]
+        placeholders = ",".join(["?"] * len(booking_ids))
+        cur.execute(f"""
+            SELECT id, booking_id, loaded_qty, invoice_file, truck_number, created_at,
+                   qc_weight, qc_moisture, qc_remarks, qc_status, qc_at,
+                   final_invoice_file, payment_status, payment_at
+            FROM loading_invoices
+            WHERE booking_id IN ({placeholders})
+            ORDER BY created_at ASC
+        """, booking_ids)
+        rows = cur.fetchall()
+        for r in rows:
+            invoices_map.setdefault(r[1], []).append({
+                "id": r[0],
+                "qty": r[2],
+                "file": r[3],
+                "truck_number": r[4],
+                "date": r[5],
+                "qc_weight": r[6],
+                "qc_moisture": r[7],
+                "qc_remarks": r[8],
+                "qc_status": r[9] or "pending",
+                "qc_at": r[10],
+                "final_invoice_file": r[11],
+                "payment_status": r[12] or "pending",
+                "payment_at": r[13]
+            })
+
     con.close()
     
-    return render_template("admin_bookings.html", bookings=bookings)
+    return render_template("admin_bookings.html", bookings=bookings, invoices_map=invoices_map)
 
 @app.route("/admin/miller-profiles")
 def admin_miller_profiles():
