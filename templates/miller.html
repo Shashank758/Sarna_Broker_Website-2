@@ -526,7 +526,7 @@
               <i class="fa fa-plus-circle"></i> Post Stock
             </a>
             <a href="#pending-orders" class="quick-action-btn">
-              <i class="fa fa-clock"></i> Pending Orders
+              <i class="fa fa-clock"></i> Pending Requests
             </a>
             <a href="#quality-check" class="quick-action-btn">
               <i class="fa fa-clipboard-check"></i> Quality Check
@@ -541,962 +541,322 @@
   </section>
 
   <main>
-    <div class="container py-4" style="max-width:1200px;">
-
-      <!-- ================= QUICK STATS ================= -->
-      {% set total_stocks = stocks|length %}
-      {% set total_pending = pending|length %}
-      {% set total_approved = approved|length %}
-      {% set total_completed = completed_loading_qc|length if completed_loading_qc else 0 %}
-
-      <div class="row g-4 mb-4" style="margin-top:-60px;">
-        <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="0">
-          <div class="stat-card stocks">
-            <div class="d-flex justify-content-between align-items-start">
-              <div>
-                <div class="stat-label mb-2">Active Stocks</div>
-                <div class="stat-value">{{ total_stocks }}</div>
-              </div>
-              <div class="stat-icon stocks">
-                <i class="fa fa-warehouse"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
-          <div class="stat-card pending">
-            <div class="d-flex justify-content-between align-items-start">
-              <div>
-                <div class="stat-label mb-2">Pending Requests</div>
-                <div class="stat-value">{{ total_pending }}</div>
-              </div>
-              <div class="stat-icon pending">
-                <i class="fa fa-clock"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
-          <div class="stat-card approved">
-            <div class="d-flex justify-content-between align-items-start">
-              <div>
-                <div class="stat-label mb-2">Approved Orders</div>
-                <div class="stat-value">{{ total_approved }}</div>
-              </div>
-              <div class="stat-icon approved">
-                <i class="fa fa-check-circle"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
-          <div class="stat-card completed">
-            <div class="d-flex justify-content-between align-items-start">
-              <div>
-                <div class="stat-label mb-2">QC Pending</div>
-                <div class="stat-value">{{ total_completed }}</div>
-              </div>
-              <div class="stat-icon completed">
-                <i class="fa fa-flask"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- NEW CARD: PENDING PAYMENTS -->
-        <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="400">
-          <a href="/miller/pending_payments" style="text-decoration:none; color:inherit;">
-            <div class="stat-card pending" style="border-color: #f59e0b; background: #fffaf0;">
-              <div class="d-flex justify-content-between align-items-start">
-                <div>
-                  <div class="stat-label mb-2" style="color: #d97706;">Payment Pending</div>
-                  <div class="stat-value" style="color: #d97706;">{{ total_pending_payments }}</div>
-                </div>
-                <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
-                  <i class="fa fa-hourglass-half"></i>
-                </div>
-              </div>
-            </div>
-          </a>
-        </div>
+    <!-- ================= POST STOCK ================= -->
+    <div class="section-card" id="post-stock">
+      <div class="section-header">
+        <h5 class="section-title">
+          <span class="icon-box green"><i class="fa fa-plus-circle"></i></span>
+          Post New Stock
+        </h5>
       </div>
 
-      <!-- ================= POST STOCK ================= -->
-      <div class="section-card" id="post-stock">
-        <div class="section-header">
-          <h5 class="section-title">
-            <span class="icon-box green"><i class="fa fa-plus-circle"></i></span>
-            Post New Stock
-          </h5>
-        </div>
-
-        <form method="POST">
-          <div class="row g-3">
-            <div class="col-md-4">
-              <label class="form-label"><i class="fa fa-seedling me-2 text-success"></i>Crop Type</label>
-              <select name="crop" class="form-select" required>
-                <option value="">Select Crop</option>
-                <option value="wheat">🌾 Wheat</option>
-                <option value="chawal">🍚 Chawal (Rice)</option>
-                <option value="sarso">🌻 Sarso (Mustard)</option>
-                <option value="maize">🌽 Maize</option>
-                <option value="paddy">🌾 Paddy</option>
-                <option value="mustard oil cake">🧈 Mustard Oil Cake</option>
-              </select>
-            </div>
-
-            <div class="col-md-8">
-              <label class="form-label"><i class="fa fa-sticky-note me-2 text-info"></i>Note (Optional)</label>
-              <input type="text" name="note" class="form-control"
-                placeholder="e.g. High quality Sarso available, contact for bulk">
-            </div>
-
-            <div class="col-md-4">
-              <label class="form-label"><i class="fa fa-indian-rupee-sign me-2 text-warning"></i>Price / Quintal</label>
-              <input type="number" name="price" class="form-control" min="1" step="0.01" placeholder="e.g. 2500.50"
-                required>
-            </div>
-
-            <div class="col-md-4">
-              <label class="form-label"><i class="fa fa-scale-balanced me-2 text-secondary"></i>Condition</label>
-              <select name="condition" class="form-select">
-                <option value="Net">Net Weight</option>
-                <option value="Full">Full Weight</option>
-              </select>
-            </div>
-
-            <div class="col-md-4">
-              <label class="form-label"><i class="fa fa-box me-2 text-primary"></i>Bag Type</label>
-              <select name="bag_type" class="form-select">
-                <option value="Jute">Jute Bag</option>
-                <option value="Plastic">Plastic Bag</option>
-                <option value="Jute/Plastic">Jute / Plastic</option>
-              </select>
-            </div>
-
-            <div class="col-md-4">
-              <label class="form-label"><i class="fa fa-minus-circle me-2 text-danger"></i>Deduction Note</label>
-              <div class="input-group">
-                <input type="text" name="deduction" id="deductionInput" placeholder="e.g. 2% moisture cut"
-                  class="form-control">
-                <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
-                  data-bs-toggle="dropdown"></button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                  <li>
-                    <h6 class="dropdown-header">Saved Options</h6>
-                  </li>
-                  {% if deduction_options %}
-                  {% for opt in deduction_options %}
-                  <li><a class="dropdown-item" href="#" onclick="selectDeduction('{{ opt[1] }}')">{{ opt[1] }}</a></li>
-                  {% endfor %}
-                  {% else %}
-                  <li><span class="dropdown-item text-muted small">No options saved</span></li>
-                  {% endif %}
-                  <li>
-                    <hr class="dropdown-divider">
-                  </li>
-                  <li><a class="dropdown-item text-primary" href="#" data-bs-toggle="modal"
-                      data-bs-target="#manageDeductionsModal">
-                      <i class="fa fa-cog me-1"></i> Manage Options
-                    </a></li>
-                </ul>
-              </div>
-            </div>
-
-            <div class="col-12 mt-3">
-              <button class="btn btn-primary-custom w-100">
-                <i class="fa fa-upload me-2"></i> Post Stock to Market
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
-
-      <!-- ================= LIVE STOCK ================= -->
-      <div class="section-card" data-aos="fade-up">
-        <div class="section-header">
-          <h5 class="section-title">
-            <span class="icon-box green"><i class="fa fa-warehouse"></i></span>
-            Your Live Stock
-          </h5>
-          <span class="section-badge bg-success">{{ stocks|length }} Active</span>
-        </div>
-
-        {% if stocks %}
-        <div class="table-responsive">
-          <table class="table-modern">
-            <thead>
-              <tr>
-                <th>Crop</th>
-                <th>Note</th>
-                <th>Price/Qt</th>
-                <th>Condition</th>
-                <th>Bag Type</th>
-                <th>Deduction</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for s in stocks %}
-              <form method="POST" action="/update_miller_stock/{{ s[0] }}">
-                <tr>
-                  <td>
-                    <span class="fw-bold text-capitalize">
-                      <i class="fa fa-seedling text-success me-2"></i>{{ s[2] }}
-                    </span>
-                  </td>
-                  <td>
-                    <input type="text" name="note" value="{{ s[11] if s[11] else '' }}"
-                      class="form-control form-control-sm" style="width:150px;margin:auto;" placeholder="Add note...">
-                  </td>
-                  <td>
-                    <input type="number" name="price" value="{{ s[4] }}" step="0.01"
-                      class="form-control form-control-sm" style="width:90px;margin:auto;">
-                  </td>
-                  <td>
-                    <select name="condition" class="form-select form-select-sm" style="width:90px;margin:auto;">
-                      <option {{ 'selected' if s[5]=='Net' }}>Net</option>
-                      <option {{ 'selected' if s[5]=='Full' }}>Full</option>
-                    </select>
-                  </td>
-                  <td>
-                    <select name="bag_type" class="form-select form-select-sm" style="width:110px;margin:auto;">
-                      <option {{ 'selected' if s[6]=='Jute' }}>Jute</option>
-                      <option {{ 'selected' if s[6]=='Plastic' }}>Plastic</option>
-                      <option {{ 'selected' if s[6]=='Jute/Plastic' }}>Jute/Plastic</option>
-                    </select>
-                  </td>
-                  <td>
-                    <input type="text" name="deduction" value="{{ s[7] }}" class="form-control form-control-sm"
-                      style="width:120px;margin:auto;">
-                  </td>
-                  <td>
-                    <button class="btn btn-sm btn-success">
-                      <i class="fa fa-save me-1"></i> Update
-                    </button>
-                  </td>
-                </tr>
-              </form>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        {% else %}
-        <div class="empty-state">
-          <i class="fa fa-warehouse"></i>
-          <p>No stock posted yet. Use the form above to add your first stock!</p>
-        </div>
-        {% endif %}
-      </div>
-
-      <!-- ================= ORDERS ================= -->
-      {% set pending = bookings | selectattr(4,'equalto','pending') | list %}
-      {% set approved = bookings | selectattr(4,'equalto','approved') | list %}
-      {% set rejected = bookings | selectattr(4,'equalto','declined') | list %}
-
-      <!-- ================= BOOKING FILTER ================= -->
-      <div class="filter-bar" data-aos="fade-up">
-        <div class="row g-3 align-items-end">
-          <div class="col-md-3">
-            <label class="form-label"><i class="fa fa-filter me-2"></i>Filter Status</label>
-            <select id="statusFilter" class="form-select">
-              <option value="all">All Orders</option>
-              <option value="pending">Pending</option>
-              <option value="approved">Approved</option>
-              <option value="declined">Rejected</option>
+      <form method="POST">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label"><i class="fa fa-seedling me-2 text-success"></i>Crop Type</label>
+            <select name="crop" class="form-select" required>
+              <option value="">Select Crop</option>
+              <option value="wheat">🌾 Wheat</option>
+              <option value="chawal">🍚 Chawal (Rice)</option>
+              <option value="sarso">🌻 Sarso (Mustard)</option>
+              <option value="maize">🌽 Maize</option>
+              <option value="paddy">🌾 Paddy</option>
+              <option value="mustard oil cake">🧈 Mustard Oil Cake</option>
             </select>
           </div>
-          <div class="col-md-3">
-            <label class="form-label"><i class="fa fa-user me-2"></i>Trader Name</label>
-            <input type="text" id="buyerFilter" class="form-control" placeholder="Search buyer...">
+
+          <div class="col-md-8">
+            <label class="form-label"><i class="fa fa-sticky-note me-2 text-info"></i>Note (Optional)</label>
+            <input type="text" name="note" class="form-control"
+              placeholder="e.g. High quality Sarso available, contact for bulk">
           </div>
-          <div class="col-md-3">
-            <label class="form-label"><i class="fa fa-seedling me-2"></i>Crop</label>
-            <input type="text" id="cropFilter" class="form-control" placeholder="Search crop...">
+
+          <div class="col-md-4">
+            <label class="form-label"><i class="fa fa-indian-rupee-sign me-2 text-warning"></i>Price / Quintal</label>
+            <input type="number" name="price" class="form-control" min="1" step="0.01" placeholder="e.g. 2500.50"
+              required>
           </div>
-          <div class="col-md-3">
-            <button onclick="clearFilters()" class="btn btn-outline-secondary w-100">
-              <i class="fa fa-times me-2"></i>Clear Filters
+
+          <div class="col-md-4">
+            <label class="form-label"><i class="fa fa-scale-balanced me-2 text-secondary"></i>Condition</label>
+            <select name="condition" class="form-select">
+              <option value="Net">Net Weight</option>
+              <option value="Full">Full Weight</option>
+            </select>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label"><i class="fa fa-box me-2 text-primary"></i>Bag Type</label>
+            <select name="bag_type" class="form-select">
+              <option value="Jute">Jute Bag</option>
+              <option value="Plastic">Plastic Bag</option>
+              <option value="Jute/Plastic">Jute / Plastic</option>
+            </select>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label"><i class="fa fa-minus-circle me-2 text-danger"></i>Deduction Note</label>
+            <div class="input-group">
+              <input type="text" name="deduction" id="deductionInput" placeholder="e.g. 2% moisture cut"
+                class="form-control">
+              <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
+                data-bs-toggle="dropdown"></button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <h6 class="dropdown-header">Saved Options</h6>
+                </li>
+                {% if deduction_options %}
+                {% for opt in deduction_options %}
+                <li><a class="dropdown-item" href="#" onclick="selectDeduction('{{ opt[1] }}')">{{ opt[1] }}</a></li>
+                {% endfor %}
+                {% else %}
+                <li><span class="dropdown-item text-muted small">No options saved</span></li>
+                {% endif %}
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item text-primary" href="#" data-bs-toggle="modal"
+                    data-bs-target="#manageDeductionsModal">
+                    <i class="fa fa-cog me-1"></i> Manage Options
+                  </a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="col-12 mt-3">
+            <button class="btn btn-primary-custom w-100">
+              <i class="fa fa-upload me-2"></i> Post Stock to Market
             </button>
           </div>
         </div>
-      </div>
-
-      <!-- ================= PENDING ORDERS ================= -->
-      <div class="section-card" id="pending-orders" data-aos="fade-up">
-        <div class="section-header">
-          <h5 class="section-title">
-            <span class="icon-box yellow"><i class="fa fa-clock"></i></span>
-            Pending Order Requests
-          </h5>
-          <span class="section-badge bg-warning text-dark">{{ pending|length }} Pending</span>
-        </div>
-
-        {% if pending %}
-        <div class="row g-3">
-          {% for b in pending %}
-          <div class="col-md-6 col-lg-4 booking-row" data-status="pending" data-buyer="{{ b[1]|lower }}"
-            data-crop="{{ b[2]|lower }}">
-            <div class="order-card">
-              <div class="order-header">
-                <div>
-                  <div class="order-id">{{ b[10] if b[10] else 'N/A' }}</div>
-                  <div class="order-meta">{{ b[1] }} • <span class="text-capitalize">{{ b[2] }}</span></div>
-                </div>
-                <span class="badge bg-warning text-dark">
-                  <i class="fa fa-clock me-1"></i>Pending
-                </span>
-              </div>
-
-              <div class="order-badges">
-                <span class="badge bg-primary"><i class="fa fa-weight-hanging me-1"></i>{{ b[3] }} Quintal</span>
-              </div>
-
-              <div class="d-grid gap-2 mt-3">
-                <a href="/miller/approve_booking/{{ b[0] }}" class="btn btn-success btn-sm">
-                  <i class="fa fa-check me-2"></i>Approve Order
-                </a>
-
-                <form method="POST" action="/miller/decline_booking/{{ b[0] }}">
-                  <input name="reason" class="form-control form-control-sm mb-2" placeholder="Rejection reason..."
-                    required>
-                  <button class="btn btn-outline-danger btn-sm w-100">
-                    <i class="fa fa-times me-2"></i>Reject
-                  </button>
-                </form>
-              </div>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-        {% else %}
-        <div class="empty-state">
-          <i class="fa fa-inbox"></i>
-          <p>No pending orders at the moment. New requests will appear here.</p>
-        </div>
-        {% endif %}
-      </div>
-      <!-- APPROVED (Still Loading) -->
-      {% set approved_loading = [] %}
-      {% set completed_loading_qc = [] %}
-      {% set final_invoice_uploaded = [] %}
-      {% set payment_completed = [] %}
-
-      {% for b in approved %}
-      {% set booked = b[3] %}
-      {% set loaded = b[7] %}
-      {% set booking_id = b[0] %}
-
-      {# --- Determine Truck Statuses --- #}
-      {% set ns = namespace(all_paid=true, all_invoiced=true, has_trucks=false) %}
-      {% if invoices_map.get(booking_id) %}
-      {% set ns.has_trucks = true %}
-      {% for t in invoices_map[booking_id] %}
-      {% if t.payment_status != 'paid' %}{% set ns.all_paid = false %}{% endif %}
-      {% if not t.final_invoice_file %}{% set ns.all_invoiced = false %}{% endif %}
-      {% endfor %}
-      {% else %}
-      {% set ns.all_paid = false %}
-      {% set ns.all_invoiced = false %}
-      {% endif %}
-
-      {# --- Logic --- #}
-      {% if loaded < booked and b[8] !='partial_closed' %} {# Still Loading #} {% set _=approved_loading.append(b) %} {%
-        else %} {# Loading Complete / Closed #} {% if ns.has_trucks and ns.all_paid %} {% set
-        _=payment_completed.append(b) %} {% elif ns.has_trucks and ns.all_invoiced %} {# All invoices uploaded, payment
-        pending #} {% set _=final_invoice_uploaded.append(b) %} {% else %} {# Needs QC or Invoice Upload #} {% set
-        _=completed_loading_qc.append(b) %} {% endif %} {% endif %} {% endfor %} <div class="section-header">
-        <h5 class="section-title">
-          <span class="icon-box green"><i class="fa fa-check-circle"></i></span>
-          Approved Orders (Still Loading)
-        </h5>
-        <span class="section-badge bg-success" id="approvedLoadingCount">{{ approved_loading|length }} Active</span>
+      </form>
     </div>
 
-    <!-- Filter & Search (QC pending trucks) -->
-    <div class="filter-bar mb-4">
-      <div class="d-flex gap-2 flex-wrap align-items-center">
-        <button type="button" class="btn btn-sm btn-success approved-loading-filter-btn" data-filter="all"
-          onclick="filterApprovedLoading('all')">
-          <i class="fa fa-list me-1"></i> All
-        </button>
-        <button type="button" class="btn btn-sm btn-outline-secondary approved-loading-filter-btn" data-filter="pending"
-          onclick="filterApprovedLoading('pending')">
-          <i class="fa fa-clock me-1"></i> QC Pending
-        </button>
-        <button type="button" class="btn btn-sm btn-outline-secondary approved-loading-filter-btn"
-          data-filter="verified" onclick="filterApprovedLoading('verified')">
-          <i class="fa fa-check-circle me-1"></i> QC Verified
-        </button>
-
-        <div class="flex-grow-1" style="min-width:260px;">
-          <input type="text" id="approvedLoadingSearchInput" class="form-control"
-            placeholder="🔍 Search by Order ID, Buyer, Crop, Truck..." onkeyup="searchApprovedLoading()">
-        </div>
-      </div>
-    </div>
-
-    {% if approved_loading %}
-    <div class="table-responsive">
-      <table class="table-modern">
-        <thead>
-          <tr>
-            <th>Order ID</th>
-            <th>Trader</th>
-            <th>Crop</th>
-            <th>Booked</th>
-            <th>Loaded</th>
-            <th>Remaining</th>
-            <th>Invoices</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-
-          {% for b in approved_loading %}
-          {% set booking_id = b[0] %}
-          {% set booked = b[3] %}
-          {% set loaded = b[7] %}
-          {% set remaining = booked - loaded %}
-
-          {% set invs = invoices_map.get(booking_id) %}
-          {% set ns = namespace(pending=0, search=(b[10]|string + ' ' + b[1] + ' ' + b[2])|lower) %}
-          {% if invs %}
-          {% for inv in invs %}
-          {% if inv.qc_status != 'verified' %}
-          {% set ns.pending = ns.pending + 1 %}
-          {% endif %}
-          {% if inv.truck_number %}
-          {% set ns.search = ns.search + ' ' + (inv.truck_number|string|lower) %}
-          {% endif %}
-          {% endfor %}
-          {% endif %}
-          {% set qc_row_status = 'none' if not invs else ('pending' if ns.pending > 0 else 'verified') %}
-
-          <tr class="approved-loading-row" data-qc="{{ qc_row_status }}" data-search="{{ ns.search }}">
-            <td><strong class="text-primary">{{ b[10] }}</strong></td>
-            <td>{{ b[1] }}</td>
-            <td>{{ b[2] }}</td>
-
-            <td><span class="badge bg-primary">{{ booked }} Qt</span></td>
-
-            <td>
-              <span class="badge bg-success">{{ loaded }} Qt</span>
-            </td>
-
-            <td>
-              <span class="badge bg-warning">{{ remaining }} Qt</span>
-              {% if remaining > 0 %}
-              <button class="btn btn-outline-danger btn-sm ms-2" title="Close Remaining Qty" data-bs-toggle="modal"
-                data-bs-target="#closeRemainingModal{{ booking_id }}">
-                <i class="fa fa-times-circle"></i>
-              </button>
-              {% endif %}
-            </td>
-
-            <!-- QC Summary -->
-            <td>
-              {% if not invs %}
-              <span class="badge bg-secondary">No Trucks</span>
-              {% elif ns.pending > 0 %}
-              <span class="badge bg-warning text-dark">QC Pending: {{ ns.pending }}</span>
-              {% else %}
-              <span class="badge bg-success">QC Verified</span>
-              {% endif %}
-            </td>
-
-            <!-- 🔴 PER LOADING INVOICES + QC (for loaded trucks even if order still loading) -->
-            <td>
-              {% if invs %}
-              <ul class="list-unstyled mb-0">
-                {% for inv in invs %}
-                <li class="mb-2 p-2 border rounded" style="background:#f8f9fa;">
-                  <div class="d-flex justify-content-between align-items-start gap-2">
-                    <div>
-                      <div class="fw-semibold">
-                        {% if inv.truck_number %}
-                        Truck {{ inv.truck_number }}
-                        {% else %}
-                        Truck #{{ loop.index }}
-                        {% endif %}
-                        <span class="badge bg-info ms-2">{{ inv.qty }} Qt</span>
-                      </div>
-
-                      <a href="/static/uploads/bills/{{ inv.file }}" target="_blank"
-                        class="btn btn-sm btn-outline-primary mt-1">
-                        <i class="fa fa-file-invoice"></i> Invoice
-                      </a>
-
-                      <small class="text-muted d-block">{{ inv.date[:16] }}</small>
-                    </div>
-
-                    <div class="text-end">
-                      {% if inv.qc_status == 'verified' %}
-                      <span class="badge bg-success">✅ QC Verified</span>
-                      {% else %}
-                      <span class="badge bg-warning text-dark">⏳ QC Pending</span>
-                      {% endif %}
-
-                      <button type="button"
-                        class="btn btn-sm {% if inv.qc_status == 'verified' %}btn-outline-warning{% else %}btn-success{% endif %} mt-2"
-                        data-bs-toggle="collapse" data-bs-target="#qcCollapse{{ inv.id }}" aria-expanded="false">
-                        <i class="fa fa-clipboard-check"></i>
-                        {% if inv.qc_status == 'verified' %}Edit QC{% else %}Do QC{% endif %}
-                      </button>
-                    </div>
-                  </div>
-
-                  {% if inv.qc_status == 'verified' %}
-                  <div class="mt-2">
-                    <small class="text-muted d-block">Net: {{ inv.qc_weight or inv.qty }} Qt • Moisture: {{
-                      inv.qc_moisture or '-' }}%</small>
-                    {% if inv.qc_remarks %}
-                    <small class="text-muted d-block">Remarks: {{ inv.qc_remarks }}</small>
-                    {% endif %}
-                    {% if inv.qc_at %}
-                    <small class="text-muted d-block">Verified on {{ inv.qc_at[:16] }}</small>
-                    {% endif %}
-                  </div>
-                  {% endif %}
-
-                  <!-- QC Collapse (more reliable than modal inside tables) -->
-                  <div class="collapse mt-2" id="qcCollapse{{ inv.id }}">
-                    <div class="card card-body">
-                      <div class="fw-semibold mb-2">
-                        {% if inv.qc_status == 'verified' %}
-                        Edit Quality Check -
-                        {% else %}
-                        Quality Check -
-                        {% endif %}
-                        {% if inv.truck_number %}
-                        Truck {{ inv.truck_number }}
-                        {% else %}
-                        Truck #{{ loop.index }}
-                        {% endif %}
-                      </div>
-
-                      <form method="POST" action="/miller/update_qc/{{ inv.id }}">
-                        <div class="row g-2 mb-2">
-                          <div class="col-6">
-                            <label class="form-label small mb-1">Net Weight (Qt)</label>
-                            <input type="number" step="0.01" name="qc_weight" class="form-control form-control-sm"
-                              value="{{ inv.qc_weight or inv.qty }}" required>
-                          </div>
-                          <div class="col-6">
-                            <label class="form-label small mb-1">Moisture (%)</label>
-                            <input type="number" step="0.01" name="qc_moisture" class="form-control form-control-sm"
-                              value="{{ inv.qc_moisture or '' }}" required>
-                          </div>
-                        </div>
-                        <div class="mb-2">
-                          <label class="form-label small mb-1">Remarks (Optional)</label>
-                          <textarea name="qc_remarks" class="form-control form-control-sm" rows="2"
-                            placeholder="Quality notes, deductions, etc.">{{ inv.qc_remarks or '' }}</textarea>
-                        </div>
-                        <div class="d-flex gap-2">
-                          <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse"
-                            data-bs-target="#qcCollapse{{ inv.id }}">
-                            Cancel
-                          </button>
-                          <button type="submit" class="btn btn-sm btn-success">
-                            <i class="fa fa-clipboard-check"></i> Save QC
-                          </button>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                </li>
-                {% endfor %}
-              </ul>
-              {% else %}
-              <span class="text-muted small">No loading yet</span>
-              {% endif %}
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    {% else %}
-    <div class="empty-state">
-      <i class="fa fa-truck"></i>
-      <p>No orders currently being loaded.</p>
-    </div>
-    {% endif %}
-    </div>
-
-    <!-- COMPLETED LOADING (QC Section) -->
-    <div class="section-card" id="quality-check" data-aos="fade-up">
+    <!-- ================= LIVE STOCK ================= -->
+    <div class="section-card" data-aos="fade-up">
       <div class="section-header">
         <h5 class="section-title">
-          <span class="icon-box blue"><i class="fa fa-clipboard-check"></i></span>
-          Completed Loading - Quality Check
+          <span class="icon-box green"><i class="fa fa-warehouse"></i></span>
+          Your Live Stock
         </h5>
-        <span class="section-badge bg-info" id="qcCount">{{ completed_loading_qc|length }} Orders</span>
+        <span class="section-badge bg-success">{{ stocks|length }} Active</span>
       </div>
 
-      {% if completed_loading_qc %}
-      <!-- Filter & Search Bar -->
+      {% if stocks %}
+      <div class="table-responsive">
+        <table class="table-modern">
+          <thead>
+            <tr>
+              <th>Crop</th>
+              <th>Note</th>
+              <th>Price/Qt</th>
+              <th>Condition</th>
+              <th>Bag Type</th>
+              <th>Deduction</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in stocks %}
+            <form method="POST" action="/update_miller_stock/{{ s[0] }}">
+              <tr>
+                <td>
+                  <span class="fw-bold text-capitalize">
+                    <i class="fa fa-seedling text-success me-2"></i>{{ s[2] }}
+                  </span>
+                </td>
+                <td>
+                  <input type="text" name="note" value="{{ s[11] if s[11] else '' }}"
+                    class="form-control form-control-sm" style="width:150px;margin:auto;" placeholder="Add note...">
+                </td>
+                <td>
+                  <input type="number" name="price" value="{{ s[4] }}" step="0.01" class="form-control form-control-sm"
+                    style="width:90px;margin:auto;">
+                </td>
+                <td>
+                  <select name="condition" class="form-select form-select-sm" style="width:90px;margin:auto;">
+                    <option {{ 'selected' if s[5]=='Net' }}>Net</option>
+                    <option {{ 'selected' if s[5]=='Full' }}>Full</option>
+                  </select>
+                </td>
+                <td>
+                  <select name="bag_type" class="form-select form-select-sm" style="width:110px;margin:auto;">
+                    <option {{ 'selected' if s[6]=='Jute' }}>Jute</option>
+                    <option {{ 'selected' if s[6]=='Plastic' }}>Plastic</option>
+                    <option {{ 'selected' if s[6]=='Jute/Plastic' }}>Jute/Plastic</option>
+                  </select>
+                </td>
+                <td>
+                  <input type="text" name="deduction" value="{{ s[7] }}" class="form-control form-control-sm"
+                    style="width:120px;margin:auto;">
+                </td>
+                <td>
+                  <button class="btn btn-sm btn-success">
+                    <i class="fa fa-save me-1"></i> Update
+                  </button>
+                </td>
+              </tr>
+            </form>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <i class="fa fa-warehouse"></i>
+        <p>No stock posted yet. Use the form above to add your first stock!</p>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- ================= ORDERS ================= -->
+    {% set pending = bookings | selectattr(4,'equalto','pending') | list %}
+    {% set approved = bookings | selectattr(4,'equalto','approved') | list %}
+    {% set rejected = bookings | selectattr(4,'equalto','declined') | list %}
+
+    <!-- ================= BOOKING FILTER ================= -->
+    <div class="filter-bar" data-aos="fade-up">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label"><i class="fa fa-filter me-2"></i>Filter Status</label>
+          <select id="statusFilter" class="form-select">
+            <option value="all">All Orders</option>
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="declined">Rejected</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label"><i class="fa fa-user me-2"></i>Trader Name</label>
+          <input type="text" id="buyerFilter" class="form-control" placeholder="Search buyer...">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label"><i class="fa fa-seedling me-2"></i>Crop</label>
+          <input type="text" id="cropFilter" class="form-control" placeholder="Search crop...">
+        </div>
+        <div class="col-md-3">
+          <button onclick="clearFilters()" class="btn btn-outline-secondary w-100">
+            <i class="fa fa-times me-2"></i>Clear Filters
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= PENDING ORDERS ================= -->
+    <div class="section-card" id="pending-orders" data-aos="fade-up">
+      <div class="section-header">
+        <h5 class="section-title">
+          <span class="icon-box yellow"><i class="fa fa-clock"></i></span>
+          Pending Order Requests
+        </h5>
+        <span class="section-badge bg-warning text-dark">{{ pending|length }} Pending</span>
+      </div>
+
+      {% if pending %}
+      <div class="row g-3">
+        {% for b in pending %}
+        <div class="col-md-6 col-lg-4 booking-row" data-status="pending" data-buyer="{{ b[1]|lower }}"
+          data-crop="{{ b[2]|lower }}">
+          <div class="order-card">
+            <div class="order-header">
+              <div>
+                <div class="order-id">{{ b[10] if b[10] else 'N/A' }}</div>
+                <div class="order-meta">{{ b[1] }} • <span class="text-capitalize">{{ b[2] }}</span></div>
+              </div>
+              <span class="badge bg-warning text-dark">
+                <i class="fa fa-clock me-1"></i>Pending
+              </span>
+            </div>
+
+            <div class="order-badges">
+              <span class="badge bg-primary"><i class="fa fa-weight-hanging me-1"></i>{{ b[3] }} Quintal</span>
+            </div>
+
+            <div class="d-grid gap-2 mt-3">
+              <a href="/miller/approve_booking/{{ b[0] }}" class="btn btn-success btn-sm">
+                <i class="fa fa-check me-2"></i>Approve Order
+              </a>
+
+              <form method="POST" action="/miller/decline_booking/{{ b[0] }}">
+                <input name="reason" class="form-control form-control-sm mb-2" placeholder="Rejection reason..."
+                  required>
+                <button class="btn btn-outline-danger btn-sm w-100">
+                  <i class="fa fa-times me-2"></i>Reject
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <i class="fa fa-inbox"></i>
+        <p>No pending orders at the moment. New requests will appear here.</p>
+      </div>
+      {% endif %}
+    </div>
+    <!-- APPROVED (Still Loading) -->
+    {% set approved_loading = [] %}
+    {% set completed_loading_qc = [] %}
+    {% set final_invoice_uploaded = [] %}
+    {% set payment_completed = [] %}
+
+    {% for b in approved %}
+    {% set booked = b[3] %}
+    {% set loaded = b[7] %}
+    {% set booking_id = b[0] %}
+
+    {# --- Determine Truck Statuses --- #}
+    {% set ns = namespace(all_paid=true, all_invoiced=true, has_trucks=false) %}
+    {% if invoices_map.get(booking_id) %}
+    {% set ns.has_trucks = true %}
+    {% for t in invoices_map[booking_id] %}
+    {% if t.payment_status != 'paid' %}{% set ns.all_paid = false %}{% endif %}
+    {% if not t.final_invoice_file %}{% set ns.all_invoiced = false %}{% endif %}
+    {% endfor %}
+    {% else %}
+    {% set ns.all_paid = false %}
+    {% set ns.all_invoiced = false %}
+    {% endif %}
+
+    {# --- Logic --- #}
+    {% if loaded < booked and b[8] !='partial_closed' %} {# Still Loading #} {% set _=approved_loading.append(b) %} {%
+      else %} {# Loading Complete / Closed #} {% if ns.has_trucks and ns.all_paid %} {% set
+      _=payment_completed.append(b) %} {% elif ns.has_trucks and ns.all_invoiced %} {# All invoices uploaded, payment
+      pending #} {% set _=final_invoice_uploaded.append(b) %} {% else %} {# Needs QC or Invoice Upload #} {% set
+      _=completed_loading_qc.append(b) %} {% endif %} {% endif %} {% endfor %} <div class="section-header">
+      <h5 class="section-title">
+        <span class="icon-box green"><i class="fa fa-check-circle"></i></span>
+        Approved Orders (Still Loading)
+      </h5>
+      <span class="section-badge bg-success" id="approvedLoadingCount">{{ approved_loading|length }} Active</span>
+      </div>
+
+      <!-- Filter & Search (QC pending trucks) -->
       <div class="filter-bar mb-4">
         <div class="d-flex gap-2 flex-wrap align-items-center">
-          <button class="filter-pill active" data-filter="all" onclick="filterQC('all')">
+          <button type="button" class="btn btn-sm btn-success approved-loading-filter-btn" data-filter="all"
+            onclick="filterApprovedLoading('all')">
             <i class="fa fa-list me-1"></i> All
           </button>
-          <button class="filter-pill" data-filter="pending" onclick="filterQC('pending')">
-            <i class="fa fa-clock me-1"></i> Pending QC
+          <button type="button" class="btn btn-sm btn-outline-secondary approved-loading-filter-btn"
+            data-filter="pending" onclick="filterApprovedLoading('pending')">
+            <i class="fa fa-clock me-1"></i> QC Pending
           </button>
-          <button class="filter-pill" data-filter="verified" onclick="filterQC('verified')">
-            <i class="fa fa-check-circle me-1"></i> Verified
+          <button type="button" class="btn btn-sm btn-outline-secondary approved-loading-filter-btn"
+            data-filter="verified" onclick="filterApprovedLoading('verified')">
+            <i class="fa fa-check-circle me-1"></i> QC Verified
           </button>
-          <div class="flex-grow-1" style="min-width:200px;">
-            <input type="text" id="qcSearchInput" class="form-control"
-              placeholder="🔍 Search by Order ID, Buyer, or Crop..." onkeyup="searchQC()">
+
+          <div class="flex-grow-1" style="min-width:260px;">
+            <input type="text" id="approvedLoadingSearchInput" class="form-control"
+              placeholder="🔍 Search by Order ID, Buyer, Crop, Truck..." onkeyup="searchApprovedLoading()">
           </div>
         </div>
       </div>
 
-      <!-- Scrollable Cards Container -->
-      <div class="qc-scroll-container">
-        <div class="row g-3" id="qcCardsContainer">
-          {% for b in completed_loading_qc %}
-          {% set booking_id = b[0] %}
-          {% set booked = b[3] %}
-          {% set loaded = b[7] %}
-          {% set qc_weight = b[11] %}
-          {% set qc_moisture = b[12] %}
-          {% set qc_remarks = b[13] %}
-          {% set qc_status = b[14] %}
-          {% set qc_at = b[15] %}
-          {% set order_id = b[10] %}
-          {% set buyer_name = b[1] %}
-          {% set crop_name = b[2] %}
-          {% set payment_status = b[16] %}
-          {% set final_invoice = b[17] %}
-          {% set payment_at = b[18] %}
-
-          <div class="col-md-6 qc-card-item"
-            data-search="{{ (order_id|string + ' ' + buyer_name|lower + ' ' + crop_name|lower) }}">
-            <div class="card border-0 shadow-sm h-100 completed-loading-card">
-              <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                  <div>
-                    <h6 class="mb-1"><strong class="text-primary">{{ b[10] }}</strong></h6>
-                    <p class="mb-1 text-muted small">{{ b[1] }} • <span class="text-capitalize">{{ b[2] }}</span></p>
-                    <div class="d-flex gap-2 mt-2">
-                      <span class="badge bg-primary">{{ booked }} Qt Booked</span>
-                      <span class="badge bg-success">{{ loaded }} Qt Loaded</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Per-Truck Quality Checks -->
-                {% if invoices_map.get(booking_id) %}
-                <div class="border-top pt-3">
-                  <small class="text-muted d-block mb-2 fw-semibold">
-                    <i class="fa fa-truck"></i> Truck Quality Checks:
-                  </small>
-
-                  {% for inv in invoices_map[booking_id] %}
-                  <div class="mb-3 p-2 border rounded" style="background:#f8f9fa;">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                      <div>
-                        <strong class="text-primary">
-                          {% if inv.truck_number %}
-                          Truck {{ inv.truck_number }}
-                          {% else %}
-                          Truck #{{ loop.index }}
-                          {% endif %}
-                        </strong>
-                        <span class="badge bg-info ms-2">{{ inv.qty }} Qt</span>
-                        <a href="/static/uploads/bills/{{ inv.file }}" target="_blank"
-                          class="btn btn-sm btn-outline-primary ms-2">
-                          <i class="fa fa-file-invoice"></i> Invoice
-                        </a>
-                      </div>
-                      {% if inv.qc_status == 'verified' %}
-                      <span class="badge bg-success">✅ Verified</span>
-                      {% else %}
-                      <span class="badge bg-warning">⏳ Pending QC</span>
-                      {% endif %}
-                    </div>
-
-                    {% if inv.qc_status == 'verified' %}
-                    <!-- Show verified QC details for this truck -->
-                    <div class="row g-2 mb-2">
-                      <div class="col-6">
-                        <small class="text-muted d-block">Net Weight</small>
-                        <strong>{{ inv.qc_weight or inv.qty }} Qt</strong>
-                      </div>
-                      <div class="col-6">
-                        <small class="text-muted d-block">Moisture</small>
-                        <strong>{{ inv.qc_moisture or '-' }}%</strong>
-                      </div>
-                    </div>
-                    {% if inv.qc_remarks %}
-                    <div class="mb-2">
-                      <small class="text-muted d-block">Remarks</small>
-                      <small>{{ inv.qc_remarks }}</small>
-                    </div>
-                    {% endif %}
-                    {% if inv.qc_at %}
-                    <small class="text-muted">Verified on {{ inv.qc_at[:16] }}</small>
-                    {% endif %}
-
-                    <button type="button" class="btn btn-sm btn-outline-warning w-100 mt-2" data-bs-toggle="collapse"
-                      data-bs-target="#qcEdit{{ inv.id }}">
-                      <i class="fa fa-pen-to-square"></i> Edit QC
-                    </button>
-
-                    <div class="collapse mt-2" id="qcEdit{{ inv.id }}">
-                      <form method="POST" action="/miller/update_qc/{{ inv.id }}">
-                        <div class="row g-2 mb-2">
-                          <div class="col-6">
-                            <label class="form-label small mb-1">Net Weight (Qt)</label>
-                            <input type="number" step="0.01" name="qc_weight" class="form-control form-control-sm"
-                              value="{{ inv.qc_weight or inv.qty }}" required>
-                          </div>
-                          <div class="col-6">
-                            <label class="form-label small mb-1">Moisture (%)</label>
-                            <input type="number" step="0.01" name="qc_moisture" class="form-control form-control-sm"
-                              value="{{ inv.qc_moisture or '' }}" required>
-                          </div>
-                        </div>
-                        <div class="mb-2">
-                          <label class="form-label small mb-1">Remarks (Optional)</label>
-                          <textarea name="qc_remarks" class="form-control form-control-sm" rows="2"
-                            placeholder="Quality notes, deductions, etc.">{{ inv.qc_remarks or '' }}</textarea>
-                        </div>
-                        <button type="submit" class="btn btn-sm btn-success w-100">
-                          <i class="fa fa-clipboard-check"></i> Update QC
-                        </button>
-                      </form>
-                    </div>
-                    {% else %}
-                    <!-- QC Form for this truck -->
-                    <form method="POST" action="/miller/update_qc/{{ inv.id }}" class="mt-2">
-                      <div class="row g-2 mb-2">
-                        <div class="col-6">
-                          <label class="form-label small mb-1">Net Weight (Qt)</label>
-                          <input type="number" step="0.01" name="qc_weight" class="form-control form-control-sm"
-                            placeholder="Net Qt" value="{{ inv.qty }}" required>
-                        </div>
-                        <div class="col-6">
-                          <label class="form-label small mb-1">Moisture (%)</label>
-                          <input type="number" step="0.01" name="qc_moisture" class="form-control form-control-sm"
-                            placeholder="%" value="{{ inv.qc_moisture or '' }}" required>
-                        </div>
-                      </div>
-                      <div class="mb-2">
-                        <label class="form-label small mb-1">Remarks (Optional)</label>
-                        <textarea name="qc_remarks" class="form-control form-control-sm" rows="2"
-                          placeholder="Quality notes, deductions, etc.">{{ inv.qc_remarks or '' }}</textarea>
-                      </div>
-                      <button class="btn btn-sm btn-success w-100">
-                        <i class="fa fa-clipboard-check"></i> Save QC for This Truck
-                      </button>
-                    </form>
-                    {% endif %}
-                  </div>
-                  {% endfor %}
-                </div>
-                {% else %}
-                <div class="border-top pt-3">
-                  <p class="text-muted small mb-0">No loading invoices yet.</p>
-                </div>
-                {% endif %}
-
-              </div>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-
-      {% else %}
-      <p class="text-muted">No completed loading orders yet.</p>
-      {% endif %}
-    </div>
-
-    <!-- FINAL HISAB UPLOADED - PAYMENT PENDING -->
-    <div class="section-card" id="final-hisab" data-aos="fade-up">
-      <div class="section-header">
-        <h5 class="section-title">
-          <span class="icon-box yellow"><i class="fa fa-file-invoice-dollar"></i></span>
-          Final Hisab - Payment Pending
-        </h5>
-        <span class="section-badge bg-warning text-dark" id="finalInvoiceCount">{{ final_invoice_uploaded|length }}
-          Pending</span>
-      </div>
-
-      {% if final_invoice_uploaded %}
-      <div class="qc-scroll-container">
-        <div class="row g-3">
-          {% for b in final_invoice_uploaded %}
-          {% set booking_id = b[0] %}
-          {% set booked = b[3] %}
-          {% set loaded = b[7] %}
-          {% set order_id = b[10] %}
-          {% set buyer_name = b[1] %}
-          {% set crop_name = b[2] %}
-          {% set payment_status = b[16] %}
-          {% set final_invoice = b[17] %}
-          {% set payment_at = b[18] %}
-
-          <div class="col-md-6">
-            <div class="card border-0 shadow-sm h-100 completed-loading-card">
-              <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                  <div>
-                    <h6 class="mb-1"><strong class="text-primary">{{ b[10] }}</strong></h6>
-                    <p class="mb-1 text-muted small">{{ b[1] }} • <span class="text-capitalize">{{ b[2] }}</span></p>
-                    <div class="d-flex gap-2 mt-2">
-                      <span class="badge bg-primary">{{ booked }} Qt Booked</span>
-                      <span class="badge bg-success">{{ loaded }} Qt Loaded</span>
-                    </div>
-                  </div>
-                  <span class="badge bg-warning">💰 Payment Pending</span>
-                </div>
-
-                <!-- Truck Payment List -->
-                <div class="border-top pt-3">
-                  {% if invoices_map.get(booking_id) %}
-                  <small class="text-muted d-block mb-3 fw-semibold">
-                    <i class="fa fa-truck"></i> Truck Payments
-                  </small>
-
-                  {% for inv in invoices_map[booking_id] %}
-                  <div class="mb-3 p-3 border rounded bg-light">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                      <span class="fw-bold">
-                        {% if inv.truck_number %}
-                        Truck {{ inv.truck_number }}
-                        {% else %}
-                        Truck #{{ loop.index }}
-                        {% endif %}
-                      </span>
-                      <span class="badge bg-secondary">{{ inv.qty }} Qt</span>
-                    </div>
-
-                    {% if inv.final_invoice_file %}
-                    <div class="d-flex gap-2 mb-2">
-                      <a href="/static/uploads/bills/{{ inv.final_invoice_file }}" target="_blank"
-                        class="btn btn-sm btn-outline-primary flex-grow-1">
-                        <i class="fa fa-file-invoice"></i> View Invoice
-                      </a>
-
-                      <!-- Edit Truck Invoice Modal Trigger -->
-                      <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal"
-                        data-bs-target="#editTruckInv{{ inv.id }}">
-                        <i class="fa fa-pen"></i>
-                      </button>
-                    </div>
-
-                    <!-- Mark Payment Done Form -->
-                    {% if inv.payment_status == 'paid' %}
-                    <div class="alert alert-success py-1 px-2 mb-0 text-center small">
-                      <i class="fa fa-check-circle"></i> Payment Received
-                    </div>
-                    {% else %}
-                    <form method="POST" action="/miller/mark_truck_payment_done/{{ inv.id }}">
-                      <button class="btn btn-success btn-sm w-100">
-                        <i class="fa fa-check-circle"></i> Mark Payment Done
-                      </button>
-                    </form>
-                    {% endif %}
-
-                    <!-- Edit Modal -->
-                    <div class="modal fade" id="editTruckInv{{ inv.id }}" tabindex="-1">
-                      <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h6 class="modal-title">Replace Invoice (Truck {{ inv.truck_number or loop.index }})</h6>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                          </div>
-                          <form method="POST" action="/miller/edit_truck_final_invoice/{{ inv.id }}"
-                            enctype="multipart/form-data">
-                            <div class="modal-body">
-                              <input type="file" name="truck_final_invoice" class="form-control form-control-sm"
-                                accept=".pdf,image/*" required>
-                            </div>
-                            <div class="modal-footer">
-                              <button class="btn btn-warning btn-sm">Upload New</button>
-                            </div>
-                          </form>
-                        </div>
-                      </div>
-                    </div>
-
-                    {% else %}
-                    <span class="badge bg-warning text-dark w-100">Invoice Pending</span>
-                    {% endif %}
-                  </div>
-                  {% endfor %}
-                  {% else %}
-                  <p class="text-muted small">No trucks found.</p>
-                  {% endif %}
-                </div>
-
-                <!-- Per-Truck QC Summary -->
-                {% if invoices_map.get(booking_id) %}
-                <div class="border-top mt-3 pt-3">
-                  <small class="text-muted d-block mb-2 fw-semibold">
-                    <i class="fa fa-truck"></i> Truck QC Summary:
-                  </small>
-                  {% for inv in invoices_map[booking_id] %}
-                  <div class="mb-2 p-2 border rounded" style="background:#f8f9fa;">
-                    <div class="d-flex justify-content-between">
-                      <span>
-                        <strong>
-                          {% if inv.truck_number %}
-                          Truck {{ inv.truck_number }}
-                          {% else %}
-                          Truck #{{ loop.index }}
-                          {% endif %}
-                        </strong>
-                        - {{ inv.qty }} Qt
-                      </span>
-                      {% if inv.qc_status == 'verified' %}
-                      <span class="badge bg-success">✅</span>
-                      {% else %}
-                      <span class="badge bg-warning">⏳</span>
-                      {% endif %}
-                    </div>
-                    {% if inv.qc_status == 'verified' %}
-                    <small class="text-muted">
-                      Net: {{ inv.qc_weight or inv.qty }} Qt |
-                      Moisture: {{ inv.qc_moisture or '-' }}%
-                    </small>
-                    {% endif %}
-                  </div>
-                  {% endfor %}
-                </div>
-                {% endif %}
-              </div>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-
-      {% else %}
-      <p class="text-muted">No orders with final invoice uploaded yet.</p>
-      {% endif %}
-    </div>
-
-    <!-- REJECTED -->
-    <div class="section-card" id="rejected-orders" data-aos="fade-up">
-      <div class="section-header">
-        <h5 class="section-title">
-          <span class="icon-box red"><i class="fa fa-times-circle"></i></span>
-          Rejected Orders
-        </h5>
-        <span class="section-badge bg-danger">{{ rejected|length }} Rejected</span>
-      </div>
-
-      {% if rejected %}
+      {% if approved_loading %}
       <div class="table-responsive">
         <table class="table-modern">
           <thead>
@@ -1504,22 +864,174 @@
               <th>Order ID</th>
               <th>Trader</th>
               <th>Crop</th>
-              <th>Quantity</th>
-              <th>Rejection Reason</th>
+              <th>Booked</th>
+              <th>Loaded</th>
+              <th>Remaining</th>
+              <th>Invoices</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>
 
-            {% for b in rejected %}
-            <tr class="booking-row" data-status="declined" data-buyer="{{ b[1]|lower }}" data-crop="{{ b[2]|lower }}">
+            {% for b in approved_loading %}
+            {% set booking_id = b[0] %}
+            {% set booked = b[3] %}
+            {% set loaded = b[7] %}
+            {% set remaining = booked - loaded %}
 
-              <td><strong class="text-primary">{{ b[10] if b[10] else 'N/A' }}</strong></td>
+            {% set invs = invoices_map.get(booking_id) %}
+            {% set ns = namespace(pending=0, search=(b[10]|string + ' ' + b[1] + ' ' + b[2])|lower) %}
+            {% if invs %}
+            {% for inv in invs %}
+            {% if inv.qc_status != 'verified' %}
+            {% set ns.pending = ns.pending + 1 %}
+            {% endif %}
+            {% if inv.truck_number %}
+            {% set ns.search = ns.search + ' ' + (inv.truck_number|string|lower) %}
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+            {% set qc_row_status = 'none' if not invs else ('pending' if ns.pending > 0 else 'verified') %}
+
+            <tr class="approved-loading-row" data-qc="{{ qc_row_status }}" data-search="{{ ns.search }}">
+              <td><strong class="text-primary">{{ b[10] }}</strong></td>
               <td>{{ b[1] }}</td>
               <td>{{ b[2] }}</td>
+
+              <td><span class="badge bg-primary">{{ booked }} Qt</span></td>
+
               <td>
-                <span class="badge bg-danger qty-badge">{{ b[3] }} Qt</span>
+                <span class="badge bg-success">{{ loaded }} Qt</span>
               </td>
-              <td>{{ b[5] }}</td>
+
+              <td>
+                <span class="badge bg-warning">{{ remaining }} Qt</span>
+                {% if remaining > 0 %}
+                <button class="btn btn-outline-danger btn-sm ms-2" title="Close Remaining Qty" data-bs-toggle="modal"
+                  data-bs-target="#closeRemainingModal{{ booking_id }}">
+                  <i class="fa fa-times-circle"></i>
+                </button>
+                {% endif %}
+              </td>
+
+              <!-- QC Summary -->
+              <td>
+                {% if not invs %}
+                <span class="badge bg-secondary">No Trucks</span>
+                {% elif ns.pending > 0 %}
+                <span class="badge bg-warning text-dark">QC Pending: {{ ns.pending }}</span>
+                {% else %}
+                <span class="badge bg-success">QC Verified</span>
+                {% endif %}
+              </td>
+
+              <!-- 🔴 PER LOADING INVOICES + QC (for loaded trucks even if order still loading) -->
+              <td>
+                {% if invs %}
+                <ul class="list-unstyled mb-0">
+                  {% for inv in invs %}
+                  <li class="mb-2 p-2 border rounded" style="background:#f8f9fa;">
+                    <div class="d-flex justify-content-between align-items-start gap-2">
+                      <div>
+                        <div class="fw-semibold">
+                          {% if inv.truck_number %}
+                          Truck {{ inv.truck_number }}
+                          {% else %}
+                          Truck #{{ loop.index }}
+                          {% endif %}
+                          <span class="badge bg-info ms-2">{{ inv.qty }} Qt</span>
+                        </div>
+
+                        <a href="/static/uploads/bills/{{ inv.file }}" target="_blank"
+                          class="btn btn-sm btn-outline-primary mt-1">
+                          <i class="fa fa-file-invoice"></i> Invoice
+                        </a>
+
+                        <small class="text-muted d-block">{{ inv.date[:16] }}</small>
+                      </div>
+
+                      <div class="text-end">
+                        {% if inv.qc_status == 'verified' %}
+                        <span class="badge bg-success">✅ QC Verified</span>
+                        {% else %}
+                        <span class="badge bg-warning text-dark">⏳ QC Pending</span>
+                        {% endif %}
+
+                        <button type="button"
+                          class="btn btn-sm {% if inv.qc_status == 'verified' %}btn-outline-warning{% else %}btn-success{% endif %} mt-2"
+                          data-bs-toggle="collapse" data-bs-target="#qcCollapse{{ inv.id }}" aria-expanded="false">
+                          <i class="fa fa-clipboard-check"></i>
+                          {% if inv.qc_status == 'verified' %}Edit QC{% else %}Do QC{% endif %}
+                        </button>
+                      </div>
+                    </div>
+
+                    {% if inv.qc_status == 'verified' %}
+                    <div class="mt-2">
+                      <small class="text-muted d-block">Net: {{ inv.qc_weight or inv.qty }} Qt • Moisture: {{
+                        inv.qc_moisture or '-' }}%</small>
+                      {% if inv.qc_remarks %}
+                      <small class="text-muted d-block">Remarks: {{ inv.qc_remarks }}</small>
+                      {% endif %}
+                      {% if inv.qc_at %}
+                      <small class="text-muted d-block">Verified on {{ inv.qc_at[:16] }}</small>
+                      {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <!-- QC Collapse (more reliable than modal inside tables) -->
+                    <div class="collapse mt-2" id="qcCollapse{{ inv.id }}">
+                      <div class="card card-body">
+                        <div class="fw-semibold mb-2">
+                          {% if inv.qc_status == 'verified' %}
+                          Edit Quality Check -
+                          {% else %}
+                          Quality Check -
+                          {% endif %}
+                          {% if inv.truck_number %}
+                          Truck {{ inv.truck_number }}
+                          {% else %}
+                          Truck #{{ loop.index }}
+                          {% endif %}
+                        </div>
+
+                        <form method="POST" action="/miller/update_qc/{{ inv.id }}">
+                          <div class="row g-2 mb-2">
+                            <div class="col-6">
+                              <label class="form-label small mb-1">Net Weight (Qt)</label>
+                              <input type="number" step="0.01" name="qc_weight" class="form-control form-control-sm"
+                                value="{{ inv.qc_weight or inv.qty }}" required>
+                            </div>
+                            <div class="col-6">
+                              <label class="form-label small mb-1">Moisture (%)</label>
+                              <input type="number" step="0.01" name="qc_moisture" class="form-control form-control-sm"
+                                value="{{ inv.qc_moisture or '' }}" required>
+                            </div>
+                          </div>
+                          <div class="mb-2">
+                            <label class="form-label small mb-1">Remarks (Optional)</label>
+                            <textarea name="qc_remarks" class="form-control form-control-sm" rows="2"
+                              placeholder="Quality notes, deductions, etc.">{{ inv.qc_remarks or '' }}</textarea>
+                          </div>
+                          <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse"
+                              data-bs-target="#qcCollapse{{ inv.id }}">
+                              Cancel
+                            </button>
+                            <button type="submit" class="btn btn-sm btn-success">
+                              <i class="fa fa-clipboard-check"></i> Save QC
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </li>
+                  {% endfor %}
+                </ul>
+                {% else %}
+                <span class="text-muted small">No loading yet</span>
+                {% endif %}
+              </td>
             </tr>
             {% endfor %}
           </tbody>
@@ -1527,177 +1039,582 @@
       </div>
       {% else %}
       <div class="empty-state">
-        <i class="fa fa-check-circle text-success"></i>
-        <p>No rejected orders. Great!</p>
+        <i class="fa fa-truck"></i>
+        <p>No orders currently being loaded.</p>
       </div>
       {% endif %}
+      </div>
 
-    </div>
-    <!-- End of Rejected Orders Section -->
+      <!-- COMPLETED LOADING (QC Section) -->
+      <div class="section-card" id="quality-check" data-aos="fade-up">
+        <div class="section-header">
+          <h5 class="section-title">
+            <span class="icon-box blue"><i class="fa fa-clipboard-check"></i></span>
+            Completed Loading - Quality Check
+          </h5>
+          <span class="section-badge bg-info" id="qcCount">{{ completed_loading_qc|length }} Orders</span>
+        </div>
 
-    <script>
-      function applyFilters() {
-        const status = document.getElementById("statusFilter").value;
-        const buyer = document.getElementById("buyerFilter").value.toLowerCase();
-        const crop = document.getElementById("cropFilter").value.toLowerCase();
+        {% if completed_loading_qc %}
+        <!-- Filter & Search Bar -->
+        <div class="filter-bar mb-4">
+          <div class="d-flex gap-2 flex-wrap align-items-center">
+            <button class="filter-pill active" data-filter="all" onclick="filterQC('all')">
+              <i class="fa fa-list me-1"></i> All
+            </button>
+            <button class="filter-pill" data-filter="pending" onclick="filterQC('pending')">
+              <i class="fa fa-clock me-1"></i> Pending QC
+            </button>
+            <button class="filter-pill" data-filter="verified" onclick="filterQC('verified')">
+              <i class="fa fa-check-circle me-1"></i> Verified
+            </button>
+            <div class="flex-grow-1" style="min-width:200px;">
+              <input type="text" id="qcSearchInput" class="form-control"
+                placeholder="🔍 Search by Order ID, Buyer, or Crop..." onkeyup="searchQC()">
+            </div>
+          </div>
+        </div>
 
-        document.querySelectorAll(".booking-row").forEach(row => {
-          const rowStatus = row.dataset.status;
-          const rowBuyer = row.dataset.buyer;
-          const rowCrop = row.dataset.crop;
+        <!-- Scrollable Cards Container -->
+        <div class="qc-scroll-container">
+          <div class="row g-3" id="qcCardsContainer">
+            {% for b in completed_loading_qc %}
+            {% set booking_id = b[0] %}
+            {% set booked = b[3] %}
+            {% set loaded = b[7] %}
+            {% set qc_weight = b[11] %}
+            {% set qc_moisture = b[12] %}
+            {% set qc_remarks = b[13] %}
+            {% set qc_status = b[14] %}
+            {% set qc_at = b[15] %}
+            {% set order_id = b[10] %}
+            {% set buyer_name = b[1] %}
+            {% set crop_name = b[2] %}
+            {% set payment_status = b[16] %}
+            {% set final_invoice = b[17] %}
+            {% set payment_at = b[18] %}
 
-          const matchStatus = (status === "all" || status === rowStatus);
-          const matchBuyer = rowBuyer.includes(buyer);
-          const matchCrop = rowCrop.includes(crop);
+            <div class="col-md-6 qc-card-item"
+              data-search="{{ (order_id|string + ' ' + buyer_name|lower + ' ' + crop_name|lower) }}">
+              <div class="card border-0 shadow-sm h-100 completed-loading-card">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                      <h6 class="mb-1"><strong class="text-primary">{{ b[10] }}</strong></h6>
+                      <p class="mb-1 text-muted small">{{ b[1] }} • <span class="text-capitalize">{{ b[2] }}</span></p>
+                      <div class="d-flex gap-2 mt-2">
+                        <span class="badge bg-primary">{{ booked }} Qt Booked</span>
+                        <span class="badge bg-success">{{ loaded }} Qt Loaded</span>
+                      </div>
+                    </div>
+                  </div>
 
-          if (matchStatus && matchBuyer && matchCrop) {
-            row.style.display = "";
-          } else {
-            row.style.display = "none";
-          }
-        });
-      }
+                  <!-- Per-Truck Quality Checks -->
+                  {% if invoices_map.get(booking_id) %}
+                  <div class="border-top pt-3">
+                    <small class="text-muted d-block mb-2 fw-semibold">
+                      <i class="fa fa-truck"></i> Truck Quality Checks:
+                    </small>
 
-      function clearFilters() {
-        document.getElementById("statusFilter").value = "all";
-        document.getElementById("buyerFilter").value = "";
-        document.getElementById("cropFilter").value = "";
-        applyFilters();
-      }
+                    {% for inv in invoices_map[booking_id] %}
+                    <div class="mb-3 p-2 border rounded" style="background:#f8f9fa;">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                          <strong class="text-primary">
+                            {% if inv.truck_number %}
+                            Truck {{ inv.truck_number }}
+                            {% else %}
+                            Truck #{{ loop.index }}
+                            {% endif %}
+                          </strong>
+                          <span class="badge bg-info ms-2">{{ inv.qty }} Qt</span>
+                          <a href="/static/uploads/bills/{{ inv.file }}" target="_blank"
+                            class="btn btn-sm btn-outline-primary ms-2">
+                            <i class="fa fa-file-invoice"></i> Invoice
+                          </a>
+                        </div>
+                        {% if inv.qc_status == 'verified' %}
+                        <span class="badge bg-success">✅ Verified</span>
+                        {% else %}
+                        <span class="badge bg-warning">⏳ Pending QC</span>
+                        {% endif %}
+                      </div>
 
-      document.getElementById("statusFilter").addEventListener("change", applyFilters);
-      document.getElementById("buyerFilter").addEventListener("keyup", applyFilters);
-      document.getElementById("cropFilter").addEventListener("keyup", applyFilters);
+                      {% if inv.qc_status == 'verified' %}
+                      <!-- Show verified QC details for this truck -->
+                      <div class="row g-2 mb-2">
+                        <div class="col-6">
+                          <small class="text-muted d-block">Net Weight</small>
+                          <strong>{{ inv.qc_weight or inv.qty }} Qt</strong>
+                        </div>
+                        <div class="col-6">
+                          <small class="text-muted d-block">Moisture</small>
+                          <strong>{{ inv.qc_moisture or '-' }}%</strong>
+                        </div>
+                      </div>
+                      {% if inv.qc_remarks %}
+                      <div class="mb-2">
+                        <small class="text-muted d-block">Remarks</small>
+                        <small>{{ inv.qc_remarks }}</small>
+                      </div>
+                      {% endif %}
+                      {% if inv.qc_at %}
+                      <small class="text-muted">Verified on {{ inv.qc_at[:16] }}</small>
+                      {% endif %}
 
-      window.onload = applyFilters;
+                      <button type="button" class="btn btn-sm btn-outline-warning w-100 mt-2" data-bs-toggle="collapse"
+                        data-bs-target="#qcEdit{{ inv.id }}">
+                        <i class="fa fa-pen-to-square"></i> Edit QC
+                      </button>
 
-      // QC Filter & Search Functions
-      let currentQCFilter = 'all';
+                      <div class="collapse mt-2" id="qcEdit{{ inv.id }}">
+                        <form method="POST" action="/miller/update_qc/{{ inv.id }}">
+                          <div class="row g-2 mb-2">
+                            <div class="col-6">
+                              <label class="form-label small mb-1">Net Weight (Qt)</label>
+                              <input type="number" step="0.01" name="qc_weight" class="form-control form-control-sm"
+                                value="{{ inv.qc_weight or inv.qty }}" required>
+                            </div>
+                            <div class="col-6">
+                              <label class="form-label small mb-1">Moisture (%)</label>
+                              <input type="number" step="0.01" name="qc_moisture" class="form-control form-control-sm"
+                                value="{{ inv.qc_moisture or '' }}" required>
+                            </div>
+                          </div>
+                          <div class="mb-2">
+                            <label class="form-label small mb-1">Remarks (Optional)</label>
+                            <textarea name="qc_remarks" class="form-control form-control-sm" rows="2"
+                              placeholder="Quality notes, deductions, etc.">{{ inv.qc_remarks or '' }}</textarea>
+                          </div>
+                          <button type="submit" class="btn btn-sm btn-success w-100">
+                            <i class="fa fa-clipboard-check"></i> Update QC
+                          </button>
+                        </form>
+                      </div>
+                      {% else %}
+                      <!-- QC Form for this truck -->
+                      <form method="POST" action="/miller/update_qc/{{ inv.id }}" class="mt-2">
+                        <div class="row g-2 mb-2">
+                          <div class="col-6">
+                            <label class="form-label small mb-1">Net Weight (Qt)</label>
+                            <input type="number" step="0.01" name="qc_weight" class="form-control form-control-sm"
+                              placeholder="Net Qt" value="{{ inv.qty }}" required>
+                          </div>
+                          <div class="col-6">
+                            <label class="form-label small mb-1">Moisture (%)</label>
+                            <input type="number" step="0.01" name="qc_moisture" class="form-control form-control-sm"
+                              placeholder="%" value="{{ inv.qc_moisture or '' }}" required>
+                          </div>
+                        </div>
+                        <div class="mb-2">
+                          <label class="form-label small mb-1">Remarks (Optional)</label>
+                          <textarea name="qc_remarks" class="form-control form-control-sm" rows="2"
+                            placeholder="Quality notes, deductions, etc.">{{ inv.qc_remarks or '' }}</textarea>
+                        </div>
+                        <button class="btn btn-sm btn-success w-100">
+                          <i class="fa fa-clipboard-check"></i> Save QC for This Truck
+                        </button>
+                      </form>
+                      {% endif %}
+                    </div>
+                    {% endfor %}
+                  </div>
+                  {% else %}
+                  <div class="border-top pt-3">
+                    <p class="text-muted small mb-0">No loading invoices yet.</p>
+                  </div>
+                  {% endif %}
 
-      function filterQC(status) {
-        currentQCFilter = status;
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
 
-        // Update button states
-        document.querySelectorAll('.filter-pill').forEach(btn => {
-          btn.classList.remove('active');
-          if (btn.dataset.filter === status) {
-            btn.classList.add('active');
-          }
-        });
+        {% else %}
+        <p class="text-muted">No completed loading orders yet.</p>
+        {% endif %}
+      </div>
 
-        // Apply filter
-        applyQCFilter();
-      }
+      <!-- FINAL HISAB UPLOADED - PAYMENT PENDING -->
+      <div class="section-card" id="final-hisab" data-aos="fade-up">
+        <div class="section-header">
+          <h5 class="section-title">
+            <span class="icon-box yellow"><i class="fa fa-file-invoice-dollar"></i></span>
+            Final Hisab - Payment Pending
+          </h5>
+          <span class="section-badge bg-warning text-dark" id="finalInvoiceCount">{{ final_invoice_uploaded|length }}
+            Pending</span>
+        </div>
 
-      function searchQC() {
-        applyQCFilter();
-      }
+        {% if final_invoice_uploaded %}
+        <div class="qc-scroll-container">
+          <div class="row g-3">
+            {% for b in final_invoice_uploaded %}
+            {% set booking_id = b[0] %}
+            {% set booked = b[3] %}
+            {% set loaded = b[7] %}
+            {% set order_id = b[10] %}
+            {% set buyer_name = b[1] %}
+            {% set crop_name = b[2] %}
+            {% set payment_status = b[16] %}
+            {% set final_invoice = b[17] %}
+            {% set payment_at = b[18] %}
 
-      function applyQCFilter() {
-        const searchTerm = document.getElementById('qcSearchInput')?.value.toLowerCase() || '';
-        const cards = document.querySelectorAll('.qc-card-item');
-        let visibleCount = 0;
+            <div class="col-md-6">
+              <div class="card border-0 shadow-sm h-100 completed-loading-card">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                      <h6 class="mb-1"><strong class="text-primary">{{ b[10] }}</strong></h6>
+                      <p class="mb-1 text-muted small">{{ b[1] }} • <span class="text-capitalize">{{ b[2] }}</span></p>
+                      <div class="d-flex gap-2 mt-2">
+                        <span class="badge bg-primary">{{ booked }} Qt Booked</span>
+                        <span class="badge bg-success">{{ loaded }} Qt Loaded</span>
+                      </div>
+                    </div>
+                    <span class="badge bg-warning">💰 Payment Pending</span>
+                  </div>
 
-        cards.forEach(card => {
-          const searchText = card.dataset.search || '';
+                  <!-- Truck Payment List -->
+                  <div class="border-top pt-3">
+                    {% if invoices_map.get(booking_id) %}
+                    <small class="text-muted d-block mb-3 fw-semibold">
+                      <i class="fa fa-truck"></i> Truck Payments
+                    </small>
 
-          // Check if this card has any pending trucks
-          const pendingBadges = card.querySelectorAll('.badge.bg-warning');
-          const verifiedBadges = card.querySelectorAll('.badge.bg-success');
-          const hasPending = pendingBadges.length > 0;
-          const allVerified = verifiedBadges.length > 0 && pendingBadges.length === 0;
+                    {% for inv in invoices_map[booking_id] %}
+                    <div class="mb-3 p-3 border rounded bg-light">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold">
+                          {% if inv.truck_number %}
+                          Truck {{ inv.truck_number }}
+                          {% else %}
+                          Truck #{{ loop.index }}
+                          {% endif %}
+                        </span>
+                        <span class="badge bg-secondary">{{ inv.qty }} Qt</span>
+                      </div>
 
-          // Status filter - check per-truck status
-          let statusMatch = true;
-          if (currentQCFilter === 'pending') {
-            statusMatch = hasPending;
-          } else if (currentQCFilter === 'verified') {
-            statusMatch = allVerified && verifiedBadges.length > 0;
-          }
+                      {% if inv.final_invoice_file %}
+                      <div class="d-flex gap-2 mb-2">
+                        <a href="/static/uploads/bills/{{ inv.final_invoice_file }}" target="_blank"
+                          class="btn btn-sm btn-outline-primary flex-grow-1">
+                          <i class="fa fa-file-invoice"></i> View Invoice
+                        </a>
 
-          // Search filter
-          const searchMatch = !searchTerm || searchText.includes(searchTerm);
+                        <!-- Edit Truck Invoice Modal Trigger -->
+                        <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal"
+                          data-bs-target="#editTruckInv{{ inv.id }}">
+                          <i class="fa fa-pen"></i>
+                        </button>
+                      </div>
 
-          if (statusMatch && searchMatch) {
-            card.style.display = '';
-            visibleCount++;
-          } else {
-            card.style.display = 'none';
-          }
-        });
+                      <!-- Mark Payment Done Form -->
+                      {% if inv.payment_status == 'paid' %}
+                      <div class="alert alert-success py-1 px-2 mb-0 text-center small">
+                        <i class="fa fa-check-circle"></i> Payment Received
+                      </div>
+                      {% else %}
+                      <form method="POST" action="/miller/mark_truck_payment_done/{{ inv.id }}">
+                        <button class="btn btn-success btn-sm w-100">
+                          <i class="fa fa-check-circle"></i> Mark Payment Done
+                        </button>
+                      </form>
+                      {% endif %}
 
-        // Update count badge
-        const countBadge = document.getElementById('qcCount');
-        if (countBadge) {
-          countBadge.textContent = `${visibleCount} Orders`;
+                      <!-- Edit Modal -->
+                      <div class="modal fade" id="editTruckInv{{ inv.id }}" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h6 class="modal-title">Replace Invoice (Truck {{ inv.truck_number or loop.index }})</h6>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form method="POST" action="/miller/edit_truck_final_invoice/{{ inv.id }}"
+                              enctype="multipart/form-data">
+                              <div class="modal-body">
+                                <input type="file" name="truck_final_invoice" class="form-control form-control-sm"
+                                  accept=".pdf,image/*" required>
+                              </div>
+                              <div class="modal-footer">
+                                <button class="btn btn-warning btn-sm">Upload New</button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+
+                      {% else %}
+                      <span class="badge bg-warning text-dark w-100">Invoice Pending</span>
+                      {% endif %}
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-muted small">No trucks found.</p>
+                    {% endif %}
+                  </div>
+
+                  <!-- Per-Truck QC Summary -->
+                  {% if invoices_map.get(booking_id) %}
+                  <div class="border-top mt-3 pt-3">
+                    <small class="text-muted d-block mb-2 fw-semibold">
+                      <i class="fa fa-truck"></i> Truck QC Summary:
+                    </small>
+                    {% for inv in invoices_map[booking_id] %}
+                    <div class="mb-2 p-2 border rounded" style="background:#f8f9fa;">
+                      <div class="d-flex justify-content-between">
+                        <span>
+                          <strong>
+                            {% if inv.truck_number %}
+                            Truck {{ inv.truck_number }}
+                            {% else %}
+                            Truck #{{ loop.index }}
+                            {% endif %}
+                          </strong>
+                          - {{ inv.qty }} Qt
+                        </span>
+                        {% if inv.qc_status == 'verified' %}
+                        <span class="badge bg-success">✅</span>
+                        {% else %}
+                        <span class="badge bg-warning">⏳</span>
+                        {% endif %}
+                      </div>
+                      {% if inv.qc_status == 'verified' %}
+                      <small class="text-muted">
+                        Net: {{ inv.qc_weight or inv.qty }} Qt |
+                        Moisture: {{ inv.qc_moisture or '-' }}%
+                      </small>
+                      {% endif %}
+                    </div>
+                    {% endfor %}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        {% else %}
+        <p class="text-muted">No orders with final invoice uploaded yet.</p>
+        {% endif %}
+      </div>
+
+      <!-- REJECTED -->
+      <div class="section-card" id="rejected-orders" data-aos="fade-up">
+        <div class="section-header">
+          <h5 class="section-title">
+            <span class="icon-box red"><i class="fa fa-times-circle"></i></span>
+            Rejected Orders
+          </h5>
+          <span class="section-badge bg-danger">{{ rejected|length }} Rejected</span>
+        </div>
+
+        {% if rejected %}
+        <div class="table-responsive">
+          <table class="table-modern">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Trader</th>
+                <th>Crop</th>
+                <th>Quantity</th>
+                <th>Rejection Reason</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              {% for b in rejected %}
+              <tr class="booking-row" data-status="declined" data-buyer="{{ b[1]|lower }}" data-crop="{{ b[2]|lower }}">
+
+                <td><strong class="text-primary">{{ b[10] if b[10] else 'N/A' }}</strong></td>
+                <td>{{ b[1] }}</td>
+                <td>{{ b[2] }}</td>
+                <td>
+                  <span class="badge bg-danger qty-badge">{{ b[3] }} Qt</span>
+                </td>
+                <td>{{ b[5] }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <i class="fa fa-check-circle text-success"></i>
+          <p>No rejected orders. Great!</p>
+        </div>
+        {% endif %}
+
+      </div>
+      <!-- End of Rejected Orders Section -->
+
+      <script>
+        function applyFilters() {
+          const status = document.getElementById("statusFilter").value;
+          const buyer = document.getElementById("buyerFilter").value.toLowerCase();
+          const crop = document.getElementById("cropFilter").value.toLowerCase();
+
+          document.querySelectorAll(".booking-row").forEach(row => {
+            const rowStatus = row.dataset.status;
+            const rowBuyer = row.dataset.buyer;
+            const rowCrop = row.dataset.crop;
+
+            const matchStatus = (status === "all" || status === rowStatus);
+            const matchBuyer = rowBuyer.includes(buyer);
+            const matchCrop = rowCrop.includes(crop);
+
+            if (matchStatus && matchBuyer && matchCrop) {
+              row.style.display = "";
+            } else {
+              row.style.display = "none";
+            }
+          });
         }
-      }
 
-      // Initialize QC search on page load
-      const qcSearchInput = document.getElementById('qcSearchInput');
-      if (qcSearchInput) {
-        qcSearchInput.addEventListener('input', searchQC);
-      }
-
-      // ================= Approved Loading Filter & Search =================
-      let currentApprovedLoadingFilter = 'all';
-
-      function setApprovedLoadingButtonState(activeFilter) {
-        document.querySelectorAll('.approved-loading-filter-btn').forEach(btn => {
-          const isActive = btn.dataset.filter === activeFilter;
-          btn.classList.toggle('btn-success', isActive);
-          btn.classList.toggle('btn-outline-secondary', !isActive);
-        });
-      }
-
-      function filterApprovedLoading(status) {
-        currentApprovedLoadingFilter = status;
-        setApprovedLoadingButtonState(status);
-        applyApprovedLoadingFilter();
-      }
-
-      function searchApprovedLoading() {
-        applyApprovedLoadingFilter();
-      }
-
-      function applyApprovedLoadingFilter() {
-        const searchTerm = (document.getElementById('approvedLoadingSearchInput')?.value || '').toLowerCase();
-        const rows = document.querySelectorAll('.approved-loading-row');
-        let visibleCount = 0;
-
-        rows.forEach(row => {
-          const qc = row.dataset.qc || 'none';
-          const searchText = row.dataset.search || '';
-
-          const statusMatch = (currentApprovedLoadingFilter === 'all') || (qc === currentApprovedLoadingFilter);
-          const searchMatch = !searchTerm || searchText.includes(searchTerm);
-
-          if (statusMatch && searchMatch) {
-            row.style.display = '';
-            visibleCount++;
-          } else {
-            row.style.display = 'none';
-          }
-        });
-
-        const countBadge = document.getElementById('approvedLoadingCount');
-        if (countBadge) {
-          countBadge.textContent = `${visibleCount} Active`;
+        function clearFilters() {
+          document.getElementById("statusFilter").value = "all";
+          document.getElementById("buyerFilter").value = "";
+          document.getElementById("cropFilter").value = "";
+          applyFilters();
         }
-      }
 
-      const approvedLoadingSearchInput = document.getElementById('approvedLoadingSearchInput');
-      if (approvedLoadingSearchInput) {
-        approvedLoadingSearchInput.addEventListener('input', searchApprovedLoading);
-      }
+        document.getElementById("statusFilter").addEventListener("change", applyFilters);
+        document.getElementById("buyerFilter").addEventListener("keyup", applyFilters);
+        document.getElementById("cropFilter").addEventListener("keyup", applyFilters);
 
-      // Initialize approved-loading filters
-      setApprovedLoadingButtonState('all');
-      applyApprovedLoadingFilter();
+        window.onload = applyFilters;
 
-    </script>
+        // QC Filter & Search Functions
+        let currentQCFilter = 'all';
 
-    </div> <!-- container -->
+        function filterQC(status) {
+          currentQCFilter = status;
+
+          // Update button states
+          document.querySelectorAll('.filter-pill').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.filter === status) {
+              btn.classList.add('active');
+            }
+          });
+
+          // Apply filter
+          applyQCFilter();
+        }
+
+        function searchQC() {
+          applyQCFilter();
+        }
+
+        function applyQCFilter() {
+          const searchTerm = document.getElementById('qcSearchInput')?.value.toLowerCase() || '';
+          const cards = document.querySelectorAll('.qc-card-item');
+          let visibleCount = 0;
+
+          cards.forEach(card => {
+            const searchText = card.dataset.search || '';
+
+            // Check if this card has any pending trucks
+            const pendingBadges = card.querySelectorAll('.badge.bg-warning');
+            const verifiedBadges = card.querySelectorAll('.badge.bg-success');
+            const hasPending = pendingBadges.length > 0;
+            const allVerified = verifiedBadges.length > 0 && pendingBadges.length === 0;
+
+            // Status filter - check per-truck status
+            let statusMatch = true;
+            if (currentQCFilter === 'pending') {
+              statusMatch = hasPending;
+            } else if (currentQCFilter === 'verified') {
+              statusMatch = allVerified && verifiedBadges.length > 0;
+            }
+
+            // Search filter
+            const searchMatch = !searchTerm || searchText.includes(searchTerm);
+
+            if (statusMatch && searchMatch) {
+              card.style.display = '';
+              visibleCount++;
+            } else {
+              card.style.display = 'none';
+            }
+          });
+
+          // Update count badge
+          const countBadge = document.getElementById('qcCount');
+          if (countBadge) {
+            countBadge.textContent = `${visibleCount} Orders`;
+          }
+        }
+
+        // Initialize QC search on page load
+        const qcSearchInput = document.getElementById('qcSearchInput');
+        if (qcSearchInput) {
+          qcSearchInput.addEventListener('input', searchQC);
+        }
+
+        // ================= Approved Loading Filter & Search =================
+        let currentApprovedLoadingFilter = 'all';
+
+        function setApprovedLoadingButtonState(activeFilter) {
+          document.querySelectorAll('.approved-loading-filter-btn').forEach(btn => {
+            const isActive = btn.dataset.filter === activeFilter;
+            btn.classList.toggle('btn-success', isActive);
+            btn.classList.toggle('btn-outline-secondary', !isActive);
+          });
+        }
+
+        function filterApprovedLoading(status) {
+          currentApprovedLoadingFilter = status;
+          setApprovedLoadingButtonState(status);
+          applyApprovedLoadingFilter();
+        }
+
+        function searchApprovedLoading() {
+          applyApprovedLoadingFilter();
+        }
+
+        function applyApprovedLoadingFilter() {
+          const searchTerm = (document.getElementById('approvedLoadingSearchInput')?.value || '').toLowerCase();
+          const rows = document.querySelectorAll('.approved-loading-row');
+          let visibleCount = 0;
+
+          rows.forEach(row => {
+            const qc = row.dataset.qc || 'none';
+            const searchText = row.dataset.search || '';
+
+            const statusMatch = (currentApprovedLoadingFilter === 'all') || (qc === currentApprovedLoadingFilter);
+            const searchMatch = !searchTerm || searchText.includes(searchTerm);
+
+            if (statusMatch && searchMatch) {
+              row.style.display = '';
+              visibleCount++;
+            } else {
+              row.style.display = 'none';
+            }
+          });
+
+          const countBadge = document.getElementById('approvedLoadingCount');
+          if (countBadge) {
+            countBadge.textContent = `${visibleCount} Active`;
+          }
+        }
+
+        const approvedLoadingSearchInput = document.getElementById('approvedLoadingSearchInput');
+        if (approvedLoadingSearchInput) {
+          approvedLoadingSearchInput.addEventListener('input', searchApprovedLoading);
+        }
+
+        // Initialize approved-loading filters
+        setApprovedLoadingButtonState('all');
+        applyApprovedLoadingFilter();
+
+      </script>
+
+      </div> <!-- container -->
   </main>
 
 

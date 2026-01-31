@@ -1204,12 +1204,15 @@ ORDER BY mb.created_at DESC
 
     # 🔹 FETCH PER-TRUCK LOADING INVOICES WITH QC DATA AND FINAL INVOICE
     cur.execute("""
-    SELECT id, booking_id, loaded_qty, invoice_file, truck_number, created_at,
-           qc_weight, qc_moisture, qc_remarks, qc_status, qc_at,
-           final_invoice_file, payment_status, payment_at
-    FROM loading_invoices
-    ORDER BY created_at ASC
-""")
+    SELECT li.id, li.booking_id, li.loaded_qty, li.invoice_file, li.truck_number, li.created_at,
+           li.qc_weight, li.qc_moisture, li.qc_remarks, li.qc_status, li.qc_at,
+           li.final_invoice_file, li.payment_status, li.payment_at
+    FROM loading_invoices li
+    JOIN miller_bookings mb ON li.booking_id = mb.id
+    JOIN miller_stock ms ON mb.stock_id = ms.id
+    WHERE ms.miller_id = ?
+    ORDER BY li.created_at ASC
+""", (miller_id,))
     rows = cur.fetchall()
 
 # Group invoices by booking_id with QC data and final invoice
@@ -1245,6 +1248,13 @@ ORDER BY mb.created_at DESC
     """, (miller_id,))
     total_pending_payments = cur.fetchone()[0] or 0
 
+    # 🔹 CALCULATE DASHBOARD COUNTS
+    active_stocks_count = len(stocks)
+    pending_bookings_count = sum(1 for b in bookings if b[4] == 'pending')
+    approved_bookings_count = sum(1 for b in bookings if b[4] == 'approved')
+    # QC Status is at index 9 in the rows query results
+    qc_pending_count = sum(1 for r in rows if (r[9] is None or r[9] == 'pending'))
+
     con.close()
 
     return render_template(
@@ -1253,7 +1263,11 @@ ORDER BY mb.created_at DESC
     bookings=bookings,
     invoices_map=invoices_map,
     deduction_options=deduction_options,
-    total_pending_payments=total_pending_payments
+    total_pending_payments=total_pending_payments,
+    active_stocks_count=active_stocks_count,
+    pending_bookings_count=pending_bookings_count,
+    approved_bookings_count=approved_bookings_count,
+    qc_pending_count=qc_pending_count
 )
 
 @app.route("/miller/add_deduction_option", methods=["POST"])
