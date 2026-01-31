@@ -6,6 +6,9 @@ import hashlib
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
 from twilio.rest import Client
+from dotenv import load_dotenv
+
+load_dotenv()  # Load environment variables from .env file
 
 app = Flask(__name__)
 app.secret_key = "sarna_broker_secret_key"
