@@ -717,6 +717,24 @@ upgrade_miller_payment_fields()
 upgrade_payments_table()
 upgrade_miller_stock_reserved_qty()
 
+def upgrade_miller_stock_note():
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("PRAGMA table_info(miller_stock)")
+    cols = [c[1] for c in cur.fetchall()]
+
+    if "note" not in cols:
+        cur.execute("""
+            ALTER TABLE miller_stock
+            ADD COLUMN note TEXT
+        """)
+
+    con.commit()
+    con.close()
+
+upgrade_miller_stock_note()
+
 def generate_next_order_id():
     """Generate next order ID in format S10001, S10002, etc."""
     con = get_db()
@@ -1107,16 +1125,17 @@ def miller_dashboard():
 
         cur.execute("""
             INSERT INTO miller_stock
-            (miller_id, crop, quantity, price, condition, bag_type, deduction)
-            VALUES (?,?,?,?,?,?,?)
+            (miller_id, crop, quantity, price, condition, bag_type, deduction, note)
+            VALUES (?,?,?,?,?,?,?,?)
         """, (
             miller_id,
             request.form["crop"],
-            request.form["quantity"],
+            100000, # Default quantity since input is removed
             request.form["price"],
             request.form["condition"],
             request.form["bag_type"],
-            request.form["deduction"]
+            request.form["deduction"],
+            request.form.get("note", "")
         ))
         # Ensure the stock is visible in buyer market (market filters status='open')
         cur.execute("UPDATE miller_stock SET status='open' WHERE id=last_insert_rowid()")
@@ -1124,10 +1143,10 @@ def miller_dashboard():
         
         # 📱 Send SMS to all buyers about new stock
         crop = request.form["crop"]
-        quantity = request.form["quantity"]
         price = request.form["price"]
+        note = request.form.get("note", "")
         buyer_phones = get_all_buyer_phones()
-        message = f"🆕 New stock available! {crop} - Qty: {quantity}, Price: ₹{price}/unit. Check the market for details."
+        message = f"🆕 New stock available! {crop} - Price: ₹{price}/unit. {note} Check the market for details."
         for phone in buyer_phones:
             send_sms(phone, message)
 
@@ -1207,6 +1226,20 @@ ORDER BY mb.created_at DESC
         "payment_at": r[13]
     })
 
+    # Limit loading invoices fetch to only relevant bookings? No, getting all is fine for now but optimize later.
+    
+    # 🔹 COUNT PENDING PAYMENTS (For Dashboard Stats)
+    cur.execute("""
+        SELECT COUNT(*)
+        FROM loading_invoices li
+        JOIN miller_bookings mb ON li.booking_id = mb.id
+        JOIN miller_stock ms ON mb.stock_id = ms.id
+        WHERE ms.miller_id = ?
+          AND li.final_invoice_file IS NOT NULL
+          AND (li.payment_status IS NULL OR li.payment_status != 'paid')
+    """, (miller_id,))
+    total_pending_payments = cur.fetchone()[0] or 0
+
     con.close()
 
     return render_template(
@@ -1214,7 +1247,8 @@ ORDER BY mb.created_at DESC
     stocks=stocks,
     bookings=bookings,
     invoices_map=invoices_map,
-    deduction_options=deduction_options
+    deduction_options=deduction_options,
+    total_pending_payments=total_pending_payments
 )
 
 @app.route("/miller/add_deduction_option", methods=["POST"])
@@ -1622,7 +1656,8 @@ def miller_payment_completed_page():
             -- columns 16-18 kept for compatibility but might be null
             'paid' AS payment_status,   -- 16 (forcing 'paid' for display purposes)
             NULL AS final_invoice,      -- 17
-            MAX(li.payment_at) AS payment_at -- 18 (latest payment)
+            MAX(li.payment_at) AS payment_at, -- 18 (latest payment)
+            ms.price                    -- 19
             
         FROM miller_bookings mb
         JOIN miller_stock ms ON mb.stock_id = ms.id
@@ -2543,14 +2578,14 @@ def update_miller_stock(id):
 
     cur.execute("""
     UPDATE miller_stock
-    SET price=?, quantity=?, condition=?, bag_type=?, deduction=?, status='open'
+    SET price=?, condition=?, bag_type=?, deduction=?, note=?, status='open'
     WHERE id=? AND miller_id=?
     """, (
         request.form["price"],
-        request.form["quantity"],
         request.form["condition"],
         request.form["bag_type"],
         request.form["deduction"],
+        request.form.get("note", ""),
         id,
         get_effective_user_id()
 
@@ -2567,20 +2602,20 @@ def update_miller_stock(id):
         old_price,
         request.form["price"],
         old_qty,
-        request.form["quantity"]
+        old_qty # Quantity does not change via this form anymore
     ))
 
     con.commit()
     
     # 📱 Send SMS to all buyers about stock update
-    cur.execute("SELECT crop FROM miller_stock WHERE id=?", (id,))
+    cur.execute("SELECT crop, note FROM miller_stock WHERE id=?", (id,))
     crop_result = cur.fetchone()
     if crop_result:
         crop = crop_result[0]
+        note = crop_result[1] or ""
         new_price = request.form["price"]
-        new_qty = request.form["quantity"]
         buyer_phones = get_all_buyer_phones()
-        message = f"📢 Stock updated! {crop} - New Qty: {new_qty}, New Price: ₹{new_price}/unit. Check the market for details."
+        message = f"📢 Stock updated! {crop} - New Price: ₹{new_price}/unit. {note} Check the market for details."
         for phone in buyer_phones:
             send_sms(phone, message)
     
@@ -2605,7 +2640,8 @@ def market():
         miller_stock.deduction,    -- 7
         miller_stock.created_at,   -- 8
         miller_stock.status,       -- 9
-        users.name                 -- 10 (miller name)
+        users.name,                -- 10 (miller name)
+        miller_stock.note          -- 11
     FROM miller_stock
     JOIN users ON miller_stock.miller_id = users.id
     WHERE miller_stock.quantity > 0
@@ -2635,9 +2671,11 @@ SELECT
     mb.decision_at,        -- 16
     IFNULL(p.status,'pending') AS payment_status,  -- 17
     p.invoice_file              AS final_invoice,   -- 18
-    p.paid_at                   AS payment_at      -- 19
+    p.paid_at                   AS payment_at,      -- 19
+    u.name                      AS miller_name      -- 20
 FROM miller_bookings mb
 JOIN miller_stock ms ON mb.stock_id = ms.id
+JOIN users u ON ms.miller_id = u.id
 LEFT JOIN payments p ON p.booking_id = mb.id
 WHERE mb.buyer_id=?
 ORDER BY mb.created_at DESC
@@ -2647,7 +2685,12 @@ ORDER BY mb.created_at DESC
 
     active_bookings = [
         b for b in my_bookings
-        if b[8] in ('pending', 'partial')
+        if b[8] in ('pending', 'partial') and b[10] == 'approved'
+    ]
+
+    requested_bookings = [
+        b for b in my_bookings
+        if b[10] == 'pending'
     ]
 
     partial_closed_bookings = [
@@ -2718,6 +2761,7 @@ ORDER BY mb.created_at DESC
         crops=crops,
         miller_stocks=miller_stocks,
         my_bookings=active_bookings,
+        requested_bookings=requested_bookings,
         partial_closed_bookings=partial_closed_bookings,
         loaded_bookings=loaded_bookings,
         invoices_map=invoices_map,
@@ -2734,7 +2778,9 @@ def get_buyer_orders(filter_type):
 
     where = ""
     if filter_type == "active":
-        where = "AND mb.loading_status IN ('pending','partial')"
+        where = "AND mb.status='approved' AND mb.loading_status IN ('pending','partial')"
+    elif filter_type == "requested":
+        where = "AND mb.status='pending'"
     elif filter_type == "partial":
         where = "AND mb.loading_status='partial_closed'"
     elif filter_type == "loaded":
@@ -2926,6 +2972,14 @@ def get_miller_orders_by_type(filter_type):
     return orders
 
 
+@app.route("/buyer/requested")
+def buyer_requested():
+    if session.get("role") != "buyer":
+        return redirect("/")
+    orders = get_buyer_orders("requested")
+    return render_template("buyer_requested.html", page_title="Requested Orders", orders=orders)
+
+
 @app.route("/buyer/active")
 def buyer_active():
     if session.get("role") != "buyer":
@@ -3000,14 +3054,17 @@ def buyer_payments():
 @app.route("/book_miller_stock/<int:stock_id>", methods=["POST"])
 def book_miller_stock(stock_id):
     if session.get("role") != "buyer":
+        flash("Unauthorized access.", "error")
         return redirect("/market")
 
     try:
         qty = float(request.form["quantity"])
     except (TypeError, ValueError):
+        flash("Invalid quantity entered.", "error")
         return redirect("/market")
 
     if qty <= 0:
+        flash("Quantity must be greater than 0.", "error")
         return redirect("/market")
 
     con = get_db()
@@ -3021,48 +3078,60 @@ def book_miller_stock(stock_id):
     """, (stock_id,))
     row = cur.fetchone()
 
-    if row and row[0] >= qty and row[1] == 'open':
+    if not row:
+        flash("Stock not found.", "error")
+    elif row[1] != 'open':
+        flash("Stock is closed or unavailable.", "error")
+    elif row[0] < qty:
+        flash(f"Insufficient stock quantity. Available: {row[0]}", "error")
+    else:
         # Generate order ID
-        order_id = generate_next_order_id()
-        
-        # Create booking
-        cur.execute("""
-            INSERT INTO miller_bookings
-            (stock_id, buyer_id, quantity, status, order_id)
-            VALUES (?, ?, ?, 'pending', ?)
-        """, (stock_id, session["user_id"], qty, order_id))
-        
-        booking_id = cur.lastrowid
-        
-        # DEDUCT quantity immediately from stock
-        cur.execute("""
-            UPDATE miller_stock
-            SET quantity = quantity - ?
-            WHERE id=?
-        """, (qty, stock_id))
-        
-        # Close stock if quantity reaches 0
-        cur.execute("""
-            UPDATE miller_stock
-            SET status='closed'
-            WHERE id=? AND quantity <= 0
-        """, (stock_id,))
-        
-        # 📱 Send SMS to miller about new booking
-        cur.execute("""
-            SELECT ms.miller_id, ms.crop
-            FROM miller_stock ms
-            WHERE ms.id = ?
-        """, (stock_id,))
-        stock_info = cur.fetchone()
-        if stock_info:
-            miller_id, crop = stock_info
-            miller_phone = get_miller_phone(miller_id)
-            if miller_phone:
-                message = f"🆕 New booking received! Order {order_id}: {crop} - Qty: {qty}. Please review and approve."
-                send_sms(miller_phone, message)
-        
-        con.commit()
+        try:
+            order_id = generate_next_order_id()
+            
+            # Create booking
+            cur.execute("""
+                INSERT INTO miller_bookings
+                (stock_id, buyer_id, quantity, status, order_id)
+                VALUES (?, ?, ?, 'pending', ?)
+            """, (stock_id, session["user_id"], qty, order_id))
+            
+            booking_id = cur.lastrowid
+            
+            # DEDUCT quantity immediately from stock
+            cur.execute("""
+                UPDATE miller_stock
+                SET quantity = quantity - ?
+                WHERE id=?
+            """, (qty, stock_id))
+            
+            # Close stock if quantity reaches 0
+            cur.execute("""
+                UPDATE miller_stock
+                SET status='closed'
+                WHERE id=? AND quantity <= 0
+            """, (stock_id,))
+            
+            # 📱 Send SMS to miller about new booking
+            cur.execute("""
+                SELECT ms.miller_id, ms.crop
+                FROM miller_stock ms
+                WHERE ms.id = ?
+            """, (stock_id,))
+            stock_info = cur.fetchone()
+            if stock_info:
+                miller_id, crop = stock_info
+                miller_phone = get_miller_phone(miller_id)
+                if miller_phone:
+                    message = f"🆕 New booking received! Order {order_id}: {crop} - Qty: {qty}. Please review and approve."
+                    send_sms(miller_phone, message)
+            
+            con.commit()
+            flash(f"Order {order_id} placed successfully! Waiting for miller approval.", "success")
+        except Exception as e:
+            con.rollback()
+            print(f"Error booking stock: {e}")
+            flash("An error occurred while placing the order.", "error")
 
     con.close()
     return redirect("/market")
@@ -3390,6 +3459,94 @@ def miller_update_qc(invoice_id):
     con.close()
 
     return redirect(request.referrer or "/miller")
+
+
+@app.route("/miller/pending_payments")
+def miller_pending_payments():
+    """Miller view for trucks with Final Invoice uploaded but Payment Pending."""
+    if session.get("role") != "miller":
+        return redirect("/")
+
+    miller_id = get_effective_user_id()
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT
+            li.id,
+            mb.order_id,
+            ms.crop,
+            li.loaded_qty,
+            li.truck_number,
+            li.final_invoice_file,
+            DATE(li.created_at) as date,
+            u.name as buyer_name,
+            ms.price
+        FROM loading_invoices li
+        JOIN miller_bookings mb ON li.booking_id = mb.id
+        JOIN miller_stock ms ON mb.stock_id = ms.id
+        JOIN users u ON mb.buyer_id = u.id
+        WHERE ms.miller_id = ?
+          AND li.final_invoice_file IS NOT NULL
+          AND (li.payment_status IS NULL OR li.payment_status != 'paid')
+        ORDER BY li.created_at DESC
+    """, (miller_id,))
+    
+    rows = cur.fetchall()
+    invoices = []
+    for r in rows:
+        invoices.append({
+            "id": r[0],
+            "order_id": r[1],
+            "crop": r[2],
+            "loaded_qty": r[3],
+            "truck_number": r[4],
+            "final_invoice_file": r[5],
+            "created_at": r[6],
+            "buyer_name": r[7],
+            "price": r[8]
+        })
+
+    con.close()
+    return render_template("miller_pending_payments.html", invoices=invoices)
+
+
+@app.route("/miller/mark_paid/<int:invoice_id>", methods=["POST"])
+def miller_mark_paid(invoice_id):
+    """Allow Miller to manually mark an invoice/truck as Paid."""
+    if session.get("role") != "miller":
+        return redirect("/")
+
+    miller_id = get_effective_user_id()
+    con = get_db()
+    cur = con.cursor()
+
+    # Verify ownership
+    cur.execute("""
+        SELECT li.id 
+        FROM loading_invoices li
+        JOIN miller_bookings mb ON li.booking_id = mb.id
+        JOIN miller_stock ms ON mb.stock_id = ms.id
+        WHERE li.id=? AND ms.miller_id=?
+    """, (invoice_id, miller_id))
+    
+    if not cur.fetchone():
+        con.close()
+        return redirect(request.referrer or "/miller")
+
+    # Update payment status
+    cur.execute("""
+        UPDATE loading_invoices
+        SET payment_status='paid',
+            payment_at=CURRENT_TIMESTAMP
+        WHERE id=?
+    """, (invoice_id,))
+    
+    con.commit()
+    con.close()
+    
+    flash("Payment marked as received.", "success")
+    return redirect(request.referrer or "/miller/pending_payments")
 
 
 # ---------------- ADMIN ----------------

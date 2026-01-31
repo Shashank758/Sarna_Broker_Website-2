@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pending Payments | Saarna Canvessars</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <style>
+        :root {
+            --primary: #0f9b5f;
+            --primary-dark: #0d8a54;
+            --primary-darker: #0a7548;
+            --bg-light: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-muted: #64748b;
+            --warning: #f59e0b;
+            --border-color: #e2e8f0;
+            --radius: 16px;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, .05);
+            --shadow-md: 0 4px 15px rgba(0, 0, 0, .08);
+            --shadow-lg: 0 10px 40px rgba(0, 0, 0, .12);
+        }
+
+        body {
+            background: var(--bg-light);
+            font-family: 'Segoe UI', 'Inter', sans-serif;
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 40px 0;
+            color: #fff;
+            margin-bottom: 40px;
+            border-radius: 0 0 30px 30px;
+        }
+
+        .page-title {
+            font-weight: 800;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Card Styling */
+        .invoice-card {
+            background: #fff;
+            border-radius: var(--radius);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .invoice-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .invoice-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+        }
+
+        .badge-pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .invoice-body {
+            padding: 24px;
+        }
+
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+
+        .meta-label {
+            color: var(--text-muted);
+        }
+
+        .meta-val {
+            font-weight: 600;
+        }
+
+        .amount-box {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border: 1px dashed var(--border-color);
+        }
+
+        .total-price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .btn-view {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-top: 20px;
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .btn-view:hover {
+            background: rgba(15, 155, 95, 0.1);
+            color: var(--primary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    {% include '_navbar.html' %}
+
+    <div class="page-header">
+        <div class="container">
+            <h1 class="page-title"><i class="fa fa-clock me-3"></i>Pending Payments</h1>
+            <p class="mb-0 opacity-75">Trucks with Final Invoice uploaded, waiting for buyer payment.</p>
+        </div>
+    </div>
+
+    <main>
+        <div class="container pb-5">
+
+            {% if invoices %}
+            <div class="row g-4">
+                {% for inv in invoices %}
+                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
+                    <div class="invoice-card">
+                        <div class="invoice-header">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-box bg-light rounded-circle p-2 me-3 text-primary">
+                                    <i class="fa fa-truck"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">Order #{{ inv.order_id }}</h6>
+                                    <small class="text-muted">{{ inv.created_at }}</small>
+                                </div>
+                            </div>
+                            <span class="badge-pending"><i class="fa fa-hourglass-half me-1"></i> Waiting Payment</span>
+                        </div>
+
+                        <div class="invoice-body">
+                            <div class="meta-row">
+                                <span class="meta-label">Buyer</span>
+                                <span class="meta-val">{{ inv.buyer_name }}</span>
+                            </div>
+                            <div class="meta-row">
+                                <span class="meta-label">Crop</span>
+                                <span class="meta-val">{{ inv.crop }}</span>
+                            </div>
+                            <div class="meta-row">
+                                <span class="meta-label">Truck Number</span>
+                                <span class="meta-val">{{ inv.truck_number or 'N/A' }}</span>
+                            </div>
+                            <div class="meta-row">
+                                <span class="meta-label">Loaded Qty</span>
+                                <span class="meta-val">{{ inv.loaded_qty }} Qt</span>
+                            </div>
+
+                            <div class="amount-box">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">Total Amount</span>
+                                    <span class="total-price">₹{{ "{:,.2f}".format(inv.loaded_qty * inv.price) }}</span>
+                                </div>
+                                <div class="text-end mt-1">
+                                    <small class="text-muted">@ ₹{{ inv.price }}/Qt</small>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 mt-3">
+                                <a href="/static/bills/{{ inv.final_invoice_file }}" target="_blank"
+                                    class="btn btn-outline-primary">
+                                    <i class="fa fa-file-invoice me-2"></i>View Final Invoice
+                                </a>
+
+                                <form action="/miller/mark_paid/{{ inv.id }}" method="POST"
+                                    onsubmit="return confirm('Are you sure you want to mark this payment as received? This will move it to the Paid section.');">
+                                    <button type="submit" class="btn btn-success w-100">
+                                        <i class="fa fa-check-circle me-2"></i>Mark Payment Done
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state" data-aos="fade-in">
+                <div class="empty-icon">
+                    <i class="fa fa-check-double"></i>
+                </div>
+                <h3>No Pending Payments</h3>
+                <p class="text-muted">All your uploaded final invoices have been paid or none are pending.</p>
+                <a href="/miller" class="btn btn-primary mt-3">Back to Dashboard</a>
+            </div>
+            {% endif %}
+
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init();
+    </script>
+</body>
+
+</html>

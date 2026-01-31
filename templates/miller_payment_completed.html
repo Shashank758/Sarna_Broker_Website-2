@@ -169,7 +169,7 @@
                         <span>Amt: ₹{{ (inv.qty * b[19] if b[19] else 0) | round(2) }}</span>
                       </div>
                       {% if inv.final_invoice_file %}
-                      <a href="/static/uploads/bills/{{ inv.final_invoice_file }}" target="_blank"
+                      <a href="/static/bills/{{ inv.final_invoice_file }}" target="_blank"
                         class="btn btn-sm btn-outline-primary w-100 mt-2">
                         <i class="fa fa-file-invoice"></i> View Final Invoice
                       </a>

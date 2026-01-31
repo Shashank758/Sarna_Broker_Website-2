@@ -2,17 +2,15 @@
 <nav class="navbar navbar-expand-lg sarna-navbar">
   <div class="container">
     <!-- Brand -->
-    <a class="navbar-brand" href="{% if session.role == 'admin' %}/admin{% elif session.role == 'miller' %}/miller{% elif session.role == 'buyer' %}/market{% else %}/market{% endif %}">
+    <a class="navbar-brand"
+      href="{% if session.role == 'admin' %}/admin{% elif session.role == 'miller' %}/miller{% elif session.role == 'buyer' %}/market{% else %}/market{% endif %}">
       <i class="fa fa-seedling"></i>
       <span>Saarna Canvessars</span>
     </a>
 
     <!-- Mobile Toggle -->
-    <button class="navbar-toggler" type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#sarnaNav"
-            aria-controls="sarnaNav"
-            aria-expanded="false">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sarnaNav"
+      aria-controls="sarnaNav" aria-expanded="false">
       <span class="navbar-toggler-icon"></span>
     </button>
 
@@ -27,6 +25,10 @@
             <i class="fa fa-store me-1"></i> Market
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/buyer/requested' %}active{% endif %}" href="/buyer/requested">
+            <i class="fa fa-hourglass-half me-1"></i> Requested
+          </a>
         <li class="nav-item">
           <a class="nav-link {% if request.path == '/buyer/active' %}active{% endif %}" href="/buyer/active">
             <i class="fa fa-truck me-1"></i> Active
@@ -78,12 +80,20 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if request.path == '/miller/final-hisab' %}active{% endif %}" href="/miller/final-hisab">
+          <a class="nav-link {% if request.path == '/miller/final-hisab' %}active{% endif %}"
+            href="/miller/final-hisab">
             <i class="fa fa-file-invoice me-1"></i> Final Hisab
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if request.path == '/miller/payment-completed' %}active{% endif %}" href="/miller/payment-completed">
+          <a class="nav-link {% if request.path == '/miller/pending_payments' %}active{% endif %}"
+            href="/miller/pending_payments">
+            <i class="fa fa-hourglass-half me-1"></i> Pending Payment
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/miller/payment-completed' %}active{% endif %}"
+            href="/miller/payment-completed">
             <i class="fa fa-check-circle me-1"></i> Paid
           </a>
         </li>
@@ -143,10 +153,14 @@
             <i class="fa fa-ellipsis-h me-1"></i> More
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="/admin/compare"><i class="fa fa-balance-scale me-2"></i>Rate Compare</a></li>
-            <li><a class="dropdown-item" href="/admin/stock-history"><i class="fa fa-history me-2"></i>Stock History</a></li>
-            <li><a class="dropdown-item" href="/admin/miller-profiles"><i class="fa fa-industry me-2"></i>Miller Profiles</a></li>
-            <li><a class="dropdown-item" href="/admin/buyer-profiles"><i class="fa fa-store me-2"></i>Buyer Profiles</a></li>
+            <li><a class="dropdown-item" href="/admin/compare"><i class="fa fa-balance-scale me-2"></i>Rate Compare</a>
+            </li>
+            <li><a class="dropdown-item" href="/admin/stock-history"><i class="fa fa-history me-2"></i>Stock History</a>
+            </li>
+            <li><a class="dropdown-item" href="/admin/miller-profiles"><i class="fa fa-industry me-2"></i>Miller
+                Profiles</a></li>
+            <li><a class="dropdown-item" href="/admin/buyer-profiles"><i class="fa fa-store me-2"></i>Buyer Profiles</a>
+            </li>
           </ul>
         </li>
 
