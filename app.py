@@ -1152,6 +1152,8 @@ def miller_dashboard():
         message = f"🆕 New stock available! {crop} - Price: ₹{price}/unit. {note} Check the market for details."
         for phone in buyer_phones:
             send_sms(phone, message)
+        
+        return redirect(url_for('miller_dashboard'))
 
 
 # ✅ LIVE STOCKS
