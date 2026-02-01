@@ -1206,7 +1206,7 @@ ORDER BY mb.created_at DESC
     cur.execute("""
     SELECT li.id, li.booking_id, li.loaded_qty, li.invoice_file, li.truck_number, li.created_at,
            li.qc_weight, li.qc_moisture, li.qc_remarks, li.qc_status, li.qc_at,
-           li.final_invoice_file, li.payment_status, li.payment_at
+           li.final_invoice_file, li.payment_status, li.payment_at, li.qc_freight
     FROM loading_invoices li
     JOIN miller_bookings mb ON li.booking_id = mb.id
     JOIN miller_stock ms ON mb.stock_id = ms.id
@@ -1231,7 +1231,8 @@ ORDER BY mb.created_at DESC
         "qc_at": r[10],
         "final_invoice_file": r[11],
         "payment_status": r[12] or "pending",
-        "payment_at": r[13]
+        "payment_at": r[13],
+        "qc_freight": r[14]
     })
 
     # Limit loading invoices fetch to only relevant bookings? No, getting all is fine for now but optimize later.
@@ -1349,7 +1350,7 @@ def miller_approved_page():
         SELECT
             id, booking_id, loaded_qty, invoice_file, truck_number, created_at,
             qc_weight, qc_moisture, qc_remarks, qc_status, qc_at,
-            final_invoice_file, payment_status, payment_at
+            final_invoice_file, payment_status, payment_at, qc_freight
         FROM loading_invoices
         ORDER BY created_at ASC
     """)
@@ -1370,7 +1371,8 @@ def miller_approved_page():
             "qc_at": r[10],
             "final_invoice_file": r[11],
             "payment_status": r[12] or "pending",
-            "payment_at": r[13]
+            "payment_at": r[13],
+            "qc_freight": r[14]
         })
 
     con.close()
@@ -1420,7 +1422,7 @@ def miller_qc_page():
     cur.execute("""
     SELECT id, booking_id, loaded_qty, invoice_file, truck_number, created_at,
            qc_weight, qc_moisture, qc_remarks, qc_status, qc_at,
-           final_invoice_file, payment_status, payment_at
+           final_invoice_file, payment_status, payment_at, qc_freight
     FROM loading_invoices
     ORDER BY created_at ASC
     """)
@@ -1441,7 +1443,8 @@ def miller_qc_page():
             "qc_at": r[10],
             "final_invoice_file": r[11],
             "payment_status": r[12] or "pending",
-            "payment_at": r[13]
+            "payment_at": r[13],
+            "qc_freight": r[14]
         })
 
     # 3️⃣ FILTER ONLY COMPLETED LOADING → QC REQUIRED
@@ -1546,7 +1549,8 @@ def miller_final_hisab_page():
             li.qc_at,
             li.final_invoice_file,
             li.payment_status,
-            li.payment_at
+            li.payment_at,
+            li.qc_freight
         FROM loading_invoices li
         JOIN miller_bookings mb ON li.booking_id = mb.id
         JOIN miller_stock ms ON mb.stock_id = ms.id
@@ -1570,39 +1574,145 @@ def miller_final_hisab_page():
             "qc_at": r[10],
             "final_invoice_file": r[11],
             "payment_status": r[12] or "pending",
-            "payment_at": r[13]
+            "payment_at": r[13],
+            "qc_freight": r[14]
         })
 
-    # Filter out orders where all trucks are paid
+    # Filter: Only show bookings that have AT LEAST ONE TRUCK needing Final Invoice
+    # (i.e. qc_verified AND final_invoice_file IS NULL)
     final_bookings = []
+    
     for b in all_bookings:
         booking_id = b[0]
         trucks = invoices_map.get(booking_id, [])
         
-        # If no trucks, technically it shouldn't be here, but let's keep it safe or hide it?
-        # If no trucks but loaded_status is partial/loaded, it is waiting for invoices.
-        # But if it has trucks, check if ANY is pending payment.
+        # Check if any truck needs an invoice (QC Verified but No Final Invoice)
+        # OR if we want to show all trucks for a booking if at least one needs attention.
+        # User said: "remove mark payment done button if the final invoice is uploaded... not more show in final hisab"
         
-        has_pending_payment = False
-        if not trucks:
-            # Maybe it appeared because of manual data? Or empty stock?
-            # Let's say if no trucks, we keep it if it's not paid at booking level (compatibility)
-            # But we moved to truck-wise. If no trucks, it can't be paid.
-            has_pending_payment = True
-        else:
-            # Check if ANY truck is NOT paid
-            if any(t['payment_status'] != 'paid' for t in trucks):
-                has_pending_payment = True
+        # So we should only pass trucks that need invoice.
+        # But our template iterates bookings then trucks.
+        # We'll filter the trucks list for each booking first.
         
-        if has_pending_payment:
-            final_bookings.append(b)
-
+        pending_invoice_trucks = [
+            t for t in trucks 
+            if t['qc_status'] == 'verified' and not t['final_invoice_file']
+        ]
+        
+        # Also include trucks that might be pending QC? Conventionally Final Hisab waits for QC.
+        # But if the user says "Final Hisab", it usually implies QC is done.
+        # Let's show bookings that have pending_invoice_trucks.
+        
+        if pending_invoice_trucks:
+            # We clone the booking simple object? 
+            # No, 'invoices_map' is separate. We can just check if we have relevant trucks.
+            # But we should probably ONLY show the relevant trucks in the template?
+            # Or show the whole booking but mark trucks? 
+            # The prompt says "remove ... not more show in final hisab".
+            # So I should Filter the trucks inside the invoices_map for this view?
+            # Creating a new map for this view might be safer.
+            pass
+            
+    # Redoing the logic to be cleaner:
+    # 1. Create filtered map 'on_final_hisab_map'
+    # 2. Only include bookings that have entries in this map.
+    
+    on_final_hisab_map = {}
+    filtered_bookings = []
+    
+    for b in all_bookings:
+        booking_id = b[0]
+        orig_trucks = invoices_map.get(booking_id, [])
+        
+        # Trucks that should appear in Final Hisab:
+        # QC Verified AND No Final Invoice
+        # (If QC not verified, it's in QC page. If Invoice Uploaded, it's in Pending Payment page)
+        
+        relevant_trucks = [
+            t for t in orig_trucks 
+            if t['qc_status'] == 'verified' and not t['final_invoice_file']
+        ]
+        
+        if relevant_trucks:
+            on_final_hisab_map[booking_id] = relevant_trucks
+            filtered_bookings.append(b)
+            
     con.close()
 
     return render_template(
         "miller_final_hisab.html",
-        all_bookings=final_bookings,
-        invoices_map=invoices_map
+        all_bookings=filtered_bookings,
+        invoices_map=on_final_hisab_map
+    )
+
+@app.route("/miller/pending-payments")
+def miller_pending_payments_page():
+    if session.get("role") != "miller":
+        return redirect("/")
+
+    miller_id = get_effective_user_id()
+    con = get_db()
+    cur = con.cursor()
+
+    # Fetch all bookings
+    cur.execute("""
+        SELECT
+            mb.id, u.name, ms.crop, mb.quantity, mb.status, mb.reason, mb.decision_at,
+            mb.loaded_qty, mb.loading_status, mb.close_reason, mb.order_id,
+            mb.qc_weight, mb.qc_moisture, mb.qc_remarks, mb.qc_status, mb.qc_at,
+            IFNULL(p.status,'pending'), p.invoice_file, p.paid_at, ms.price
+        FROM miller_bookings mb
+        JOIN users u ON mb.buyer_id = u.id
+        JOIN miller_stock ms ON mb.stock_id = ms.id
+        LEFT JOIN payments p ON p.booking_id = mb.id
+        WHERE ms.miller_id = ?
+        ORDER BY mb.created_at DESC
+    """, (miller_id,))
+
+    all_bookings = cur.fetchall()
+
+    # Fetch invoices
+    cur.execute("""
+        SELECT id, booking_id, loaded_qty, invoice_file, truck_number, created_at,
+               qc_weight, qc_moisture, qc_remarks, qc_status, qc_at,
+               final_invoice_file, payment_status, payment_at, qc_freight
+        FROM loading_invoices
+        ORDER BY created_at ASC
+    """)
+    rows = cur.fetchall()
+
+    invoices_map = {}
+    for r in rows:
+        invoices_map.setdefault(r[1], []).append({
+            "id": r[0], "qty": r[2], "file": r[3], "truck_number": r[4], "date": r[5],
+            "qc_weight": r[6], "qc_moisture": r[7], "qc_remarks": r[8], "qc_status": r[9] or "pending", "qc_at": r[10],
+            "final_invoice_file": r[11], "payment_status": r[12] or "pending", "payment_at": r[13],
+            "qc_freight": r[14]
+        })
+
+    # FILTER: Trucks that have Final Invoice BUT correspond to Payment Pending
+    pending_payment_map = {}
+    filtered_bookings = []
+
+    for b in all_bookings:
+        booking_id = b[0]
+        orig_trucks = invoices_map.get(booking_id, [])
+        
+        relevant_trucks = [
+            t for t in orig_trucks
+            if t['final_invoice_file'] and t['payment_status'] != 'paid'
+        ]
+
+        if relevant_trucks:
+            pending_payment_map[booking_id] = relevant_trucks
+            filtered_bookings.append(b)
+
+    con.close()
+
+    return render_template(
+        "miller_pending_payments.html",
+        all_bookings=filtered_bookings,
+        invoices_map=pending_payment_map
     )
 
 
@@ -1695,7 +1805,7 @@ def miller_payment_completed_page():
     cur.execute("""
         SELECT li.id, li.booking_id, li.loaded_qty, li.invoice_file, li.truck_number, li.created_at,
                li.qc_weight, li.qc_moisture, li.qc_remarks, li.qc_status, li.qc_at,
-               li.final_invoice_file, li.payment_status, li.payment_at
+               li.final_invoice_file, li.payment_status, li.payment_at, li.qc_freight
         FROM loading_invoices li
         JOIN miller_bookings mb ON li.booking_id = mb.id
         JOIN miller_stock ms ON mb.stock_id = ms.id
@@ -2722,10 +2832,16 @@ ORDER BY mb.created_at DESC
         if b[8] == 'loaded'
     ]
 
-    cancelled_bookings = [
+    rejected_bookings = [
         b for b in my_bookings
-        if b[10] == 'cancelled'
+        if b[10] in ('cancelled', 'declined')
     ]
+
+    # Create map for booking info to enrich invoices
+    bookings_info = {b[0]: b for b in my_bookings}
+    
+    debit_notes_list = []
+    payments_list = []
 
     # Fetch per-truck loading invoices WITH QC DATA AND FINAL INVOICE
     all_booking_ids = [b[0] for b in my_bookings]
@@ -2735,14 +2851,14 @@ ORDER BY mb.created_at DESC
         cur.execute(f"""
         SELECT id, booking_id, loaded_qty, invoice_file, truck_number, created_at,
                qc_weight, qc_moisture, qc_remarks, qc_status, qc_at,
-               final_invoice_file, payment_status, payment_at
+               final_invoice_file, payment_status, payment_at, qc_freight
         FROM loading_invoices
         WHERE booking_id IN ({placeholders})
         ORDER BY created_at ASC
         """, all_booking_ids)
         rows = cur.fetchall()
         for r in rows:
-            invoices_map.setdefault(r[1], []).append({
+            inv_data = {
                 "id": r[0],  # invoice id
                 "qty": r[2],
                 "file": r[3],
@@ -2755,8 +2871,40 @@ ORDER BY mb.created_at DESC
                 "qc_at": r[10],
                 "final_invoice_file": r[11],
                 "payment_status": r[12] or "pending",
-                "payment_at": r[13]
-            })
+                "payment_at": r[13],
+                "qc_freight": r[14]
+            }
+            invoices_map.setdefault(r[1], []).append(inv_data)
+
+            # Enrich with booking info for lists
+            b_info = bookings_info.get(r[1])
+            if b_info:
+                # b_info structure based on query:
+                # 0:id, 1:crop, 2:qty, 3:loaded, 4:rem, 5:truck_st, 6:loaded_at, ... 9:order_id, ... 20:miller_name
+                # Need to verify indices from query
+                # Query: SELECT mb.id (0), ms.crop (1), ... mb.order_id (9), ... u.name (20)
+                # See lines 2673-2700 approx
+                
+                enriched_inv = inv_data.copy()
+                enriched_inv.update({
+                    "order_id": b_info[9],
+                    "miller_name": b_info[20],
+                    "crop": b_info[1],
+                    # Calculate amount roughly (price not in my_bookings query! need to add price?)
+                    # Price is not in my_bookings query currently.
+                    # It is in miller_stocks but my_bookings query joins miller_stock.
+                    # Let's check my_bookings query again.
+                })
+                
+                if inv_data["final_invoice_file"] and inv_data["payment_status"] != 'paid':
+                    debit_notes_list.append(enriched_inv)
+                elif inv_data["payment_status"] == 'paid':
+                    payments_list.append(enriched_inv)
+        
+        print(f"DEBUG: Debit Notes Count: {len(debit_notes_list)}")
+        print(f"DEBUG: Payments Count: {len(payments_list)}")
+        if debit_notes_list:
+             print(f"DEBUG: Sample Debit Note: {debit_notes_list[0]['id']} - {debit_notes_list[0]['final_invoice_file']}")
 
     # Calculate totals
     total_booked = sum(b[2] or 0 for b in active_bookings)
@@ -2787,7 +2935,9 @@ ORDER BY mb.created_at DESC
         total_booked=total_booked,
         total_loaded=total_loaded,
         total_remaining=total_remaining,
-        cancelled_bookings=cancelled_bookings
+        rejected_bookings=rejected_bookings,
+        debit_note_invoices=debit_notes_list,
+        paid_invoices=payments_list
     )
 # ================= BUYER ORDER PAGES =================
 
@@ -2803,7 +2953,9 @@ def get_buyer_orders(filter_type):
     elif filter_type == "partial":
         where = "AND mb.loading_status='partial_closed'"
     elif filter_type == "loaded":
-        where = "AND mb.loading_status='loaded'"
+        where = "AND mb.loading_status IN ('loaded', 'partial_closed')"
+    elif filter_type == "rejected":
+        where = "AND mb.status IN ('declined', 'cancelled')"
 
     cur.execute(f"""
         SELECT
@@ -2843,7 +2995,7 @@ LEFT JOIN payments p ON p.booking_id = mb.id
     cur.execute("""
         SELECT id, booking_id, loaded_qty, invoice_file, truck_number, created_at,
                qc_weight, qc_moisture, qc_remarks, qc_status, qc_at,
-               final_invoice_file, payment_status, payment_at
+               final_invoice_file, payment_status, payment_at, qc_freight
         FROM loading_invoices
         ORDER BY created_at ASC
     """)
@@ -2864,7 +3016,8 @@ LEFT JOIN payments p ON p.booking_id = mb.id
             "qc_at": i[10],
             "final_invoice_file": i[11],
             "payment_status": i[12] or "pending",
-            "payment_at": i[13]
+            "payment_at": i[13],
+            "qc_freight": i[14]
         })
 
     orders = []
@@ -2942,7 +3095,7 @@ def get_miller_orders_by_type(filter_type):
     cur.execute("""
         SELECT id, booking_id, loaded_qty, invoice_file, truck_number, created_at,
                qc_weight, qc_moisture, qc_remarks, qc_status, qc_at,
-               final_invoice_file, payment_status, payment_at
+               final_invoice_file, payment_status, payment_at, qc_freight
         FROM loading_invoices
         ORDER BY created_at ASC
     """)
@@ -2963,7 +3116,8 @@ def get_miller_orders_by_type(filter_type):
             "qc_at": i[10],
             "final_invoice_file": i[11],
             "payment_status": i[12] or "pending",
-            "payment_at": i[13]
+            "payment_at": i[13],
+            "qc_freight": i[14]
         })
 
     orders = []
@@ -3007,12 +3161,105 @@ def buyer_active():
     return render_template("buyer_active.html", page_title="Active Orders", orders=orders)
 
 
-@app.route("/buyer/partial")
-def buyer_partial():
+@app.route("/buyer/rejected")
+def buyer_rejected():
     if session.get("role") != "buyer":
         return redirect("/")
-    orders = get_buyer_orders("partial")
-    return render_template("buyer_partial.html", page_title="Partially Closed Orders", orders=orders)
+    orders = get_buyer_orders("rejected")
+    return render_template("buyer_rejected.html", page_title="Rejected Orders", orders=orders)
+
+
+@app.route("/buyer/debit_note/<int:invoice_id>")
+def buyer_debit_note(invoice_id):
+    if session.get("role") != "buyer":
+        return redirect("/")
+    
+    con = get_db()
+    cur = con.cursor()
+    
+    # Fetch invoice details with order info, including booking_id and buyer_id for security
+    cur.execute("""
+        SELECT li.id, li.truck_number, li.loaded_qty, li.final_invoice_file, li.payment_status,
+               mb.order_id, ms.crop, ms.price, u.name, mb.id,
+               li.qc_weight, li.qc_moisture, li.qc_remarks, li.qc_freight
+        FROM loading_invoices li
+        JOIN miller_bookings mb ON li.booking_id = mb.id
+        JOIN miller_stock ms ON mb.stock_id = ms.id
+        JOIN users u ON ms.miller_id = u.id
+        WHERE li.id = ? AND mb.buyer_id = ?
+    """, (invoice_id, session["user_id"]))
+    
+    inv = cur.fetchone()
+    con.close()
+    
+    if not inv:
+        return "Invoice not found or unauthorized", 404
+        
+    invoice_data = {
+        "id": inv[0],
+        "truck_number": inv[1],
+        "qty": inv[2],
+        "final_invoice": inv[3],
+        "status": inv[4] or "pending",
+        "order_id": inv[5],
+        "crop": inv[6],
+        "price": inv[7],
+        "miller_name": inv[8],
+        "booking_id": inv[9],
+        "qc_weight": inv[10],
+        "qc_moisture": inv[11],
+        "qc_remarks": inv[12],
+        "qc_freight": inv[13],
+        "total_amount": round((inv[2] or 0) * (inv[7] or 0), 2)
+    }
+    
+    return render_template("buyer_debit_note.html", invoice=invoice_data)
+
+
+@app.route("/buyer/debit_notes")
+def buyer_debit_notes_list():
+    if session.get("role") != "buyer":
+        return redirect("/")
+    
+    con = get_db()
+    cur = con.cursor()
+    
+    # Fetch all invoices that have a final invoice file (debit note)
+    cur.execute("""
+        SELECT li.id, li.truck_number, li.loaded_qty, li.final_invoice_file, li.payment_status,
+               mb.order_id, ms.crop, ms.price, u.name, mb.id, li.created_at
+        FROM loading_invoices li
+        JOIN miller_bookings mb ON li.booking_id = mb.id
+        JOIN miller_stock ms ON mb.stock_id = ms.id
+        JOIN users u ON ms.miller_id = u.id
+        WHERE mb.buyer_id = ? AND li.final_invoice_file IS NOT NULL
+        ORDER BY li.created_at DESC
+    """, (session["user_id"],))
+    
+    rows = cur.fetchall()
+    con.close()
+    
+    invoices = []
+    for r in rows:
+        status = r[4] or "pending"
+        # Calculate amount
+        amount = round((r[2] or 0) * (r[7] or 0), 2)
+        
+        invoices.append({
+            "id": r[0],
+            "truck_number": r[1],
+            "qty": r[2],
+            "final_invoice": r[3],
+            "status": status,
+            "order_id": r[5],
+            "crop": r[6],
+            "miller_name": r[8],
+            "booking_id": r[9],
+            "date": r[10],
+            "amount": amount
+        })
+        
+    return render_template("buyer_debit_notes_list.html", invoices=invoices)
 
 
 @app.route("/buyer/loaded")
@@ -3435,6 +3682,7 @@ def miller_update_qc(invoice_id):
     qc_weight = request.form.get("qc_weight") or None
     qc_moisture = request.form.get("qc_moisture") or None
     qc_remarks = request.form.get("qc_remarks") or ""
+    qc_freight = request.form.get("qc_freight") or None
 
     try:
         qc_weight_val = float(qc_weight) if qc_weight not in (None, "",) else None
@@ -3446,6 +3694,11 @@ def miller_update_qc(invoice_id):
     except ValueError:
         qc_moisture_val = None
 
+    try:
+        qc_freight_val = float(qc_freight) if qc_freight not in (None, "",) else None
+    except ValueError:
+        qc_freight_val = None
+
     # Update QC for this specific invoice (truck)
     cur.execute("""
         UPDATE loading_invoices
@@ -3453,9 +3706,10 @@ def miller_update_qc(invoice_id):
             qc_moisture=?,
             qc_remarks=?,
             qc_status='verified',
-            qc_at=CURRENT_TIMESTAMP
+            qc_at=CURRENT_TIMESTAMP,
+            qc_freight=?
         WHERE id=?
-    """, (qc_weight_val, qc_moisture_val, qc_remarks, invoice_id))
+    """, (qc_weight_val, qc_moisture_val, qc_remarks, qc_freight_val, invoice_id))
     
     # 📱 Send SMS to buyer about QC update
     cur.execute("""
@@ -3934,7 +4188,7 @@ def admin_bookings():
         cur.execute(f"""
             SELECT id, booking_id, loaded_qty, invoice_file, truck_number, created_at,
                    qc_weight, qc_moisture, qc_remarks, qc_status, qc_at,
-                   final_invoice_file, payment_status, payment_at
+                   final_invoice_file, payment_status, payment_at, qc_freight
             FROM loading_invoices
             WHERE booking_id IN ({placeholders})
             ORDER BY created_at ASC
@@ -3954,7 +4208,8 @@ def admin_bookings():
                 "qc_at": r[10],
                 "final_invoice_file": r[11],
                 "payment_status": r[12] or "pending",
-                "payment_at": r[13]
+                "payment_at": r[13],
+                "qc_freight": r[14]
             })
 
     con.close()

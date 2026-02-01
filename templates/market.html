@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trader Market | Saarna Canvessars</title>
+  <title>Trader Dashboard | Saarna Canvessars</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -866,6 +866,12 @@
             <a href="/buyer/requested" class="quick-action-btn">
               <i class="fa fa-user-cog"></i> Requested orders
             </a>
+            <a href="/buyer/debit_notes" class="quick-action-btn">
+              <i class="fa fa-file-invoice-dollar"></i> Debit Notes
+            </a>
+            <a href="/buyer/payments" class="quick-action-btn">
+              <i class="fa fa-money-bill"></i> Payments
+            </a>
           </div>
         </div>
       </div>
@@ -924,19 +930,6 @@
           </div>
         </div>
 
-        <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
-          <div class="stat-card paid">
-            <div class="d-flex justify-content-between align-items-start">
-              <div>
-                <div class="stat-label mb-2">Partial Closed</div>
-                <div class="stat-value">{{ total_partial }}</div>
-              </div>
-              <div class="stat-icon paid">
-                <i class="fa fa-lock"></i>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- ================= MILLER STOCKS ================= -->
@@ -944,7 +937,7 @@
         <div class="section-header">
           <h5 class="section-title">
             <span class="icon-box green"><i class="fa fa-warehouse"></i></span>
-            Live Miller Stocks
+            Live Commodity Rates
           </h5>
           <span class="section-badge bg-success">{{ miller_stocks|length }} Available</span>
         </div>
@@ -1340,249 +1333,6 @@
       </div>
       {% endif %}
 
-      <!-- ================= PARTIALLY CLOSED ORDERS ================= -->
-      {% if partial_closed_bookings %}
-      <div class="section-card" data-aos="fade-up">
-        <div class="section-header">
-          <h5 class="section-title">
-            <span class="icon-box red"><i class="fa fa-lock"></i></span>
-            Partially Closed Orders
-          </h5>
-          <span class="section-badge bg-danger">{{ partial_closed_bookings|length }} Orders</span>
-        </div>
-
-        <div class="accordion" id="partialClosedAccordion">
-          {% for b in partial_closed_bookings %}
-          {% set order_id = b[9] %}
-          {% set crop = b[1] %}
-          {% set booked_qty = b[2] or 0 %}
-          {% set loaded_qty = b[3] or 0 %}
-          {% set remaining_qty = b[4] or 0 %}
-
-          <div class="order-card">
-            <div class="accordion-item border-0">
-              <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                  data-bs-target="#pc{{ b[0] }}">
-                  <div class="order-card-header">
-                    <div class="order-main">
-                      <span class="order-id">{{ order_id }}</span>
-                      <span class="order-crop">{{ crop }}</span>
-
-                      <div class="order-meta-row">
-                        <span><i class="fa fa-box"></i> {{ booked_qty }} Qt Booked</span>
-                        <span><i class="fa fa-check"></i> {{ loaded_qty }} Qt Loaded</span>
-                      </div>
-                    </div>
-
-                    <div class="d-flex align-items-center gap-3">
-                      <span class="order-status status-partial">
-                        <i class="fa fa-lock"></i> Partially Closed
-                      </span>
-                      <i class="fa fa-chevron-down order-expand"></i>
-                    </div>
-                  </div>
-                </button>
-              </h2>
-
-              <div id="pc{{ b[0] }}" class="accordion-collapse collapse" data-bs-parent="#partialClosedAccordion">
-                <div class="accordion-body">
-                  <div class="order-body-grid">
-
-                    <!-- Order Details -->
-                    <div class="soft-card">
-                      <div class="kv">
-                        <span>Booked Quantity</span>
-                        <span>{{ booked_qty }} Qt</span>
-                      </div>
-                      <div class="kv">
-                        <span>Loaded Quantity</span>
-                        <span>{{ loaded_qty }} Qt</span>
-                      </div>
-                      <div class="kv">
-                        <span>Closed Quantity</span>
-                        <span>{{ remaining_qty }} Qt</span>
-                      </div>
-
-                      {% if b[11] %}
-                      <div class="kv">
-                        <span>Reason for Closure</span>
-                        <span class="text-muted">{{ b[11] }}</span>
-                      </div>
-                      {% endif %}
-                    </div>
-
-                    <!-- Per-Truck Quality Checks -->
-                    <div class="soft-card">
-                      <div class="mb-3">
-                        <h6 class="fw-bold">
-                          <i class="fa fa-balance-scale me-1"></i> Truck Quality Checks
-                        </h6>
-                      </div>
-
-                      {% set invs = invoices_map.get(b[0]) %}
-                      {% if invs %}
-                      {% for inv in invs %}
-                      <div class="mb-3 p-2 border rounded" style="background:#f8f9fa;">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                          <div>
-                            <strong class="text-primary">
-                              {% if inv.truck_number %}
-                              Truck {{ inv.truck_number }}
-                              {% else %}
-                              Truck #{{ loop.index }}
-                              {% endif %}
-                            </strong>
-                            <span class="badge bg-info ms-2">{{ inv.qty }} Qt</span>
-                          </div>
-                          <div>
-                            {% if inv.qc_status == 'verified' %}
-                            <span class="badge bg-success me-1">✅ Verified</span>
-                            {% else %}
-                            <span class="badge bg-warning me-1">⏳ Pending QC</span>
-                            {% endif %}
-
-                            <!-- Payment Status Badge -->
-                            {% if inv.payment_status == 'paid' %}
-                            <span class="badge bg-success">Paid</span>
-                            {% elif inv.final_invoice_file %}
-                            <span class="badge bg-warning text-dark">Unpaid</span>
-                            {% else %}
-                            <span class="badge bg-secondary">No Bill</span>
-                            {% endif %}
-                          </div>
-                        </div>
-
-                        {% if inv.qc_status == 'verified' %}
-                        <div class="d-flex justify-content-between flex-wrap">
-                          <div class="kv mb-0 flex-grow-1 me-2">
-                            <span>Net Weight</span>
-                            <span>{{ inv.qc_weight or inv.qty }} Qt</span>
-                          </div>
-                          <div class="kv mb-0 flex-grow-1">
-                            <span>Moisture</span>
-                            <span>{{ inv.qc_moisture or '-' }}%</span>
-                          </div>
-                        </div>
-
-                        <!-- Final Invoice Link -->
-                        {% if inv.final_invoice_file %}
-                        <div class="mt-2 text-end">
-                          <a href="/static/uploads/bills/{{ inv.final_invoice_file }}" target="_blank"
-                            class="text-primary fw-bold text-decoration-none small">
-                            <i class="fa fa-file-invoice"></i> View Final Bill
-                          </a>
-                        </div>
-                        {% endif %}
-
-                        {% if inv.qc_remarks %}
-                        <div class="kv mt-2">
-                          <span>Remarks</span>
-                          <span>{{ inv.qc_remarks }}</span>
-                        </div>
-                        {% endif %}
-                        {% if inv.qc_at %}
-                        <small class="text-muted d-block mt-2">
-                          Verified on {{ inv.qc_at[:16] }}
-                        </small>
-                        {% endif %}
-                        {% else %}
-                        <p class="text-muted small mb-0">
-                          Waiting for miller quality verification.
-                        </p>
-                        {% endif %}
-                      </div>
-                      {% endfor %}
-                      {% else %}
-                      <p class="text-muted small mb-0">
-                        No loading invoices found.
-                      </p>
-                      {% endif %}
-                    </div>
-
-                  </div>
-
-                  <!-- Loading Invoices -->
-                  <div class="soft-card mt-3">
-                    <h6 class="fw-bold mb-3">
-                      <i class="fa fa-file-invoice me-1"></i> Loading Invoices
-                    </h6>
-
-                    {% set invs = invoices_map.get(b[0]) %}
-                    {% if invs %}
-                    <div class="list-group">
-                      {% for inv in invs %}
-                      <div class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                          {% if inv.truck_number %}
-                          <strong>{{ inv.truck_number }}</strong>
-                          <br>
-                          {% endif %}
-                          <strong>{{ inv.qty }} Qt</strong>
-                          <br>
-                          <small class="text-muted">{{ inv.date[:16] if inv.date else '' }}</small>
-                        </div>
-                        <div class="d-flex gap-1">
-                          <a href="/static/uploads/bills/{{ inv.file }}" target="_blank"
-                            class="btn btn-sm btn-outline-primary">
-                            <i class="fa fa-eye me-1"></i> View
-                          </a>
-                          <button class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                            data-bs-target="#editInvoiceList{{ inv.id }}">
-                            <i class="fa fa-edit"></i> Edit
-                          </button>
-
-                          <!-- Edit Invoice Modal -->
-                          <div class="modal fade" id="editInvoiceList{{ inv.id }}" tabindex="-1">
-                            <div class="modal-dialog">
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h5 class="modal-title">Edit Loading Invoice</h5>
-                                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                </div>
-                                <form method="POST" action="/buyer/edit_loading_invoice/{{ inv.id }}"
-                                  enctype="multipart/form-data">
-                                  <div class="modal-body">
-                                    <div class="mb-3">
-                                      <label class="form-label">Truck Number</label>
-                                      <input type="text" name="truck_number" class="form-control"
-                                        value="{{ inv.truck_number or '' }}" placeholder="e.g. MH12AB1234">
-                                    </div>
-                                    <div class="mb-3">
-                                      <label class="form-label">Upload New Invoice</label>
-                                      <input type="file" name="invoice" class="form-control" accept=".pdf,image/*"
-                                        required>
-                                      <small class="text-muted">This will replace the existing invoice for {{ inv.qty }}
-                                        Qt.</small>
-                                    </div>
-                                  </div>
-                                  <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary"
-                                      data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-warning">
-                                      <i class="fa fa-upload"></i> Replace Invoice
-                                    </button>
-                                  </div>
-                                </form>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      {% endfor %}
-                    </div>
-                    {% else %}
-                    <p class="text-muted small mb-0">No invoices uploaded.</p>
-                    {% endif %}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      {% endif %}
 
       <!-- ================= LOADED ORDERS ================= -->
       {% if loaded_bookings %}
@@ -1807,6 +1557,16 @@
                           <span>Remarks</span>
                           <span>{{ inv.qc_remarks }}</span>
                         </div>
+                        <div class="kv">
+                          <span>Remarks</span>
+                          <span>{{ inv.qc_remarks }}</span>
+                        </div>
+                        {% endif %}
+                        {% if inv.qc_freight %}
+                        <div class="kv">
+                          <span>Freight (Paid by Miller)</span>
+                          <span class="text-success fw-bold">₹{{ inv.qc_freight }}</span>
+                        </div>
                         {% endif %}
                         {% if inv.qc_at %}
                         <small class="text-muted d-block mt-2">
@@ -1863,6 +1623,219 @@
                   {% else %}
                   <p class="text-muted small text-center mb-0">No trucks available for payment info.</p>
                   {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- ================= DEBIT NOTES ================= -->
+    {% if debit_note_invoices %}
+    <div class="section-card" id="debit-notes" data-aos="fade-up">
+      <div class="section-header">
+        <h5 class="section-title">
+          <span class="icon-box red"><i class="fa fa-file-invoice-dollar"></i></span>
+          Debit Notes
+        </h5>
+        <span class="section-badge bg-danger">{{ debit_note_invoices|length }} Pending</span>
+      </div>
+
+      <div class="accordion" id="debitNotesAccordion">
+        {% for inv in debit_note_invoices %}
+        <div class="order-card" data-search="{{ inv.truck_number|lower }}">
+          <div class="accordion-item border-0">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#dn{{ inv.id }}">
+                <div class="order-card-header">
+                  <div class="order-main">
+                    <span class="order-id">#{{ inv.order_id }}</span>
+                    <span class="order-crop">{{ inv.crop }}</span>
+                    <div class="order-meta-row">
+                      <span><i class="fa fa-truck"></i> {{ inv.truck_number or 'N/A' }}</span>
+                      <span><i class="fa fa-industry"></i> {{ inv.miller_name }}</span>
+                    </div>
+                  </div>
+
+                  <div class="d-flex align-items-center gap-3">
+                    <span class="badge bg-warning text-dark">Unpaid</span>
+                    <i class="fa fa-chevron-down order-expand"></i>
+                  </div>
+                </div>
+              </button>
+            </h2>
+
+            <div id="dn{{ inv.id }}" class="accordion-collapse collapse" data-bs-parent="#debitNotesAccordion">
+              <div class="accordion-body">
+                <div class="soft-card">
+                  <div class="kv">
+                    <span>Loaded Qty</span>
+                    <span>{{ inv.qty }} Qt</span>
+                  </div>
+                  <div class="kv">
+                    <span>Invoice Date</span>
+                    <span>{{ inv.date[:10] }}</span>
+                  </div>
+                  {% if inv.qc_freight %}
+                  <div class="kv">
+                    <span>Freight (Paid)</span>
+                    <span class="text-success fw-bold">₹{{ inv.qc_freight }}</span>
+                  </div>
+                  {% endif %}
+                  <div class="mt-3">
+                    <a href="/buyer/debit_note/{{ inv.id }}" class="btn btn-outline-primary btn-sm w-100">
+                      <i class="fa fa-eye me-2"></i> View Bill Details
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- ================= PAYMENTS ================= -->
+    {% if paid_invoices %}
+    <div class="section-card" id="payments-history" data-aos="fade-up">
+      <div class="section-header">
+        <h5 class="section-title">
+          <span class="icon-box green"><i class="fa fa-money-bill"></i></span>
+          Paid
+        </h5>
+        <span class="section-badge bg-success">{{ paid_invoices|length }} Paid</span>
+      </div>
+
+      <div class="accordion" id="paymentsAccordion">
+        {% for inv in paid_invoices %}
+        <div class="order-card" data-search="{{ inv.truck_number|lower }}">
+          <div class="accordion-item border-0">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#pay{{ inv.id }}">
+                <div class="order-card-header">
+                  <div class="order-main">
+                    <span class="order-id">#{{ inv.order_id }}</span>
+                    <span class="order-crop">{{ inv.crop }}</span>
+                    <div class="order-meta-row">
+                      <span><i class="fa fa-truck"></i> {{ inv.truck_number or 'N/A' }}</span>
+                      <span><i class="fa fa-calendar-check"></i> {{ inv.payment_at[:10] if inv.payment_at else 'Paid'
+                        }}</span>
+                    </div>
+                  </div>
+
+                  <div class="d-flex align-items-center gap-3">
+                    <span class="badge bg-success">Paid</span>
+                    <i class="fa fa-chevron-down order-expand"></i>
+                  </div>
+                </div>
+              </button>
+            </h2>
+
+            <div id="pay{{ inv.id }}" class="accordion-collapse collapse" data-bs-parent="#paymentsAccordion">
+              <div class="accordion-body">
+                <div class="soft-card">
+                  <div class="kv">
+                    <span>Miller</span>
+                    <span>{{ inv.miller_name }}</span>
+                  </div>
+                  <div class="kv">
+                    <span>Loaded Qty</span>
+                    <span>{{ inv.qty }} Qt</span>
+                  </div>
+                  <div class="kv">
+                    <span>Paid On</span>
+                    <span>{{ inv.payment_at[:10] if inv.payment_at else 'N/A' }}</span>
+                  </div>
+                  {% if inv.qc_freight %}
+                  <div class="kv">
+                    <span>Freight (Paid)</span>
+                    <span class="text-success fw-bold">₹{{ inv.qc_freight }}</span>
+                  </div>
+                  {% endif %}
+                  <div class="mt-3">
+                    <a href="/static/uploads/bills/{{ inv.final_invoice_file }}" target="_blank"
+                      class="btn btn-outline-success btn-sm w-100">
+                      <i class="fa fa-download me-2"></i> Download Invoice
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- ================= REJECTED ORDERS ================= -->
+    {% if rejected_bookings %}
+    <div class="section-card" data-aos="fade-up">
+      <div class="section-header">
+        <h5 class="section-title">
+          <span class="icon-box red"><i class="fa fa-ban"></i></span>
+          Rejected Orders
+        </h5>
+        <span class="section-badge bg-danger">{{ rejected_bookings|length }} Orders</span>
+      </div>
+
+      <div class="accordion" id="rejectedAccordion">
+        {% for b in rejected_bookings %}
+        {% set order_id = b[9] %}
+        {% set crop = b[1] %}
+        {% set booked_qty = b[2] or 0 %}
+        {% set miller_name = b[20] %}
+        {% set loaded_at = b[6] %}
+
+        <div class="order-card">
+          <div class="accordion-item border-0">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#rej{{ b[0] }}">
+                <div class="order-card-header">
+                  <div class="order-main">
+                    <span class="order-id">{{ order_id }}</span>
+                    <span class="order-crop">{{ crop }}</span>
+                    <div class="order-meta-row">
+                      <span><i class="fa fa-box"></i> {{ booked_qty }} Qt</span>
+                      <span><i class="fa fa-industry"></i> {{ miller_name }}</span>
+                    </div>
+                  </div>
+
+                  <div class="d-flex align-items-center gap-3">
+                    {% if 'cancel' in (b[10] or '')|lower %}
+                    <span class="badge bg-secondary">Cancelled</span>
+                    {% else %}
+                    <span class="badge bg-danger">Declined</span>
+                    {% endif %}
+                    <i class="fa fa-chevron-down order-expand"></i>
+                  </div>
+                </div>
+              </button>
+            </h2>
+
+            <div id="rej{{ b[0] }}" class="accordion-collapse collapse" data-bs-parent="#rejectedAccordion">
+              <div class="accordion-body">
+                <div class="soft-card">
+                  <div class="kv">
+                    <span>Miller</span>
+                    <span>{{ miller_name }}</span>
+                  </div>
+                  <div class="kv">
+                    <span>Date</span>
+                    <span>{{ loaded_at or 'N/A' }}</span>
+                  </div>
+                  <div class="kv">
+                    <span>Status</span>
+                    <span class="text-uppercase fw-bold text-danger">{{ b[10] }}</span>
+                  </div>
                 </div>
               </div>
             </div>

@@ -224,6 +224,10 @@
                 {% if inv.qc_remarks %}
                 <div class="kv"><span>Remarks</span><span>{{ inv.qc_remarks }}</span></div>
                 {% endif %}
+                {% if inv.qc_freight %}
+                <div class="kv"><span>Freight (Paid)</span><span class="text-success fw-bold">₹{{ inv.qc_freight
+                    }}</span></div>
+                {% endif %}
                 {% if inv.qc_at %}
                 <small class="text-muted d-block mt-2">Verified on {{ inv.qc_at[:16] }}</small>
                 {% endif %}
@@ -324,7 +328,7 @@
                     {% endif %}
 
                     {% if inv.final_invoice_file %}
-                    <a href="/static/uploads/bills/{{ inv.final_invoice_file }}" target="_blank"
+                    <a href="/buyer/debit_note/{{ inv.id }}"
                       class="d-block mt-1 badge bg-white text-primary border border-primary text-decoration-none">
                       <i class="fa fa-eye"></i> View Bill
                     </a>

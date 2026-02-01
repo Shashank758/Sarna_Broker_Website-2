@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debit Notes | Saarna Canvessars</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        body {
+            background: var(--bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            color: white;
+            padding: 40px 0;
+            margin-bottom: 30px;
+        }
+
+        .dn-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            transition: transform 0.2s;
+            margin-bottom: 20px;
+        }
+
+        .dn-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-paid {
+            background: #dcfce7;
+            color: #166534;
+        }
+    </style>
+</head>
+
+<body>
+
+    {% include '_navbar.html' %}
+
+    <div class="page-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="fw-bold mb-1">Debit Notes</h2>
+                    <p class="mb-0 text-white-50">Manage your pending invoices and payments</p>
+                </div>
+                <a href="/market" class="btn btn-outline-light btn-sm"><i class="fa fa-arrow-left me-2"></i>Back to
+                    Market</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container pb-5">
+
+        <div class="row g-4">
+            {% if invoices %}
+            {% for inv in invoices %}
+            <div class="col-md-6 col-lg-4">
+                <div class="dn-card p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <div class="fw-bold text-dark mb-1">Order #{{ inv.order_id }}</div>
+                            <div class="small text-muted">{{ inv.miller_name }}</div>
+                        </div>
+                        {% if inv.status == 'paid' %}
+                        <span class="status-badge status-paid"><i class="fa fa-check-circle me-1"></i>PAID</span>
+                        {% else %}
+                        <span class="status-badge status-pending"><i class="fa fa-clock me-1"></i>PENDING</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Truck</span>
+                        <span class="fw-bold small">{{ inv.truck_number or 'N/A' }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Date</span>
+                        <span class="fw-bold small">{{ inv.date[:10] }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted small">Amount</span>
+                        <span class="fw-bold text-success">₹{{ inv.amount }}</span>
+                    </div>
+
+                    <a href="/buyer/debit_note/{{ inv.id }}" class="btn btn-outline-primary w-100 btn-sm">
+                        <i class="fa fa-eye me-2"></i> View Details
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="col-12 text-center py-5">
+                <div class="text-muted">
+                    <i class="fa fa-file-invoice fa-3x mb-3"></i>
+                    <p>No debit notes found.</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

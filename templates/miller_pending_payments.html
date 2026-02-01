@@ -3,157 +3,47 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pending Payments | Saarna Canvessars</title>
+    <title>Pending Payments | Miller</title>
 
+    <!-- Bootstrap & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
 
     <style>
-        :root {
-            --primary: #0f9b5f;
-            --primary-dark: #0d8a54;
-            --primary-darker: #0a7548;
-            --bg-light: #f4f7f6;
-            --card-bg: #ffffff;
-            --text-primary: #1e293b;
-            --text-muted: #64748b;
-            --warning: #f59e0b;
-            --border-color: #e2e8f0;
-            --radius: 16px;
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, .05);
-            --shadow-md: 0 4px 15px rgba(0, 0, 0, .08);
-            --shadow-lg: 0 10px 40px rgba(0, 0, 0, .12);
-        }
-
         body {
             background: var(--bg-light);
-            font-family: 'Segoe UI', 'Inter', sans-serif;
-            color: var(--text-primary);
-            line-height: 1.6;
+            font-family: Inter, Segoe UI, sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        main {
-            flex: 1;
-        }
-
-        /* Page Header */
         .page-header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            padding: 40px 0;
             color: #fff;
-            margin-bottom: 40px;
-            border-radius: 0 0 30px 30px;
+            padding: 25px 0;
+            margin-bottom: 30px;
         }
 
-        .page-title {
-            font-weight: 800;
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        /* Card Styling */
-        .invoice-card {
+        .section-card {
             background: #fff;
-            border-radius: var(--radius);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            box-shadow: var(--shadow-sm);
-            overflow: hidden;
+            border-radius: 18px;
+            box-shadow: var(--shadow-md);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .completed-loading-card {
+            border-radius: 14px;
             transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, .08);
             height: 100%;
         }
 
-        .invoice-card:hover {
-            transform: translateY(-5px);
+        .completed-loading-card:hover {
             box-shadow: var(--shadow-lg);
-            border-color: var(--primary);
-        }
-
-        .invoice-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #fff;
-        }
-
-        .badge-pending {
-            background: rgba(245, 158, 11, 0.1);
-            color: var(--warning);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            border: 1px solid rgba(245, 158, 11, 0.2);
-        }
-
-        .invoice-body {
-            padding: 24px;
-        }
-
-        .meta-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            font-size: 0.95rem;
-        }
-
-        .meta-label {
-            color: var(--text-muted);
-        }
-
-        .meta-val {
-            font-weight: 600;
-        }
-
-        .amount-box {
-            background: #f8fafc;
-            padding: 16px;
-            border-radius: 12px;
-            margin-top: 20px;
-            border: 1px dashed var(--border-color);
-        }
-
-        .total-price {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--primary-dark);
-        }
-
-        .btn-view {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: 600;
-            margin-top: 20px;
-            display: inline-block;
-            text-align: center;
-            text-decoration: none;
-            background: var(--bg-light);
-            color: var(--text-primary);
-            transition: all 0.2s;
-        }
-
-        .btn-view:hover {
-            background: rgba(15, 155, 95, 0.1);
-            color: var(--primary);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-        }
-
-        .empty-icon {
-            font-size: 4rem;
-            color: #cbd5e1;
-            margin-bottom: 20px;
+            transform: translateY(-2px);
         }
     </style>
 </head>
@@ -162,99 +52,105 @@
 
     {% include '_navbar.html' %}
 
+    <!-- PAGE HEADER -->
     <div class="page-header">
         <div class="container">
-            <h1 class="page-title"><i class="fa fa-clock me-3"></i>Pending Payments</h1>
-            <p class="mb-0 opacity-75">Trucks with Final Invoice uploaded, waiting for buyer payment.</p>
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <nav class="breadcrumb mb-2">
+                        <a href="/miller" class="text-white-50 text-decoration-none"><i class="fa fa-home"></i>
+                            Dashboard</a>
+                        <span class="mx-2 text-white-50">/</span>
+                        <span class="text-white">Pending Payments</span>
+                    </nav>
+                    <h4 class="mb-0 fw-bold"><i class="fa fa-clock text-warning me-2"></i>Pending Payments</h4>
+                </div>
+                <a href="/miller" class="btn btn-light shadow-sm">
+                    <i class="fa fa-arrow-left me-1"></i> Back
+                </a>
+            </div>
         </div>
     </div>
 
-    <main>
-        <div class="container pb-5">
+    <main class="flex-grow-1">
+        <div class="container mb-5">
 
-            {% if invoices %}
-            <div class="row g-4">
-                {% for inv in invoices %}
-                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
-                    <div class="invoice-card">
-                        <div class="invoice-header">
-                            <div class="d-flex align-items-center">
-                                <div class="icon-box bg-light rounded-circle p-2 me-3 text-primary">
-                                    <i class="fa fa-truck"></i>
-                                </div>
-                                <div>
-                                    <h6 class="mb-0 fw-bold">Order #{{ inv.order_id }}</h6>
-                                    <small class="text-muted">{{ inv.created_at }}</small>
-                                </div>
-                            </div>
-                            <span class="badge-pending"><i class="fa fa-hourglass-half me-1"></i> Waiting Payment</span>
-                        </div>
+            {% if all_bookings %}
+            {% for b in all_bookings %}
+            {% set booking_id = b[0] %}
+            {% set order_id = b[10] %}
+            {% set buyer_name = b[1] %}
+            {% set crop_name = b[2] %}
+            {% set price = b[19] %}
+            {% set trucks = invoices_map.get(booking_id, []) %}
 
-                        <div class="invoice-body">
-                            <div class="meta-row">
-                                <span class="meta-label">Buyer</span>
-                                <span class="meta-val">{{ inv.buyer_name }}</span>
-                            </div>
-                            <div class="meta-row">
-                                <span class="meta-label">Crop</span>
-                                <span class="meta-val">{{ inv.crop }}</span>
-                            </div>
-                            <div class="meta-row">
-                                <span class="meta-label">Truck Number</span>
-                                <span class="meta-val">{{ inv.truck_number or 'N/A' }}</span>
-                            </div>
-                            <div class="meta-row">
-                                <span class="meta-label">Loaded Qty</span>
-                                <span class="meta-val">{{ inv.loaded_qty }} Qt</span>
+            {% if trucks %}
+            <div class="section-card">
+                <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                    <div>
+                        <h5 class="fw-bold text-primary mb-0">{{ order_id }}</h5>
+                        <small class="text-muted">{{ buyer_name }} • {{ crop_name|capitalize }}</small>
+                    </div>
+                    <span class="badge bg-warning text-dark">{{ trucks|length }} Trucks Pending Pay</span>
+                </div>
+
+                <div class="row g-3">
+                    {% for truck in trucks %}
+                    {% set truck_id = truck.id %}
+                    {% set truck_num = truck.truck_number or loop.index %}
+                    {% set truck_qty = truck.qty %}
+                    {% set final_invoice = truck.final_invoice_file %}
+                    {% set amount = truck_qty * price %}
+
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card completed-loading-card p-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <h6 class="fw-bold mb-0">Truck {{ truck_num }}</h6>
+                                <span class="badge bg-light text-dark border">{{ truck_qty }} Qt</span>
                             </div>
 
-                            <div class="amount-box">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="text-muted">Total Amount</span>
-                                    <span class="total-price">₹{{ "{:,.2f}".format(inv.loaded_qty * inv.price) }}</span>
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Price: ₹{{ price }}/Qt</small>
+                                <strong class="text-success fs-5">₹{{ amount }}</strong>
+                                {% if truck.qc_freight %}
+                                <div class="mt-1 small text-success fw-bold">
+                                    <i class="fa fa-truck-fast"></i> Freight: ₹{{ truck.qc_freight }}
                                 </div>
-                                <div class="text-end mt-1">
-                                    <small class="text-muted">@ ₹{{ inv.price }}/Qt</small>
-                                </div>
+                                {% endif %}
                             </div>
 
-                            <div class="d-grid gap-2 mt-3">
-                                <a href="/static/bills/{{ inv.final_invoice_file }}" target="_blank"
-                                    class="btn btn-outline-primary">
-                                    <i class="fa fa-file-invoice me-2"></i>View Final Invoice
+                            <div class="d-grid gap-2">
+                                <a href="/static/uploads/bills/{{ final_invoice }}" target="_blank"
+                                    class="btn btn-outline-primary btn-sm">
+                                    <i class="fa fa-eye me-1"></i> View Invoice
                                 </a>
 
-                                <form action="/miller/mark_paid/{{ inv.id }}" method="POST"
-                                    onsubmit="return confirm('Are you sure you want to mark this payment as received? This will move it to the Paid section.');">
-                                    <button type="submit" class="btn btn-success w-100">
-                                        <i class="fa fa-check-circle me-2"></i>Mark Payment Done
+                                <form method="POST" action="/miller/mark_truck_payment_done/{{ truck_id }}">
+                                    <button class="btn btn-success btn-sm w-100">
+                                        <i class="fa fa-check-circle me-1"></i> Mark Payment Done
                                     </button>
                                 </form>
                             </div>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
+            {% endif %}
+            {% endfor %}
+
             {% else %}
-            <div class="empty-state" data-aos="fade-in">
-                <div class="empty-icon">
-                    <i class="fa fa-check-double"></i>
-                </div>
-                <h3>No Pending Payments</h3>
-                <p class="text-muted">All your uploaded final invoices have been paid or none are pending.</p>
-                <a href="/miller" class="btn btn-primary mt-3">Back to Dashboard</a>
+            <div class="text-center py-5">
+                <i class="fa fa-check-circle text-muted" style="font-size: 3rem;"></i>
+                <p class="text-muted mt-3">No pending payments found.</p>
             </div>
             {% endif %}
 
         </div>
     </main>
 
+    {% include '_footer.html' %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
-        AOS.init();
-    </script>
 </body>
 
 </html>

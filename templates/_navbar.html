@@ -29,14 +29,10 @@
           <a class="nav-link {% if request.path == '/buyer/requested' %}active{% endif %}" href="/buyer/requested">
             <i class="fa fa-hourglass-half me-1"></i> Requested
           </a>
+
         <li class="nav-item">
           <a class="nav-link {% if request.path == '/buyer/active' %}active{% endif %}" href="/buyer/active">
             <i class="fa fa-truck me-1"></i> Active
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link {% if request.path == '/buyer/partial' %}active{% endif %}" href="/buyer/partial">
-            <i class="fa fa-lock me-1"></i> Partial
           </a>
         </li>
         <li class="nav-item">
@@ -45,8 +41,18 @@
           </a>
         </li>
         <li class="nav-item">
+          <a class="nav-link {% if request.path == '/buyer/debit_notes' %}active{% endif %}" href="/buyer/debit_notes">
+            <i class="fa fa-file-invoice-dollar me-1"></i> Debit Notes
+          </a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link {% if request.path == '/buyer/payments' %}active{% endif %}" href="/buyer/payments">
             <i class="fa fa-money-bill me-1"></i> Payments
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/buyer/rejected' %}active{% endif %}" href="/buyer/rejected">
+            <i class="fa fa-ban me-1"></i> Rejected
           </a>
         </li>
         <li class="nav-item">
@@ -80,14 +86,11 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if request.path == '/miller/final-hisab' %}active{% endif %}"
-            href="/miller/final-hisab">
-            <i class="fa fa-file-invoice me-1"></i> Final Hisab
-          </a>
+          <a class="nav-link" href="/miller/final-hisab">Final Hisab</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if request.path == '/miller/pending_payments' %}active{% endif %}"
-            href="/miller/pending_payments">
+          <a class="nav-link {% if request.path == '/miller/pending-payments' %}active{% endif %}"
+            href="/miller/pending-payments">
             <i class="fa fa-hourglass-half me-1"></i> Pending Payment
           </a>
         </li>

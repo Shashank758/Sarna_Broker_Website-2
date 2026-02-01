@@ -286,6 +286,10 @@
                             Truck {{ truck_num }}
                           </h6>
                           <small class="text-muted">{{ truck_qty }} Qt • ₹{{ amount }}</small>
+                          {% if truck.qc_freight %}
+                          <small class="d-block text-success mt-1"><i class="fa fa-truck-fast"></i> Freight: ₹{{
+                            truck.qc_freight }}</small>
+                          {% endif %}
                         </div>
                         <div>
                           {% if payment_status == 'paid' %}

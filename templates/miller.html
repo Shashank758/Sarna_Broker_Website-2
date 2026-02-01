@@ -1180,6 +1180,11 @@
                               <input type="number" step="0.01" name="qc_moisture" class="form-control form-control-sm"
                                 value="{{ inv.qc_moisture or '' }}" required>
                             </div>
+                            <div class="col-12 mt-2">
+                              <label class="form-label small mb-1">Freight (Paid by Miller)</label>
+                              <input type="number" step="0.01" name="qc_freight" class="form-control form-control-sm"
+                                value="{{ inv.qc_freight or '' }}" placeholder="Freight">
+                            </div>
                           </div>
                           <div class="mb-2">
                             <label class="form-label small mb-1">Remarks (Optional)</label>
@@ -1204,6 +1209,11 @@
                             <label class="form-label small mb-1">Moisture (%)</label>
                             <input type="number" step="0.01" name="qc_moisture" class="form-control form-control-sm"
                               placeholder="%" value="{{ inv.qc_moisture or '' }}" required>
+                          </div>
+                          <div class="col-12 mt-2">
+                            <label class="form-label small mb-1">Freight (Paid by Miller)</label>
+                            <input type="number" step="0.01" name="qc_freight" class="form-control form-control-sm"
+                              value="{{ inv.qc_freight or '' }}" placeholder="Freight">
                           </div>
                         </div>
                         <div class="mb-2">

@@ -221,14 +221,11 @@
 
                   <!-- Invoices + QC (for loaded trucks even if order still loading) -->
                   <td>
-                    {% if invs %}
-                    {% if ns.pending > 0 %}
+                    {% if invs and ns.pending > 0 %}
                     <span class="badge bg-warning text-dark mb-2 d-inline-block">QC Pending: {{ ns.pending }}</span>
-                    {% else %}
-                    <span class="badge bg-success mb-2 d-inline-block">QC Verified</span>
-                    {% endif %}
 
                     {% for inv in invs %}
+                    {% if inv.qc_status != 'verified' %}
                     <div class="mb-2 p-2 border rounded" style="background:#f8f9fa;">
                       <div class="d-flex justify-content-between align-items-start gap-2">
                         <div>
@@ -306,6 +303,11 @@
                                 <input type="number" step="0.01" name="qc_moisture" class="form-control form-control-sm"
                                   value="{{ inv.qc_moisture or '' }}" required>
                               </div>
+                              <div class="col-12 mt-2">
+                                <label class="form-label small mb-1">Freight (Paid by Miller)</label>
+                                <input type="number" step="0.01" name="qc_freight" class="form-control form-control-sm"
+                                  value="{{ inv.qc_freight or '' }}" placeholder="Enter freight amount">
+                              </div>
                             </div>
                             <div class="mb-2">
                               <label class="form-label small mb-1">Remarks (Optional)</label>
@@ -325,9 +327,14 @@
                         </div>
                       </div>
                     </div>
+                    {% endif %} <!-- End if qc != verified -->
                     {% endfor %}
                     {% else %}
+                    {% if invs %}
+                    <span class="text-success small"><i class="fa fa-check-circle"></i> All loaded items verified</span>
+                    {% else %}
                     <span class="text-muted small">No loading yet</span>
+                    {% endif %}
                     {% endif %}
                   </td>
 
