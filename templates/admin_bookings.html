@@ -39,8 +39,8 @@
         <li><a href="/admin"><i class="fa fa-gauge"></i> Dashboard</a></li>
         <li><a href="/admin/compare"><i class="fa fa-balance-scale"></i> Rate Comparison</a></li>
         <li><a href="/admin/users"><i class="fa fa-users"></i> Users</a></li>
-        <li><a href="/admin/stock"><i class="fa fa-box"></i> Miller Stock</a></li>
-        <li><a href="/admin/stock-history"><i class="fa fa-history"></i> Stock Update History</a></li>
+        <li><a href="/admin/stock"><i class="fa fa-box"></i> Latest rate  </a></li>
+        <li><a href="/admin/stock-history"><i class="fa fa-history"></i> Rate update history</a></li>
         <li class="active"><i class="fa fa-shopping-cart"></i> Bookings</li>
         <li><a href="/admin/miller-profiles"><i class="fa fa-industry"></i> Miller Profiles</a></li>
         <li><a href="/admin/buyer-profiles"><i class="fa fa-store"></i> Trader Profiles</a></li>
@@ -159,14 +159,16 @@
 
                   {% if invs %}
                   <div class="table-responsive">
-                    <table class="table table-sm table-bordered bg-white">
-                      <thead>
+                    <table class="table table-sm table-bordered bg-white align-middle">
+                      <thead class="table-light">
                         <tr>
                           <th>Truck #</th>
                           <th>Qty (Qt)</th>
-                          <th>Invoice</th>
-                          <th>QC Status</th>
-                          <th>Payment</th>
+                          <th>Loading Slip</th>
+                          <th>Final Invoice</th>
+                          <th>QC Details (Wt/Mst)</th>
+                          <th style="width: 120px;">Freight</th>
+                          <th>Action</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -174,30 +176,57 @@
                         <tr>
                           <td>{{ inv.truck_number or 'N/A' }}</td>
                           <td>{{ inv.qty }}</td>
+                          <!-- Loading Slip -->
                           <td>
                             <a href="/static/uploads/bills/{{ inv.file }}" target="_blank"
-                              class="btn btn-xs btn-outline-info">
+                              class="btn btn-xs btn-outline-info" title="View Loading Slip">
                               <i class="fa fa-eye"></i> View
                             </a>
                           </td>
+                          <!-- Final Invoice -->
+                          <td>
+                            {% if inv.final_invoice_file %}
+                            <a href="/static/uploads/bills/{{ inv.final_invoice_file }}" target="_blank"
+                              class="btn btn-xs btn-outline-primary" title="View Final Invoice">
+                              <i class="fa fa-file-invoice"></i> Bill
+                            </a>
+                            {% else %}
+                            <span class="text-muted small">-</span>
+                            {% endif %}
+                          </td>
                           <td>
                             {% if inv.qc_status == 'verified' %}
-                            <span class="badge bg-success"
-                              title="Wt: {{ inv.qc_weight }} | Moist: {{ inv.qc_moisture }}%">Verified</span>
+                            <div class="small">
+                              <strong>Wt:</strong> {{ inv.qc_weight or '-' }} <br>
+                              <strong>Mst:</strong> {{ inv.qc_moisture or '-' }}% <br>
+                              {% if inv.qc_remarks %}
+                              <span class="text-muted fst-italic">{{ inv.qc_remarks }}</span>
+                              {% endif %}
+                            </div>
                             {% else %}
                             <span class="badge bg-warning text-dark">Pending</span>
                             {% endif %}
                           </td>
                           <td>
-                            {% if inv.payment_status == 'paid' %}
-                            <span class="badge bg-success">Paid</span>
-                            {% elif inv.final_invoice_file %}
-                            <span class="badge bg-warning text-dark">Unpaid</span>
-                            <a href="/static/uploads/bills/{{ inv.final_invoice_file }}" target="_blank"
-                              class="ms-1 text-primary"><i class="fa fa-file-invoice"></i> Bill</a>
-                            {% else %}
-                            <span class="badge bg-secondary">No Bill</span>
-                            {% endif %}
+                            <input type="number" step="0.01" name="qc_freight" value="{{ inv.qc_freight or '' }}"
+                              class="form-control form-control-sm" placeholder="Freight" form="form_{{inv.id}}">
+                          </td>
+                          <td>
+                            <div class="d-flex align-items-center gap-2">
+                              <form id="form_{{inv.id}}" action="/admin/update_truck/{{ inv.id }}" method="POST">
+                                <button type="submit" class="btn btn-sm btn-primary" title="Save Freight">
+                                  <i class="fa fa-save"></i>
+                                </button>
+                              </form>
+
+                              {% if inv.payment_status == 'paid' %}
+                              <span class="badge bg-success">Paid</span>
+                              {% elif inv.final_invoice_file %}
+                              <span class="badge bg-warning text-dark">Unpaid</span>
+                              {% else %}
+                              <span class="badge bg-secondary">No Bill</span>
+                              {% endif %}
+                            </div>
                           </td>
                         </tr>
                         {% endfor %}

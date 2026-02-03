@@ -166,6 +166,7 @@
                       </div>
                       <div class="d-flex justify-content-between small text-muted">
                         <span>Qty: {{ inv.qty }} Qt</span>
+                        <span>Rate: ₹{{ b[19] }}/Qt</span>
                         <span>Amt: ₹{{ (inv.qty * b[19] if b[19] else 0) | round(2) }}</span>
                         {% if inv.qc_freight %}
                         <span class="d-block text-end text-success w-100" style="font-size: 0.8em;">Freight: ₹{{

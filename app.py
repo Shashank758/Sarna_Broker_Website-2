@@ -414,7 +414,26 @@ def upgrade_loading_invoices():
     con.commit()
     con.close()
 
+def upgrade_loading_invoices_debit_note():
+    """Add debit_note column to loading_invoices."""
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("PRAGMA table_info(loading_invoices)")
+    cols = [c[1] for c in cur.fetchall()]
+
+    if "debit_note" not in cols:
+        cur.execute("ALTER TABLE loading_invoices ADD COLUMN debit_note INTEGER")
+    
+    # Ensure qc_freight is there too just in case
+    if "qc_freight" not in cols:
+        cur.execute("ALTER TABLE loading_invoices ADD COLUMN qc_freight INTEGER")
+
+    con.commit()
+    con.close()
+
 upgrade_loading_invoices()
+upgrade_loading_invoices_debit_note()
    
 def get_effective_user_id():
     # For miller staff → parent miller
@@ -738,6 +757,32 @@ def upgrade_miller_stock_note():
 
 upgrade_miller_stock_note()
 
+def upgrade_miller_booking_price():
+    """Add price column to miller_bookings and backfill."""
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("PRAGMA table_info(miller_bookings)")
+    cols = [c[1] for c in cur.fetchall()]
+
+    if "price" not in cols:
+        cur.execute("ALTER TABLE miller_bookings ADD COLUMN price REAL")
+        
+        # Backfill existing bookings with current stock price
+        cur.execute("""
+            UPDATE miller_bookings
+            SET price = (
+                SELECT price FROM miller_stock 
+                WHERE miller_stock.id = miller_bookings.stock_id
+            )
+            WHERE price IS NULL
+        """)
+
+    con.commit()
+    con.close()
+
+upgrade_miller_booking_price()
+
 def generate_next_order_id():
     """Generate next order ID in format S10001, S10002, etc."""
     con = get_db()
@@ -1044,20 +1089,70 @@ def reset_password_link_fallback(token):
 @app.route("/register", methods=["GET","POST"])
 def register():
     if request.method == "POST":
+        name = request.form["name"]
+        email = request.form["email"]
+        password = request.form["password"]
+        role = request.form["role"]
+        
+        # Profile fields
+        phone = request.form.get("phone", "").strip()
+        address = request.form.get("address", "").strip()
+        firm_name = request.form.get("firm_name", "").strip()
+        
+        # File uploads
+        gst_doc = request.files.get("gst_doc")
+        mandi_doc = request.files.get("mandi_doc")
+        other_doc = request.files.get("other_doc")
+        
         con = get_db()
         cur = con.cursor()
-        cur.execute("""
-        INSERT INTO users (name,email,password,role)
-        VALUES (?,?,?,?)
-        """, (
-            request.form["name"],
-            request.form["email"],
-            request.form["password"],
-            request.form["role"]
-        ))
-        con.commit()
-        con.close()
-        return redirect("/")
+        
+        try:
+            cur.execute("""
+            INSERT INTO users (name,email,password,role)
+            VALUES (?,?,?,?)
+            """, (name, email, password, role))
+            
+            user_id = cur.lastrowid
+            
+            # Helper to save file
+            def save_doc(file_obj, prefix):
+                if file_obj and file_obj.filename:
+                    filename = secure_filename(file_obj.filename)
+                    base, ext = os.path.splitext(filename)
+                    new_filename = f"{prefix}_{user_id}_{base}{ext}"
+                    file_obj.save(os.path.join(app.config["PROFILE_FOLDER"], new_filename))
+                    return new_filename
+                return None
+
+            gst_filename = save_doc(gst_doc, "gst")
+            mandi_filename = save_doc(mandi_doc, "mandi")
+            other_filename = save_doc(other_doc, "other")
+            
+            if role == "miller":
+                cur.execute("""
+                    INSERT INTO miller_profiles
+                    (miller_id, mill_name, owner_phone, address, gst_doc, mandi_doc, other_doc)
+                    VALUES (?,?,?,?,?,?,?)
+                """, (user_id, firm_name, phone, address, gst_filename, mandi_filename, other_filename))
+                
+            elif role == "buyer":
+                # For buyer, map firm_name -> shop_name, mandi_doc -> license_doc
+                cur.execute("""
+                    INSERT INTO buyer_profiles
+                    (buyer_id, shop_name, owner_name, phone, address, gst_doc, license_doc, other_doc)
+                    VALUES (?,?,?,?,?,?,?,?)
+                """, (user_id, firm_name, name, phone, address, gst_filename, mandi_filename, other_filename))
+                
+            con.commit()
+            con.close()
+            return redirect("/")
+            
+        except Exception as e:
+            con.rollback()
+            con.close()
+            print(f"Registration Error: {e}")
+            return render_template("register.html", error="Registration failed. Email might be taken.")
     return render_template("register.html")
 
 @app.route("/logout")
@@ -1520,7 +1615,7 @@ def miller_final_hisab_page():
             IFNULL(p.status,'pending') AS payment_status, -- 16
             p.invoice_file                 AS final_invoice, -- 17
             p.paid_at                      AS payment_at,    -- 18
-            ms.price                       AS price          -- 19
+            IFNULL(mb.price, ms.price)     AS price          -- 19
 
         FROM miller_bookings mb
         JOIN users u ON mb.buyer_id = u.id
@@ -1786,7 +1881,7 @@ def miller_payment_completed_page():
             'paid' AS payment_status,   -- 16 (forcing 'paid' for display purposes)
             NULL AS final_invoice,      -- 17
             MAX(li.payment_at) AS payment_at, -- 18 (latest payment)
-            ms.price                    -- 19
+            IFNULL(mb.price, ms.price)  -- 19
             
         FROM miller_bookings mb
         JOIN miller_stock ms ON mb.stock_id = ms.id
@@ -3180,7 +3275,7 @@ def buyer_debit_note(invoice_id):
     # Fetch invoice details with order info, including booking_id and buyer_id for security
     cur.execute("""
         SELECT li.id, li.truck_number, li.loaded_qty, li.final_invoice_file, li.payment_status,
-               mb.order_id, ms.crop, ms.price, u.name, mb.id,
+               mb.order_id, ms.crop, IFNULL(mb.price, ms.price), u.name, mb.id,
                li.qc_weight, li.qc_moisture, li.qc_remarks, li.qc_freight
         FROM loading_invoices li
         JOIN miller_bookings mb ON li.booking_id = mb.id
@@ -3227,7 +3322,7 @@ def buyer_debit_notes_list():
     # Fetch all invoices that have a final invoice file (debit note)
     cur.execute("""
         SELECT li.id, li.truck_number, li.loaded_qty, li.final_invoice_file, li.payment_status,
-               mb.order_id, ms.crop, ms.price, u.name, mb.id, li.created_at
+               mb.order_id, ms.crop, IFNULL(mb.price, ms.price), u.name, mb.id, li.created_at
         FROM loading_invoices li
         JOIN miller_bookings mb ON li.booking_id = mb.id
         JOIN miller_stock ms ON mb.stock_id = ms.id
@@ -3298,8 +3393,8 @@ def buyer_payments():
         mb.order_id,
         ms.crop,
         li.loaded_qty,
-        ms.price,
-        (li.loaded_qty * ms.price) AS total_amount,
+        IFNULL(mb.price, ms.price),
+        (li.loaded_qty * IFNULL(mb.price, ms.price)) AS total_amount,
         li.final_invoice_file,
         li.payment_at,
         u.name AS miller_name,
@@ -3338,7 +3433,7 @@ def book_miller_stock(stock_id):
 
     # Check if stock exists and has enough quantity
     cur.execute("""
-        SELECT quantity, status
+        SELECT quantity, status, price
         FROM miller_stock
         WHERE id=?
     """, (stock_id,))
@@ -3351,6 +3446,7 @@ def book_miller_stock(stock_id):
     elif row[0] < qty:
         flash(f"Insufficient stock quantity. Available: {row[0]}", "error")
     else:
+        current_price = row[2]
         # Generate order ID
         try:
             order_id = generate_next_order_id()
@@ -3358,9 +3454,9 @@ def book_miller_stock(stock_id):
             # Create booking
             cur.execute("""
                 INSERT INTO miller_bookings
-                (stock_id, buyer_id, quantity, status, order_id)
-                VALUES (?, ?, ?, 'pending', ?)
-            """, (stock_id, session["user_id"], qty, order_id))
+                (stock_id, buyer_id, quantity, status, order_id, price)
+                VALUES (?, ?, ?, 'pending', ?, ?)
+            """, (stock_id, session["user_id"], qty, order_id, current_price))
             
             booking_id = cur.lastrowid
             
@@ -3754,7 +3850,7 @@ def miller_pending_payments():
             li.final_invoice_file,
             DATE(li.created_at) as date,
             u.name as buyer_name,
-            ms.price
+            IFNULL(mb.price, ms.price)
         FROM loading_invoices li
         JOIN miller_bookings mb ON li.booking_id = mb.id
         JOIN miller_stock ms ON mb.stock_id = ms.id
@@ -3860,8 +3956,8 @@ def admin():
         miller.name,           -- 2 Miller
         ms.crop,               -- 3 Crop
         mb.quantity,           -- 4 Qty
-        ms.price,              -- 5 Price
-        (mb.quantity * ms.price), -- 6 Total
+        IFNULL(mb.price, ms.price), -- 5 Price
+        (mb.quantity * IFNULL(mb.price, ms.price)), -- 6 Total
         mb.status,             -- 7 Booking status
         mb.truck_status,       -- 8 🚚 Loading status
         mb.loaded_at,          -- 9 Loaded date
@@ -4162,8 +4258,8 @@ def admin_bookings():
         miller.name,           -- 2 Miller
         ms.crop,               -- 3 Crop
         mb.quantity,           -- 4 Qty
-        ms.price,              -- 5 Price
-        (mb.quantity * ms.price), -- 6 Total
+        IFNULL(mb.price, ms.price), -- 5 Price
+        (mb.quantity * IFNULL(mb.price, ms.price)), -- 6 Total
         mb.status,             -- 7 Booking status
         mb.truck_status,       -- 8 Truck status
         mb.loaded_at,          -- 9 Loaded date
@@ -4188,7 +4284,7 @@ def admin_bookings():
         cur.execute(f"""
             SELECT id, booking_id, loaded_qty, invoice_file, truck_number, created_at,
                    qc_weight, qc_moisture, qc_remarks, qc_status, qc_at,
-                   final_invoice_file, payment_status, payment_at, qc_freight
+                   final_invoice_file, payment_status, payment_at, qc_freight, debit_note
             FROM loading_invoices
             WHERE booking_id IN ({placeholders})
             ORDER BY created_at ASC
@@ -4209,7 +4305,8 @@ def admin_bookings():
                 "final_invoice_file": r[11],
                 "payment_status": r[12] or "pending",
                 "payment_at": r[13],
-                "qc_freight": r[14]
+                "qc_freight": r[14],
+                "debit_note": r[15] if len(r) > 15 else 0
             })
 
     con.close()
@@ -4383,6 +4480,41 @@ def admin_decline_booking(id):
     con.commit()
     con.close()
     return redirect("/admin/bookings")
+
+@app.route("/admin/update_truck/<int:invoice_id>", methods=["POST"])
+def admin_update_truck(invoice_id):
+    """Admin update truck details (Freight & Debit Note)."""
+    if session.get("role") != "admin":
+        return redirect("/")
+
+    qc_freight = request.form.get("qc_freight")
+    debit_note = request.form.get("debit_note")
+
+    try:
+        qc_freight_val = float(qc_freight) if qc_freight not in (None, "") else None
+    except ValueError:
+        qc_freight_val = None
+
+    try:
+        debit_note_val = float(debit_note) if debit_note not in (None, "") else None
+    except ValueError:
+        debit_note_val = None
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        UPDATE loading_invoices
+        SET qc_freight=?,
+            debit_note=?
+        WHERE id=?
+    """, (qc_freight_val, debit_note_val, invoice_id))
+
+    con.commit()
+    con.close()
+
+    flash("Truck details updated.", "success")
+    return redirect(request.referrer or "/admin/bookings")
 
 # ---------------- SMS TEST ROUTE ----------------
 @app.route("/test_sms", methods=["GET", "POST"])

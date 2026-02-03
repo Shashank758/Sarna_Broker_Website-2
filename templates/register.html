@@ -424,7 +424,7 @@
         Join India's trusted agricultural marketplace
       </p>
 
-      <form method="POST">
+      <form method="POST" enctype="multipart/form-data">
 
         <!-- NAME -->
         <div class="form-group">
@@ -481,6 +481,79 @@
             </label>
           </div>
         </div>
+
+        <!-- ADDITIONAL PROFILE DETAILS (Hidden for Farmer initially) -->
+        <div id="profileDetails" style="display: none;">
+          <hr class="my-4">
+          <p class="text-muted small mb-3 fw-bold">Additional Details</p>
+
+          <!-- PHONE -->
+          <div class="form-group">
+            <label class="form-label ms-1">Phone Number</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fa fa-phone"></i></span>
+              <input name="phone" type="tel" class="form-control" placeholder="+91 XXXXX XXXXX">
+            </div>
+          </div>
+
+          <!-- ADDRESS -->
+          <div class="form-group">
+            <label class="form-label ms-1">Address</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fa fa-map-marker-alt"></i></span>
+              <input name="address" class="form-control" placeholder="Full Address">
+            </div>
+          </div>
+
+          <!-- MILL/SHOP NAME -->
+          <div class="form-group" id="firmNameGroup">
+            <label class="form-label ms-1" id="firmLabel">Mill / Shop Name</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fa fa-building"></i></span>
+              <input name="firm_name" class="form-control" placeholder="Enter Name">
+            </div>
+          </div>
+
+          <!-- DOCUMENTS -->
+          <div class="form-group">
+            <label class="form-label ms-1">GST Document</label>
+            <input name="gst_doc" type="file" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label ms-1">Mandi License</label>
+            <input name="mandi_doc" type="file" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label ms-1">Other Document (Optional)</label>
+            <input name="other_doc" type="file" class="form-control">
+          </div>
+        </div>
+
+        <script>
+          const roleRadios = document.querySelectorAll('input[name="role"]');
+          const profileDetails = document.getElementById('profileDetails');
+          const firmLabel = document.getElementById('firmLabel');
+
+          roleRadios.forEach(radio => {
+            radio.addEventListener('change', function () {
+              if (this.value === 'miller') {
+                profileDetails.style.display = 'block';
+                firmLabel.innerText = "Mill Name";
+              } else if (this.value === 'buyer') {
+                profileDetails.style.display = 'block';
+                firmLabel.innerText = "Firm / Shop Name";
+              } else {
+                // Farmer - hide details logic OR keep them optional?
+                // User requirement implies "profile details" which usually implies non-farmers.
+                // Resetting or Hiding. user said "taking in profile page...". Farmer has no profile page?
+                // Assuming mostly for Miller/Buyer.
+                profileDetails.style.display = 'none';
+              }
+            });
+          });
+        </script>
 
         <button type="submit" class="btn btn-register w-100">
           <i class="fa fa-user-plus me-2"></i> Create Account
