@@ -28,11 +28,17 @@
         <li class="nav-item">
           <a class="nav-link {% if request.path == '/buyer/requested' %}active{% endif %}" href="/buyer/requested">
             <i class="fa fa-hourglass-half me-1"></i> Requested
+            {% if buyer_pending_requests and buyer_pending_requests > 0 %}
+            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.7em;">{{ buyer_pending_requests }}</span>
+            {% endif %}
           </a>
 
         <li class="nav-item">
           <a class="nav-link {% if request.path == '/buyer/active' %}active{% endif %}" href="/buyer/active">
             <i class="fa fa-truck me-1"></i> Active
+            {% if buyer_active_orders and buyer_active_orders > 0 %}
+            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.7em;">{{ buyer_active_orders }}</span>
+            {% endif %}
           </a>
         </li>
         <li class="nav-item">
@@ -60,6 +66,14 @@
             <i class="fa fa-user me-1"></i> Profile
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/switch_role/miller">
+            <i class="fa fa-exchange-alt me-1"></i> Switch to Miller
+            {% if miller_total_pending and miller_total_pending > 0 %}
+            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.7em;">{{ miller_total_pending }}</span>
+            {% endif %}
+          </a>
+        </li>
 
         {% elif session.role == 'miller' %}
         <!-- ===== MILLER NAVIGATION ===== -->
@@ -73,16 +87,25 @@
         <li class="nav-item">
           <a class="nav-link {% if request.path == '/miller' %}active{% endif %}" href="/miller">
             <i class="fa fa-gauge me-1"></i> Dashboard
+            {% if miller_pending_orders and miller_pending_orders > 0 %}
+            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.7em;">{{ miller_pending_orders }}</span>
+            {% endif %}
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link {% if request.path == '/miller/approved' %}active{% endif %}" href="/miller/approved">
             <i class="fa fa-clock me-1"></i> Approved
+            {% if miller_active_orders and miller_active_orders > 0 %}
+            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.7em;">{{ miller_active_orders }}</span>
+            {% endif %}
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link {% if request.path == '/miller/qc' %}active{% endif %}" href="/miller/qc">
             <i class="fa fa-clipboard-check me-1"></i> QC
+            {% if miller_pending_qc and miller_pending_qc > 0 %}
+            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.7em;">{{ miller_pending_qc }}</span>
+            {% endif %}
           </a>
         </li>
         <li class="nav-item">
@@ -92,6 +115,10 @@
           <a class="nav-link {% if request.path == '/miller/pending-payments' %}active{% endif %}"
             href="/miller/pending-payments">
             <i class="fa fa-hourglass-half me-1"></i> Pending Payment
+            {% if miller_pending_payments and miller_pending_payments > 0 %}
+            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.7em;">{{ miller_pending_payments
+              }}</span>
+            {% endif %}
           </a>
         </li>
         <li class="nav-item">
@@ -103,6 +130,14 @@
         <li class="nav-item">
           <a class="nav-link {% if request.path == '/miller/profile' %}active{% endif %}" href="/miller/profile">
             <i class="fa fa-user me-1"></i> Profile
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/switch_role/buyer">
+            <i class="fa fa-exchange-alt me-1"></i> Switch to Trader
+            {% if buyer_total_pending and buyer_total_pending > 0 %}
+            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.7em;">{{ buyer_total_pending }}</span>
+            {% endif %}
           </a>
         </li>
 

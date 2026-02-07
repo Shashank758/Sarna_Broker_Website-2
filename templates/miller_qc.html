@@ -149,9 +149,13 @@
           </nav>
           <h4><i class="fa fa-clipboard-check me-2"></i>Quality Check</h4>
         </div>
-        <a href="/miller" class="btn btn-light">
-          <i class="fa fa-arrow-left me-1"></i> Back
-        </a>
+        <div class="d-flex gap-2">
+          <input type="text" id="qcSearch" class="form-control form-control-sm" style="width: 250px;"
+            placeholder="Search Order, Truck, Buyer...">
+          <a href="/miller" class="btn btn-light">
+            <i class="fa fa-arrow-left me-1"></i> Back
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -245,14 +249,56 @@
                         <small class="text-muted">Net Weight</small>
                         <div class="fw-bold">{{ inv.qc_weight or inv.qty }} Qt</div>
                       </div>
+
+                      {% if inv.qc_moisture %}
                       <div class="col-6">
                         <small class="text-muted">Moisture</small>
                         <div class="fw-bold">{{ inv.qc_moisture }}%</div>
                       </div>
+                      {% endif %}
+
+                      {% if inv.qc_broken %}
                       <div class="col-6">
-                        <small class="text-muted">Moisture</small>
-                        <div class="fw-bold">{{ inv.qc_moisture }}%</div>
+                        <small class="text-muted">Broken</small>
+                        <div class="fw-bold">{{ inv.qc_broken }}%</div>
                       </div>
+                      {% endif %}
+
+                      {% if inv.qc_karda %}
+                      <div class="col-6">
+                        <small class="text-muted">Karda</small>
+                        <div class="fw-bold">{{ inv.qc_karda }}</div>
+                      </div>
+                      {% endif %}
+
+                      {% if inv.qc_oil %}
+                      <div class="col-6">
+                        <small class="text-muted">Oil</small>
+                        <div class="fw-bold">{{ inv.qc_oil }}%</div>
+                      </div>
+                      {% endif %}
+
+                      {% if inv.qc_mitti %}
+                      <div class="col-6">
+                        <small class="text-muted">Mitti</small>
+                        <div class="fw-bold">{{ inv.qc_mitti }}</div>
+                      </div>
+                      {% endif %}
+
+                      {% if inv.qc_ssa %}
+                      <div class="col-6">
+                        <small class="text-muted">SSA</small>
+                        <div class="fw-bold">{{ inv.qc_ssa }}</div>
+                      </div>
+                      {% endif %}
+
+                      {% if inv.qc_claim %}
+                      <div class="col-6">
+                        <small class="text-muted">Claim</small>
+                        <div class="fw-bold text-danger">₹{{ inv.qc_claim }}</div>
+                      </div>
+                      {% endif %}
+
                       {% if inv.qc_freight %}
                       <div class="col-12 mt-2">
                         <small class="text-muted">Freight (Paid)</small>
@@ -277,10 +323,48 @@
                             <input type="number" step="0.01" name="qc_weight" class="form-control form-control-sm"
                               placeholder="Net Qt" value="{{ inv.qc_weight or inv.qty }}" required>
                           </div>
+
+                          {% if crop_name.lower() == 'chawal' %}
+                          <div class="col-6">
+                            <input type="number" step="0.01" name="qc_broken" class="form-control form-control-sm"
+                              placeholder="Broken %" value="{{ inv.qc_broken or '' }}">
+                          </div>
+                          {% else %}
                           <div class="col-6">
                             <input type="number" step="0.01" name="qc_moisture" class="form-control form-control-sm"
                               placeholder="Moisture %" value="{{ inv.qc_moisture or '' }}" required>
                           </div>
+                          {% endif %}
+
+                          {% if crop_name.lower() == 'sarso' %}
+                          <div class="col-6">
+                            <input type="number" step="0.01" name="qc_karda" class="form-control form-control-sm"
+                              placeholder="Karda" value="{{ inv.qc_karda or '' }}">
+                          </div>
+                          <div class="col-6">
+                            <input type="number" step="0.01" name="qc_oil" class="form-control form-control-sm"
+                              placeholder="Oil %" value="{{ inv.qc_oil or '' }}">
+                          </div>
+                          {% endif %}
+
+                          {% if crop_name.lower() == 'mustard oil cake' %}
+                          <div class="col-6">
+                            <input type="number" step="0.01" name="qc_mitti" class="form-control form-control-sm"
+                              placeholder="Mitti" value="{{ inv.qc_mitti or '' }}">
+                          </div>
+                          <div class="col-6">
+                            <input type="number" step="0.01" name="qc_ssa" class="form-control form-control-sm"
+                              placeholder="SSA" value="{{ inv.qc_ssa or '' }}">
+                          </div>
+                          {% endif %}
+
+                          {% if crop_name.lower() in ['paddy', 'sarso', 'maize', 'mustard oil cake'] %}
+                          <div class="col-6">
+                            <input type="number" step="0.01" name="qc_claim" class="form-control form-control-sm"
+                              placeholder="Claim Amount" value="{{ inv.qc_claim or '' }}">
+                          </div>
+                          {% endif %}
+
                           <div class="col-12 mt-2">
                             <label class="form-label small mb-1">Freight (Paid by Miller)</label>
                             <input type="number" step="0.01" name="qc_freight" class="form-control form-control-sm"
@@ -326,10 +410,48 @@
                           <input type="number" step="0.01" name="qc_weight" class="form-control form-control-sm"
                             placeholder="Net Qt" value="{{ inv.qc_weight or inv.qty }}" required>
                         </div>
+
+                        {% if crop_name.lower() == 'chawal' %}
+                        <div class="col-6">
+                          <input type="number" step="0.01" name="qc_broken" class="form-control form-control-sm"
+                            placeholder="Broken %" value="{{ inv.qc_broken or '' }}">
+                        </div>
+                        {% else %}
                         <div class="col-6">
                           <input type="number" step="0.01" name="qc_moisture" class="form-control form-control-sm"
                             placeholder="Moisture %" value="{{ inv.qc_moisture or '' }}" required>
                         </div>
+                        {% endif %}
+
+                        {% if crop_name.lower() == 'sarso' %}
+                        <div class="col-6">
+                          <input type="number" step="0.01" name="qc_karda" class="form-control form-control-sm"
+                            placeholder="Karda" value="{{ inv.qc_karda or '' }}">
+                        </div>
+                        <div class="col-6">
+                          <input type="number" step="0.01" name="qc_oil" class="form-control form-control-sm"
+                            placeholder="Oil %" value="{{ inv.qc_oil or '' }}">
+                        </div>
+                        {% endif %}
+
+                        {% if crop_name.lower() == 'mustard oil cake' %}
+                        <div class="col-6">
+                          <input type="number" step="0.01" name="qc_mitti" class="form-control form-control-sm"
+                            placeholder="Mitti" value="{{ inv.qc_mitti or '' }}">
+                        </div>
+                        <div class="col-6">
+                          <input type="number" step="0.01" name="qc_ssa" class="form-control form-control-sm"
+                            placeholder="SSA" value="{{ inv.qc_ssa or '' }}">
+                        </div>
+                        {% endif %}
+
+                        {% if crop_name.lower() in ['paddy', 'sarso', 'maize', 'mustard oil cake'] %}
+                        <div class="col-6">
+                          <input type="number" step="0.01" name="qc_claim" class="form-control form-control-sm"
+                            placeholder="Claim Amount" value="{{ inv.qc_claim or '' }}">
+                        </div>
+                        {% endif %}
+
                         <div class="col-12 mt-2">
                           <label class="form-label small mb-1">Freight (Paid by Miller)</label>
                           <input type="number" step="0.01" name="qc_freight" class="form-control form-control-sm"
@@ -428,7 +550,27 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script>AOS.init({ duration: 600, once: true });</script>
+  <script>
+    AOS.init({ duration: 600, once: true });
+
+    document.getElementById('qcSearch').addEventListener('keyup', function () {
+      let filter = this.value.toLowerCase();
+      let cards = document.querySelectorAll('.completed-loading-card');
+
+      cards.forEach(card => {
+        let col = card.closest('.col-md-6');
+        let text = card.textContent.toLowerCase();
+
+        if (text.includes(filter)) {
+          if (col) col.style.display = '';
+          else card.style.display = '';
+        } else {
+          if (col) col.style.display = 'none';
+          else card.style.display = 'none';
+        }
+      });
+    });
+  </script>
 </body>
 
 </html>

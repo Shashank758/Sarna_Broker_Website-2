@@ -432,8 +432,35 @@ def upgrade_loading_invoices_debit_note():
     con.commit()
     con.close()
 
+
+
+def upgrade_loading_invoices_extended_qc():
+    """Add extended QC fields for specific crops."""
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("PRAGMA table_info(loading_invoices)")
+    cols = [c[1] for c in cur.fetchall()]
+
+    new_cols = [
+        ("qc_broken", "REAL"),
+        ("qc_karda", "REAL"),
+        ("qc_oil", "REAL"),
+        ("qc_mitti", "REAL"),
+        ("qc_ssa", "REAL"),
+        ("qc_claim", "REAL"),
+    ]
+
+    for col_name, col_type in new_cols:
+        if col_name not in cols:
+            cur.execute(f"ALTER TABLE loading_invoices ADD COLUMN {col_name} {col_type}")
+
+    con.commit()
+    con.close()
+
 upgrade_loading_invoices()
 upgrade_loading_invoices_debit_note()
+upgrade_loading_invoices_extended_qc()
    
 def get_effective_user_id():
     # For miller staff → parent miller
@@ -444,6 +471,99 @@ def get_effective_user_id():
 
     # Otherwise → logged in user
     return session.get("user_id")
+
+@app.context_processor
+def inject_pending_counts():
+    """Inject notification counts into templates."""
+    if not session.get("user_id"):
+        return dict()
+    
+    counts = {}
+    user_id = session.get("user_id")
+    
+    # Determine IDs
+    miller_id = user_id
+    if session.get("role") == "miller" and session.get("is_staff"):
+        if session.get("parent_miller_id"):
+            miller_id = session.get("parent_miller_id")
+            
+    buyer_id = user_id
+    
+    try:
+        con = get_db()
+        cur = con.cursor()
+        
+        # --- MILLER METRICS ---
+        # 1. Pending Orders
+        cur.execute("""
+            SELECT count(*) FROM miller_bookings mb 
+            JOIN miller_stock ms ON mb.stock_id = ms.id 
+            WHERE ms.miller_id=? AND mb.status='pending'
+        """, (miller_id,))
+        m_orders = cur.fetchone()[0]
+        
+        # 2. Pending QC
+        cur.execute("""
+            SELECT count(*) FROM loading_invoices li
+            JOIN miller_bookings mb ON li.booking_id = mb.id
+            JOIN miller_stock ms ON mb.stock_id = ms.id
+            WHERE ms.miller_id=? AND (li.qc_status IS NULL OR li.qc_status='pending')
+        """, (miller_id,))
+        m_qc = cur.fetchone()[0]
+        
+        # 3. Pending Payments
+        cur.execute("""
+            SELECT count(*) FROM loading_invoices li
+            JOIN miller_bookings mb ON li.booking_id = mb.id
+            JOIN miller_stock ms ON mb.stock_id = ms.id
+            WHERE ms.miller_id=? 
+              AND li.final_invoice_file IS NOT NULL 
+              AND (li.payment_status IS NULL OR li.payment_status != 'paid')
+        """, (miller_id,))
+        m_pay = cur.fetchone()[0]
+        
+        # 4. Active (Approved) Orders - Strictly those in loading process (not yet loaded/completed)
+        cur.execute("""
+            SELECT count(*) FROM miller_bookings mb
+            JOIN miller_stock ms ON mb.stock_id = ms.id
+            WHERE ms.miller_id=? 
+              AND mb.status='approved' 
+              AND (mb.loading_status IS NULL OR mb.loading_status IN ('pending', 'partial', 'active'))
+        """, (miller_id,))
+        m_active = cur.fetchone()[0]
+        
+        counts['miller_pending_orders'] = m_orders
+        counts['miller_pending_qc'] = m_qc
+        counts['miller_pending_payments'] = m_pay
+        counts['miller_active_orders'] = m_active
+        
+        # Total counts
+        counts['miller_total_pending'] = m_orders + m_qc + m_pay + m_active
+        
+        # --- BUYER METRICS ---
+        # 1. Pending Requests
+        cur.execute("SELECT count(*) FROM miller_bookings WHERE buyer_id=? AND status='pending'", (buyer_id,))
+        b_req = cur.fetchone()[0]
+        
+        # 2. Active Orders (Approved but not yet loaded/completed)
+        cur.execute("""
+            SELECT count(*) FROM miller_bookings 
+            WHERE buyer_id=? 
+              AND status='approved' 
+              AND (loading_status IS NULL OR loading_status IN ('pending', 'partial', 'active'))
+        """, (buyer_id,))
+        b_active = cur.fetchone()[0]
+        
+        counts['buyer_pending_requests'] = b_req
+        counts['buyer_active_orders'] = b_active
+        counts['buyer_total_pending'] = b_req + b_active
+
+        con.close()
+    except Exception as e:
+        print(f"Error in context processor: {e}")
+        return dict()
+        
+    return counts
 @app.route("/_fix_staff_miller_data")
 def fix_staff_miller_data():
     con = get_db()
@@ -1160,6 +1280,24 @@ def logout():
     session.clear()
     return redirect("/")
 
+@app.route("/switch_role/<target_role>")
+def switch_role(target_role):
+    if not session.get("user_id"):
+        return redirect("/")
+    
+    current_role = session.get("role")
+    
+    # Security: Only allow switching between miller and buyer
+    if current_role in ["miller", "buyer"] and target_role in ["miller", "buyer"]:
+        session["role"] = target_role
+        
+        if target_role == "buyer":
+            return redirect("/market")
+        elif target_role == "miller":
+            return redirect("/miller")
+            
+    return redirect("/")
+
 # ---------------- FARMER ----------------
 @app.route("/post_crop", methods=["GET","POST"])
 def post_crop():
@@ -1445,7 +1583,8 @@ def miller_approved_page():
         SELECT
             id, booking_id, loaded_qty, invoice_file, truck_number, created_at,
             qc_weight, qc_moisture, qc_remarks, qc_status, qc_at,
-            final_invoice_file, payment_status, payment_at, qc_freight
+            final_invoice_file, payment_status, payment_at, qc_freight,
+            qc_broken, qc_karda, qc_oil, qc_mitti, qc_ssa, qc_claim
         FROM loading_invoices
         ORDER BY created_at ASC
     """)
@@ -1467,7 +1606,13 @@ def miller_approved_page():
             "final_invoice_file": r[11],
             "payment_status": r[12] or "pending",
             "payment_at": r[13],
-            "qc_freight": r[14]
+            "qc_freight": r[14],
+            "qc_broken": r[15],
+            "qc_karda": r[16],
+            "qc_oil": r[17],
+            "qc_mitti": r[18],
+            "qc_ssa": r[19],
+            "qc_claim": r[20]
         })
 
     con.close()
@@ -1517,7 +1662,8 @@ def miller_qc_page():
     cur.execute("""
     SELECT id, booking_id, loaded_qty, invoice_file, truck_number, created_at,
            qc_weight, qc_moisture, qc_remarks, qc_status, qc_at,
-           final_invoice_file, payment_status, payment_at, qc_freight
+           final_invoice_file, payment_status, payment_at, qc_freight,
+           qc_broken, qc_karda, qc_oil, qc_mitti, qc_ssa, qc_claim
     FROM loading_invoices
     ORDER BY created_at ASC
     """)
@@ -1539,7 +1685,13 @@ def miller_qc_page():
             "final_invoice_file": r[11],
             "payment_status": r[12] or "pending",
             "payment_at": r[13],
-            "qc_freight": r[14]
+            "qc_freight": r[14],
+            "qc_broken": r[15],
+            "qc_karda": r[16],
+            "qc_oil": r[17],
+            "qc_mitti": r[18],
+            "qc_ssa": r[19],
+            "qc_claim": r[20]
         })
 
     # 3️⃣ FILTER ONLY COMPLETED LOADING → QC REQUIRED
@@ -1645,7 +1797,13 @@ def miller_final_hisab_page():
             li.final_invoice_file,
             li.payment_status,
             li.payment_at,
-            li.qc_freight
+            li.qc_freight,
+            li.qc_broken,
+            li.qc_karda,
+            li.qc_oil,
+            li.qc_mitti,
+            li.qc_ssa,
+            li.qc_claim
         FROM loading_invoices li
         JOIN miller_bookings mb ON li.booking_id = mb.id
         JOIN miller_stock ms ON mb.stock_id = ms.id
@@ -1670,7 +1828,13 @@ def miller_final_hisab_page():
             "final_invoice_file": r[11],
             "payment_status": r[12] or "pending",
             "payment_at": r[13],
-            "qc_freight": r[14]
+            "qc_freight": r[14],
+            "qc_broken": r[15],
+            "qc_karda": r[16],
+            "qc_oil": r[17],
+            "qc_mitti": r[18],
+            "qc_ssa": r[19],
+            "qc_claim": r[20]
         })
 
     # Filter: Only show bookings that have AT LEAST ONE TRUCK needing Final Invoice
@@ -1900,7 +2064,8 @@ def miller_payment_completed_page():
     cur.execute("""
         SELECT li.id, li.booking_id, li.loaded_qty, li.invoice_file, li.truck_number, li.created_at,
                li.qc_weight, li.qc_moisture, li.qc_remarks, li.qc_status, li.qc_at,
-               li.final_invoice_file, li.payment_status, li.payment_at, li.qc_freight
+               li.final_invoice_file, li.payment_status, li.payment_at, li.qc_freight,
+               li.qc_broken, li.qc_karda, li.qc_oil, li.qc_mitti, li.qc_ssa, li.qc_claim
         FROM loading_invoices li
         JOIN miller_bookings mb ON li.booking_id = mb.id
         JOIN miller_stock ms ON mb.stock_id = ms.id
@@ -1924,7 +2089,14 @@ def miller_payment_completed_page():
             "qc_at": r[10],
             "final_invoice_file": r[11],
             "payment_status": r[12] or "pending",
-            "payment_at": r[13]
+            "payment_at": r[13],
+            "qc_freight": r[14],
+            "qc_broken": r[15],
+            "qc_karda": r[16],
+            "qc_oil": r[17],
+            "qc_mitti": r[18],
+            "qc_ssa": r[19],
+            "qc_claim": r[20]
         })
 
     con.close()
@@ -3276,7 +3448,8 @@ def buyer_debit_note(invoice_id):
     cur.execute("""
         SELECT li.id, li.truck_number, li.loaded_qty, li.final_invoice_file, li.payment_status,
                mb.order_id, ms.crop, IFNULL(mb.price, ms.price), u.name, mb.id,
-               li.qc_weight, li.qc_moisture, li.qc_remarks, li.qc_freight
+               li.qc_weight, li.qc_moisture, li.qc_remarks, li.qc_freight,
+               li.qc_broken, li.qc_karda, li.qc_oil, li.qc_mitti, li.qc_ssa, li.qc_claim
         FROM loading_invoices li
         JOIN miller_bookings mb ON li.booking_id = mb.id
         JOIN miller_stock ms ON mb.stock_id = ms.id
@@ -3305,6 +3478,12 @@ def buyer_debit_note(invoice_id):
         "qc_moisture": inv[11],
         "qc_remarks": inv[12],
         "qc_freight": inv[13],
+        "qc_broken": inv[14],
+        "qc_karda": inv[15],
+        "qc_oil": inv[16],
+        "qc_mitti": inv[17],
+        "qc_ssa": inv[18],
+        "qc_claim": inv[19],
         "total_amount": round((inv[2] or 0) * (inv[7] or 0), 2)
     }
     
@@ -3779,21 +3958,31 @@ def miller_update_qc(invoice_id):
     qc_moisture = request.form.get("qc_moisture") or None
     qc_remarks = request.form.get("qc_remarks") or ""
     qc_freight = request.form.get("qc_freight") or None
+    
+    # New QC Fields
+    qc_broken = request.form.get("qc_broken") or None
+    qc_karda = request.form.get("qc_karda") or None
+    qc_oil = request.form.get("qc_oil") or None
+    qc_mitti = request.form.get("qc_mitti") or None
+    qc_ssa = request.form.get("qc_ssa") or None
+    qc_claim = request.form.get("qc_claim") or None
 
-    try:
-        qc_weight_val = float(qc_weight) if qc_weight not in (None, "",) else None
-    except ValueError:
-        qc_weight_val = None
+    def safe_float(val):
+        try:
+            return float(val) if val not in (None, "",) else None
+        except ValueError:
+            return None
 
-    try:
-        qc_moisture_val = float(qc_moisture) if qc_moisture not in (None, "",) else None
-    except ValueError:
-        qc_moisture_val = None
-
-    try:
-        qc_freight_val = float(qc_freight) if qc_freight not in (None, "",) else None
-    except ValueError:
-        qc_freight_val = None
+    qc_weight_val = safe_float(qc_weight)
+    qc_moisture_val = safe_float(qc_moisture)
+    qc_freight_val = safe_float(qc_freight)
+    
+    qc_broken_val = safe_float(qc_broken)
+    qc_karda_val = safe_float(qc_karda)
+    qc_oil_val = safe_float(qc_oil)
+    qc_mitti_val = safe_float(qc_mitti)
+    qc_ssa_val = safe_float(qc_ssa)
+    qc_claim_val = safe_float(qc_claim)
 
     # Update QC for this specific invoice (truck)
     cur.execute("""
@@ -3803,9 +3992,17 @@ def miller_update_qc(invoice_id):
             qc_remarks=?,
             qc_status='verified',
             qc_at=CURRENT_TIMESTAMP,
-            qc_freight=?
+            qc_freight=?,
+            qc_broken=?,
+            qc_karda=?,
+            qc_oil=?,
+            qc_mitti=?,
+            qc_ssa=?,
+            qc_claim=?
         WHERE id=?
-    """, (qc_weight_val, qc_moisture_val, qc_remarks, qc_freight_val, invoice_id))
+    """, (qc_weight_val, qc_moisture_val, qc_remarks, qc_freight_val,
+          qc_broken_val, qc_karda_val, qc_oil_val, qc_mitti_val, qc_ssa_val, qc_claim_val,
+          invoice_id))
     
     # 📱 Send SMS to buyer about QC update
     cur.execute("""
@@ -4284,7 +4481,8 @@ def admin_bookings():
         cur.execute(f"""
             SELECT id, booking_id, loaded_qty, invoice_file, truck_number, created_at,
                    qc_weight, qc_moisture, qc_remarks, qc_status, qc_at,
-                   final_invoice_file, payment_status, payment_at, qc_freight, debit_note
+                   final_invoice_file, payment_status, payment_at, qc_freight, debit_note,
+                   qc_broken, qc_karda, qc_oil, qc_mitti, qc_ssa, qc_claim
             FROM loading_invoices
             WHERE booking_id IN ({placeholders})
             ORDER BY created_at ASC
@@ -4306,7 +4504,13 @@ def admin_bookings():
                 "payment_status": r[12] or "pending",
                 "payment_at": r[13],
                 "qc_freight": r[14],
-                "debit_note": r[15] if len(r) > 15 else 0
+                "debit_note": r[15],
+                "qc_broken": r[16],
+                "qc_karda": r[17],
+                "qc_oil": r[18],
+                "qc_mitti": r[19],
+                "qc_ssa": r[20],
+                "qc_claim": r[21]
             })
 
     con.close()
@@ -4412,6 +4616,19 @@ def block_user(id):
     con.commit()
     con.close()
     return redirect("/admin/users")
+
+@app.route("/admin/unblock_user/<int:id>")
+def unblock_user(id):
+    if session.get("role") != "admin":
+        return redirect("/")
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("UPDATE users SET status='approved' WHERE id=?", (id,))
+    con.commit()
+    con.close()
+    return redirect("/admin/users")
+
 @app.route("/admin/reject_user/<int:id>")
 def reject_user(id):
     if session.get("role") != "admin":
@@ -4488,27 +4705,59 @@ def admin_update_truck(invoice_id):
         return redirect("/")
 
     qc_freight = request.form.get("qc_freight")
-    debit_note = request.form.get("debit_note")
+    truck_number = request.form.get("truck_number")
+    loaded_qty = request.form.get("loaded_qty")
+    
+    qc_weight = request.form.get("qc_weight")
+    qc_moisture = request.form.get("qc_moisture")
+    qc_broken = request.form.get("qc_broken")
+    qc_karda = request.form.get("qc_karda")
+    qc_oil = request.form.get("qc_oil")
+    qc_mitti = request.form.get("qc_mitti")
+    qc_ssa = request.form.get("qc_ssa")
+    qc_claim = request.form.get("qc_claim")
+    qc_freight = request.form.get("qc_freight")
+    qc_remarks = request.form.get("qc_remarks")
 
-    try:
-        qc_freight_val = float(qc_freight) if qc_freight not in (None, "") else None
-    except ValueError:
-        qc_freight_val = None
+    def safe_float(val):
+        try:
+            return float(val) if val not in (None, "") else None
+        except ValueError:
+            return None
 
-    try:
-        debit_note_val = float(debit_note) if debit_note not in (None, "") else None
-    except ValueError:
-        debit_note_val = None
+    loaded_qty_val = safe_float(loaded_qty)
+    qc_weight_val = safe_float(qc_weight)
+    qc_moisture_val = safe_float(qc_moisture)
+    qc_broken_val = safe_float(qc_broken)
+    qc_karda_val = safe_float(qc_karda)
+    qc_oil_val = safe_float(qc_oil)
+    qc_mitti_val = safe_float(qc_mitti)
+    qc_ssa_val = safe_float(qc_ssa)
+    qc_claim_val = safe_float(qc_claim)
+    qc_freight_val = safe_float(qc_freight)
 
     con = get_db()
     cur = con.cursor()
 
     cur.execute("""
         UPDATE loading_invoices
-        SET qc_freight=?,
-            debit_note=?
+        SET truck_number=?,
+            loaded_qty=?,
+            qc_weight=?,
+            qc_moisture=?,
+            qc_broken=?,
+            qc_karda=?,
+            qc_oil=?,
+            qc_mitti=?,
+            qc_ssa=?,
+            qc_claim=?,
+            qc_freight=?,
+            qc_remarks=?,
+            qc_status='verified'
         WHERE id=?
-    """, (qc_freight_val, debit_note_val, invoice_id))
+    """, (truck_number, loaded_qty_val, qc_weight_val, qc_moisture_val, 
+          qc_broken_val, qc_karda_val, qc_oil_val, qc_mitti_val, qc_ssa_val, qc_claim_val,
+          qc_freight_val, qc_remarks, invoice_id))
 
     con.commit()
     con.close()

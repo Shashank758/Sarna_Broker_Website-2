@@ -62,7 +62,7 @@
 
     <div class="page-header">
         <div class="container">
-            <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
                     <h2 class="fw-bold mb-1">Rejected Orders</h2>
                     <p class="mb-0 text-white-50">Orders declined by miller or cancelled</p>
@@ -70,6 +70,8 @@
                 <a href="/market" class="btn btn-outline-light btn-sm"><i class="fa fa-arrow-left me-2"></i>Back to
                     Market</a>
             </div>
+            <input type="text" id="rejectedSearch" class="form-control form-control-sm" style="max-width: 300px;"
+                placeholder="Search Order ID, Miller, Crop...">
         </div>
     </div>
 
@@ -130,6 +132,25 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('rejectedSearch').addEventListener('keyup', function () {
+            let filter = this.value.toLowerCase();
+            let cards = document.querySelectorAll('.order-card');
+
+            cards.forEach(card => {
+                let col = card.closest('.col-md-6');
+                let text = card.textContent.toLowerCase();
+
+                if (text.includes(filter)) {
+                    if (col) col.style.display = '';
+                    else card.style.display = '';
+                } else {
+                    if (col) col.style.display = 'none';
+                    else card.style.display = 'none';
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

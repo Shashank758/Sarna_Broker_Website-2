@@ -145,6 +145,48 @@
                                     <span class="fw-bold text-success">₹{{ invoice.qc_freight }}</span>
                                 </div>
                                 {% endif %}
+
+                                {% if invoice.qc_broken %}
+                                <div class="detail-row">
+                                    <span class="text-muted">Broken</span>
+                                    <span class="fw-bold">{{ invoice.qc_broken }}%</span>
+                                </div>
+                                {% endif %}
+
+                                {% if invoice.qc_karda %}
+                                <div class="detail-row">
+                                    <span class="text-muted">Karda</span>
+                                    <span class="fw-bold">{{ invoice.qc_karda }}</span>
+                                </div>
+                                {% endif %}
+
+                                {% if invoice.qc_oil %}
+                                <div class="detail-row">
+                                    <span class="text-muted">Oil</span>
+                                    <span class="fw-bold">{{ invoice.qc_oil }}%</span>
+                                </div>
+                                {% endif %}
+
+                                {% if invoice.qc_mitti %}
+                                <div class="detail-row">
+                                    <span class="text-muted">Mitti</span>
+                                    <span class="fw-bold">{{ invoice.qc_mitti }}</span>
+                                </div>
+                                {% endif %}
+
+                                {% if invoice.qc_ssa %}
+                                <div class="detail-row">
+                                    <span class="text-muted">SSA</span>
+                                    <span class="fw-bold">{{ invoice.qc_ssa }}</span>
+                                </div>
+                                {% endif %}
+
+                                {% if invoice.qc_claim %}
+                                <div class="detail-row">
+                                    <span class="text-muted">Claim</span>
+                                    <span class="fw-bold text-danger">₹{{ invoice.qc_claim }}</span>
+                                </div>
+                                {% endif %}
                                 {% if invoice.qc_remarks %}
                                 <div class="detail-row">
                                     <span class="text-muted">Remarks</span>

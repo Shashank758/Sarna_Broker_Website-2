@@ -275,43 +275,43 @@
           </div>
         </div>
 
-      <!-- ================= CHARTS ================= -->
-      <!-- ================= CHARTS ================= -->
-      <div class="row mt-4">
-        <!-- Booking Status Chart -->
-        <div class="col-md-6 mb-4">
-          <div class="table-card">
-            <h6>📊 Booking Status Distribution</h6>
-            <canvas id="bookingStatusChart" style="max-height: 300px;"></canvas>
+        <!-- ================= CHARTS ================= -->
+        <!-- ================= CHARTS ================= -->
+        <div class="row mt-4">
+          <!-- Booking Status Chart -->
+          <div class="col-md-6 mb-4">
+            <div class="table-card">
+              <h6>📊 Booking Status Distribution</h6>
+              <canvas id="bookingStatusChart" style="max-height: 300px;"></canvas>
+            </div>
+          </div>
+
+          <!-- User Status Chart -->
+          <div class="col-md-6 mb-4">
+            <div class="table-card">
+              <h6>👥 User Status Distribution</h6>
+              <canvas id="userStatusChart" style="max-height: 300px;"></canvas>
+            </div>
           </div>
         </div>
 
-        <!-- User Status Chart -->
-        <div class="col-md-6 mb-4">
-          <div class="table-card">
-            <h6>👥 User Status Distribution</h6>
-            <canvas id="userStatusChart" style="max-height: 300px;"></canvas>
+        <div class="row mt-4">
+          <!-- Stock by Crop Chart -->
+          <div class="col-md-6 mb-4">
+            <div class="table-card">
+              <h6>🌾 Stock Quantity by Crop</h6>
+              <canvas id="stockByCropChart" style="max-height: 300px;"></canvas>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <div class="row mt-4">
-        <!-- Stock by Crop Chart -->
-        <div class="col-md-6 mb-4">
-          <div class="table-card">
-            <h6>🌾 Stock Quantity by Crop</h6>
-            <canvas id="stockByCropChart" style="max-height: 300px;"></canvas>
+          <!-- Recent Bookings Trend -->
+          <div class="col-md-6 mb-4">
+            <div class="table-card">
+              <h6>📈 Recent Bookings (Last 7 Days)</h6>
+              <canvas id="recentBookingsChart" style="max-height: 300px;"></canvas>
+            </div>
           </div>
         </div>
-
-        <!-- Recent Bookings Trend -->
-        <div class="col-md-6 mb-4">
-          <div class="table-card">
-            <h6>📈 Recent Bookings (Last 7 Days)</h6>
-            <canvas id="recentBookingsChart" style="max-height: 300px;"></canvas>
-          </div>
-        </div>
-      </div>
 
     </main>
   </div>
@@ -364,8 +364,8 @@
 
     // Stock by Crop Chart
     const stockByCropCtx = document.getElementById('stockByCropChart').getContext('2d');
-    const cropLabels = [{% if crop_stats and crop_stats | length > 0 %}{% for crop, data in crop_stats.items() %} '{{ crop }}'{% if not loop.last %}, {% endif %} {% endfor %} {% else %} []{% endif %}];
-    const cropQuantities = [{% if crop_stats and crop_stats | length > 0 %}{% for crop, data in crop_stats.items() %} { { data.quantity } } {% if not loop.last %}, {% endif %} {% endfor %} {% else %} []{% endif %}];
+    const cropLabels = [{% if crop_stats and crop_stats | length > 0 %}{% for crop, data in crop_stats.items() %} '{{ crop }}'{% if not loop.last %}, {% endif %} {% endfor %} {% endif %}];
+    const cropQuantities = [{% if crop_stats and crop_stats | length > 0 %}{% for crop, data in crop_stats.items() %} { { data.quantity } } {% if not loop.last %}, {% endif %} {% endfor %} {% endif %}];
 
     {% if crop_stats and crop_stats | length > 0 %}
     new Chart(stockByCropCtx, {
@@ -415,8 +415,8 @@
 
     // Recent Bookings Trend
     const recentBookingsCtx = document.getElementById('recentBookingsChart').getContext('2d');
-    const bookingDates = [{% if recent_bookings_dates and recent_bookings_dates | length > 0 %}{% for date in recent_bookings_dates %} '{{ date }}'{% if not loop.last %}, {% endif %} {% endfor %} {% else %} []{% endif %}];
-    const bookingCounts = [{% if recent_bookings_counts and recent_bookings_counts | length > 0 %}{% for count in recent_bookings_counts %} { { count } } {% if not loop.last %}, {% endif %} {% endfor %} {% else %} []{% endif %}];
+    const bookingDates = [{% if recent_bookings_dates and recent_bookings_dates | length > 0 %}{% for date in recent_bookings_dates %} '{{ date }}'{% if not loop.last %}, {% endif %} {% endfor %} {% endif %}];
+    const bookingCounts = [{% if recent_bookings_counts and recent_bookings_counts | length > 0 %}{% for count in recent_bookings_counts %} { { count } } {% if not loop.last %}, {% endif %} {% endfor %} {% endif %}];
 
     {% if recent_bookings_dates and recent_bookings_dates | length > 0 %}
     new Chart(recentBookingsCtx, {
