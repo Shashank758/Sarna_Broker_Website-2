@@ -1217,7 +1217,8 @@ def register():
         # Profile fields
         phone = request.form.get("phone", "").strip()
         address = request.form.get("address", "").strip()
-        firm_name = request.form.get("firm_name", "").strip()
+        # firm_name is now same as name
+        firm_name = name
         
         # File uploads
         gst_doc = request.files.get("gst_doc")
@@ -1720,9 +1721,9 @@ def miller_qc_page():
         if listing_invoices:
             all_trucks_invoiced = all(inv['final_invoice_file'] for inv in listing_invoices)
         
-        # Logic: Show in QC list if (Fully Loaded OR Partial Closed) AND (Payment Pending) AND (Not All Truck Invoices Uploaded)
+        # Logic: Show in QC list if (Fully Loaded OR Overloaded OR Partial Closed) AND (Payment Pending) AND (Not All Truck Invoices Uploaded)
         # removing 'not final_invoice' check as we don't use booking level invoice now
-        if (abs(loaded_val - booked_val) < EPS or b[8] == 'partial_closed') and payment_status != 'paid' and not all_trucks_invoiced:
+        if (loaded_val >= (booked_val - EPS) or b[8] == 'partial_closed') and payment_status != 'paid' and not all_trucks_invoiced:
             completed_loading_qc.append(b)
 
     con.close()
@@ -3037,9 +3038,11 @@ def market():
         miller_stock.created_at,   -- 8
         miller_stock.status,       -- 9
         users.name,                -- 10 (miller name)
-        miller_stock.note          -- 11
+        miller_stock.note,         -- 11
+        mp.address                 -- 12 (miller location)
     FROM miller_stock
     JOIN users ON miller_stock.miller_id = users.id
+    LEFT JOIN miller_profiles mp ON users.id = mp.miller_id
     WHERE miller_stock.quantity > 0
     AND miller_stock.status = 'open'
     ORDER BY miller_stock.created_at DESC
@@ -3782,16 +3785,16 @@ def buyer_update_loading(id):
 
     remaining = total_qty - loaded_qty
 
-    if load_qty > remaining:
-        load_qty = remaining
+    # Remove artificial cap on load_qty
+    # if load_qty > remaining:
+    #     load_qty = remaining
 
     new_loaded = loaded_qty + load_qty
 
-    # Float-safe completion check
+    # Float-safe completion check (still marks as loaded if fully loaded)
     EPS = 1e-6
-    if abs(new_loaded - total_qty) < EPS:
-        new_loaded = total_qty
-
+    # Loading status logic: 'loaded' if >= total booked. 
+    # If overloaded, it is also 'loaded'.
     loading_status = "loaded" if new_loaded >= (total_qty - EPS) else "partial"
     truck_status = loading_status
 
@@ -3814,13 +3817,17 @@ def buyer_update_loading(id):
     """, (id, load_qty, filename, truck_number_val))
 
     # 🔹 MOVE RESERVED → USED STOCK
+    # Only deduct from reserved_qty up to the original booked amount
+    remaining_reserved = max(0, total_qty - loaded_qty)
+    deduct_from_reserved = min(load_qty, remaining_reserved)
+
     cur.execute("""
         UPDATE miller_stock
         SET
             quantity = quantity - ?,
             reserved_qty = reserved_qty - ?
         WHERE id=?
-    """, (load_qty, load_qty, stock_id))
+    """, (load_qty, deduct_from_reserved, stock_id))
 
     # 🔹 Auto close stock if empty
     cur.execute("""

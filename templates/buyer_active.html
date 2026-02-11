@@ -338,16 +338,16 @@
               </div>
               {% endif %}
 
-              <!-- 🔥 UPDATE LOADING BAR (ADDED) -->
-              {% if o.loaded < o.booked %} <div class="col-12">
-
-
+              <!-- 🔥 UPDATE LOADING BAR (ALLOWED OVERLOADING) -->
+              {% if o.loading_status != 'partial_closed' %}
+              <div class="col-12">
                 <form method="POST" action="/buyer/update_loading/{{ o.id }}" enctype="multipart/form-data"
                   class="update-bar row g-2 align-items-center">
 
                   <div class="col-md-3">
-                    <input type="number" name="load_qty" class="form-control" min="1" step="0.01"
-                      max="{{ o.booked - o.loaded }}" placeholder="Qty to load" required>
+                    <!-- Removed max attribute to allow overloading -->
+                    <input type="number" name="load_qty" class="form-control" min="0.01" step="0.01"
+                      placeholder="Qty to load" required>
                   </div>
 
                   <div class="col-md-3">
@@ -365,32 +365,32 @@
                   </div>
 
                 </form>
+              </div>
+              {% endif %}
+
             </div>
-            {% endif %}
 
           </div>
-
         </div>
       </div>
-    </div>
 
-    {% endfor %}
-    {% else %}
-    <p class="text-muted">No active orders</p>
-    {% endif %}
+      {% endfor %}
+      {% else %}
+      <p class="text-muted">No active orders</p>
+      {% endif %}
 
-    <!-- PAGINATION -->
-    {% if pages > 1 %}
-    <nav class="mt-4">
-      <ul class="pagination justify-content-center">
-        {% for p in range(1, pages+1) %}
-        <li class="page-item {% if p==page %}active{% endif %}">
-          <a class="page-link" href="?page={{ p }}">{{ p }}</a>
-        </li>
-        {% endfor %}
-      </ul>
-    </nav>
-    {% endif %}
+      <!-- PAGINATION -->
+      {% if pages > 1 %}
+      <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+          {% for p in range(1, pages+1) %}
+          <li class="page-item {% if p==page %}active{% endif %}">
+            <a class="page-link" href="?page={{ p }}">{{ p }}</a>
+          </li>
+          {% endfor %}
+        </ul>
+      </nav>
+      {% endif %}
 
     </div>
   </main>

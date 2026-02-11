@@ -346,6 +346,38 @@
               {% endif %}
             </div>
 
+
+            <!-- 🔥 UPDATE LOADING BAR (ALLOWED OVERLOADING) -->
+            {% if o.loading_status != 'partial_closed' %}
+            <div class="col-12 mt-3">
+              <h6 class="fw-bold mb-2 text-primary"><i class="fa fa-truck-loading me-1"></i> Add More Loading (Overload)
+              </h6>
+              <form method="POST" action="/buyer/update_loading/{{ o.id }}" enctype="multipart/form-data"
+                class="update-bar row g-2 align-items-center">
+
+                <div class="col-md-3">
+                  <input type="number" name="load_qty" class="form-control" min="0.01" step="0.01"
+                    placeholder="Qty to load" required>
+                </div>
+
+                <div class="col-md-3">
+                  <input type="text" name="truck_number" class="form-control" placeholder="Truck number" required>
+                </div>
+
+                <div class="col-md-4">
+                  <input type="file" name="invoice" class="form-control" required>
+                </div>
+
+                <div class="col-md-2 d-grid">
+                  <button class="update-btn">
+                    <i class="fa fa-plus-circle"></i> Add
+                  </button>
+                </div>
+
+              </form>
+            </div>
+            {% endif %}
+
           </div>
 
         </div>

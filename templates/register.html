@@ -432,7 +432,7 @@
             <span class="input-group-text">
               <i class="fa fa-user"></i>
             </span>
-            <input name="name" class="form-control" placeholder="Firm Name" required>
+            <input name="name" class="form-control" placeholder="Firm Name / Owner Name" required>
           </div>
         </div>
 
@@ -498,21 +498,14 @@
 
           <!-- ADDRESS -->
           <div class="form-group">
-            <label class="form-label ms-1">Address</label>
+            <label class="form-label ms-1">Address / Location <span class="text-danger">*</span></label>
             <div class="input-group">
               <span class="input-group-text"><i class="fa fa-map-marker-alt"></i></span>
-              <input name="address" class="form-control" placeholder="Full Address">
+              <input name="address" class="form-control" placeholder="City, State (e.g. Karnal, Haryana)" required>
             </div>
           </div>
 
-          <!-- MILL/SHOP NAME -->
-          <div class="form-group" id="firmNameGroup">
-            <label class="form-label ms-1" id="firmLabel">Mill / Shop Name</label>
-            <div class="input-group">
-              <span class="input-group-text"><i class="fa fa-building"></i></span>
-              <input name="firm_name" class="form-control" placeholder="Enter Name">
-            </div>
-          </div>
+          <!-- MILL/SHOP NAME (REMOVED - now using main 'name' field) -->
 
           <!-- DOCUMENTS -->
           <div class="form-group">
@@ -534,21 +527,14 @@
         <script>
           const roleRadios = document.querySelectorAll('input[name="role"]');
           const profileDetails = document.getElementById('profileDetails');
-          const firmLabel = document.getElementById('firmLabel');
 
           roleRadios.forEach(radio => {
             radio.addEventListener('change', function () {
               if (this.value === 'miller') {
                 profileDetails.style.display = 'block';
-                firmLabel.innerText = "Mill Name";
               } else if (this.value === 'buyer') {
                 profileDetails.style.display = 'block';
-                firmLabel.innerText = "Firm / Shop Name";
               } else {
-                // Farmer - hide details logic OR keep them optional?
-                // User requirement implies "profile details" which usually implies non-farmers.
-                // Resetting or Hiding. user said "taking in profile page...". Farmer has no profile page?
-                // Assuming mostly for Miller/Buyer.
                 profileDetails.style.display = 'none';
               }
             });
