@@ -247,7 +247,7 @@
                           <i class="fa fa-file-invoice"></i> Invoice
                         </a>
 
-                        <small class="text-muted d-block">{{ inv.date[:16] }}</small>
+                        <small class="text-muted d-block">{{ inv.date.strftime('%Y-%m-%d %H:%M') }}</small>
                       </div>
 
                       <div class="text-end">
@@ -274,7 +274,7 @@
                       <small class="text-muted d-block">Remarks: {{ inv.qc_remarks }}</small>
                       {% endif %}
                       {% if inv.qc_at %}
-                      <small class="text-muted d-block">Verified on {{ inv.qc_at[:16] }}</small>
+                      <small class="text-muted d-block">Verified on {{ inv.qc_at.strftime('%Y-%m-%d %H:%M') }}</small>
                       {% endif %}
                     </div>
                     {% endif %}

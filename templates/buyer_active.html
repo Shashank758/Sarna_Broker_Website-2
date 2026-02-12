@@ -221,7 +221,7 @@
                       }}</span></div>
                   {% endif %}
                   {% if inv.qc_at %}
-                  <small class="text-muted d-block mt-2">Verified on {{ inv.qc_at[:16] }}</small>
+                  <small class="text-muted d-block mt-2">Verified on {{ inv.qc_at.strftime('%Y-%m-%d %H:%M') }}</small>
                   {% endif %}
                   {% else %}
                   <span class="text-muted small">Waiting for miller QC verification</span>
@@ -311,7 +311,7 @@
                 </a>
                 {% if o.payment_at %}
                 <small class="text-muted d-block text-center mt-2">
-                  Paid on {{ o.payment_at[:16] }}
+                  Paid on {{ o.payment_at.strftime('%Y-%m-%d %H:%M') }}
                 </small>
                 {% endif %}
                 {% elif o.final_invoice and o.payment_status != 'paid' %}

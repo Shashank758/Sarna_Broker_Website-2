@@ -233,7 +233,7 @@
                     }}</span></div>
                 {% endif %}
                 {% if inv.qc_at %}
-                <small class="text-muted d-block mt-2">Verified on {{ inv.qc_at[:16] }}</small>
+                <small class="text-muted d-block mt-2">Verified on {{ inv.qc_at.strftime('%Y-%m-%d %H:%M') }}</small>
                 {% endif %}
                 {% else %}
                 <span class="text-muted small">Waiting for miller QC verification</span>
@@ -259,7 +259,7 @@
                     {% endif %}
                   </span>
                   {% if inv.date %}
-                  <br><small class="text-muted">{{ inv.date[:16] }}</small>
+                  <br><small class="text-muted">{{ inv.date.strftime('%Y-%m-%d %H:%M') }}</small>
                   {% endif %}
                 </div>
                 <div class="d-flex gap-1">

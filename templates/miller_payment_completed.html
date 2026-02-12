@@ -196,7 +196,8 @@
                     </a>
                     {% endif %}
                     {% if inv.payment_at %}
-                    <small class="text-muted d-block text-center mt-1">Paid: {{ inv.payment_at[:16] }}</small>
+                    <small class="text-muted d-block text-center mt-1">Paid: {{ inv.payment_at.strftime('%Y-%m-%d
+                      %H:%M') }}</small>
                     {% endif %}
                   </div>
                   {% endfor %}

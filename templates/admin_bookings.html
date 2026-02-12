@@ -87,7 +87,7 @@
               <td>
                 <strong class="text-primary order-id">{{ b[11] if b[11] else 'N/A' }}</strong>
                 <br>
-                <small class="text-muted">{{ b[9][:10] if b[9] else b[15] }}</small>
+                <small class="text-muted">{{ b[9].strftime('%Y-%m-%d') if b[9] else b[15] }}</small>
               </td>
               <td class="trader-miller">
                 <div class="d-flex flex-column">

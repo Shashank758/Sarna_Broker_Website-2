@@ -110,7 +110,7 @@
             <div class="d-flex justify-content-between align-items-center">
               <small class="text-muted">
                 <i class="fa fa-industry"></i> {{ p[7] }}<br>
-                <i class="fa fa-clock"></i> {{ p[6][:16] }}
+                <i class="fa fa-clock"></i> {{ p[6].strftime('%Y-%m-%d %H:%M') }}
               </small>
 
               <a href="/static/uploads/bills/{{ p[5] }}" target="_blank" class="btn btn-sm btn-primary">

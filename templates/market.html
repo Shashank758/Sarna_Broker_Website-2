@@ -1424,7 +1424,7 @@
                       <span><i class="fa fa-box"></i> {{ booked_qty }} Qt Booked</span>
                       <span><i class="fa fa-check"></i> {{ loaded_qty }} Qt Loaded</span>
                       {% if loaded_date %}
-                      <span><i class="fa fa-calendar"></i> {{ loaded_date[:10] }}</span>
+                      <span><i class="fa fa-calendar"></i> {{ loaded_date.strftime('%Y-%m-%d') }}</span>
                       {% endif %}
                     </div>
                   </div>
@@ -1455,7 +1455,7 @@
                     </div>
                     <div class="kv">
                       <span>Loaded Date</span>
-                      <span>{{ loaded_date[:16] if loaded_date else '—' }}</span>
+                      <span>{{ loaded_date.strftime('%Y-%m-%d %H:%M') if loaded_date else '—' }}</span>
                     </div>
                     <div class="kv">
                       <span>QC Status</span>
@@ -1583,7 +1583,7 @@
                       {% endif %}
                       {% if inv.qc_at %}
                       <small class="text-muted d-block mt-2">
-                        Verified on {{ inv.qc_at[:16] }}
+                        Verified on {{ inv.qc_at.strftime('%Y-%m-%d %H:%M') }}
                       </small>
                       {% endif %}
                       {% else %}
@@ -1691,7 +1691,7 @@
                   </div>
                   <div class="kv">
                     <span>Invoice Date</span>
-                    <span>{{ inv.date[:10] }}</span>
+                    <span>{{ inv.date.strftime('%Y-%m-%d') }}</span>
                   </div>
                   {% if inv.qc_freight %}
                   <div class="kv">
@@ -1738,7 +1738,8 @@
                     <span class="order-crop">{{ inv.crop }}</span>
                     <div class="order-meta-row">
                       <span><i class="fa fa-truck"></i> {{ inv.truck_number or 'N/A' }}</span>
-                      <span><i class="fa fa-calendar-check"></i> {{ inv.payment_at[:10] if inv.payment_at else 'Paid'
+                      <span><i class="fa fa-calendar-check"></i> {{ inv.payment_at.strftime('%Y-%m-%d') if
+                        inv.payment_at else 'Paid'
                         }}</span>
                     </div>
                   </div>
@@ -1764,7 +1765,7 @@
                   </div>
                   <div class="kv">
                     <span>Paid On</span>
-                    <span>{{ inv.payment_at[:10] if inv.payment_at else 'N/A' }}</span>
+                    <span>{{ inv.payment_at.strftime('%Y-%m-%d') if inv.payment_at else 'N/A' }}</span>
                   </div>
                   {% if inv.qc_freight %}
                   <div class="kv">

@@ -262,7 +262,8 @@
                 {% endif %}
 
                 {% if booking_payment_status == 'paid' and booking_payment_at %}
-                <small class="text-muted d-block mt-2">Paid on {{ booking_payment_at[:16] }}</small>
+                <small class="text-muted d-block mt-2">Paid on {{ booking_payment_at.strftime('%Y-%m-%d %H:%M')
+                  }}</small>
                 {% endif %}
               </div>
               {% endif %}
