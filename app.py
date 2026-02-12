@@ -216,7 +216,7 @@ def upgrade_db():
     cols = [c[0] for c in cur.fetchall()]
 
     if "decision_at" not in cols:
-        cur.execute("ALTER TABLE miller_bookings ADD COLUMN decision_at DATETIME")
+        cur.execute("ALTER TABLE miller_bookings ADD COLUMN decision_at TIMESTAMP")
 
     if "reason" not in cols:
         cur.execute("ALTER TABLE miller_bookings ADD COLUMN reason TEXT")
@@ -262,7 +262,7 @@ CREATE TABLE IF NOT EXISTS users (
         user_id INTEGER,
         bill_file TEXT,
         phone TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
 
@@ -277,7 +277,7 @@ CREATE TABLE IF NOT EXISTS users (
         condition TEXT,
         bag_type TEXT,
         deduction INTEGER,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
 
@@ -291,7 +291,7 @@ CREATE TABLE IF NOT EXISTS users (
         new_price INTEGER,
         old_quantity INTEGER,
         new_quantity INTEGER,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
 
@@ -303,7 +303,7 @@ CREATE TABLE IF NOT EXISTS users (
         buyer_id INTEGER,
         quantity INTEGER,
         status TEXT DEFAULT 'pending',
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
     
@@ -313,7 +313,7 @@ CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
         miller_id INTEGER,
         text TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
 
@@ -326,7 +326,7 @@ CREATE TABLE IF NOT EXISTS miller_profiles (
     phone TEXT,
     address TEXT,
     document TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
 """)
 
@@ -392,7 +392,7 @@ def upgrade_loading_invoices():
         loaded_qty INTEGER,
         invoice_file TEXT,
         truck_number TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
 
@@ -413,7 +413,7 @@ def upgrade_loading_invoices():
     if "qc_status" not in cols:
         cur.execute("ALTER TABLE loading_invoices ADD COLUMN qc_status TEXT DEFAULT 'pending'")
     if "qc_at" not in cols:
-        cur.execute("ALTER TABLE loading_invoices ADD COLUMN qc_at DATETIME")
+        cur.execute("ALTER TABLE loading_invoices ADD COLUMN qc_at TIMESTAMP")
     
     # Per-truck final invoice fields
     if "final_invoice_file" not in cols:
@@ -421,7 +421,7 @@ def upgrade_loading_invoices():
     if "payment_status" not in cols:
         cur.execute("ALTER TABLE loading_invoices ADD COLUMN payment_status TEXT DEFAULT 'pending'")
     if "payment_at" not in cols:
-        cur.execute("ALTER TABLE loading_invoices ADD COLUMN payment_at DATETIME")
+        cur.execute("ALTER TABLE loading_invoices ADD COLUMN payment_at TIMESTAMP")
 
     con.commit()
     con.close()
@@ -658,9 +658,9 @@ def upgrade_password_resets_table():
             id SERIAL PRIMARY KEY,
             user_id INTEGER NOT NULL,
             token_hash TEXT NOT NULL,
-            expires_at DATETIME NOT NULL,
+            expires_at TIMESTAMP NOT NULL,
             used INTEGER DEFAULT 0,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
 
@@ -721,7 +721,7 @@ def upgrade_miller_booking_truck_status():
     if "loaded_at" not in cols:
         cur.execute("""
             ALTER TABLE miller_bookings
-            ADD COLUMN loaded_at DATETIME
+            ADD COLUMN loaded_at TIMESTAMP
         """)
 
     con.commit()
@@ -739,7 +739,7 @@ def upgrade_buyer_profile_table():
         phone TEXT,
         address TEXT,
         document TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
 
@@ -793,7 +793,7 @@ def upgrade_miller_booking_qc():
     if "qc_status" not in cols:
         cur.execute("ALTER TABLE miller_bookings ADD COLUMN qc_status TEXT DEFAULT 'pending'")
     if "qc_at" not in cols:
-        cur.execute("ALTER TABLE miller_bookings ADD COLUMN qc_at DATETIME")
+        cur.execute("ALTER TABLE miller_bookings ADD COLUMN qc_at TIMESTAMP")
 
     con.commit()
     con.close()
@@ -849,7 +849,7 @@ def upgrade_miller_payment_fields():
     if "payment_at" not in cols:
         cur.execute("""
             ALTER TABLE miller_bookings
-            ADD COLUMN payment_at DATETIME
+            ADD COLUMN payment_at TIMESTAMP
         """)
 
     con.commit()
@@ -866,7 +866,7 @@ def upgrade_payments_table():
         buyer_id INTEGER,
         amount INTEGER,
         status TEXT DEFAULT 'pending',
-        paid_at DATETIME,
+        paid_at TIMESTAMP,
         invoice_file TEXT
     )
     """)

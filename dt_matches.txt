@@ -1,0 +1,7 @@
+8: from datetime import datetime, timedelta
+294:         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+661:             expires_at DATETIME NOT NULL,
+724:             ADD COLUMN loaded_at DATETIME
+852:             ADD COLUMN payment_at DATETIME
+869:         paid_at DATETIME,
+1139:         expires_at = (datetime.utcnow() + timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")
