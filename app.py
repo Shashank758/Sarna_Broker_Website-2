@@ -2108,9 +2108,13 @@ def miller_payment_completed_page():
         JOIN users u ON mb.buyer_id = u.id
         JOIN loading_invoices li ON li.booking_id = mb.id
         WHERE
-            ms.miller_id = %s
-            AND li.payment_status = 'paid'
-        GROUP BY mb.id
+            mb.stock_id IN (SELECT id FROM miller_stock WHERE miller_id=%s)
+            AND li.payment_status='paid'
+        GROUP BY
+            mb.id, u.name, ms.crop, mb.quantity, mb.status, mb.reason,
+            mb.decision_at, mb.loaded_qty, mb.loading_status, mb.close_reason,
+            mb.order_id, mb.qc_weight, mb.qc_moisture, mb.qc_remarks,
+            mb.qc_status, mb.qc_at, COALESCE(mb.price, ms.price)
         ORDER BY MAX(li.payment_at) DESC
     """, (miller_id,))
 
