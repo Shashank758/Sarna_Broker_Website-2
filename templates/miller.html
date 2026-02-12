@@ -623,6 +623,15 @@
             </div>
           </div>
 
+          <div class="col-md-4">
+            <label class="form-label"><i class="fa fa-robot me-2 text-primary"></i>Auto-Approve Limit</label>
+            <input type="number" name="auto_approve_min_qty" class="form-control" placeholder="e.g. 1000 (0 = Manual)"
+              min="0">
+            <div class="form-text small text-muted">
+              Orders <strong>equal to or less than</strong> this qty will be auto-approved.
+            </div>
+          </div>
+
           <div class="col-12 mt-3">
             <button class="btn btn-primary-custom w-100">
               <i class="fa fa-upload me-2"></i> Post Stock to Market
@@ -653,6 +662,7 @@
               <th>Condition</th>
               <th>Bag Type</th>
               <th>Deduction</th>
+              <th>Auto-Approve Limit</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -689,6 +699,10 @@
                 <td>
                   <input type="text" name="deduction" value="{{ s[7] }}" class="form-control form-control-sm"
                     style="width:120px;margin:auto;">
+                </td>
+                <td>
+                  <input type="number" name="auto_approve_min_qty" value="{{ s[13] if s[13] else 0 }}"
+                    class="form-control form-control-sm" style="width:100px;margin:auto;" min="0">
                 </td>
                 <td>
                   <button class="btn btn-sm btn-success">

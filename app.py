@@ -663,6 +663,30 @@ upgrade_partial_loading()
 upgrade_staff_system()
 upgrade_miller_stock_status()
 
+def upgrade_miller_stock_auto_approve():
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("PRAGMA table_info(miller_stock)")
+    cols = [c[1] for c in cur.fetchall()]
+
+    if "auto_approve" not in cols:
+        cur.execute("""
+            ALTER TABLE miller_stock
+            ADD COLUMN auto_approve INTEGER DEFAULT 0
+        """)
+
+    if "auto_approve_min_qty" not in cols:
+        cur.execute("""
+            ALTER TABLE miller_stock
+            ADD COLUMN auto_approve_min_qty INTEGER DEFAULT 0
+        """)
+
+    con.commit()
+    con.close()
+
+upgrade_miller_stock_auto_approve()
+
 def upgrade_miller_booking_truck_status():
     con = get_db()
     cur = con.cursor()
@@ -1362,8 +1386,8 @@ def miller_dashboard():
 
         cur.execute("""
             INSERT INTO miller_stock
-            (miller_id, crop, quantity, price, condition, bag_type, deduction, note)
-            VALUES (?,?,?,?,?,?,?,?)
+            (miller_id, crop, quantity, price, condition, bag_type, deduction, note, auto_approve_min_qty)
+            VALUES (?,?,?,?,?,?,?,?,?)
         """, (
             miller_id,
             request.form["crop"],
@@ -1372,7 +1396,8 @@ def miller_dashboard():
             request.form["condition"],
             request.form["bag_type"],
             request.form["deduction"],
-            request.form.get("note", "")
+            request.form.get("note", ""),
+            request.form.get("auto_approve_min_qty", 0)
         ))
         # Ensure the stock is visible in buyer market (market filters status='open')
         cur.execute("UPDATE miller_stock SET status='open' WHERE id=last_insert_rowid()")
@@ -2974,21 +2999,41 @@ def update_miller_stock(id):
     old_price, old_qty = cur.fetchone()
 
     cur.execute("""
-    UPDATE miller_stock
-    SET price=?, condition=?, bag_type=?, deduction=?, note=?, status='open'
-    WHERE id=? AND miller_id=?
+        UPDATE miller_stock_history
+        SET
+        new_price=?,
+        new_quantity=?,
+        updated_at=CURRENT_TIMESTAMP
+        WHERE stock_id=? AND id=(SELECT MAX(id) FROM miller_stock_history WHERE stock_id=?)
     """, (
         request.form["price"],
+        old_qty,
+        id,
+        id
+    ))
+    
+    cur.execute("""
+        UPDATE miller_stock
+        SET note=?,
+            condition=?,
+            bag_type=?,
+            deduction=?,
+            price=?,
+            auto_approve_min_qty=?,
+            status='open'
+        WHERE id=? AND miller_id=?
+    """, (
+        request.form.get("note", ""),
         request.form["condition"],
         request.form["bag_type"],
         request.form["deduction"],
-        request.form.get("note", ""),
+        request.form["price"],
+        request.form.get("auto_approve_min_qty", 0),
         id,
         get_effective_user_id()
-
-
     ))
 
+    # Record history
     cur.execute("""
     INSERT INTO miller_stock_history
     (stock_id,miller_id,old_price,new_price,old_quantity,new_quantity)
@@ -2999,7 +3044,7 @@ def update_miller_stock(id):
         old_price,
         request.form["price"],
         old_qty,
-        old_qty # Quantity does not change via this form anymore
+        old_qty
     ))
 
     con.commit()
@@ -3615,7 +3660,7 @@ def book_miller_stock(stock_id):
 
     # Check if stock exists and has enough quantity
     cur.execute("""
-        SELECT quantity, status, price
+        SELECT quantity, status, price, auto_approve_min_qty
         FROM miller_stock
         WHERE id=?
     """, (stock_id,))
@@ -3629,6 +3674,13 @@ def book_miller_stock(stock_id):
         flash(f"Insufficient stock quantity. Available: {row[0]}", "error")
     else:
         current_price = row[2]
+        auto_approve_min_qty = row[3] or 0
+        
+        # Auto-approve logic: If threshold > 0 AND booking qty <= threshold
+        is_auto_approved = (auto_approve_min_qty > 0 and qty <= auto_approve_min_qty)
+        
+        initial_status = 'approved' if is_auto_approved else 'pending'
+
         # Generate order ID
         try:
             order_id = generate_next_order_id()
@@ -3637,10 +3689,14 @@ def book_miller_stock(stock_id):
             cur.execute("""
                 INSERT INTO miller_bookings
                 (stock_id, buyer_id, quantity, status, order_id, price)
-                VALUES (?, ?, ?, 'pending', ?, ?)
-            """, (stock_id, session["user_id"], qty, order_id, current_price))
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (stock_id, session["user_id"], qty, initial_status, order_id, current_price))
             
             booking_id = cur.lastrowid
+            
+            # If auto-approved, we should probably set decision_at as well?
+            if is_auto_approved:
+                cur.execute("UPDATE miller_bookings SET decision_at=CURRENT_TIMESTAMP WHERE id=?", (booking_id,))
             
             # DEDUCT quantity immediately from stock
             cur.execute("""
@@ -3667,11 +3723,17 @@ def book_miller_stock(stock_id):
                 miller_id, crop = stock_info
                 miller_phone = get_miller_phone(miller_id)
                 if miller_phone:
-                    message = f"🆕 New booking received! Order {order_id}: {crop} - Qty: {qty}. Please review and approve."
+                    if is_auto_approved:
+                        message = f"✅ New Auto-Approved Order! {order_id}: {crop} - Qty: {qty}. Status: Approved."
+                    else:
+                        message = f"🆕 New booking received! Order {order_id}: {crop} - Qty: {qty}. Please review and approve."
                     send_sms(miller_phone, message)
             
             con.commit()
-            flash(f"Order {order_id} placed successfully! Waiting for miller approval.", "success")
+            if is_auto_approved:
+                flash(f"Order {order_id} placed successfully and Auto-Approved!", "success")
+            else:
+                flash(f"Order {order_id} placed successfully! Waiting for miller approval.", "success")
         except Exception as e:
             con.rollback()
             print(f"Error booking stock: {e}")
