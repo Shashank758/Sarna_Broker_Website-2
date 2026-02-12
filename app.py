@@ -1416,6 +1416,7 @@ def miller_dashboard():
             INSERT INTO miller_stock
             (miller_id, crop, quantity, price, condition, bag_type, deduction, note, auto_approve_min_qty)
             VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            RETURNING id
         """, (
             miller_id,
             request.form["crop"],
@@ -1427,8 +1428,9 @@ def miller_dashboard():
             request.form.get("note", ""),
             request.form.get("auto_approve_min_qty", 0)
         ))
+        new_stock_id = cur.fetchone()[0]
         # Ensure the stock is visible in buyer market (market filters status='open')
-        cur.execute("UPDATE miller_stock SET status='open' WHERE id=last_insert_rowid()")
+        cur.execute("UPDATE miller_stock SET status='open' WHERE id=%s", (new_stock_id,))
         con.commit()
         
         # 📱 Send SMS to all buyers about new stock
