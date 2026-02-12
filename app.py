@@ -445,10 +445,10 @@ def index():
             con.close()
 
         if not user:
-            return render_template("index.html", error="User not found")
+            return render_template("login.html", error="User not found")
 
         if user[4] != "approved":
-            return render_template("index.html", error=f"Your account is {user[4]}. Please wait for admin approval.")
+            return render_template("login.html", error=f"Your account is {user[4]}. Please wait for admin approval.")
 
         stored_pw = user[5]
         # Support both hashed and legacy plain-text passwords
@@ -459,7 +459,7 @@ def index():
             pw_ok = stored_pw == password  # legacy plain-text fallback
 
         if not pw_ok:
-            return render_template("index.html", error="Invalid password")
+            return render_template("login.html", error="Invalid password")
 
         session["user_id"] = user[0]
         session["role"] = user[1]
@@ -476,7 +476,7 @@ def index():
         elif user[1] == "farmer":
             return redirect("/farmer")
 
-    return render_template("index.html")
+    return render_template("login.html")
 
 
 @app.route("/logout")
@@ -922,7 +922,7 @@ def farmer_dashboard():
         my_crops = cur.fetchall()
     finally:
         con.close()
-    return render_template("farmer.html", crops=my_crops)
+    return render_template("my_commodity.html", crops=my_crops)
 
 
 @app.route("/add_crop", methods=["POST"])
