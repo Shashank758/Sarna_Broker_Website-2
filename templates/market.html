@@ -977,7 +977,8 @@
       <div class="row g-4" id="stocksContainer">
         {% for m in miller_stocks %}
         <div class="col-md-6 col-lg-4 stock-item" data-crop="{{ m[2]|lower }}" data-miller="{{ m[10]|lower }}"
-          data-location="{{ m[12]|lower if m[12] else '' }}" data-aos="fade-up"
+          data-location="{{ m[12]|lower if m[12] else '' }}" data-city="{{ m[13]|lower if m[13] else '' }}"
+          data-state="{{ m[14]|lower if m[14] else '' }}" data-aos="fade-up"
           data-aos-delay="{{ (loop.index % 6) * 50 }}">
           <div class="stock-card">
             <div class="stock-card-header">
@@ -1884,10 +1885,12 @@
         const itemCrop = item.dataset.crop || '';
         const itemMiller = item.dataset.miller || '';
         const itemLocation = item.dataset.location || '';
+        const itemCity = item.dataset.city || '';
+        const itemState = item.dataset.state || '';
 
         const matchCrop = crop === 'all' || itemCrop.includes(crop);
         const matchMiller = !miller || itemMiller.includes(miller);
-        const matchLocation = !location || itemLocation.includes(location);
+        const matchLocation = !location || itemLocation.includes(location) || itemCity.includes(location) || itemState.includes(location);
 
         if (matchCrop && matchMiller && matchLocation) {
           item.style.display = '';

@@ -496,14 +496,91 @@
             </div>
           </div>
 
-          <!-- ADDRESS -->
+          <!-- ADDRESS SECTION -->
           <div class="form-group">
-            <label class="form-label ms-1">Address / Location <span class="text-danger">*</span></label>
-            <div class="input-group">
-              <span class="input-group-text"><i class="fa fa-map-marker-alt"></i></span>
-              <input name="address" class="form-control" placeholder="City, State (e.g. Karnal, Haryana)" required>
+            <label class="form-label ms-1">Address Details <span class="text-danger">*</span></label>
+
+            <!-- PIN Code -->
+            <div class="row mb-2">
+              <div class="col-12">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="fa fa-map-pin"></i></span>
+                  <input name="pincode" id="pincode" type="text" class="form-control"
+                    placeholder="PIN Code (e.g. 110001)" maxlength="6" pattern="\d{6}" required>
+                  <button class="btn btn-outline-secondary" type="button" id="searchPin">
+                    <i class="fa fa-search"></i>
+                  </button>
+                </div>
+                <small id="pinError" class="text-danger"
+                  style="display:none; font-size:0.8rem; margin-left:5px;">Invalid PIN Code</small>
+              </div>
+            </div>
+
+            <!-- Auto-filled Fields -->
+            <div class="row mb-2">
+              <div class="col-4">
+                <input name="city" id="city" class="form-control form-control-sm" placeholder="City" readonly required>
+              </div>
+              <div class="col-4">
+                <input name="state" id="state" class="form-control form-control-sm" placeholder="State" readonly
+                  required>
+              </div>
+              <div class="col-4">
+                <input name="country" id="country" class="form-control form-control-sm" value="India" readonly required>
+              </div>
+            </div>
+
+            <!-- Manual Fields -->
+            <div class="row mb-2">
+              <div class="col-6">
+                <input name="house_no" class="form-control form-control-sm" placeholder="House No / Block *" required>
+              </div>
+              <div class="col-6">
+                <input name="area" class="form-control form-control-sm" placeholder="Area / Street *" required>
+              </div>
+            </div>
+
+            <div class="row mb-2">
+              <div class="col-6">
+                <input name="locality" class="form-control form-control-sm" placeholder="Locality (Optional)">
+              </div>
+              <div class="col-6">
+                <input name="landmark" class="form-control form-control-sm" placeholder="Landmark (Optional)">
+              </div>
             </div>
           </div>
+
+          <script>
+            document.getElementById('pincode').addEventListener('input', function () {
+              const pincode = this.value;
+              const errorMsg = document.getElementById('pinError');
+
+              if (pincode.length === 6) {
+                // Fetch details
+                fetch(`https://api.postalpincode.in/pincode/${pincode}`)
+                  .then(response => response.json())
+                  .then(data => {
+                    if (data && data[0].Status === "Success") {
+                      const details = data[0].PostOffice[0];
+                      document.getElementById('city').value = details.District;
+                      document.getElementById('state').value = details.State;
+                      document.getElementById('country').value = details.Country;
+                      errorMsg.style.display = 'none';
+                    } else {
+                      document.getElementById('city').value = '';
+                      document.getElementById('state').value = '';
+                      errorMsg.style.display = 'block';
+                      errorMsg.textContent = "Invalid PIN Code";
+                    }
+                  })
+                  .catch(err => {
+                    console.error(err);
+                    errorMsg.style.display = 'block';
+                    errorMsg.textContent = "Error fetching PIN details";
+                  });
+              }
+            });
+          </script>
 
           <!-- MILL/SHOP NAME (REMOVED - now using main 'name' field) -->
 

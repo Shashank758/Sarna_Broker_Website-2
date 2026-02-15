@@ -1009,6 +1009,38 @@ def upgrade_miller_profile_table():
     con.commit()
     con.close()
 
+def upgrade_address_schema():
+    """Add detailed address fields to miller_profiles and buyer_profiles."""
+    con = get_db()
+    cur = con.cursor()
+
+    tables = ["miller_profiles", "buyer_profiles"]
+    new_columns = [
+        ("pincode", "TEXT"),
+        ("house_no", "TEXT"),
+        ("area", "TEXT"),
+        ("locality", "TEXT"),
+        ("landmark", "TEXT"),
+        ("city", "TEXT"),
+        ("state", "TEXT"),
+        ("country", "TEXT DEFAULT 'India'"),
+    ]
+
+    for table in tables:
+        cur.execute(f"SELECT column_name FROM information_schema.columns WHERE table_name='{table}'")
+        existing_cols = [c[0] for c in cur.fetchall()]
+
+        for col_name, col_type in new_columns:
+            if col_name not in existing_cols:
+                cur.execute(f"ALTER TABLE {table} ADD COLUMN {col_name} {col_type}")
+                print(f"Added column {col_name} to {table}")
+
+    con.commit()
+    con.close()
+
+upgrade_address_schema()
+
+
 # Call the upgrade function after it's defined
 upgrade_miller_profile_table()
 
@@ -1265,9 +1297,27 @@ def register():
         password = request.form["password"]
         role = request.form["role"]
         
-        # Profile fields
-        phone = request.form.get("phone", "").strip()
-        address = request.form.get("address", "").strip()
+        # Address fields
+        pincode = request.form.get("pincode", "").strip()
+        house_no = request.form.get("house_no", "").strip()
+        area = request.form.get("area", "").strip()
+        locality = request.form.get("locality", "").strip()
+        landmark = request.form.get("landmark", "").strip()
+        city = request.form.get("city", "").strip()
+        state = request.form.get("state", "").strip()
+        country = request.form.get("country", "India").strip()
+
+        # Construct legacy address string for backward compatibility
+        # Format: House No, Area, Locality (if any), Landmark (if any), City, State - Pincode
+        address_parts = [house_no, area]
+        if locality: address_parts.append(locality)
+        if landmark: address_parts.append(landmark)
+        address_parts.append(city)
+        address_parts.append(state)
+        address_parts.append(f"- {pincode}")
+        
+        full_address = ", ".join(filter(None, address_parts))
+
         # firm_name is now same as name
         firm_name = name
         
@@ -1305,17 +1355,21 @@ def register():
             if role == "miller":
                 cur.execute("""
                     INSERT INTO miller_profiles
-                    (miller_id, mill_name, owner_phone, address, gst_doc, mandi_doc, other_doc)
-                    VALUES (%s,%s,%s,%s,%s,%s,%s)
-                """, (user_id, firm_name, phone, address, gst_filename, mandi_filename, other_filename))
+                    (miller_id, mill_name, owner_phone, address, gst_doc, mandi_doc, other_doc,
+                     pincode, house_no, area, locality, landmark, city, state, country)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s, %s,%s,%s,%s,%s,%s,%s,%s)
+                """, (user_id, firm_name, phone, full_address, gst_filename, mandi_filename, other_filename,
+                      pincode, house_no, area, locality, landmark, city, state, country))
                 
             elif role == "buyer":
                 # For buyer, map firm_name -> shop_name, mandi_doc -> license_doc
                 cur.execute("""
                     INSERT INTO buyer_profiles
-                    (buyer_id, shop_name, owner_name, phone, address, gst_doc, license_doc, other_doc)
-                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
-                """, (user_id, firm_name, name, phone, address, gst_filename, mandi_filename, other_filename))
+                    (buyer_id, shop_name, owner_name, phone, address, gst_doc, license_doc, other_doc,
+                     pincode, house_no, area, locality, landmark, city, state, country)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s, %s,%s,%s,%s,%s,%s,%s,%s)
+                """, (user_id, firm_name, name, phone, full_address, gst_filename, mandi_filename, other_filename,
+                      pincode, house_no, area, locality, landmark, city, state, country))
                 
             con.commit()
             con.close()
@@ -3118,7 +3172,10 @@ def market():
         miller_stock.status,       -- 9
         users.name,                -- 10 (miller name)
         miller_stock.note,         -- 11
-        mp.address                 -- 12 (miller location)
+        mp.address,                -- 12 (miller location)
+        mp.city,                   -- 13
+        mp.state,                  -- 14
+        mp.pincode                 -- 15
     FROM miller_stock
     JOIN users ON miller_stock.miller_id = users.id
     LEFT JOIN miller_profiles mp ON users.id = mp.miller_id
