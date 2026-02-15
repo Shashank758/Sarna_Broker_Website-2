@@ -207,6 +207,26 @@ def get_db():
     return con
 
 
+def log_admin_action(action, target_id, details=None):
+    """Log an admin action to the database."""
+    try:
+        if session.get("role") != "admin":
+            return
+            
+        admin_id = session.get("user_id")
+        con = get_db()
+        cur = con.cursor()
+        cur.execute("""
+            INSERT INTO admin_logs (admin_id, action, target_id, details)
+            VALUES (%s, %s, %s, %s)
+        """, (admin_id, action, target_id, details))
+        con.commit()
+        con.close()
+    except Exception as e:
+        print(f"Failed to log admin action: {e}")
+
+
+
 def upgrade_db():
     con = get_db()
     cur = con.cursor()
@@ -955,6 +975,27 @@ def generate_next_order_id():
     
     return f"S{next_number}"
 
+
+def upgrade_admin_logs_table():
+    """Create admin_logs table to track admin actions."""
+    con = get_db()
+    cur = con.cursor()
+    
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS admin_logs (
+            id SERIAL PRIMARY KEY,
+            admin_id INTEGER,
+            action VARCHAR(50),
+            target_id INTEGER,
+            details TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    
+    con.commit()
+    con.close()
+    print("✅ Verified admin_logs table.")
+
 def run_migrations():
     """Run all database migrations in a single connection to speed up startup."""
     try:
@@ -965,6 +1006,7 @@ def run_migrations():
         upgrade_db()
         upgrade_users_table()
         upgrade_password_resets_table()
+        upgrade_admin_logs_table()
         
         # Features
         upgrade_partial_loading()
@@ -2095,6 +2137,129 @@ def miller_pending_payments_page():
         all_bookings=filtered_bookings,
         invoices_map=pending_payment_map
     )
+
+
+
+@app.route("/miller/post-stock", methods=["GET", "POST"])
+def miller_post_stock_page():
+    if session.get("role") != "miller":
+        return redirect("/")
+
+    miller_id = get_effective_user_id()
+    con = get_db()
+    cur = con.cursor()
+
+    if request.method == "POST":
+        crop = request.form["crop"]
+        price = request.form["price"]
+        qty = 0 # Default for now, as qty is not in the form shown in screenshot/code
+        condition = request.form["condition"]
+        bag_type = request.form["bag_type"]
+        deduction = request.form["deduction"]
+        note = request.form["note"]
+        auto_approve_min_qty = request.form.get("auto_approve_min_qty", 0) or 0
+
+        # Create new stock entry
+        cur.execute("""
+            INSERT INTO miller_stock (miller_id, crop, quantity, price, condition, bag_type, deduction, note, auto_approve_min_qty)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (miller_id, crop, qty, price, condition, bag_type, deduction, note, auto_approve_min_qty))
+        
+        con.commit()
+        con.close()
+        flash("Stock posted successfully!", "success")
+        return redirect("/miller")
+
+    # Fetch deduction options for the form
+    cur.execute("SELECT * FROM miller_deduction_options WHERE miller_id=%s ORDER BY created_at DESC", (miller_id,))
+    deduction_options = cur.fetchall()
+    
+    con.close()
+    return render_template("post_stock.html", deduction_options=deduction_options)
+
+
+@app.route("/miller/profile", methods=["GET", "POST"])
+def miller_profile_page():
+    if session.get("role") != "miller":
+        return redirect("/")
+
+    miller_id = get_effective_user_id() # Logic handles staff (returns parent_id)
+    
+    # Staff check for editing is handled in template, but we can enforce here too for POST
+    is_staff = session.get("is_staff", 0)
+
+    con = get_db()
+    cur = con.cursor()
+
+    if request.method == "POST":
+        if is_staff:
+            con.close()
+            flash("Staff members cannot edit profile.", "danger")
+            return redirect("/miller/profile")
+
+        mill_name = request.form.get("mill_name")
+        owner_name = request.form.get("owner_name")
+        owner_phone = request.form.get("owner_phone")
+        staff_phone = request.form.get("staff_phone")
+        accountant_phone = request.form.get("accountant_phone")
+        address = request.form.get("address")
+        
+        # Handle file uploads
+        gst_doc = request.files.get("gst_doc")
+        mandi_doc = request.files.get("mandi_doc")
+        other_doc = request.files.get("other_doc")
+        
+        # Helper to fetch current docs
+        cur.execute("SELECT gst_doc, document, other_doc FROM miller_profiles WHERE miller_id=%s", (miller_id,))
+        current_docs = cur.fetchone()
+        
+        gst_filename = current_docs[0] if current_docs else None
+        mandi_filename = current_docs[1] if current_docs else None
+        other_filename = current_docs[2] if current_docs else None
+        
+        if gst_doc and gst_doc.filename:
+            gst_filename = secure_filename(gst_doc.filename)
+            gst_doc.save(os.path.join(app.config["PROFILE_FOLDER"], gst_filename))
+            
+        if mandi_doc and mandi_doc.filename:
+            mandi_filename = secure_filename(mandi_doc.filename)
+            mandi_doc.save(os.path.join(app.config["PROFILE_FOLDER"], mandi_filename))
+            
+        if other_doc and other_doc.filename:
+            other_filename = secure_filename(other_doc.filename)
+            other_doc.save(os.path.join(app.config["PROFILE_FOLDER"], other_filename))
+
+        # Update or Insert
+        cur.execute("SELECT id FROM miller_profiles WHERE miller_id=%s", (miller_id,))
+        if cur.fetchone():
+            cur.execute("""
+                UPDATE miller_profiles 
+                SET mill_name=%s, owner_name=%s, owner_phone=%s, staff_phone=%s, accountant_phone=%s, 
+                    address=%s, gst_doc=%s, document=%s, other_doc=%s
+                WHERE miller_id=%s
+            """, (mill_name, owner_name, owner_phone, staff_phone, accountant_phone, address, gst_filename, mandi_filename, other_filename, miller_id))
+        else:
+             cur.execute("""
+                INSERT INTO miller_profiles (miller_id, mill_name, owner_name, owner_phone, staff_phone, accountant_phone, address, gst_doc, document, other_doc)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (miller_id, mill_name, owner_name, owner_phone, staff_phone, accountant_phone, address, gst_filename, mandi_filename, other_filename))
+            
+        con.commit()
+        flash("Profile updated successfully!", "success")
+        return redirect("/miller/profile")
+
+    # Fetch profile data (including new columns from previous task)
+    cur.execute("""
+        SELECT 
+            id, miller_id, mill_name, owner_name, address, document, created_at, 
+            owner_phone, accountant_phone, staff_phone, gst_doc, document, other_doc
+        FROM miller_profiles 
+        WHERE miller_id=%s
+    """, (miller_id,))
+    profile = cur.fetchone()
+    con.close()
+
+    return render_template("miller_profile.html", profile=profile)
 
 
 @app.route("/miller/rejected")
@@ -4474,74 +4639,7 @@ def admin():
     total_stock_qty=total_stock_qty,
     )
     
-@app.route("/admin/api/miller_stock/<int:miller_id>")
-def get_miller_stock_api(miller_id):
-    """API endpoint to get miller stock data for comparison"""
-    if session.get("role") != "admin":
-        return {"error": "Unauthorized"}, 403
-    
-    con = get_db()
-    cur = con.cursor()
-    
-    # Get miller info
-    cur.execute("SELECT id, name FROM users WHERE id=%s AND role='miller'", (miller_id,))
-    miller = cur.fetchone()
-    
-    if not miller:
-        con.close()
-        return {"error": "Miller not found"}, 404
-    
-    # Get miller stock
-    cur.execute("""
-        SELECT crop, quantity, price, condition, bag_type, deduction, created_at
-        FROM miller_stock
-        WHERE miller_id=%s
-        ORDER BY created_at DESC
-    """, (miller_id,))
-    stocks = cur.fetchall()
-    
-    # Format stock data
-    stock_data = []
-    for stock in stocks:
-        stock_data.append({
-            "crop": stock[0],
-            "quantity": stock[1],
-            "price": stock[2],
-            "condition": stock[3],
-            "bag_type": stock[4],
-            "deduction": stock[5],
-            "created_at": stock[6]
-        })
-    
-    con.close()
-    
-    return {
-        "miller_id": miller[0],
-        "miller_name": miller[1],
-        "stocks": stock_data
-    }
 
-@app.route("/admin/compare")
-def admin_compare():
-    """Miller Rate Comparison Page"""
-    if session.get("role") != "admin":
-        return redirect("/")
-    
-    con = get_db()
-    cur = con.cursor()
-    
-    # Get all main millers (not staff) for comparison
-    cur.execute("""
-        SELECT u.id, u.name
-        FROM users u
-        WHERE u.role = 'miller' AND (u.is_staff = 0 OR u.is_staff IS NULL)
-        ORDER BY u.name
-    """)
-    millers = cur.fetchall()
-    
-    con.close()
-    
-    return render_template("admin_compare.html", millers=millers)
 
 @app.route("/admin/users")
 def admin_users():
@@ -4746,6 +4844,26 @@ def admin_buyer_profiles():
     
     return render_template("admin_buyer_profiles.html", buyer_profiles=buyer_profiles)
 
+
+@app.route("/admin/logs")
+def admin_logs():
+    if session.get("role") != "admin":
+        return redirect("/")
+    
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("""
+        SELECT l.id, u.name, l.admin_id, l.action, l.target_id, l.details, l.created_at
+        FROM admin_logs l
+        JOIN users u ON l.admin_id = u.id
+        ORDER BY l.created_at DESC
+        LIMIT 100
+    """)
+    logs = cur.fetchall()
+    con.close()
+    
+    return render_template("admin_logs.html", logs=logs)
+
 @app.route("/admin/update_deduction/<int:stock_id>", methods=["POST"])
 def admin_update_deduction(stock_id):
     if session.get("role") != "admin":
@@ -4777,6 +4895,7 @@ def approve_user(id):
     cur.execute("UPDATE users SET status='approved' WHERE id=%s", (id,))
     con.commit()
     con.close()
+    log_admin_action("approve_user", id, f"User {id} approved")
     return redirect("/admin/users")
 @app.route("/admin/block_user/<int:id>")
 def block_user(id):
@@ -4788,6 +4907,7 @@ def block_user(id):
     cur.execute("UPDATE users SET status='blocked' WHERE id=%s", (id,))
     con.commit()
     con.close()
+    log_admin_action("block_user", id, f"User {id} blocked")
     return redirect("/admin/users")
 
 @app.route("/admin/unblock_user/<int:id>")
@@ -4800,6 +4920,7 @@ def unblock_user(id):
     cur.execute("UPDATE users SET status='approved' WHERE id=%s", (id,))
     con.commit()
     con.close()
+    log_admin_action("unblock_user", id, f"User {id} unblocked")
     return redirect("/admin/users")
 
 @app.route("/admin/reject_user/<int:id>")
@@ -4812,6 +4933,7 @@ def reject_user(id):
     cur.execute("UPDATE users SET status='rejected' WHERE id=%s", (id,))
     con.commit()
     con.close()
+    log_admin_action("reject_user", id, f"User {id} rejected")
     return redirect("/admin/users")
     
 @app.route("/admin/miller/<int:miller_id>")
@@ -4850,6 +4972,7 @@ def admin_approve_booking(id):
 
     con.commit()
     con.close()
+    log_admin_action("approve_booking", id, f"Booking {id} approved")
     return redirect("/admin/bookings")
 @app.route("/admin/decline_booking/<int:id>")
 def admin_decline_booking(id):
@@ -4869,6 +4992,7 @@ def admin_decline_booking(id):
 
     con.commit()
     con.close()
+    log_admin_action("decline_booking", id, f"Booking {id} declined")
     return redirect("/admin/bookings")
 
 @app.route("/admin/update_truck/<int:invoice_id>", methods=["POST"])
