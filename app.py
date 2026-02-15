@@ -4852,16 +4852,27 @@ def admin_logs():
     
     con = get_db()
     cur = con.cursor()
-    cur.execute("""
-        SELECT l.id, u.name, l.admin_id, l.action, l.target_id, l.details, l.created_at
-        FROM admin_logs l
-        JOIN users u ON l.admin_id = u.id
-        ORDER BY l.created_at DESC
-        LIMIT 100
-    """)
-    logs = cur.fetchall()
-    con.close()
-    
+    try:
+        cur.execute("""
+            SELECT l.id, u.name, l.admin_id, l.action, l.target_id, l.details, l.created_at
+            FROM admin_logs l
+            JOIN users u ON l.admin_id = u.id
+            ORDER BY l.created_at DESC
+            LIMIT 100
+        """)
+        logs = cur.fetchall()
+        con.close()
+    except psycopg2.errors.UndefinedTable:
+        con.rollback()
+        con.close()
+        # Auto-fix: Run migration and retry
+        print("⚠️ admin_logs table missing. Running migration...")
+        upgrade_admin_logs_table()
+        return redirect("/admin/logs")
+    except Exception as e:
+        con.close()
+        return f"Error loading logs: {e}"
+        
     return render_template("admin_logs.html", logs=logs)
 
 
