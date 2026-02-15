@@ -4854,9 +4854,9 @@ def admin_logs():
     cur = con.cursor()
     try:
         cur.execute("""
-            SELECT l.id, u.name, l.admin_id, l.action, l.target_id, l.details, l.created_at
+            SELECT l.id, COALESCE(u.name, 'Unknown Admin'), l.admin_id, l.action, l.target_id, l.details, l.created_at
             FROM admin_logs l
-            JOIN users u ON l.admin_id = u.id
+            LEFT JOIN users u ON l.admin_id = u.id
             ORDER BY l.created_at DESC
             LIMIT 100
         """)
@@ -4907,6 +4907,7 @@ def admin_update_deduction(stock_id):
     con.commit()
     con.close()
 
+    log_admin_action("update_deduction", stock_id, f"Stock {stock_id} deduction updated to {deduction}")
     return redirect("/admin/stock")
     
 @app.route("/admin/approve_user/<int:id>")
@@ -5083,6 +5084,7 @@ def admin_update_truck(invoice_id):
     con.commit()
     con.close()
 
+    log_admin_action("update_truck", invoice_id, f"Truck details updated for Invoice {invoice_id}")
     flash("Truck details updated.", "success")
     return redirect(request.referrer or "/admin/bookings")
 
