@@ -365,7 +365,7 @@ def upgrade_miller_stock_status():
     con.commit()
     con.close()
 
-init_db()
+
 def upgrade_staff_system():
     con = get_db()
     cur = con.cursor()
@@ -470,9 +470,7 @@ def upgrade_loading_invoices_extended_qc():
     con.commit()
     con.close()
 
-upgrade_loading_invoices()
-upgrade_loading_invoices_debit_note()
-upgrade_loading_invoices_extended_qc()
+
    
 def get_effective_user_id():
     # For miller staff → parent miller
@@ -668,12 +666,7 @@ def upgrade_password_resets_table():
     con.close()
 
 
-upgrade_db()
-upgrade_users_table()
-upgrade_password_resets_table()
-upgrade_partial_loading()
-upgrade_staff_system()
-upgrade_miller_stock_status()
+
 
 def upgrade_miller_stock_auto_approve():
     con = get_db()
@@ -697,7 +690,7 @@ def upgrade_miller_stock_auto_approve():
     con.commit()
     con.close()
 
-upgrade_miller_stock_auto_approve()
+
 
 def upgrade_miller_booking_truck_status():
     con = get_db()
@@ -757,8 +750,7 @@ def upgrade_buyer_profile_table():
 
     con.commit()
     con.close()
-upgrade_buyer_profile_table()
-upgrade_miller_booking_truck_status()
+
 
 def upgrade_miller_booking_bill():
     con = get_db()
@@ -798,8 +790,7 @@ def upgrade_miller_booking_qc():
     con.commit()
     con.close()
 
-upgrade_miller_booking_bill()
-upgrade_miller_booking_qc()
+
 
 def upgrade_miller_booking_order_id():
     con = get_db()
@@ -889,11 +880,7 @@ def upgrade_miller_stock_reserved_qty():
     con.commit()
     con.close()
 
-upgrade_miller_booking_qc()
-upgrade_miller_booking_order_id()
-upgrade_miller_payment_fields()
-upgrade_payments_table()
-upgrade_miller_stock_reserved_qty()
+
 
 def upgrade_miller_stock_note():
     con = get_db()
@@ -911,7 +898,7 @@ def upgrade_miller_stock_note():
     con.commit()
     con.close()
 
-upgrade_miller_stock_note()
+
 
 def upgrade_miller_booking_price():
     """Add price column to miller_bookings and backfill."""
@@ -937,7 +924,7 @@ def upgrade_miller_booking_price():
     con.commit()
     con.close()
 
-upgrade_miller_booking_price()
+
 
 def generate_next_order_id():
     """Generate next order ID in format S10001, S10002, etc."""
@@ -972,6 +959,41 @@ def run_migrations():
     """Run all database migrations in a single connection to speed up startup."""
     try:
         print("🔄 Starting database migrations...")
+        
+        # Core Initialization
+        init_db()
+        upgrade_db()
+        upgrade_users_table()
+        upgrade_password_resets_table()
+        
+        # Features
+        upgrade_partial_loading()
+        upgrade_staff_system()
+        upgrade_loading_invoices()
+        upgrade_loading_invoices_debit_note()
+        upgrade_loading_invoices_extended_qc()
+        
+        # Miller Stock
+        upgrade_miller_stock_status()
+        upgrade_miller_stock_auto_approve()
+        upgrade_miller_stock_reserved_qty()
+        upgrade_miller_stock_note()
+        
+        # Buyer Profile
+        upgrade_buyer_profile_table()
+        
+        # Miller Bookings
+        upgrade_miller_booking_truck_status()
+        upgrade_miller_booking_bill()
+        upgrade_miller_booking_qc()
+        upgrade_miller_booking_order_id()
+        upgrade_miller_booking_price()
+        upgrade_miller_payment_fields()
+        
+        # Payments
+        upgrade_payments_table()
+        
+        # Miller Profile & Address Schema (Custom Logic)
         con = get_db()
         cur = con.cursor()
 
@@ -1028,8 +1050,7 @@ def run_migrations():
         print(f"❌ Migration failed: {e}")
         # We catch the error to prevent app crash, logging it for review
 
-# Run migrations once on startup
-run_migrations()
+
 
 
 # ---------------- AUTH ----------------
@@ -4982,3 +5003,8 @@ def test_sms():
     </html>
     """
     
+
+if __name__ == "__main__":
+    init_db()
+    run_migrations()
+    app.run(debug=os.environ.get("FLASK_DEBUG", "0") == "1")
