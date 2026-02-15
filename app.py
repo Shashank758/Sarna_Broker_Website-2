@@ -4864,6 +4864,19 @@ def admin_logs():
     
     return render_template("admin_logs.html", logs=logs)
 
+
+@app.route("/admin/migrate_db")
+def admin_migrate_db():
+    if session.get("role") != "admin":
+        return redirect("/")
+    
+    try:
+        run_migrations()
+        return "Migrations completed successfully. <a href='/admin/logs'>Go to Logs</a>"
+    except Exception as e:
+        return f"Migration failed: {e}"
+
+
 @app.route("/admin/update_deduction/<int:stock_id>", methods=["POST"])
 def admin_update_deduction(stock_id):
     if session.get("role") != "admin":
