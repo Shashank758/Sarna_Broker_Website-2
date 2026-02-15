@@ -1297,6 +1297,9 @@ def register():
         password = request.form["password"]
         role = request.form["role"]
         
+        # Phone number
+        phone = request.form.get("phone", "").strip()
+
         # Address fields
         pincode = request.form.get("pincode", "").strip()
         house_no = request.form.get("house_no", "").strip()
