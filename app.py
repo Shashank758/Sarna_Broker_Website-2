@@ -4898,6 +4898,11 @@ def admin_update_deduction(stock_id):
     con = get_db()
     cur = con.cursor()
 
+    # Get old deduction
+    cur.execute("SELECT deduction FROM miller_stock WHERE id=%s", (stock_id,))
+    old_deduction = cur.fetchone()
+    old_val = old_deduction[0] if old_deduction else 0
+
     cur.execute("""
         UPDATE miller_stock
         SET deduction=%s
@@ -4907,7 +4912,8 @@ def admin_update_deduction(stock_id):
     con.commit()
     con.close()
 
-    log_admin_action("update_deduction", stock_id, f"Stock {stock_id} deduction updated to {deduction}")
+    change_msg = f"Stock {stock_id} deduction changed from {old_val} to {deduction}"
+    log_admin_action("update_deduction", stock_id, change_msg)
     return redirect("/admin/stock")
     
 @app.route("/admin/approve_user/<int:id>")
@@ -5061,6 +5067,34 @@ def admin_update_truck(invoice_id):
     con = get_db()
     cur = con.cursor()
 
+    # Fetch old details for logging
+    cur.execute("""
+        SELECT truck_number, loaded_qty, qc_weight, qc_moisture, qc_broken, qc_karda, 
+               qc_oil, qc_mitti, qc_ssa, qc_claim, qc_freight, qc_remarks
+        FROM loading_invoices WHERE id=%s
+    """, (invoice_id,))
+    old_row = cur.fetchone()
+    
+    changes = []
+    if old_row:
+        fields = ["truck_number", "loaded_qty", "qc_weight", "qc_moisture", "qc_broken", "qc_karda", 
+                  "qc_oil", "qc_mitti", "qc_ssa", "qc_claim", "qc_freight", "qc_remarks"]
+        new_vals = [truck_number, loaded_qty_val, qc_weight_val, qc_moisture_val, qc_broken_val, qc_karda_val, 
+                    qc_oil_val, qc_mitti_val, qc_ssa_val, qc_claim_val, qc_freight_val, qc_remarks]
+        
+        for i, field in enumerate(fields):
+            old = old_row[i]
+            new = new_vals[i]
+            
+            # Normalize for comparison (handle None vs '' vs 0.0)
+            def normalize(v):
+                if v is None: return ""
+                if isinstance(v, (int, float)): return str(float(v))
+                return str(v).strip()
+
+            if normalize(old) != normalize(new):
+                changes.append(f"{field}: {old} -> {new}")
+
     cur.execute("""
         UPDATE loading_invoices
         SET truck_number=%s,
@@ -5084,7 +5118,8 @@ def admin_update_truck(invoice_id):
     con.commit()
     con.close()
 
-    log_admin_action("update_truck", invoice_id, f"Truck details updated for Invoice {invoice_id}")
+    log_msg = f"Updated Truck {invoice_id}: " + ", ".join(changes) if changes else f"Updated Truck {invoice_id} (No changes detected)"
+    log_admin_action("update_truck", invoice_id, log_msg)
     flash("Truck details updated.", "success")
     return redirect(request.referrer or "/admin/bookings")
 
