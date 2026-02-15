@@ -968,81 +968,69 @@ def generate_next_order_id():
     
     return f"S{next_number}"
 
-def upgrade_miller_profile_table():
-    con = get_db()
-    cur = con.cursor()
+def run_migrations():
+    """Run all database migrations in a single connection to speed up startup."""
+    try:
+        print("🔄 Starting database migrations...")
+        con = get_db()
+        cur = con.cursor()
 
-    cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name=%s", ("miller_profiles",))
-    cols = [c[0] for c in cur.fetchall()]
+        # 1. Miller Profile Upgrades
+        cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name='miller_profiles'")
+        miller_cols = [c[0] for c in cur.fetchall()]
+        
+        # List of all miller profile columns to ensure exist
+        miller_fields = [
+            ("mill_name", "TEXT"),
+            ("phone", "TEXT"),
+            ("address", "TEXT"), 
+            ("document", "TEXT"),
+            ("owner_phone", "TEXT"),
+            ("accountant_phone", "TEXT"),
+            ("staff_phone", "TEXT"),
+            ("gst_doc", "TEXT"),
+            ("mandi_doc", "TEXT"),
+            ("other_doc", "TEXT")
+        ]
+        
+        for col, col_type in miller_fields:
+            if col not in miller_cols:
+                cur.execute(f"ALTER TABLE miller_profiles ADD COLUMN {col} {col_type}")
+                print(f"✅ Added {col} to miller_profiles")
 
-    if "mill_name" not in cols:
-        cur.execute("ALTER TABLE miller_profiles ADD COLUMN mill_name TEXT")
+        # 2. Address Schema Upgrades
+        tables = ["miller_profiles", "buyer_profiles"]
+        address_cols = [
+            ("pincode", "TEXT"),
+            ("house_no", "TEXT"),
+            ("area", "TEXT"),
+            ("locality", "TEXT"),
+            ("landmark", "TEXT"),
+            ("city", "TEXT"),
+            ("state", "TEXT"),
+            ("country", "TEXT DEFAULT 'India'"),
+        ]
 
-    if "phone" not in cols:
-        cur.execute("ALTER TABLE miller_profiles ADD COLUMN phone TEXT")
+        for table in tables:
+            # Re-fetch columns for each table as we iterate
+            cur.execute(f"SELECT column_name FROM information_schema.columns WHERE table_name='{table}'")
+            existing_cols = [c[0] for c in cur.fetchall()]
 
-    if "address" not in cols:
-        cur.execute("ALTER TABLE miller_profiles ADD COLUMN address TEXT")
+            for col_name, col_type in address_cols:
+                if col_name not in existing_cols:
+                    cur.execute(f"ALTER TABLE {table} ADD COLUMN {col_name} {col_type}")
+                    print(f"✅ Added {col_name} to {table}")
 
-    if "document" not in cols:
-        cur.execute("ALTER TABLE miller_profiles ADD COLUMN document TEXT")
+        con.commit()
+        con.close()
+        print("✅ Database migrations completed successfully.")
+    except Exception as e:
+        print(f"❌ Migration failed: {e}")
+        # We catch the error to prevent app crash, logging it for review
 
-    # Add new fields for multiple documents and phone numbers
-    if "owner_phone" not in cols:
-        cur.execute("ALTER TABLE miller_profiles ADD COLUMN owner_phone TEXT")
-    
-    if "accountant_phone" not in cols:
-        cur.execute("ALTER TABLE miller_profiles ADD COLUMN accountant_phone TEXT")
-    
-    if "staff_phone" not in cols:
-        cur.execute("ALTER TABLE miller_profiles ADD COLUMN staff_phone TEXT")
-    
-    if "gst_doc" not in cols:
-        cur.execute("ALTER TABLE miller_profiles ADD COLUMN gst_doc TEXT")
-    
-    if "mandi_doc" not in cols:
-        cur.execute("ALTER TABLE miller_profiles ADD COLUMN mandi_doc TEXT")
-    
-    if "other_doc" not in cols:
-        cur.execute("ALTER TABLE miller_profiles ADD COLUMN other_doc TEXT")
+# Run migrations once on startup
+run_migrations()
 
-    con.commit()
-    con.close()
-
-def upgrade_address_schema():
-    """Add detailed address fields to miller_profiles and buyer_profiles."""
-    con = get_db()
-    cur = con.cursor()
-
-    tables = ["miller_profiles", "buyer_profiles"]
-    new_columns = [
-        ("pincode", "TEXT"),
-        ("house_no", "TEXT"),
-        ("area", "TEXT"),
-        ("locality", "TEXT"),
-        ("landmark", "TEXT"),
-        ("city", "TEXT"),
-        ("state", "TEXT"),
-        ("country", "TEXT DEFAULT 'India'"),
-    ]
-
-    for table in tables:
-        cur.execute(f"SELECT column_name FROM information_schema.columns WHERE table_name='{table}'")
-        existing_cols = [c[0] for c in cur.fetchall()]
-
-        for col_name, col_type in new_columns:
-            if col_name not in existing_cols:
-                cur.execute(f"ALTER TABLE {table} ADD COLUMN {col_name} {col_type}")
-                print(f"Added column {col_name} to {table}")
-
-    con.commit()
-    con.close()
-
-upgrade_address_schema()
-
-
-# Call the upgrade function after it's defined
-upgrade_miller_profile_table()
 
 # ---------------- AUTH ----------------
 @app.route("/", methods=["GET", "POST"])
