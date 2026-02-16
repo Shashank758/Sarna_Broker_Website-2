@@ -3541,6 +3541,18 @@ ORDER BY mb.created_at DESC
     """)
     crops = cur.fetchall()
 
+    # Fetch Buyer Details for Header
+    user_id = session.get("user_id")
+    cur.execute("""
+        SELECT u.name, bp.address, bp.city, bp.state 
+        FROM users u 
+        LEFT JOIN buyer_profiles bp ON u.id = bp.buyer_id 
+        WHERE u.id = %s
+    """, (user_id,))
+    buyer_info = cur.fetchone()
+    buyer_name = buyer_info[0] if buyer_info else "Trader"
+    buyer_address = f"{buyer_info[1]}, {buyer_info[2]}" if buyer_info and buyer_info[1] else "Address not set"
+
     con.close()
     
     return render_template(
@@ -3557,7 +3569,9 @@ ORDER BY mb.created_at DESC
         total_remaining=total_remaining,
         rejected_bookings=rejected_bookings,
         debit_note_invoices=debit_notes_list,
-        paid_invoices=payments_list
+        paid_invoices=payments_list,
+        buyer_name=buyer_name,
+        buyer_address=buyer_address
     )
 # ================= BUYER ORDER PAGES =================
 
