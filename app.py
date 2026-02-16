@@ -1552,37 +1552,7 @@ def miller_dashboard():
         
         return redirect(url_for('miller_dashboard'))
 
-@app.route("/miller/delete_stock/<int:id>", methods=["POST"])
-def delete_miller_stock(id):
-    if session.get("role") != "miller":
-        return redirect("/")
-    
-    miller_id = get_effective_user_id()
-    con = get_db()
-    cur = con.cursor()
-    
-    # Check if stock exists and belongs to miller
-    cur.execute("SELECT id FROM miller_stock WHERE id=%s AND miller_id=%s", (id, miller_id))
-    if not cur.fetchone():
-        con.close()
-        return redirect("/miller")
-        
-    # Check if there are any active bookings for this stock
-    cur.execute("SELECT count(*) FROM miller_bookings WHERE stock_id=%s AND status IN ('pending', 'approved')", (id,))
-    active_count = cur.fetchone()[0]
-    
-    if active_count > 0:
-        flash("Cannot delete stock with active bookings!", "error")
-    else:
-        cur.execute("DELETE FROM miller_stock WHERE id=%s", (id,))
-        con.commit()
-        flash("Stock deleted successfully.", "success")
-        
-    con.close()
-    return redirect("/miller")
-
-
-# ✅ LIVE STOCKS
+    # ✅ LIVE STOCKS
     cur.execute("""
     SELECT *
     FROM miller_stock
@@ -1591,7 +1561,7 @@ def delete_miller_stock(id):
 """, (miller_id,))
     stocks = cur.fetchall()
 
-# ✅ BUYER BOOKINGS
+    # ✅ BUYER BOOKINGS
     cur.execute("""
 SELECT
     mb.id,              -- 0 booking_id
@@ -1641,10 +1611,10 @@ ORDER BY mb.created_at DESC
 """, (miller_id,))
     rows = cur.fetchall()
 
-# Group invoices by booking_id with QC data and final invoice
+    # Group invoices by booking_id with QC data and final invoice
     invoices_map = {}
     for r in rows:
-     invoices_map.setdefault(r[1], []).append({
+        invoices_map.setdefault(r[1], []).append({
         "id": r[0],  # invoice id
         "qty": r[2],
         "file": r[3],
@@ -1705,6 +1675,35 @@ ORDER BY mb.created_at DESC
     qc_pending_count=qc_pending_count,
     miller_address=miller_address
 )
+
+@app.route("/miller/delete_stock/<int:id>", methods=["POST"])
+def delete_miller_stock(id):
+    if session.get("role") != "miller":
+        return redirect("/")
+    
+    miller_id = get_effective_user_id()
+    con = get_db()
+    cur = con.cursor()
+    
+    # Check if stock exists and belongs to miller
+    cur.execute("SELECT id FROM miller_stock WHERE id=%s AND miller_id=%s", (id, miller_id))
+    if not cur.fetchone():
+        con.close()
+        return redirect("/miller")
+        
+    # Check if there are active bookings
+    cur.execute("SELECT count(*) FROM miller_bookings WHERE stock_id=%s AND status IN ('pending', 'approved')", (id,))
+    active_count = cur.fetchone()[0]
+    
+    if active_count > 0:
+        flash("Cannot delete stock with active bookings!", "error")
+    else:
+        cur.execute("DELETE FROM miller_stock WHERE id=%s", (id,))
+        con.commit()
+        flash("Stock deleted successfully.", "success")
+        
+    con.close()
+    return redirect("/miller")
 
 @app.route("/miller/add_deduction_option", methods=["POST"])
 def miller_add_deduction_option():
