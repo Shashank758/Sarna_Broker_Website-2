@@ -119,8 +119,8 @@
                     </h4>
                     <p class="text-muted mb-0">Orders pending approval from the Miller.</p>
                 </div>
-                <input type="text" id="requestedSearch" class="form-control form-control-sm" style="width: 250px;"
-                    placeholder="Search Order ID, Miller, Crop...">
+                <input type="text" id="requestedSearch" class="form-control form-control-sm" style="width: 280px;"
+                    placeholder="Search ID, Miller, Location, Crop...">
             </div>
 
             {% set per_page = 5 %}
@@ -140,7 +140,11 @@
                     <div>
                         <div class="order-id">{{ o.order_id }}</div>
                         <div class="order-sub">{{ o.crop }} · {{ o.booked }} Qt</div>
-                        <div class="order-sub">Miller: {{ o.miller_name }}</div>
+                        <div class="order-sub">Miller: {{ o.miller_name }}
+                            {% if o.miller_city %}
+                            <small class="text-muted">({{ o.miller_city }}, {{ o.miller_state }})</small>
+                            {% endif %}
+                        </div>
                     </div>
                     <span class="badge-requested">PENDING APPROVAL</span>
                 </div>
@@ -152,7 +156,8 @@
                         <div class="row g-4">
                             <div class="col-md-6">
                                 <div class="section-title">Order Summary</div>
-                                <div class="kv"><span>Miller</span><span>{{ o.miller_name }}</span></div>
+                                <div class="kv"><span>Miller</span><span>{{ o.miller_name }}{% if o.miller_city %} ({{
+                                        o.miller_city }}){% endif %}</span></div>
                                 <div class="kv"><span>Crop</span><span>{{ o.crop }}</span></div>
                                 <div class="kv"><span>Quantity Booked</span><span>{{ o.booked }} Qt</span></div>
                             </div>

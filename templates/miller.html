@@ -668,6 +668,10 @@
           <input type="text" id="buyerFilter" class="form-control" placeholder="Search buyer...">
         </div>
         <div class="col-md-3">
+          <label class="form-label"><i class="fa fa-map-marker-alt me-2"></i>Location</label>
+          <input type="text" id="locationFilter" class="form-control" placeholder="Search city/state...">
+        </div>
+        <div class="col-md-3">
           <label class="form-label"><i class="fa fa-seedling me-2"></i>Crop</label>
           <input type="text" id="cropFilter" class="form-control" placeholder="Search crop...">
         </div>
@@ -693,7 +697,8 @@
       <div class="row g-3">
         {% for b in pending %}
         <div class="col-md-6 col-lg-4 booking-row" data-status="pending" data-buyer="{{ b[1]|lower }}"
-          data-crop="{{ b[2]|lower }}">
+          data-crop="{{ b[2]|lower }}"
+          data-location="{{ (b[19]|string + ' ' + b[20]|string + ' ' + b[21]|string)|lower }}">
           <div class="order-card">
             <div class="order-header">
               <div>
@@ -788,7 +793,7 @@
 
           <div class="flex-grow-1" style="min-width:260px;">
             <input type="text" id="approvedLoadingSearchInput" class="form-control"
-              placeholder="🔍 Search by Order ID, Buyer, Crop, Truck..." onkeyup="searchApprovedLoading()">
+              placeholder="🔍 Search by Order ID, Buyer, Location, Crop, Truck..." onkeyup="searchApprovedLoading()">
           </div>
         </div>
       </div>
@@ -817,7 +822,8 @@
             {% set remaining = booked - loaded %}
 
             {% set invs = invoices_map.get(booking_id) %}
-            {% set ns = namespace(pending=0, search=(b[10]|string + ' ' + b[1] + ' ' + b[2])|lower) %}
+            {% set ns = namespace(pending=0, search=(b[10]|string + ' ' + b[1] + ' ' + b[2] + ' ' + (b[19] or '') + ' '
+            + (b[20] or '') + ' ' + (b[21] or ''))|lower) %}
             {% if invs %}
             {% for inv in invs %}
             {% if inv.qc_status != 'verified' %}
@@ -1007,7 +1013,7 @@
             </button>
             <div class="flex-grow-1" style="min-width:200px;">
               <input type="text" id="qcSearchInput" class="form-control"
-                placeholder="🔍 Search by Order ID, Buyer, or Crop..." onkeyup="searchQC()">
+                placeholder="🔍 Search by Order, Buyer, Location..." onkeyup="searchQC()">
             </div>
           </div>
         </div>
@@ -1032,7 +1038,7 @@
             {% set payment_at = b[18] %}
 
             <div class="col-md-6 qc-card-item"
-              data-search="{{ (order_id|string + ' ' + buyer_name|lower + ' ' + crop_name|lower) }}">
+              data-search="{{ (order_id|string + ' ' + buyer_name + ' ' + crop_name + ' ' + (b[19] or '') + ' ' + (b[20] or '') + ' ' + (b[21] or '')) | lower }}">
               <div class="card border-0 shadow-sm h-100 completed-loading-card">
                 <div class="card-body">
                   <div class="d-flex justify-content-between align-items-start mb-3">
@@ -1404,17 +1410,20 @@
           const status = document.getElementById("statusFilter").value;
           const buyer = document.getElementById("buyerFilter").value.toLowerCase();
           const crop = document.getElementById("cropFilter").value.toLowerCase();
+          const location = document.getElementById("locationFilter").value.toLowerCase();
 
           document.querySelectorAll(".booking-row").forEach(row => {
             const rowStatus = row.dataset.status;
             const rowBuyer = row.dataset.buyer;
             const rowCrop = row.dataset.crop;
+            const rowLocation = row.dataset.location || "";
 
             const matchStatus = (status === "all" || status === rowStatus);
             const matchBuyer = rowBuyer.includes(buyer);
             const matchCrop = rowCrop.includes(crop);
+            const matchLocation = !location || rowLocation.includes(location);
 
-            if (matchStatus && matchBuyer && matchCrop) {
+            if (matchStatus && matchBuyer && matchCrop && matchLocation) {
               row.style.display = "";
             } else {
               row.style.display = "none";
@@ -1426,12 +1435,14 @@
           document.getElementById("statusFilter").value = "all";
           document.getElementById("buyerFilter").value = "";
           document.getElementById("cropFilter").value = "";
+          document.getElementById("locationFilter").value = "";
           applyFilters();
         }
 
         document.getElementById("statusFilter").addEventListener("change", applyFilters);
         document.getElementById("buyerFilter").addEventListener("keyup", applyFilters);
         document.getElementById("cropFilter").addEventListener("keyup", applyFilters);
+        document.getElementById("locationFilter").addEventListener("keyup", applyFilters);
 
         window.onload = applyFilters;
 

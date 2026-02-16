@@ -1581,14 +1581,18 @@ SELECT
     mb.qc_status,       -- 14 qc_status
     mb.qc_at,           -- 15 qc_at
 
-    COALESCE(p.status,'pending')     AS payment_status,  -- 16 ✅
-    p.invoice_file                 AS final_invoice,   -- 17 ✅
-    p.paid_at                      AS payment_at       -- 18 ✅
+    COALESCE(p.status,'pending')     AS payment_status,  -- 16
+    p.invoice_file                 AS final_invoice,   -- 17
+    p.paid_at                      AS payment_at,      -- 18
+    bp.address,                                        -- 19 (NEW)
+    bp.city,                                           -- 20 (NEW)
+    bp.state                                           -- 21 (NEW)
 
 FROM miller_bookings mb
 JOIN users u ON mb.buyer_id = u.id
 JOIN miller_stock ms ON mb.stock_id = ms.id
 LEFT JOIN payments p ON p.booking_id = mb.id
+LEFT JOIN buyer_profiles bp ON u.id = bp.buyer_id
 WHERE ms.miller_id=%s
 ORDER BY mb.created_at DESC
 """, (miller_id,))
@@ -3611,11 +3615,14 @@ def get_buyer_orders(filter_type):
             p.paid_at,
 
             u.name AS miller_name,
-            mb.close_reason
+            mb.close_reason,
+            mp.city,
+            mp.state
 
         FROM miller_bookings mb
 JOIN miller_stock ms ON mb.stock_id = ms.id
 JOIN users u ON ms.miller_id = u.id
+LEFT JOIN miller_profiles mp ON u.id = mp.miller_id
 LEFT JOIN payments p ON p.booking_id = mb.id
 
         WHERE mb.buyer_id=%s
@@ -3676,6 +3683,8 @@ LEFT JOIN payments p ON p.booking_id = mb.id
 
             "miller_name": r[15],
             "close_reason": r[16],
+            "miller_city": r[17],
+            "miller_state": r[18],
 
             "invoices": invoices_map.get(r[0], [])
         })
@@ -3943,11 +3952,14 @@ def buyer_payments():
         li.final_invoice_file,
         li.payment_at,
         u.name AS miller_name,
-        li.truck_number
+        li.truck_number,
+        mp.city,
+        mp.state
     FROM loading_invoices li
     JOIN miller_bookings mb ON li.booking_id = mb.id
     JOIN miller_stock ms ON mb.stock_id = ms.id
     JOIN users u ON ms.miller_id = u.id
+    LEFT JOIN miller_profiles mp ON u.id = mp.miller_id
     WHERE mb.buyer_id=%s AND li.payment_status='paid'
     ORDER BY li.payment_at DESC
     """, (session["user_id"],))

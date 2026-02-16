@@ -150,7 +150,7 @@
           <i class="fa fa-truck-moving text-primary"></i> Active Orders
         </h4>
         <input type="text" id="activeSearch" class="form-control form-control-sm" style="width: 250px;"
-          placeholder="Search Order ID, Miller, Crop...">
+          placeholder="Search Order, Miller, Location...">
       </div>
 
       {% set per_page = 5 %}
@@ -170,7 +170,11 @@
           <div>
             <div class="order-id">{{ o.order_id }}</div>
             <div class="order-sub">{{ o.crop }} · {{ o.booked }} Qt</div>
-            <div class="order-sub">Miller: {{ o.miller_name }}</div>
+            <div class="order-sub">Miller: {{ o.miller_name }}
+              {% if o.miller_city %}
+              <small class="text-muted">({{ o.miller_city }}, {{ o.miller_state }})</small>
+              {% endif %}
+            </div>
           </div>
           <span class="badge-active">ACTIVE</span>
         </div>

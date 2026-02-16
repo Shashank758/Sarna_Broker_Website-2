@@ -63,8 +63,8 @@
         </div>
 
         <div class="d-flex gap-2">
-          <input type="text" id="paymentSearch" class="form-control form-control-sm" style="width: 200px;"
-            placeholder="Search Order, Truck...">
+          <input type="text" id="paymentSearch" class="form-control form-control-sm" style="width: 250px;"
+            placeholder="Search Order, Truck, Location...">
           <a href="/market" class="btn btn-outline-secondary btn-sm">
             <i class="fa fa-arrow-left"></i> Back to Market
           </a>
@@ -109,7 +109,8 @@
 
             <div class="d-flex justify-content-between align-items-center">
               <small class="text-muted">
-                <i class="fa fa-industry"></i> {{ p[7] }}<br>
+                <i class="fa fa-industry"></i> {{ p[7] }}
+                {% if p[9] %} <span class="text-muted small">({{ p[9] }})</span> {% endif %}<br>
                 <i class="fa fa-clock"></i> {{ p[6].strftime('%Y-%m-%d %H:%M') }}
               </small>
 
