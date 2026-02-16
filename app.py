@@ -1552,6 +1552,35 @@ def miller_dashboard():
         
         return redirect(url_for('miller_dashboard'))
 
+@app.route("/miller/delete_stock/<int:id>", methods=["POST"])
+def delete_miller_stock(id):
+    if session.get("role") != "miller":
+        return redirect("/")
+    
+    miller_id = get_effective_user_id()
+    con = get_db()
+    cur = con.cursor()
+    
+    # Check if stock exists and belongs to miller
+    cur.execute("SELECT id FROM miller_stock WHERE id=%s AND miller_id=%s", (id, miller_id))
+    if not cur.fetchone():
+        con.close()
+        return redirect("/miller")
+        
+    # Check if there are any active bookings for this stock
+    cur.execute("SELECT count(*) FROM miller_bookings WHERE stock_id=%s AND status IN ('pending', 'approved')", (id,))
+    active_count = cur.fetchone()[0]
+    
+    if active_count > 0:
+        flash("Cannot delete stock with active bookings!", "error")
+    else:
+        cur.execute("DELETE FROM miller_stock WHERE id=%s", (id,))
+        con.commit()
+        flash("Stock deleted successfully.", "success")
+        
+    con.close()
+    return redirect("/miller")
+
 
 # ✅ LIVE STOCKS
     cur.execute("""
@@ -1655,6 +1684,14 @@ ORDER BY mb.created_at DESC
 
     con.close()
 
+    # Fetch Miller Address
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT address FROM miller_profiles WHERE miller_id=%s", (miller_id,))
+    addr_row = cur.fetchone()
+    con.close()
+    miller_address = addr_row[0] if addr_row else None
+
     return render_template(
     "miller.html",
     stocks=stocks,
@@ -1665,7 +1702,8 @@ ORDER BY mb.created_at DESC
     active_stocks_count=active_stocks_count,
     pending_bookings_count=pending_bookings_count,
     approved_bookings_count=approved_bookings_count,
-    qc_pending_count=qc_pending_count
+    qc_pending_count=qc_pending_count,
+    miller_address=miller_address
 )
 
 @app.route("/miller/add_deduction_option", methods=["POST"])
