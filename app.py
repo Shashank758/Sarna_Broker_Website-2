@@ -5207,6 +5207,15 @@ def test_sms():
 
 
 
+@app.route("/debug-stocks")
+def debug_stocks():
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT id, miller_id, crop, quantity, status, created_at FROM miller_stock ORDER BY created_at DESC LIMIT 10")
+    stocks = cur.fetchall()
+    con.close()
+    return str(stocks)
+
 if __name__ == "__main__":
     init_db()
     run_migrations()
