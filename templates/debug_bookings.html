@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Debug Bookings</title>
+</head>
+
+<body>
+    <h1>Last 10 Bookings</h1>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Order ID</th>
+            <th>Stock ID</th>
+            <th>Buyer ID</th>
+            <th>Qty</th>
+            <th>Status</th>
+            <th>Loading Status</th>
+            <th>Created At</th>
+        </tr>
+        {% for b in bookings %}
+        <tr>
+            <td>{{ b[0] }}</td>
+            <td>{{ b[1] }}</td>
+            <td>{{ b[2] }}</td>
+            <td>{{ b[3] }}</td>
+            <td>{{ b[4] }}</td>
+            <td>{{ b[5] }}</td>
+            <td>{{ b[6] }}</td>
+            <td>{{ b[7] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h1>Last 5 Stocks</h1>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Miller ID</th>
+            <th>Status</th>
+        </tr>
+        {% for s in stocks %}
+        <tr>
+            <td>{{ s[0] }}</td>
+            <td>{{ s[1] }}</td>
+            <td>{{ s[2] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+
+</html>

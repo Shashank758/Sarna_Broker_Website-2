@@ -647,9 +647,20 @@
     </div>
 
     <!-- ================= ORDERS ================= -->
-    {% set pending = bookings | selectattr(4,'equalto','pending') | list %}
-    {% set approved = bookings | selectattr(4,'equalto','approved') | list %}
-    {% set rejected = bookings | selectattr(4,'equalto','declined') | list %}
+    <!-- ================= ORDERS ================= -->
+    {% set pending = [] %}
+    {% set approved = [] %}
+    {% set rejected = [] %}
+
+    {% for b in bookings %}
+    {% if b[4]|lower == 'pending' %}
+    {% set _ = pending.append(b) %}
+    {% elif b[4]|lower == 'approved' %}
+    {% set _ = approved.append(b) %}
+    {% elif b[4]|lower in ['declined', 'cancelled'] %}
+    {% set _ = rejected.append(b) %}
+    {% endif %}
+    {% endfor %}
 
     <!-- ================= BOOKING FILTER ================= -->
     <div class="filter-bar" data-aos="fade-up">

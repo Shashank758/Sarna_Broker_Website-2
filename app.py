@@ -3599,15 +3599,15 @@ def get_buyer_orders(filter_type):
 
     where = ""
     if filter_type == "active":
-        where = "AND mb.status='approved' AND mb.loading_status IN ('pending','partial')"
+        where = "AND LOWER(mb.status)='approved' AND LOWER(mb.loading_status) IN ('pending','partial')"
     elif filter_type == "requested":
-        where = "AND mb.status='pending'"
+        where = "AND LOWER(mb.status)='pending'"
     elif filter_type == "partial":
-        where = "AND mb.loading_status='partial_closed'"
+        where = "AND LOWER(mb.loading_status)='partial_closed'"
     elif filter_type == "loaded":
-        where = "AND mb.loading_status IN ('loaded', 'partial_closed')"
+        where = "AND LOWER(mb.loading_status) IN ('loaded', 'partial_closed')"
     elif filter_type == "rejected":
-        where = "AND mb.status IN ('declined', 'cancelled')"
+        where = "AND LOWER(mb.status) IN ('declined', 'cancelled')"
 
     cur.execute(f"""
         SELECT
@@ -3712,13 +3712,13 @@ def get_miller_orders_by_type(filter_type):
 
     where = ""
     if filter_type == "approved":
-        where = "AND mb.status='approved' AND mb.loading_status IN ('pending','partial')"
+        where = "AND LOWER(mb.status)='approved' AND LOWER(mb.loading_status) IN ('pending','partial')"
     elif filter_type == "qc":
-        where = "AND mb.loading_status='loaded' AND mb.qc_status='pending'"
+        where = "AND LOWER(mb.loading_status)='loaded' AND LOWER(mb.qc_status)='pending'"
     elif filter_type == "final":
-        where = "AND mb.loading_status='loaded' AND COALESCE(p.invoice_file,'') != '' AND COALESCE(p.status,'pending')='pending'"
+        where = "AND LOWER(mb.loading_status)='loaded' AND COALESCE(p.invoice_file,'') != '' AND COALESCE(LOWER(p.status),'pending')='pending'"
     elif filter_type == "rejected":
-        where = "AND mb.status IN ('declined','cancelled')"
+        where = "AND LOWER(mb.status) IN ('declined','cancelled')"
 
     cur.execute(f"""
         SELECT
@@ -5274,6 +5274,21 @@ def patch_miller_profile():
         return f"Error: {e}"
     finally:
         con.close()
+
+
+@app.route("/debug-bookings")
+def debug_bookings():
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT id, order_id, stock_id, buyer_id, quantity, status, loading_status, created_at FROM miller_bookings ORDER BY created_at DESC LIMIT 10")
+    rows = cur.fetchall()
+    
+    # Also check miller_stock
+    cur.execute("SELECT id, miller_id, status FROM miller_stock ORDER BY created_at DESC LIMIT 5")
+    stocks = cur.fetchall()
+    
+    con.close()
+    return render_template("debug_bookings.html", bookings=rows, stocks=stocks)
 
 if __name__ == "__main__":
     init_db()
