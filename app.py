@@ -5191,6 +5191,11 @@ def test_sms():
     """
     
 
+@app.route("/init-db")
+def manual_init_db():
+    run_migrations()
+    return "Database initialized successfully!"
+
 if __name__ == "__main__":
     init_db()
     run_migrations()
