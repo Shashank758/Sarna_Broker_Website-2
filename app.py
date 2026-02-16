@@ -202,7 +202,7 @@ def get_db():
     db_url = os.environ.get("DATABASE_URL")
     if not db_url:
         raise RuntimeError("DATABASE_URL environment variable is not set")
-    con = psycopg2.connect(db_url)
+    con = psycopg2.connect(db_url, sslmode="require")
     con.autocommit = False
     return con
 
