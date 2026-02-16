@@ -322,7 +322,22 @@ CREATE TABLE IF NOT EXISTS users (
         stock_id INTEGER,
         buyer_id INTEGER,
         quantity INTEGER,
-        status TEXT DEFAULT 'pending',
+        status VARCHAR(20) DEFAULT 'pending',
+        order_id VARCHAR(20),
+        price DECIMAL(10,2),
+        loading_status VARCHAR(20) DEFAULT 'pending',
+        loaded_qty DECIMAL(10,2) DEFAULT 0,
+        reason TEXT,
+        decision_at TIMESTAMP,
+        close_reason TEXT,
+        closed_by VARCHAR(20),
+        qc_weight DECIMAL(10,2),
+        qc_moisture DECIMAL(5,2),
+        qc_remarks TEXT,
+        qc_status VARCHAR(20) DEFAULT 'pending',
+        qc_at TIMESTAMP,
+        bill_document VARCHAR(255),
+        truck_status VARCHAR(50),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
@@ -5277,6 +5292,52 @@ def patch_miller_profile():
     finally:
         con.close()
 
+
+
+@app.route("/patch-db-schema")
+def patch_db_schema():
+    con = get_db()
+    cur = con.cursor()
+    try:
+        # Get current columns
+        cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name = 'miller_bookings'")
+        columns = [row[0] for row in cur.fetchall()]
+        
+        msgs = []
+        
+        # Define missing columns and their types
+        new_cols = {
+            "order_id": "VARCHAR(20)",
+            "price": "DECIMAL(10,2)",
+            "loading_status": "VARCHAR(20) DEFAULT 'pending'",
+            "loaded_qty": "DECIMAL(10,2) DEFAULT 0",
+            "reason": "TEXT",
+            "decision_at": "TIMESTAMP",
+            "close_reason": "TEXT",
+            "closed_by": "VARCHAR(20)",
+            "qc_weight": "DECIMAL(10,2)",
+            "qc_moisture": "DECIMAL(5,2)",
+            "qc_remarks": "TEXT",
+            "qc_status": "VARCHAR(20) DEFAULT 'pending'",
+            "qc_at": "TIMESTAMP",
+            "bill_document": "VARCHAR(255)",
+            "truck_status": "VARCHAR(50)"
+        }
+
+        for col, col_type in new_cols.items():
+            if col not in columns:
+                cur.execute(f"ALTER TABLE miller_bookings ADD COLUMN {col} {col_type}")
+                msgs.append(f"Added column: {col}")
+            else:
+                msgs.append(f"Column exists: {col}")
+        
+        con.commit()
+        return "<br>".join(msgs)
+    except Exception as e:
+        con.rollback()
+        return f"Error: {e}"
+    finally:
+        con.close()
 
 @app.route("/debug-bookings")
 def debug_bookings():
