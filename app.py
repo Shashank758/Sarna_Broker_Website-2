@@ -4084,6 +4084,8 @@ def book_miller_stock(stock_id):
             con.rollback()
             logger.error(f"Error booking stock: {e}")
             flash("An error occurred while placing the order.", "error")
+            flash(str(e), "error") # DEBUG: Show actual error
+            logger.error(f"Error booking stock: {e}")
 
     con.close()
     return redirect("/market")
