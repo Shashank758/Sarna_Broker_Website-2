@@ -1658,13 +1658,14 @@ ORDER BY mb.created_at DESC
 
     con.close()
 
-    # Fetch Miller Address
+    # Fetch Miller Address & Name
     con = get_db()
     cur = con.cursor()
-    cur.execute("SELECT address FROM miller_profiles WHERE miller_id=%s", (miller_id,))
+    cur.execute("SELECT address, mill_name FROM miller_profiles WHERE miller_id=%s", (miller_id,))
     addr_row = cur.fetchone()
     con.close()
     miller_address = addr_row[0] if addr_row else None
+    miller_name = addr_row[1] if addr_row else "Miller Login"
 
     return render_template(
     "miller.html",
@@ -1677,7 +1678,8 @@ ORDER BY mb.created_at DESC
     pending_bookings_count=pending_bookings_count,
     approved_bookings_count=approved_bookings_count,
     qc_pending_count=qc_pending_count,
-    miller_address=miller_address
+    miller_address=miller_address,
+    miller_name=miller_name
 )
 
 @app.route("/miller/delete_stock/<int:id>", methods=["POST"])
@@ -1738,6 +1740,89 @@ def miller_delete_deduction_option(id):
     con.close()
     
     return redirect("/miller#post-stock")
+
+@app.route("/miller/profile", methods=["GET", "POST"])
+def miller_profile_page():
+    if session.get("role") != "miller":
+        return redirect("/")
+    
+    miller_id = get_effective_user_id()
+    con = get_db()
+    cur = con.cursor()
+    
+    if request.method == "POST":
+        owner_name = request.form.get("owner_name")
+        mill_name = request.form.get("mill_name")
+        owner_phone = request.form.get("owner_phone")
+        accountant_phone = request.form.get("accountant_phone")
+        staff_phone = request.form.get("staff_phone")
+        address = request.form.get("address")
+        city = request.form.get("city")
+        state = request.form.get("state")
+        
+        # Handle file uploads
+        gst_doc = request.files.get("gst_doc")
+        mandi_doc = request.files.get("mandi_doc")
+        other_doc = request.files.get("other_doc")
+        
+        gst_filename = save_file(gst_doc, "miller_docs") if gst_doc else None
+        mandi_filename = save_file(mandi_doc, "miller_docs") if mandi_doc else None
+        other_filename = save_file(other_doc, "miller_docs") if other_doc else None
+        
+        # Check if profile exists
+        cur.execute("SELECT id FROM miller_profiles WHERE miller_id=%s", (miller_id,))
+        exists = cur.fetchone()
+        
+        if exists:
+            # Update
+            query = """
+                UPDATE miller_profiles 
+                SET owner_name=%s, mill_name=%s, owner_phone=%s, accountant_phone=%s, staff_phone=%s, address=%s, city=%s, state=%s
+            """
+            params = [owner_name, mill_name, owner_phone, accountant_phone, staff_phone, address, city, state]
+            
+            if gst_filename:
+                query += ", gst_doc=%s"
+                params.append(gst_filename)
+            if mandi_filename:
+                query += ", mandi_doc=%s"
+                params.append(mandi_filename)
+            if other_filename:
+                query += ", other_doc=%s"
+                params.append(other_filename)
+                
+            query += " WHERE miller_id=%s"
+            params.append(miller_id)
+            
+            cur.execute(query, tuple(params))
+        else:
+            # Insert
+            cur.execute("""
+                INSERT INTO miller_profiles 
+                (miller_id, owner_name, mill_name, owner_phone, accountant_phone, staff_phone, address, city, state, gst_doc, mandi_doc, other_doc)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (miller_id, owner_name, mill_name, owner_phone, accountant_phone, staff_phone, address, city, state, gst_filename, mandi_filename, other_filename))
+            
+        con.commit()
+        flash("Profile updated successfully", "success")
+        con.close()
+        return redirect("/miller/profile")
+
+    # Fetch Profile
+    # Explicitly select columns to match template indices + city/state
+    # 0:id, 1:miller_id, 2:mill_name, 3:owner_name, 4:address, 5:city, 6:state, 
+    # 7:owner_phone, 8:accountant_phone, 9:staff_phone, 10:gst_doc, 11:mandi_doc, 12:other_doc
+    cur.execute("""
+        SELECT id, miller_id, mill_name, owner_name, address, city, state, 
+               owner_phone, accountant_phone, staff_phone, gst_doc, mandi_doc, other_doc 
+        FROM miller_profiles 
+        WHERE miller_id=%s
+    """, (miller_id,))
+    profile = cur.fetchone()
+    con.close()
+    
+    return render_template("miller_profile.html", profile=profile)
+
 @app.route("/miller/approved")
 def miller_approved_page():
     if session.get("role") != "miller":

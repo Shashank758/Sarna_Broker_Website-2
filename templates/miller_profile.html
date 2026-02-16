@@ -1,256 +1,275 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<title>Miller Profile | Sarna Broker</title>
+  <meta charset="UTF-8">
+  <title>Miller Profile | Sarna Broker</title>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-<link rel="stylesheet" href="/static/css/style.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
 
-<style>
-body{
-  background:var(--bg-light);
-  font-family:"Segoe UI", sans-serif;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-}
+  <style>
+    body {
+      background: var(--bg-light);
+      font-family: "Segoe UI", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
-/* PAGE HEADER */
-.page-header{
-  background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);
-  color:#fff;
-  padding:25px 0;
-  margin-bottom:30px;
-}
-.page-header h4{
-  font-weight:700;
-  margin:0;
-}
-.page-header .breadcrumb{
-  margin:0;
-  background:none;
-  padding:0;
-}
-.page-header .breadcrumb a{
-  color:rgba(255,255,255,0.8);
-  text-decoration:none;
-}
-.page-header .breadcrumb a:hover{
-  color:#fff;
-}
+    /* PAGE HEADER */
+    .page-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: #fff;
+      padding: 25px 0;
+      margin-bottom: 30px;
+    }
 
-/* CARD */
-.profile-card{
-  background:#fff;
-  border-radius:16px;
-  padding:30px;
-  box-shadow:var(--shadow-md);
-  border:1px solid rgba(0,0,0,.05);
-}
+    .page-header h4 {
+      font-weight: 700;
+      margin: 0;
+    }
 
-/* FORM */
-.form-label{
-  font-weight:600;
-  font-size:14px;
-  color:#495057;
-}
-.form-control{
-  border-radius:10px;
-  padding:12px 15px;
-  border:1px solid #e0e0e0;
-  transition:all 0.3s ease;
-}
-.form-control:focus{
-  border-color:var(--primary);
-  box-shadow:0 0 0 3px rgba(15,155,95,0.15);
-}
+    .page-header .breadcrumb {
+      margin: 0;
+      background: none;
+      padding: 0;
+    }
 
-/* DOCUMENT */
-.doc-box{
-  border:2px dashed var(--primary);
-  padding:15px;
-  border-radius:12px;
-  text-align:center;
-  background:linear-gradient(135deg,rgba(15,155,95,0.03) 0%,rgba(15,155,95,0.01) 100%);
-}
+    .page-header .breadcrumb a {
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+    }
 
-/* STAFF SECTION */
-.staff-section{
-  background:linear-gradient(135deg,#f8f9fa 0%,#fff 100%);
-  border-radius:12px;
-  padding:20px;
-  border:1px solid #e9ecef;
-}
+    .page-header .breadcrumb a:hover {
+      color: #fff;
+    }
 
-main{
-  flex:1;
-}
-</style>
+    /* CARD */
+    .profile-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid rgba(0, 0, 0, .05);
+    }
+
+    /* FORM */
+    .form-label {
+      font-weight: 600;
+      font-size: 14px;
+      color: #495057;
+    }
+
+    .form-control {
+      border-radius: 10px;
+      padding: 12px 15px;
+      border: 1px solid #e0e0e0;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(15, 155, 95, 0.15);
+    }
+
+    /* DOCUMENT */
+    .doc-box {
+      border: 2px dashed var(--primary);
+      padding: 15px;
+      border-radius: 12px;
+      text-align: center;
+      background: linear-gradient(135deg, rgba(15, 155, 95, 0.03) 0%, rgba(15, 155, 95, 0.01) 100%);
+    }
+
+    /* STAFF SECTION */
+    .staff-section {
+      background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #e9ecef;
+    }
+
+    main {
+      flex: 1;
+    }
+  </style>
 </head>
 
 <body>
 
-{% include '_navbar.html' %}
+  {% include '_navbar.html' %}
 
-<!-- PAGE HEADER -->
-<div class="page-header">
-  <div class="container">
-    <div class="d-flex justify-content-between align-items-center">
-      <div>
-        <nav class="breadcrumb mb-2">
-          <a href="/miller"><i class="fa fa-home"></i> Dashboard</a>
-          <span class="mx-2">/</span>
-          <span>Profile</span>
-        </nav>
-        <h4><i class="fa fa-user-check me-2"></i>Miller Profile & Verification</h4>
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <nav class="breadcrumb mb-2">
+            <a href="/miller"><i class="fa fa-home"></i> Dashboard</a>
+            <span class="mx-2">/</span>
+            <span>Profile</span>
+          </nav>
+          <h4><i class="fa fa-user-check me-2"></i>Miller Profile & Verification</h4>
+        </div>
+        <a href="/miller" class="btn btn-light">
+          <i class="fa fa-arrow-left me-1"></i> Back
+        </a>
       </div>
-      <a href="/miller" class="btn btn-light">
-        <i class="fa fa-arrow-left me-1"></i> Back
-      </a>
     </div>
   </div>
-</div>
 
-<main>
-<div class="container mb-5">
+  <main>
+    <div class="container mb-5">
 
-{% if session.is_staff %}
-<div class="alert alert-danger alert-dismissible fade show" role="alert" data-aos="fade-down">
-  <i class="fa fa-exclamation-triangle me-2"></i>
-  Staff members cannot edit miller profile.
-  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-</div>
-{% endif %}
-
-<!-- ================= PROFILE FORM ================= -->
-<div class="profile-card" data-aos="fade-up">
-
-    {% if error %}
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <strong>Error:</strong> {{ error }}
+      {% if session.is_staff %}
+      <div class="alert alert-danger alert-dismissible fade show" role="alert" data-aos="fade-down">
+        <i class="fa fa-exclamation-triangle me-2"></i>
+        Staff members cannot edit miller profile.
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    {% endif %}
+      </div>
+      {% endif %}
 
-    <form method="POST" enctype="multipart/form-data" class="card p-4 shadow-sm">
+      <!-- ================= PROFILE FORM ================= -->
+      <div class="profile-card" data-aos="fade-up">
 
-        <!-- OWNER NAME -->
-        <label class="form-label">Owner Name</label>
-        <input class="form-control mb-2" name="owner_name"
-               value="{{ profile[3] if profile else '' }}">
-      
-        <!-- MILL NAME -->
-        <label class="form-label">Mill / Firm Name</label>
-        <input class="form-control mb-2" name="mill_name"
-               value="{{ profile[2] if profile else '' }}" required>
-      
-        <!-- OWNER PHONE -->
-        <label class="form-label">Owner Mobile Number</label>
-        <input class="form-control mb-2" name="owner_phone"
-               value="{{ profile[7] if profile else '' }}" required>
-      
-        <!-- ACCOUNTANT PHONE -->
-        <label class="form-label">Accountant Mobile Number</label>
-        <input class="form-control mb-2" name="accountant_phone"
-               value="{{ profile[8] if profile else '' }}">
-      
-        <!-- STAFF PHONE -->
-        <label class="form-label">Staff Mobile Number</label>
-        <input class="form-control mb-2" name="staff_phone"
-               value="{{ profile[9] if profile else '' }}">
-      
-        <!-- ADDRESS -->
-        <label class="form-label">Complete Address</label>
-        <textarea class="form-control mb-3" name="address" required>
+        {% if error %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>Error:</strong> {{ error }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data" class="card p-4 shadow-sm">
+
+          <!-- OWNER NAME -->
+          <label class="form-label">Owner Name</label>
+          <input class="form-control mb-2" name="owner_name" value="{{ profile[3] if profile else '' }}">
+
+          <!-- MILL NAME -->
+          <label class="form-label">Mill / Firm Name</label>
+          <input class="form-control mb-2" name="mill_name" value="{{ profile[2] if profile else '' }}" required>
+
+          <!-- OWNER PHONE -->
+          <label class="form-label">Owner Mobile Number</label>
+          <input class="form-control mb-2" name="owner_phone" value="{{ profile[7] if profile else '' }}" required>
+
+          <!-- ACCOUNTANT PHONE -->
+          <label class="form-label">Accountant Mobile Number</label>
+          <input class="form-control mb-2" name="accountant_phone" value="{{ profile[8] if profile else '' }}">
+
+          <!-- STAFF PHONE -->
+          <label class="form-label">Staff Mobile Number</label>
+          <input class="form-control mb-2" name="staff_phone" value="{{ profile[9] if profile else '' }}">
+
+          <!-- ADDRESS -->
+          <label class="form-label">Complete Address</label>
+          <textarea class="form-control mb-3" name="address" required>
       {{ profile[4] if profile else '' }}
       </textarea>
-      
-        <!-- GST DOC -->
-        <label class="form-label">GST Certificate</label>
-        {% if profile and profile[10] %}
+
+          <div class="row">
+            <div class="col-md-6">
+              <label class="form-label">City</label>
+              <input class="form-control mb-3" name="city" value="{{ profile[5] if profile else '' }}"
+                placeholder="e.g. Gonda" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">State</label>
+              <input class="form-control mb-3" name="state" value="{{ profile[6] if profile else '' }}"
+                placeholder="e.g. Uttar Pradesh" required>
+            </div>
+          </div>
+
+          <!-- GST DOC -->
+          <label class="form-label">GST Certificate</label>
+          {% if profile and profile[10] %}
           <div class="alert alert-success mb-2">
-            <i class="fa fa-check-circle"></i> Document uploaded: 
-            <a href="{{ url_for('static', filename='uploads/miller_docs/' + profile[10]) }}" target="_blank" class="text-decoration-none">
+            <i class="fa fa-check-circle"></i> Document uploaded:
+            <a href="{{ url_for('static', filename='uploads/miller_docs/' + profile[10]) }}" target="_blank"
+              class="text-decoration-none">
               {{ profile[10] }}
             </a>
           </div>
-        {% else %}
+          {% else %}
           <div class="alert alert-warning mb-2">
             <i class="fa fa-exclamation-circle"></i> No document uploaded yet
           </div>
-        {% endif %}
-        <input type="file" class="form-control mb-2" name="gst_doc" accept="image/*,.pdf">
-      
-        <!-- MANDI DOC -->
-        <label class="form-label">Mandi License</label>
-        {% if profile and profile[11] %}
+          {% endif %}
+          <input type="file" class="form-control mb-2" name="gst_doc" accept="image/*,.pdf">
+
+          <!-- MANDI DOC -->
+          <label class="form-label">Mandi License</label>
+          {% if profile and profile[11] %}
           <div class="alert alert-success mb-2">
-            <i class="fa fa-check-circle"></i> Document uploaded: 
-            <a href="{{ url_for('static', filename='uploads/miller_docs/' + profile[11]) }}" target="_blank" class="text-decoration-none">
+            <i class="fa fa-check-circle"></i> Document uploaded:
+            <a href="{{ url_for('static', filename='uploads/miller_docs/' + profile[11]) }}" target="_blank"
+              class="text-decoration-none">
               {{ profile[11] }}
             </a>
           </div>
-        {% else %}
+          {% else %}
           <div class="alert alert-warning mb-2">
             <i class="fa fa-exclamation-circle"></i> No document uploaded yet
           </div>
-        {% endif %}
-        <input type="file" class="form-control mb-2" name="mandi_doc" accept="image/*,.pdf">
-      
-        <!-- OTHER DOC -->
-        <label class="form-label">Other Document</label>
-        {% if profile and profile[12] %}
+          {% endif %}
+          <input type="file" class="form-control mb-2" name="mandi_doc" accept="image/*,.pdf">
+
+          <!-- OTHER DOC -->
+          <label class="form-label">Other Document</label>
+          {% if profile and profile[12] %}
           <div class="alert alert-success mb-2">
-            <i class="fa fa-check-circle"></i> Document uploaded: 
-            <a href="{{ url_for('static', filename='uploads/miller_docs/' + profile[12]) }}" target="_blank" class="text-decoration-none">
+            <i class="fa fa-check-circle"></i> Document uploaded:
+            <a href="{{ url_for('static', filename='uploads/miller_docs/' + profile[12]) }}" target="_blank"
+              class="text-decoration-none">
               {{ profile[12] }}
             </a>
           </div>
-        {% else %}
+          {% else %}
           <div class="alert alert-warning mb-2">
             <i class="fa fa-exclamation-circle"></i> No document uploaded yet
           </div>
-        {% endif %}
-        <input type="file" class="form-control mb-3" name="other_doc" accept="image/*,.pdf">
-      
-        <button class="btn btn-success w-100">
-          Save Profile
-        </button>
-      </form>
-      <hr class="my-4">
+          {% endif %}
+          <input type="file" class="form-control mb-3" name="other_doc" accept="image/*,.pdf">
 
-      <div class="staff-section" data-aos="fade-up" data-aos-delay="100">
-        <h5 class="mb-3">👷 Create Staff Account</h5>
-
-        <form method="POST" action="/miller/create_staff" class="row g-3">
-          <div class="col-md-4">
-            <input class="form-control" name="name" placeholder="Staff Name" required>
-          </div>
-          <div class="col-md-4">
-            <input class="form-control" name="email" type="email" placeholder="Staff Email" required>
-          </div>
-          <div class="col-md-4">
-            <input class="form-control" name="password" type="password" placeholder="Password" required>
-          </div>
-          <div class="col-12">
-            <button class="btn btn-success">
-              ➕ Create Staff
-            </button>
-          </div>
+          <button class="btn btn-success w-100">
+            Save Profile
+          </button>
         </form>
+        <hr class="my-4">
+
+        <div class="staff-section" data-aos="fade-up" data-aos-delay="100">
+          <h5 class="mb-3">👷 Create Staff Account</h5>
+
+          <form method="POST" action="/miller/create_staff" class="row g-3">
+            <div class="col-md-4">
+              <input class="form-control" name="name" placeholder="Staff Name" required>
+            </div>
+            <div class="col-md-4">
+              <input class="form-control" name="email" type="email" placeholder="Staff Email" required>
+            </div>
+            <div class="col-md-4">
+              <input class="form-control" name="password" type="password" placeholder="Password" required>
+            </div>
+            <div class="col-12">
+              <button class="btn btn-success">
+                ➕ Create Staff
+              </button>
+            </div>
+          </form>
+        </div>
+
       </div>
+    </div>
+  </main>
 
-</div>
-</div>
-</main>
+  {% include '_footer.html' %}
 
-{% include '_footer.html' %}
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-<script>AOS.init({duration:600,once:true});</script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>AOS.init({ duration: 600, once: true });</script>
 </body>
+
 </html>
