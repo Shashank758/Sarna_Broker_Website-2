@@ -3393,8 +3393,7 @@ def market():
     FROM miller_stock
     JOIN users ON miller_stock.miller_id = users.id
     LEFT JOIN miller_profiles mp ON users.id = mp.miller_id
-    WHERE miller_stock.quantity > 0
-    AND miller_stock.status = 'open'
+    WHERE miller_stock.status = 'open'
     ORDER BY miller_stock.created_at DESC
     """)
     miller_stocks = cur.fetchall()
@@ -5206,15 +5205,6 @@ def test_sms():
     
 
 
-
-@app.route("/debug-stocks")
-def debug_stocks():
-    con = get_db()
-    cur = con.cursor()
-    cur.execute("SELECT id, miller_id, crop, quantity, status, created_at FROM miller_stock ORDER BY created_at DESC LIMIT 10")
-    stocks = cur.fetchall()
-    con.close()
-    return str(stocks)
 
 if __name__ == "__main__":
     init_db()
