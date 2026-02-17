@@ -3346,7 +3346,15 @@ def update_miller_stock(id):
     cur = con.cursor()
 
     cur.execute("SELECT price,quantity FROM miller_stock WHERE id=%s", (id,))
-    old_price, old_qty = cur.fetchone()
+    row = cur.fetchone()
+    if not row:
+        con.close()
+        return redirect("/miller")
+    old_price, old_qty = row
+
+    new_price = request.form["price"]
+    new_qty = request.form["quantity"]
+    deduction = request.form["deduction"]
 
     cur.execute("""
         UPDATE miller_stock_history
@@ -3356,29 +3364,23 @@ def update_miller_stock(id):
         updated_at=CURRENT_TIMESTAMP
         WHERE stock_id=%s AND id=(SELECT MAX(id) FROM miller_stock_history WHERE stock_id=%s)
     """, (
-        request.form["price"],
-        old_qty,
+        new_price,
+        new_qty,
         id,
         id
     ))
     
     cur.execute("""
         UPDATE miller_stock
-        SET note=%s,
-            condition=%s,
-            bag_type=%s,
-            deduction=%s,
+        SET deduction=%s,
             price=%s,
-            auto_approve_min_qty=%s,
+            quantity=%s,
             status='open'
         WHERE id=%s AND miller_id=%s
     """, (
-        request.form.get("note", ""),
-        request.form["condition"],
-        request.form["bag_type"],
-        request.form["deduction"],
-        request.form["price"],
-        request.form.get("auto_approve_min_qty", 0),
+        deduction,
+        new_price,
+        new_qty,
         id,
         get_effective_user_id()
     ))
@@ -3392,9 +3394,9 @@ def update_miller_stock(id):
         id,
         get_effective_user_id(),
         old_price,
-        request.form["price"],
+        new_price,
         old_qty,
-        old_qty
+        new_qty
     ))
 
     con.commit()
@@ -3405,7 +3407,6 @@ def update_miller_stock(id):
     if crop_result:
         crop = crop_result[0]
         note = crop_result[1] or ""
-        new_price = request.form["price"]
         buyer_phones = get_all_buyer_phones()
         message = f"📢 Stock updated! {crop} - New Price: ₹{new_price}/unit. {note} Check the market for details."
         for phone in buyer_phones:

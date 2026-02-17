@@ -589,12 +589,9 @@
           <thead>
             <tr>
               <th>Crop</th>
-              <th>Note</th>
+              <th>Quantity (Qt)</th>
               <th>Price/Qt</th>
-              <th>Condition</th>
-              <th>Bag Type</th>
               <th>Deduction</th>
-              <th>Auto-Approve Limit</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -608,33 +605,16 @@
                   </span>
                 </td>
                 <td>
-                  <input type="text" name="note" value="{{ s[11] if s[11] else '' }}"
-                    class="form-control form-control-sm" style="width:150px;margin:auto;" placeholder="Add note...">
+                  <input type="number" name="quantity" value="{{ s[3] }}" class="form-control form-control-sm"
+                    style="width:100px;margin:auto;" min="0">
                 </td>
                 <td>
                   <input type="number" name="price" value="{{ s[4] }}" step="0.01" class="form-control form-control-sm"
-                    style="width:90px;margin:auto;">
-                </td>
-                <td>
-                  <select name="condition" class="form-select form-select-sm" style="width:90px;margin:auto;">
-                    <option {{ 'selected' if s[5]=='Net' }}>Net</option>
-                    <option {{ 'selected' if s[5]=='Full' }}>Full</option>
-                  </select>
-                </td>
-                <td>
-                  <select name="bag_type" class="form-select form-select-sm" style="width:110px;margin:auto;">
-                    <option {{ 'selected' if s[6]=='Jute' }}>Jute</option>
-                    <option {{ 'selected' if s[6]=='Plastic' }}>Plastic</option>
-                    <option {{ 'selected' if s[6]=='Jute/Plastic' }}>Jute/Plastic</option>
-                  </select>
+                    style="width:100px;margin:auto;">
                 </td>
                 <td>
                   <input type="text" name="deduction" value="{{ s[7] }}" class="form-control form-control-sm"
                     style="width:120px;margin:auto;">
-                </td>
-                <td>
-                  <input type="number" name="auto_approve_min_qty" value="{{ s[13] if s[13] else 0 }}"
-                    class="form-control form-control-sm" style="width:100px;margin:auto;" min="0">
                 </td>
                 <td>
                   <div class="d-flex gap-2 justify-content-center">
