@@ -5052,7 +5052,7 @@ def admin_update_deduction(stock_id):
     con.commit()
     con.close()
 
-    log_admin_action("update_deduction", stock_id, f"Stock {stock_id} deduction updated to {deduction}")
+    log_activity("update_deduction", stock_id, f"Stock {stock_id} deduction updated to {deduction}")
     return redirect("/admin/stock")
     
 @app.route("/admin/approve_user/<int:id>")
@@ -5065,7 +5065,7 @@ def approve_user(id):
     cur.execute("UPDATE users SET status='approved' WHERE id=%s", (id,))
     con.commit()
     con.close()
-    log_admin_action("approve_user", id, f"User {id} approved")
+    log_activity("approve_user", id, f"User {id} approved")
     return redirect("/admin/users")
 @app.route("/admin/block_user/<int:id>")
 def block_user(id):
@@ -5077,7 +5077,7 @@ def block_user(id):
     cur.execute("UPDATE users SET status='blocked' WHERE id=%s", (id,))
     con.commit()
     con.close()
-    log_admin_action("block_user", id, f"User {id} blocked")
+    log_activity("block_user", id, f"User {id} blocked")
     return redirect("/admin/users")
 
 @app.route("/admin/unblock_user/<int:id>")
@@ -5090,7 +5090,7 @@ def unblock_user(id):
     cur.execute("UPDATE users SET status='approved' WHERE id=%s", (id,))
     con.commit()
     con.close()
-    log_admin_action("unblock_user", id, f"User {id} unblocked")
+    log_activity("unblock_user", id, f"User {id} unblocked")
     return redirect("/admin/users")
 
 @app.route("/admin/reject_user/<int:id>")
@@ -5103,7 +5103,7 @@ def reject_user(id):
     cur.execute("UPDATE users SET status='rejected' WHERE id=%s", (id,))
     con.commit()
     con.close()
-    log_admin_action("reject_user", id, f"User {id} rejected")
+    log_activity("reject_user", id, f"User {id} rejected")
     return redirect("/admin/users")
     
 @app.route("/admin/miller/<int:miller_id>")
@@ -5142,7 +5142,7 @@ def admin_approve_booking(id):
 
     con.commit()
     con.close()
-    log_admin_action("approve_booking", id, f"Booking {id} approved")
+    log_activity("approve_booking", id, f"Booking {id} approved")
     return redirect("/admin/bookings")
 @app.route("/admin/decline_booking/<int:id>")
 def admin_decline_booking(id):
@@ -5162,7 +5162,7 @@ def admin_decline_booking(id):
 
     con.commit()
     con.close()
-    log_admin_action("decline_booking", id, f"Booking {id} declined")
+    log_activity("decline_booking", id, f"Booking {id} declined")
     return redirect("/admin/bookings")
 
 @app.route("/admin/update_truck/<int:invoice_id>", methods=["POST"])
@@ -5229,7 +5229,7 @@ def admin_update_truck(invoice_id):
     con.commit()
     con.close()
 
-    log_admin_action("update_truck", invoice_id, f"Truck details updated for Invoice {invoice_id}")
+    log_activity("update_truck", invoice_id, f"Truck details updated for Invoice {invoice_id}")
     flash("Truck details updated.", "success")
     return redirect(request.referrer or "/admin/bookings")
 
