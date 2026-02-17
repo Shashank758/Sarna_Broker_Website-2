@@ -1053,6 +1053,7 @@ def run_migrations():
         upgrade_users_table()
         upgrade_password_resets_table()
         upgrade_admin_logs_table()
+        upgrade_admin_logs_extended()
         
         # Features
         upgrade_partial_loading()
