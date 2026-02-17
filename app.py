@@ -2317,7 +2317,7 @@ def miller_post_stock_page():
     if request.method == "POST":
         crop = request.form["crop"]
         price = request.form["price"]
-        qty = 0 # Default for now, as qty is not in the form shown in screenshot/code
+        qty = request.form.get("quantity", 0) # Get quantity from form!
         condition = request.form["condition"]
         bag_type = request.form["bag_type"]
         deduction = request.form["deduction"]
