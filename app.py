@@ -202,7 +202,19 @@ def get_db():
     db_url = os.environ.get("DATABASE_URL")
     if not db_url:
         raise RuntimeError("DATABASE_URL environment variable is not set")
-    con = psycopg2.connect(db_url, sslmode="require")
+    
+    # Use SSL for production (Render), but disable for local
+    if "render" in db_url or "aws" in db_url:
+        ssl_mode = "require"
+    else:
+        ssl_mode = "prefer" # Allow local without SSL
+
+    try:
+        con = psycopg2.connect(db_url, sslmode=ssl_mode)
+    except psycopg2.OperationalError:
+       # Fallback for local if prefer/require fails (e.g. windows local pg often needs disable)
+       con = psycopg2.connect(db_url, sslmode="disable")
+       
     con.autocommit = False
     return con
 
