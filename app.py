@@ -2317,12 +2317,14 @@ def miller_post_stock_page():
     if request.method == "POST":
         crop = request.form["crop"]
         price = request.form["price"]
-        qty = request.form.get("quantity", 0) # Get quantity from form!
+        qty = request.form["quantity"] # Get quantity from form!
         condition = request.form["condition"]
-        bag_type = request.form["bag_type"]
-        deduction = request.form["deduction"]
-        note = request.form["note"]
-        auto_approve_min_qty = request.form.get("auto_approve_min_qty", 0) or 0
+        
+        # Defaults for removed fields
+        bag_type = "Standard" 
+        deduction = request.form.get("deduction", "")
+        note = ""
+        auto_approve_min_qty = 0
 
         # Create new stock entry
         cur.execute("""
