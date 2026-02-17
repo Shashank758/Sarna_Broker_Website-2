@@ -64,8 +64,17 @@
       <div class="table-card mt-5">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h6>📦 Miller Bookings (Admin Control)</h6>
-          <input type="text" id="bookingSearch" class="form-control form-control-sm" style="width: 250px;"
-            placeholder="Search Order ID, Trader, Miller...">
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-success"
+              onclick="exportTableToExcel('bookingTable', 'bookings_data.xlsx')">
+              <i class="fa fa-file-excel"></i> Export
+            </button>
+            <button class="btn btn-sm btn-outline-dark" onclick="printTable()">
+              <i class="fa fa-print"></i> Print
+            </button>
+            <input type="text" id="bookingSearch" class="form-control form-control-sm" style="width: 250px;"
+              placeholder="Search Order ID, Trader, Miller...">
+          </div>
         </div>
 
         <table class="table table-bordered table-hover align-middle" id="bookingTable">

@@ -63,8 +63,16 @@
       <div class="table-card mt-5">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h6>👥 User Access Control</h6>
-          <input type="text" id="userSearch" class="form-control form-control-sm" style="width: 250px;"
-            placeholder="Search Name, Email, Role...">
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-success" onclick="exportTableToExcel('userTable', 'users_data.xlsx')">
+              <i class="fa fa-file-excel"></i> Export
+            </button>
+            <button class="btn btn-sm btn-outline-dark" onclick="printTable()">
+              <i class="fa fa-print"></i> Print
+            </button>
+            <input type="text" id="userSearch" class="form-control form-control-sm" style="width: 250px;"
+              placeholder="Search Name, Email, Role...">
+          </div>
         </div>
 
         <table class="table table-bordered table-striped table-sm align-middle" id="userTable">

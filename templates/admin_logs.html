@@ -35,12 +35,21 @@
         <main class="admin-content">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>Admin Activity Logs</h2>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-success"
+                        onclick="exportTableToExcel('logsTable', 'activity_logs.xlsx')">
+                        <i class="fa fa-file-excel"></i> Export
+                    </button>
+                    <button class="btn btn-sm btn-outline-dark" onclick="printTable()">
+                        <i class="fa fa-print"></i> Print
+                    </button>
+                </div>
             </div>
 
             <div class="card shadow-sm">
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
+                        <table class="table table-hover align-middle mb-0" id="logsTable">
                             <thead class="table-light">
                                 <tr>
                                     <th>ID</th>

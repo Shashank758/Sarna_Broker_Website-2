@@ -63,12 +63,21 @@
       <div class="table-card mt-5">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h6>🏭 Miller Profiles</h6>
-          <input type="text" id="millerSearch" class="form-control form-control-sm" style="width: 250px;"
-            placeholder="Search Name, Mill, Phone, Address...">
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-success"
+              onclick="exportTableToExcel('millerTable', 'miller_profiles.xlsx')">
+              <i class="fa fa-file-excel"></i> Export
+            </button>
+            <button class="btn btn-sm btn-outline-dark" onclick="printTable()">
+              <i class="fa fa-print"></i> Print
+            </button>
+            <input type="text" id="millerSearch" class="form-control form-control-sm" style="width: 250px;"
+              placeholder="Search Name, Mill, Phone, Address...">
+          </div>
         </div>
 
         {% if miller_profiles %}
-        <table class="table table-bordered table-striped table-sm align-middle">
+        <table class="table table-bordered table-striped table-sm align-middle" id="millerTable">
           <tr class="table-info">
             <th>Miller Name</th>
             <th>Mill Name</th>
