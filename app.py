@@ -3439,7 +3439,7 @@ def market():
     FROM miller_stock
     JOIN users ON miller_stock.miller_id = users.id
     LEFT JOIN miller_profiles mp ON users.id = mp.miller_id
-    WHERE miller_stock.status = 'open'
+    WHERE miller_stock.status = 'open' AND miller_stock.quantity > 0
     ORDER BY miller_stock.created_at DESC
     """)
     miller_stocks = cur.fetchall()
