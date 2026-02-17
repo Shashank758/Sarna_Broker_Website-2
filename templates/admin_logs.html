@@ -44,7 +44,8 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>ID</th>
-                                    <th>Admin</th>
+                                    <th>Role</th>
+                                    <th>Name</th>
                                     <th>Action</th>
                                     <th>Target ID</th>
                                     <th>Details</th>
@@ -55,15 +56,16 @@
                                 {% for log in logs %}
                                 <tr>
                                     <td>{{ log[0] }}</td>
-                                    <td>{{ log[1] }} (ID: {{ log[2] }})</td>
-                                    <td><span class="badge bg-secondary">{{ log[3] }}</span></td>
+                                    <td><span class="badge bg-secondary">{{ log[2] }}</span></td>
+                                    <td>{{ log[1] }}</td>
+                                    <td><strong>{{ log[3] }}</strong></td>
                                     <td>{{ log[4] }}</td>
                                     <td>{{ log[5] }}</td>
                                     <td>{{ log[6].strftime('%d-%m-%Y %I:%M %p') }}</td>
                                 </tr>
                                 {% else %}
                                 <tr>
-                                    <td colspan="6" class="text-center py-4 text-muted">No logs found.</td>
+                                    <td colspan="7" class="text-center py-4 text-muted">No logs found.</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

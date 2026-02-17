@@ -219,23 +219,29 @@ def get_db():
     return con
 
 
-def log_admin_action(action, target_id, details=None):
-    """Log an admin action to the database."""
+def log_activity(action, target_id=None, details=None, user_id=None, role=None):
+    """Log any user activity to the database."""
     try:
-        if session.get("role") != "admin":
-            return
+        if not user_id:
+            user_id = session.get("user_id")
+        if not role:
+            role = session.get("role")
             
-        admin_id = session.get("user_id")
+        # If no user context, we can't log (or log as system?)
+        if not user_id:
+            return
+
         con = get_db()
         cur = con.cursor()
+        # admin_logs table now has role column (admin_id is used as user_id)
         cur.execute("""
-            INSERT INTO admin_logs (admin_id, action, target_id, details)
-            VALUES (%s, %s, %s, %s)
-        """, (admin_id, action, target_id, details))
+            INSERT INTO admin_logs (admin_id, role, action, target_id, details)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (user_id, role, action, target_id, details))
         con.commit()
         con.close()
     except Exception as e:
-        print(f"Failed to log admin action: {e}")
+        print(f"Failed to log activity: {e}")
 
 
 
@@ -1023,6 +1029,19 @@ def upgrade_admin_logs_table():
     con.close()
     print("✅ Verified admin_logs table.")
 
+def upgrade_admin_logs_extended():
+    """Add role column to admin_logs if not exists."""
+    con = get_db()
+    cur = con.cursor()
+    try:
+        cur.execute("ALTER TABLE admin_logs ADD COLUMN role VARCHAR(20)")
+        print("✅ Added role column to admin_logs.")
+    except Exception:
+        con.rollback() # Column likely exists
+    con.commit()
+    con.close()
+
+
 def run_migrations():
     """Run all database migrations in a single connection to speed up startup."""
     try:
@@ -1185,12 +1204,16 @@ def login():
         session["parent_miller_id"] = user[7] if user[7] else None
 
         if user[4] == "farmer":
+            log_activity("User Login", user[0], f"Role: {user[4]}", user_id=user[0], role=user[4])
             return redirect("/my_commodity")
         elif user[4] == "buyer":
+            log_activity("User Login", user[0], f"Role: {user[4]}", user_id=user[0], role=user[4])
             return redirect("/market")
         elif user[4] == "miller":
+            log_activity("User Login", user[0], f"Role: {user[4]}", user_id=user[0], role=user[4])
             return redirect("/miller")
         else:
+            log_activity("User Login", user[0], "Role: Admin", user_id=user[0], role="admin")
             return redirect("/admin")
 
     return render_template("login.html")
@@ -1454,6 +1477,8 @@ def register():
                 
             con.commit()
             con.close()
+            # We can't use session here as user is not logged in yet, so pass explicit user_id and role
+            log_activity("User Registration", user_id, f"Name: {name}, Role: {role}", user_id=user_id, role=role)
             return redirect("/")
             
         except Exception as e:
@@ -1577,6 +1602,7 @@ def miller_dashboard():
         for phone in buyer_phones:
             send_sms(phone, message)
         
+        log_activity("Stock Posted", new_stock_id, f"Crop: {crop}, Qty: 100000, Price: {price}, Note: {note}")
         return redirect(url_for('miller_dashboard'))
 
     # ✅ LIVE STOCKS
@@ -1844,6 +1870,7 @@ def miller_profile_page():
             
         con.commit()
         flash("Profile updated successfully", "success")
+        log_activity("Profile Updated", miller_id, "Miller Profile Updated")
         con.close()
         return redirect("/miller/profile")
 
@@ -2838,6 +2865,7 @@ def miller_mark_truck_payment_done(invoice_id):
             send_sms(buyer_phone, message)
 
     con.commit()
+    log_activity("Truck Payment Done", invoice_id, f"Payment marked for truck {invoice_id} of Order {order_id}")
     con.close()
 
     return redirect(request.referrer or "/miller")
@@ -3094,6 +3122,7 @@ def buyer_profile():
             ))
 
         con.commit()
+        log_activity("Profile Updated", session["user_id"], "Buyer Profile Updated", user_id=session["user_id"], role="buyer")
         con.close()
         return redirect("/buyer/profile")
 
@@ -3237,6 +3266,7 @@ def miller_close_remaining(booking_id):
             send_sms(buyer_phone, message)
 
     con.commit()
+    log_activity("Booking Partial Close", booking_id, f"Miller Closed Remaining. Reason: {reason}")
     con.close()
 
     return redirect(request.referrer or "/miller")
@@ -3284,6 +3314,7 @@ def miller_approve_booking(id):
             send_sms(buyer_phone, message)
 
     con.commit()
+    log_activity("Booking Approved", id, f"Booking Approved for Order {order_id}")
     con.close()
     return redirect("/miller")
 
@@ -3333,6 +3364,7 @@ def miller_decline_booking(id):
             send_sms(buyer_phone, message)
 
     con.commit()
+    log_activity("Booking Declined", id, f"Booking Declined. Reason: {reason}")
     con.close()
     return redirect("/miller")
 
@@ -3400,6 +3432,7 @@ def update_miller_stock(id):
     ))
 
     con.commit()
+    log_activity("Stock Updated", id, f"Updated Stock {id} - Price: {new_price}, Qty: {new_qty}")
     
     # 📱 Send SMS to all buyers about stock update
     cur.execute("SELECT crop, note FROM miller_stock WHERE id=%s", (id,))
@@ -4106,6 +4139,7 @@ def book_miller_stock(stock_id):
                     send_sms(miller_phone, message)
             
             con.commit()
+            log_activity("Stock Booked", booking_id, f"Order {order_id} placed. Qty: {qty}")
             if is_auto_approved:
                 flash(f"Order {order_id} placed successfully and Auto-Approved!", "success")
             else:
@@ -4170,8 +4204,9 @@ def cancel_booking(id):
             if miller_phone:
                 message = f"❌ Order {order_id} cancelled by buyer. {crop} - Qty: {qty}. Stock returned to inventory."
                 send_sms(miller_phone, message)
-
+        
         con.commit()
+        log_activity("Booking Cancelled", id, f"Order {order_id} cancelled by buyer")
 
     con.close()
     return redirect("/market")
@@ -4963,7 +4998,7 @@ def admin_logs():
     cur = con.cursor()
     try:
         cur.execute("""
-            SELECT l.id, COALESCE(u.name, 'Unknown Admin'), l.admin_id, l.action, l.target_id, l.details, l.created_at
+            SELECT l.id, COALESCE(u.name, 'Unknown User'), l.role, l.action, l.target_id, l.details, l.created_at, l.admin_id
             FROM admin_logs l
             LEFT JOIN users u ON l.admin_id = u.id
             ORDER BY l.created_at DESC
