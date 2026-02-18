@@ -1,4 +1,86 @@
 <!-- ================= UNIFIED NAVBAR - SAARNA CANVESSARS ================= -->
+<style>
+  .sarna-navbar {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    box-shadow: 0 4px 12px rgba(15, 155, 95, 0.15);
+    padding: 12px 0;
+  }
+
+  .sarna-navbar .navbar-brand {
+    color: #fff !important;
+    font-weight: 800;
+    font-size: 1.35rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: -0.5px;
+  }
+
+  .sarna-navbar .navbar-brand i {
+    font-size: 1.5rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  }
+
+  .sarna-navbar .nav-link {
+    color: rgba(255, 255, 255, 0.85) !important;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 8px 16px !important;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .sarna-navbar .nav-link:hover {
+    color: #fff !important;
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+  }
+
+  .sarna-navbar .nav-link.active {
+    color: #fff !important;
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .sarna-navbar .navbar-toggler {
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    padding: 4px 8px;
+  }
+
+  .sarna-navbar .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+  }
+
+  /* Badge Styles */
+  .sarna-navbar .badge {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .nav-role-badge {
+    background: rgba(0, 0, 0, 0.2);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  @media (max-width: 991px) {
+    .sarna-navbar .navbar-collapse {
+      background: rgba(0, 0, 0, 0.1);
+      margin-top: 10px;
+      border-radius: 12px;
+      padding: 10px;
+    }
+  }
+</style>
+
 <nav class="navbar navbar-expand-lg sarna-navbar">
   <link rel="stylesheet" href="/static/css/print.css">
   <div class="container">
@@ -23,22 +105,24 @@
         <!-- ===== BUYER NAVIGATION ===== -->
         <li class="nav-item">
           <a class="nav-link {% if request.path == '/market' %}active{% endif %}" href="/market">
-            <i class="fa fa-gauge me-1"></i> Dashboard
+            <i class="fa fa-gauge me-1"></i> Market
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link {% if request.path == '/buyer/requested' %}active{% endif %}" href="/buyer/requested">
             <i class="fa fa-hourglass-half me-1"></i> Requested
             {% if buyer_pending_requests and buyer_pending_requests > 0 %}
-            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.7em;">{{ buyer_pending_requests }}</span>
+            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.75em;">{{ buyer_pending_requests
+              }}</span>
             {% endif %}
           </a>
+        </li>
 
         <li class="nav-item">
           <a class="nav-link {% if request.path == '/buyer/active' %}active{% endif %}" href="/buyer/active">
             <i class="fa fa-truck me-1"></i> Active
             {% if buyer_active_orders and buyer_active_orders > 0 %}
-            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.7em;">{{ buyer_active_orders }}</span>
+            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.75em;">{{ buyer_active_orders }}</span>
             {% endif %}
           </a>
         </li>
@@ -54,7 +138,7 @@
         </li>
         <li class="nav-item">
           <a class="nav-link {% if request.path == '/buyer/payments' %}active{% endif %}" href="/buyer/payments">
-            <i class="fa fa-money-bill me-1"></i> Paid
+            <i class="fa fa-money-bill me-1"></i> Payments
           </a>
         </li>
         <li class="nav-item">
@@ -67,20 +151,26 @@
             <i class="fa fa-user me-1"></i> Profile
           </a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/switch_role/miller">
-            <i class="fa fa-exchange-alt me-1"></i> Switch to Buyer
+        <li class="nav-item ms-lg-2">
+          <a class="nav-link btn btn-sm btn-outline-light border-0" href="/switch_role/miller"
+            style="background: rgba(255,255,255,0.1);">
+            <i class="fa fa-exchange-alt me-1"></i> Switch to Miller
             {% if miller_total_pending and miller_total_pending > 0 %}
-            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.7em;">{{ miller_total_pending }}</span>
+            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.75em;">{{ miller_total_pending }}</span>
             {% endif %}
+          </a>
+        </li>
+        <li class="nav-item ms-lg-2">
+          <a class="nav-link" href="/logout">
+            <i class="fa fa-sign-out-alt"></i> Logout
           </a>
         </li>
 
         {% elif session.role == 'miller' %}
         <!-- ===== MILLER NAVIGATION ===== -->
         {% if session.is_staff %}
-        <li class="nav-item">
-          <span class="nav-role-badge me-2">
+        <li class="nav-item me-2">
+          <span class="nav-role-badge">
             <i class="fa fa-user-shield me-1"></i> STAFF
           </span>
         </li>
@@ -89,7 +179,7 @@
           <a class="nav-link {% if request.path == '/miller' %}active{% endif %}" href="/miller">
             <i class="fa fa-gauge me-1"></i> Dashboard
             {% if miller_pending_orders and miller_pending_orders > 0 %}
-            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.7em;">{{ miller_pending_orders }}</span>
+            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.75em;">{{ miller_pending_orders }}</span>
             {% endif %}
           </a>
         </li>
@@ -97,48 +187,55 @@
           <a class="nav-link {% if request.path == '/miller/approved' %}active{% endif %}" href="/miller/approved">
             <i class="fa fa-clock me-1"></i> Approved
             {% if miller_active_orders and miller_active_orders > 0 %}
-            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.7em;">{{ miller_active_orders }}</span>
+            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.75em;">{{ miller_active_orders }}</span>
             {% endif %}
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link {% if request.path == '/miller/qc' %}active{% endif %}" href="/miller/qc">
-            <i class="fa fa-clipboard-check me-1"></i> QC
-            {% if miller_pending_qc and miller_pending_qc > 0 %}
-            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.7em;">{{ miller_pending_qc }}</span>
-            {% endif %}
+            <i class="fa fa-clipboard-check me-1"></i> Quality Check
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/miller/final-hisab">Final Hisab</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link {% if request.path == '/miller/pending-payments' %}active{% endif %}"
-            href="/miller/pending-payments">
-            <i class="fa fa-hourglass-half me-1"></i> Pending Payment
-            {% if miller_pending_payments and miller_pending_payments > 0 %}
-            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.7em;">{{ miller_pending_payments
-              }}</span>
-            {% endif %}
+          <a class="nav-link {% if request.path == '/miller/final_hisab' %}active{% endif %}"
+            href="/miller/final_hisab">
+            <i class="fa fa-file-invoice me-1"></i> Final Hisab
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if request.path == '/miller/payment-completed' %}active{% endif %}"
-            href="/miller/payment-completed">
-            <i class="fa fa-check-circle me-1"></i> Paid
+          <a class="nav-link {% if request.path == '/miller/payment_completed' %}active{% endif %}"
+            href="/miller/payment_completed">
+            <i class="fa fa-check-double me-1"></i> Completed
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/miller/rejected' %}active{% endif %}" href="/miller/rejected">
+            <i class="fa fa-ban me-1"></i> Rejected
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/miller/pending_payments' %}active{% endif %}"
+            href="/miller/pending_payments">
+            <i class="fa fa-wallet me-1"></i> Payments
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link {% if request.path == '/miller/profile' %}active{% endif %}" href="/miller/profile">
-            <i class="fa fa-user me-1"></i> Profile
+            <i class="fa fa-user-cog me-1"></i> Profile
           </a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/switch_role/buyer">
-            <i class="fa fa-exchange-alt me-1"></i> Switch to Seller
-            {% if buyer_total_pending and buyer_total_pending > 0 %}
-            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.7em;">{{ buyer_total_pending }}</span>
+        <li class="nav-item ms-lg-2">
+          <a class="nav-link btn btn-sm btn-outline-light border-0" href="/switch_role/buyer"
+            style="background: rgba(255,255,255,0.1);">
+            <i class="fa fa-exchange-alt me-1"></i> Switch to Buyer
+            {% if buyer_total_active and buyer_total_active > 0 %}
+            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.75em;">{{ buyer_total_active }}</span>
             {% endif %}
+          </a>
+        </li>
+        <li class="nav-item ms-lg-2">
+          <a class="nav-link" href="/logout">
+            <i class="fa fa-sign-out-alt"></i> Logout
           </a>
         </li>
 
