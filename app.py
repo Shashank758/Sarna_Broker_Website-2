@@ -1641,7 +1641,8 @@ SELECT
     p.paid_at                      AS payment_at,      -- 18
     bp.address,                                        -- 19 (NEW)
     bp.city,                                           -- 20 (NEW)
-    bp.state                                           -- 21 (NEW)
+    bp.state,                                          -- 21 (NEW)
+    mb.deadline_at                                     -- 22 (NEW)
 
 FROM miller_bookings mb
 JOIN users u ON mb.buyer_id = u.id
@@ -2355,12 +2356,18 @@ def miller_post_stock_page():
         deduction = request.form.get("deduction", "")
         note = ""
         auto_approve_min_qty = 0
+        
+        duration = request.form.get("duration")
+        try:
+            duration = int(duration) if duration else None
+        except ValueError:
+            duration = None
 
         # Create new stock entry
         cur.execute("""
-            INSERT INTO miller_stock (miller_id, crop, quantity, price, condition, bag_type, deduction, note, auto_approve_min_qty)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """, (miller_id, crop, qty, price, condition, bag_type, deduction, note, auto_approve_min_qty))
+            INSERT INTO miller_stock (miller_id, crop, quantity, price, condition, bag_type, deduction, note, auto_approve_min_qty, duration)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (miller_id, crop, qty, price, condition, bag_type, deduction, note, auto_approve_min_qty, duration))
         
         con.commit()
         con.close()
@@ -3293,12 +3300,27 @@ def miller_approve_booking(id):
         )
     """, (id, id))
 
-    # Approve booking
+    # Calculate deadline based on stock duration
     cur.execute("""
+        SELECT s.duration 
+        FROM miller_stock s
+        JOIN miller_bookings b ON s.id = b.stock_id
+        WHERE b.id = %s
+    """, (id,))
+    row = cur.fetchone()
+    duration = row[0] if row else None
+    
+    deadline_expr = "NULL"
+    if duration:
+        deadline_expr = f"CURRENT_TIMESTAMP + INTERVAL '{duration} days'"
+
+    # Approve booking
+    cur.execute(f"""
         UPDATE miller_bookings
         SET status='approved',
-        decision_at=CURRENT_TIMESTAMP
-    WHERE id=%s
+            decision_at=CURRENT_TIMESTAMP,
+            deadline_at={deadline_expr}
+        WHERE id=%s
     """, (id,))
     
     # 📱 Send SMS to buyer about approval
@@ -3536,7 +3558,8 @@ SELECT
     COALESCE(p.status,'pending') AS payment_status,  -- 17
     p.invoice_file              AS final_invoice,   -- 18
     p.paid_at                   AS payment_at,      -- 19
-    u.name                      AS miller_name      -- 20
+    u.name                      AS miller_name,     -- 20
+    mb.deadline_at                                  -- 21 (NEW)
 FROM miller_bookings mb
 JOIN miller_stock ms ON mb.stock_id = ms.id
 JOIN users u ON ms.miller_id = u.id
@@ -5409,7 +5432,8 @@ def patch_db_schema():
             "qc_status": "VARCHAR(20) DEFAULT 'pending'",
             "qc_at": "TIMESTAMP",
             "bill_document": "VARCHAR(255)",
-            "truck_status": "VARCHAR(50)"
+            "truck_status": "VARCHAR(50)",
+            "deadline_at": "TIMESTAMP"
         }
 
         for col, col_type in new_cols.items():
@@ -5419,6 +5443,15 @@ def patch_db_schema():
             else:
                 msgs.append(f"Column exists: {col}")
         
+        # Also patch miller_stock for duration
+        cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name = 'miller_stock'")
+        stock_cols = [row[0] for row in cur.fetchall()]
+        if 'duration' not in stock_cols:
+            cur.execute("ALTER TABLE miller_stock ADD COLUMN duration INTEGER")
+            msgs.append("Added duration to miller_stock")
+        else:
+            msgs.append("Duration exists in miller_stock")
+
         con.commit()
         return "<br>".join(msgs)
     except Exception as e:

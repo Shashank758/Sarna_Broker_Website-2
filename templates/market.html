@@ -1220,6 +1220,11 @@
                       <span><i class="fa fa-box"></i> {{ booked_qty }} Qt Booked</span>
                       <span><i class="fa fa-truck"></i> {{ loaded_qty }} Qt Loaded</span>
                       <span><i class="fa fa-hourglass-half"></i> {{ remaining_qty }} Qt Remaining</span>
+                      {% if b[21] %}
+                      <span class="{% if b[21] < now %}text-danger fw-bold{% endif %}">
+                        <i class="fa fa-clock"></i> Deadline: {{ b[21].strftime('%d-%b-%Y') }}
+                      </span>
+                      {% endif %}
                     </div>
                   </div>
 
@@ -1437,6 +1442,11 @@
                     <div class="order-meta-row">
                       <span><i class="fa fa-box"></i> {{ booked_qty }} Qt Booked</span>
                       <span><i class="fa fa-check"></i> {{ loaded_qty }} Qt Loaded</span>
+                      {% if b[21] %}
+                      <span class="{% if loaded_date and b[21] < loaded_date %}text-danger fw-bold{% endif %}">
+                        <i class="fa fa-clock"></i> Deadline: {{ b[21].strftime('%d-%b-%Y') }}
+                      </span>
+                      {% endif %}
                       {% if loaded_date %}
                       <span><i class="fa fa-calendar"></i> {{ loaded_date.strftime('%Y-%m-%d') }}</span>
                       {% endif %}
