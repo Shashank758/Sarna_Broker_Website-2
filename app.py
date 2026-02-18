@@ -5476,5 +5476,8 @@ def debug_bookings():
 
 if __name__ == "__main__":
     init_db()
-    run_migrations()
+    try:
+        run_migrations()
+    except Exception as e:
+        print(f"Migration warning: {e}")
     app.run(debug=os.environ.get("FLASK_DEBUG", "0") == "1")
