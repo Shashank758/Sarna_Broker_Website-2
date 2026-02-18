@@ -1,68 +1,78 @@
-<!-- ================= PREMIUM NAVBAR ================= -->
-<nav class="navbar navbar-expand-lg premium-navbar">
+<!-- ================= UNIFIED NAVBAR - SAARNA CANVESSARS ================= -->
+<nav class="navbar navbar-expand-lg sarna-navbar">
   <link rel="stylesheet" href="/static/css/print.css">
   <div class="container">
-
     <!-- Brand -->
     <a class="navbar-brand"
       href="{% if session.role == 'admin' %}/admin{% elif session.role == 'miller' %}/miller{% elif session.role == 'buyer' %}/market{% else %}/market{% endif %}">
-      <div
-        style="width: 40px; height: 40px; background: var(--primary); color: white; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-        <i class="fa fa-seedling"></i>
-      </div>
-      Saarna
+      <i class="fa fa-seedling"></i>
+      <span>Saarna Canvessars</span>
     </a>
 
     <!-- Mobile Toggle -->
-    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#sarnaNav"
-      aria-controls="sarnaNav" aria-expanded="false" style="color: var(--primary);">
-      <i class="fa fa-bars" style="font-size: 1.5rem;"></i>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sarnaNav"
+      aria-controls="sarnaNav" aria-expanded="false">
+      <span class="navbar-toggler-icon"></span>
     </button>
 
     <!-- Navigation Links -->
     <div class="collapse navbar-collapse" id="sarnaNav">
-      <ul class="navbar-nav ms-auto align-items-center gap-2">
+      <ul class="navbar-nav ms-auto align-items-center">
 
         {% if session.role == 'buyer' %}
         <!-- ===== BUYER NAVIGATION ===== -->
         <li class="nav-item">
           <a class="nav-link {% if request.path == '/market' %}active{% endif %}" href="/market">
-            Dashboard
+            <i class="fa fa-gauge me-1"></i> Dashboard
           </a>
         </li>
         <li class="nav-item">
+          <a class="nav-link {% if request.path == '/buyer/requested' %}active{% endif %}" href="/buyer/requested">
+            <i class="fa fa-hourglass-half me-1"></i> Requested
+            {% if buyer_pending_requests and buyer_pending_requests > 0 %}
+            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.7em;">{{ buyer_pending_requests }}</span>
+            {% endif %}
+          </a>
+
+        <li class="nav-item">
           <a class="nav-link {% if request.path == '/buyer/active' %}active{% endif %}" href="/buyer/active">
-            Active
+            <i class="fa fa-truck me-1"></i> Active
             {% if buyer_active_orders and buyer_active_orders > 0 %}
-            <span class="badge badge-danger ms-1">{{ buyer_active_orders }}</span>
+            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.7em;">{{ buyer_active_orders }}</span>
             {% endif %}
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if request.path == '/buyer/loaded' %}active{% endif %}" href="/buyer/loaded">Loaded</a>
+          <a class="nav-link {% if request.path == '/buyer/loaded' %}active{% endif %}" href="/buyer/loaded">
+            <i class="fa fa-check-circle me-1"></i> Loaded
+          </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if request.path == '/buyer/debit_notes' %}active{% endif %}"
-            href="/buyer/debit_notes">Debit Notes</a>
+          <a class="nav-link {% if request.path == '/buyer/debit_notes' %}active{% endif %}" href="/buyer/debit_notes">
+            <i class="fa fa-file-invoice-dollar me-1"></i> Debit Notes
+          </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if request.path == '/buyer/payments' %}active{% endif %}"
-            href="/buyer/payments">Paid</a>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">More</a>
-          <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm rounded-3">
-            <li><a class="dropdown-item" href="/buyer/requested">Requested</a></li>
-            <li><a class="dropdown-item" href="/buyer/rejected">Rejected</a></li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-            <li><a class="dropdown-item" href="/buyer/profile">Profile</a></li>
-          </ul>
+          <a class="nav-link {% if request.path == '/buyer/payments' %}active{% endif %}" href="/buyer/payments">
+            <i class="fa fa-money-bill me-1"></i> Paid
+          </a>
         </li>
         <li class="nav-item">
-          <a class="btn btn-secondary btn-sm" href="/switch_role/miller" style="font-size: 0.8rem; padding: 6px 12px;">
-            Switch to Seller
+          <a class="nav-link {% if request.path == '/buyer/rejected' %}active{% endif %}" href="/buyer/rejected">
+            <i class="fa fa-ban me-1"></i> Rejected
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/buyer/profile' %}active{% endif %}" href="/buyer/profile">
+            <i class="fa fa-user me-1"></i> Profile
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/switch_role/miller">
+            <i class="fa fa-exchange-alt me-1"></i> Switch to Buyer
+            {% if miller_total_pending and miller_total_pending > 0 %}
+            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.7em;">{{ miller_total_pending }}</span>
+            {% endif %}
           </a>
         </li>
 
@@ -70,90 +80,144 @@
         <!-- ===== MILLER NAVIGATION ===== -->
         {% if session.is_staff %}
         <li class="nav-item">
-          <span class="badge badge-info me-2">STAFF</span>
+          <span class="nav-role-badge me-2">
+            <i class="fa fa-user-shield me-1"></i> STAFF
+          </span>
         </li>
         {% endif %}
-
         <li class="nav-item">
           <a class="nav-link {% if request.path == '/miller' %}active{% endif %}" href="/miller">
-            Dashboard
+            <i class="fa fa-gauge me-1"></i> Dashboard
             {% if miller_pending_orders and miller_pending_orders > 0 %}
-            <span class="badge badge-danger ms-1">{{ miller_pending_orders }}</span>
+            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.7em;">{{ miller_pending_orders }}</span>
             {% endif %}
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link {% if request.path == '/miller/approved' %}active{% endif %}" href="/miller/approved">
-            Approved
+            <i class="fa fa-clock me-1"></i> Approved
             {% if miller_active_orders and miller_active_orders > 0 %}
-            <span class="badge badge-danger ms-1">{{ miller_active_orders }}</span>
+            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.7em;">{{ miller_active_orders }}</span>
             {% endif %}
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link {% if request.path == '/miller/qc' %}active{% endif %}" href="/miller/qc">
-            QC
+            <i class="fa fa-clipboard-check me-1"></i> QC
             {% if miller_pending_qc and miller_pending_qc > 0 %}
-            <span class="badge badge-danger ms-1">{{ miller_pending_qc }}</span>
+            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.7em;">{{ miller_pending_qc }}</span>
+            {% endif %}
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/miller/final-hisab">Final Hisab</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/miller/pending-payments' %}active{% endif %}"
+            href="/miller/pending-payments">
+            <i class="fa fa-hourglass-half me-1"></i> Pending Payment
+            {% if miller_pending_payments and miller_pending_payments > 0 %}
+            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.7em;">{{ miller_pending_payments
+              }}</span>
+            {% endif %}
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/miller/payment-completed' %}active{% endif %}"
+            href="/miller/payment-completed">
+            <i class="fa fa-check-circle me-1"></i> Paid
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/miller/profile' %}active{% endif %}" href="/miller/profile">
+            <i class="fa fa-user me-1"></i> Profile
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/switch_role/buyer">
+            <i class="fa fa-exchange-alt me-1"></i> Switch to Seller
+            {% if buyer_total_pending and buyer_total_pending > 0 %}
+            <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.7em;">{{ buyer_total_pending }}</span>
             {% endif %}
           </a>
         </li>
 
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Payments</a>
-          <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm rounded-3">
-            <li>
-              <a class="dropdown-item d-flex justify-content-between align-items-center"
-                href="/miller/pending-payments">
-                Pending
-                {% if miller_pending_payments and miller_pending_payments > 0 %}
-                <span class="badge badge-danger ms-2">{{ miller_pending_payments }}</span>
-                {% endif %}
-              </a>
-            </li>
-            <li><a class="dropdown-item" href="/miller/payment-completed">Completed</a></li>
-            <li><a class="dropdown-item" href="/miller/final-hisab">Final Hisab</a></li>
-          </ul>
-        </li>
-
+        {% elif session.role == 'farmer' %}
+        <!-- ===== FARMER NAVIGATION ===== -->
         <li class="nav-item">
-          <a class="nav-link" href="/miller/profile"><i class="fa fa-user-circle"></i></a>
+          <a class="nav-link {% if request.path == '/market' %}active{% endif %}" href="/market">
+            <i class="fa fa-store me-1"></i> Market
+          </a>
         </li>
-
         <li class="nav-item">
-          <a class="btn btn-secondary btn-sm" href="/switch_role/buyer" style="font-size: 0.8rem; padding: 6px 12px;">
-            Switch to Buyer
+          <a class="nav-link {% if request.path == '/my_commodity' %}active{% endif %}" href="/my_commodity">
+            <i class="fa fa-seedling me-1"></i> My Crops
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/post_crop' %}active{% endif %}" href="/post_crop">
+            <i class="fa fa-plus me-1"></i> Post Crop
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/profile' %}active{% endif %}" href="/profile">
+            <i class="fa fa-user me-1"></i> Profile
           </a>
         </li>
 
         {% elif session.role == 'admin' %}
         <!-- ===== ADMIN NAVIGATION ===== -->
-        <li class="nav-item"><a class="nav-link" href="/admin">Dashboard</a></li>
-        <li class="nav-item"><a class="nav-link" href="/admin/users">Users</a></li>
-        <li class="nav-item"><a class="nav-link" href="/admin/stock">Stock</a></li>
-        <li class="nav-item"><a class="nav-link" href="/admin/bookings">Bookings</a></li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/admin' %}active{% endif %}" href="/admin">
+            <i class="fa fa-gauge me-1"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/admin/users' %}active{% endif %}" href="/admin/users">
+            <i class="fa fa-users me-1"></i> Users
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/admin/stock' %}active{% endif %}" href="/admin/stock">
+            <i class="fa fa-box me-1"></i> Stock
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/admin/bookings' %}active{% endif %}" href="/admin/bookings">
+            <i class="fa fa-shopping-cart me-1"></i> Bookings
+          </a>
+        </li>
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">More</a>
-          <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm rounded-3">
-            <li><a class="dropdown-item" href="/admin/compare">Rate Compare</a></li>
-            <li><a class="dropdown-item" href="/admin/stock-history">Stock History</a></li>
-            <li><a class="dropdown-item" href="/admin/miller-profiles">Miller Profiles</a></li>
-            <li><a class="dropdown-item" href="/admin/buyer-profiles">Buyer Profiles</a></li>
+          <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+            <i class="fa fa-ellipsis-h me-1"></i> More
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="/admin/compare"><i class="fa fa-balance-scale me-2"></i>Rate Compare</a>
+            </li>
+            <li><a class="dropdown-item" href="/admin/stock-history"><i class="fa fa-history me-2"></i>Stock History</a>
+            </li>
+            <li><a class="dropdown-item" href="/admin/miller-profiles"><i class="fa fa-industry me-2"></i>Miller
+                Profiles</a></li>
+            <li><a class="dropdown-item" href="/admin/buyer-profiles"><i class="fa fa-store me-2"></i>Buyer Profiles</a>
+            </li>
           </ul>
+        </li>
+
+        {% else %}
+        <!-- ===== DEFAULT / GUEST NAVIGATION ===== -->
+        <li class="nav-item">
+          <a class="nav-link" href="/market">
+            <i class="fa fa-store me-1"></i> Market
+          </a>
         </li>
         {% endif %}
 
-        <!-- ===== LOGOUT ===== -->
+        <!-- ===== LOGOUT (for all logged-in users) ===== -->
         {% if session.user_id %}
-        <li class="nav-item ms-lg-2">
-          <a class="btn btn-primary btn-sm" href="/logout"
-            style="box-shadow: none; background: var(--primary-surface); color: var(--primary);">
-            <i class="fa fa-power-off"></i>
+        <li class="nav-item ms-2">
+          <a class="nav-link" href="/logout" style="color: rgba(255,255,255,0.8) !important;">
+            <i class="fa fa-right-from-bracket me-1"></i> Logout
           </a>
-        </li>
-        {% else %}
-        <li class="nav-item">
-          <a class="nav-link" href="/">Login</a>
         </li>
         {% endif %}
 
