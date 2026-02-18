@@ -1609,7 +1609,7 @@ def miller_dashboard():
     # ✅ LIVE STOCKS
     cur.execute("""
     SELECT 
-        id, miller_id, crop, quantity, price, condition, bag_type, deduction, created_at, status, note, reserved_qty, auto_approve_min_qty
+        id, miller_id, crop, quantity, price, condition, bag_type, deduction, created_at, status, note, reserved_qty, auto_approve_min_qty, duration
     FROM miller_stock
     WHERE miller_id=%s
     ORDER BY created_at DESC
@@ -3527,7 +3527,8 @@ def market():
         mp.address,                -- 12 (miller location)
         mp.city,                   -- 13
         mp.state,                  -- 14
-        mp.pincode                 -- 15
+        mp.pincode,                -- 15
+        miller_stock.duration      -- 16
     FROM miller_stock
     JOIN users ON miller_stock.miller_id = users.id
     LEFT JOIN miller_profiles mp ON users.id = mp.miller_id

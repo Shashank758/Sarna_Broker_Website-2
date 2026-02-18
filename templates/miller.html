@@ -617,6 +617,11 @@
                   {% else %}
                   <span class="badge bg-danger ms-2" style="font-size: 0.7em;">Inactive</span>
                   {% endif %}
+                  {% if s[13] %}
+                  <span class="badge bg-info ms-1" style="font-size: 0.7em;">
+                    <i class="fa fa-clock"></i> {{ s[13] }} Days
+                  </span>
+                  {% endif %}
                 </td>
                 <td>
                   <input type="number" name="quantity" value="{{ s[3] }}" class="form-control form-control-sm"

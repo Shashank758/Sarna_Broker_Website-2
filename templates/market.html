@@ -1026,14 +1026,22 @@
                 <span class="value text-success fw-bold">₹{{ m[4] }}/Qt</span>
               </div>
 
-              <div class="stock-detail">
-                <span class="label"><i class="fa fa-box"></i>Bag Type</span>
+              <div class="stock-info-row">
+                <span class="label"><i class="fa fa-box me-2"></i>Bag Type</span>
                 <span class="value">{{ m[6] }}</span>
               </div>
+
+              {% if m[16] %}
+              <div class="stock-info-row">
+                <span class="label"><i class="fa fa-clock me-2"></i>Time Limit</span>
+                <span class="value">{{ m[16] }} Days</span>
+              </div>
+              {% endif %}
+
               {% if m[7] %}
-              <div class="stock-detail">
-                <span class="label"><i class="fa fa-minus-circle"></i>Condition Note</span>
-                <span class="value text-danger">{{ m[7] }}</span>
+              <div class="stock-info-row">
+                <span class="label"><i class="fa fa-minus-circle me-2"></i>Condition Note</span>
+                <span class="value text-danger fw-bold">{{ m[7] }}</span>
               </div>
               {% endif %}
             </div>
