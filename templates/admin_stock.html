@@ -82,15 +82,23 @@
             <th>Miller</th>
             <th>Crop</th>
             <th>Price</th>
+            <th>Status</th>
             <th>Condition</th>
             <th>Bag</th>
             <th>Condition Note</th>
           </tr>
           {% for s in stocks %}
           <tr class="stock-row">
-            <td class="stock-miller">{{ s[12] }}</td>
+            <td class="stock-miller">{{ s[13] }}</td>
             <td class="stock-crop">{{ s[2] }}</td>
             <td>₹{{ s[4] }}</td>
+            <td class="stock-status">
+              {% if s[9] == 'open' %}
+              <span class="badge bg-success">Live</span>
+              {% else %}
+              <span class="badge bg-danger">Inactive</span>
+              {% endif %}
+            </td>
             <td>{{ s[5] }}</td>
             <td>{{ s[6] }}</td>
             <td>
@@ -136,8 +144,9 @@
       rows.forEach(row => {
         let miller = row.querySelector('.stock-miller').textContent.toLowerCase();
         let crop = row.querySelector('.stock-crop').textContent.toLowerCase();
+        let status = row.querySelector('.stock-status').textContent.toLowerCase();
 
-        if (miller.includes(filter) || crop.includes(filter)) {
+        if (miller.includes(filter) || crop.includes(filter) || status.includes(filter)) {
           row.style.display = '';
         } else {
           row.style.display = 'none';

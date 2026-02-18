@@ -1608,7 +1608,8 @@ def miller_dashboard():
 
     # ✅ LIVE STOCKS
     cur.execute("""
-    SELECT *
+    SELECT 
+        id, miller_id, crop, quantity, price, condition, bag_type, deduction, created_at, status, note, reserved_qty, auto_approve_min_qty
     FROM miller_stock
     WHERE miller_id=%s
     ORDER BY created_at DESC
@@ -3450,6 +3451,37 @@ def update_miller_stock(id):
     con.close()
     return redirect("/miller")
 
+@app.route("/miller/toggle_stock_status/<int:id>", methods=["POST"])
+def toggle_stock_status(id):
+    if session.get("role") != "miller":
+        return redirect("/")
+
+    con = get_db()
+    cur = con.cursor()
+
+    # Check current status and ownership
+    cur.execute("SELECT status, quantity FROM miller_stock WHERE id=%s AND miller_id=%s", (id, get_effective_user_id()))
+    row = cur.fetchone()
+
+    if row:
+        current_status = row[0]
+        qty = row[1]
+        
+        # Toggle logic
+        new_status = 'inactive' if current_status == 'open' else 'open'
+        
+        # Prevent opening if quantity is 0
+        if new_status == 'open' and qty <= 0:
+            flash("Cannot set to Live. Quantity is 0.", "error")
+        else:
+            cur.execute("UPDATE miller_stock SET status=%s WHERE id=%s", (new_status, id))
+            con.commit()
+            status_msg = "Live" if new_status == 'open' else "Inactive"
+            flash(f"Stock marked as {status_msg}.", "success")
+
+    con.close()
+    return redirect("/miller")
+
 # ---------------- BUYER ----------------
 @app.route("/market")
 def market():
@@ -4826,7 +4858,11 @@ def admin_stock():
     cur = con.cursor()
     
     cur.execute("""
-    SELECT miller_stock.*, users.name
+    SELECT 
+        miller_stock.id, miller_stock.miller_id, miller_stock.crop, miller_stock.quantity, miller_stock.price, 
+        miller_stock.condition, miller_stock.bag_type, miller_stock.deduction, miller_stock.created_at, 
+        miller_stock.status, miller_stock.note, miller_stock.reserved_qty, miller_stock.auto_approve_min_qty, 
+        users.name
     FROM miller_stock
     JOIN users ON miller_stock.miller_id = users.id
     ORDER BY miller_stock.created_at DESC
