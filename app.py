@@ -2346,7 +2346,8 @@ def miller_post_stock_page():
         crop = request.form["crop"]
         price = request.form["price"]
         qty = request.form["quantity"] # Get quantity from form!
-        condition = request.form["condition"]
+        # condition = request.form["condition"] 
+        condition = "Net Weight" # Default per user request to remove block
         
         # Defaults for removed fields
         bag_type = "Standard" 
