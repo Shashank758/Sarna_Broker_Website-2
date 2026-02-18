@@ -9,8 +9,503 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/main.css">
-  <link rel="stylesheet" href="/static/css/print.css">
+  <link rel="stylesheet" href="/static/css/style.css">
+
+  <style>
+    :root {
+      --primary: #0f9b5f;
+      --primary-dark: #0d8a54;
+      --primary-darker: #0a7548;
+      --primary-light: #12b36e;
+      --bg-light: #f4f7f6;
+      --card-bg: #ffffff;
+      --text-primary: #1e293b;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+      --radius: 16px;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, .05);
+      --shadow-md: 0 4px 15px rgba(0, 0, 0, .08);
+      --shadow-lg: 0 10px 40px rgba(0, 0, 0, .12);
+    }
+
+    /* ========== GLOBAL ========== */
+    body {
+      background: var(--bg-light);
+      font-family: 'Segoe UI', 'Inter', sans-serif;
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    main {
+      flex: 1;
+    }
+
+    /* ========== HERO DASHBOARD HEADER ========== */
+    .dashboard-hero {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 50%, var(--primary-darker) 100%);
+      color: #fff;
+      padding: 40px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dashboard-hero::before {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .dashboard-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -50px;
+      left: -50px;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .dashboard-hero h1 {
+      font-weight: 800;
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+
+    .dashboard-hero p {
+      opacity: 0.9;
+      font-size: 1rem;
+      margin: 0;
+    }
+
+    /* ========== STAT CARDS ========== */
+    .stat-card {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid rgba(0, 0, 0, .05);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .stat-card .stat-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: #fff;
+    }
+
+    .stat-card .stat-icon.stocks {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    }
+
+    .stat-card .stat-icon.pending {
+      background: linear-gradient(135deg, var(--warning), #d97706);
+    }
+
+    .stat-card .stat-icon.approved {
+      background: linear-gradient(135deg, var(--success), #059669);
+    }
+
+    .stat-card .stat-icon.completed {
+      background: linear-gradient(135deg, var(--info), #2563eb);
+    }
+
+    .stat-card .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    .stat-card .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      border-radius: var(--radius) 0 0 var(--radius);
+    }
+
+    .stat-card.stocks::before {
+      background: var(--primary);
+    }
+
+    .stat-card.pending::before {
+      background: var(--warning);
+    }
+
+    .stat-card.approved::before {
+      background: var(--success);
+    }
+
+    .stat-card.completed::before {
+      background: var(--info);
+    }
+
+    /* ========== QUICK ACTIONS ========== */
+    .quick-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .quick-action-btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .quick-action-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    /* ========== SECTION CARDS ========== */
+    .section-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid rgba(0, 0, 0, .05);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .section-title {
+      font-weight: 700;
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .section-title .icon-box {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .section-title .icon-box.green {
+      background: rgba(15, 155, 95, 0.1);
+      color: var(--primary);
+    }
+
+    .section-title .icon-box.yellow {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--warning);
+    }
+
+    .section-title .icon-box.blue {
+      background: rgba(59, 130, 246, 0.1);
+      color: var(--info);
+    }
+
+    .section-title .icon-box.red {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+    }
+
+    .section-badge {
+      font-size: 0.85rem;
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-weight: 600;
+    }
+
+    /* ========== FORM STYLING ========== */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+
+    .form-control,
+    .form-select {
+      border-radius: 10px;
+      padding: 12px 16px;
+      border: 2px solid var(--border-color);
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(15, 155, 95, 0.15);
+    }
+
+    .form-control-sm {
+      padding: 8px 12px;
+      font-size: 0.85rem;
+    }
+
+    /* ========== BUTTONS ========== */
+    .btn-primary-custom {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      border: none;
+      font-weight: 600;
+      border-radius: 10px;
+      padding: 14px 28px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary-custom:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-darker));
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(15, 155, 95, 0.3);
+    }
+
+    /* ========== TABLE STYLING ========== */
+    .table-modern {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    .table-modern thead th {
+      background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+      padding: 16px 14px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      border-bottom: 2px solid var(--primary);
+      text-align: center;
+    }
+
+    .table-modern tbody td {
+      padding: 16px 14px;
+      text-align: center;
+      vertical-align: middle;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.9rem;
+    }
+
+    .table-modern tbody tr {
+      transition: all 0.2s ease;
+    }
+
+    .table-modern tbody tr:hover {
+      background: rgba(15, 155, 95, 0.03);
+    }
+
+    /* ========== ORDER CARDS ========== */
+    .order-card {
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid rgba(0, 0, 0, .08);
+      padding: 20px;
+      transition: all 0.3s ease;
+      height: 100%;
+    }
+
+    .order-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary);
+    }
+
+    .order-card .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .order-card .order-id {
+      font-weight: 700;
+      color: var(--primary);
+      font-size: 1rem;
+    }
+
+    .order-card .order-meta {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .order-card .order-badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 12px 0;
+    }
+
+    /* ========== TRUCK QC ITEM ========== */
+    .truck-qc-item {
+      background: linear-gradient(135deg, #f8fafc, #fff);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .truck-qc-item:hover {
+      border-color: var(--primary);
+      box-shadow: 0 4px 15px rgba(15, 155, 95, 0.1);
+    }
+
+    /* ========== FILTER BAR ========== */
+    .filter-bar {
+      background: linear-gradient(135deg, #f8fafc, #fff);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .filter-pill {
+      padding: 8px 18px;
+      border-radius: 25px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      border: 2px solid var(--border-color);
+      background: #fff;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .filter-pill:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .filter-pill.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    /* ========== SCROLL CONTAINER ========== */
+    .scroll-container {
+      max-height: 70vh;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+
+    .scroll-container::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .scroll-container::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 10px;
+    }
+
+    .scroll-container::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 10px;
+    }
+
+    /* ========== EMPTY STATE ========== */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .empty-state i {
+      font-size: 48px;
+      color: var(--border-color);
+      margin-bottom: 16px;
+    }
+
+    .empty-state p {
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media(max-width:768px) {
+      .dashboard-hero h1 {
+        font-size: 1.5rem;
+      }
+
+      .stat-card {
+        padding: 18px;
+      }
+
+      .stat-card .stat-value {
+        font-size: 1.5rem;
+      }
+
+      .quick-actions {
+        justify-content: center;
+      }
+    }
+
+    /* ========== SMOOTH SCROLL ========== */
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
 </head>
 
 <body>
@@ -33,14 +528,13 @@
   </div>
 
   <!-- ================= DASHBOARD HERO ================= -->
-  <section class="market-hero">
+  <section class="dashboard-hero">
     <div class="container">
       <div class="row align-items-center">
         <div class="col-lg-8" data-aos="fade-right">
           <h1><i class="fa fa-industry me-3"></i>{{ miller_name }}</h1>
           <p class="mb-2"><i class="fa fa-map-marker-alt me-2"></i>{{ miller_address or 'Address not set' }}</p>
-          <p><i class="fa fa-chart-line me-2"></i>Manage your stock, approve orders, track quality & process
-            payments —
+          <p><i class="fa fa-chart-line me-2"></i>Manage your stock, approve orders, track quality & process payments —
             all in one place</p>
 
           <div class="quick-actions">
@@ -122,11 +616,6 @@
                   <span class="badge bg-success ms-2" style="font-size: 0.7em;">Live</span>
                   {% else %}
                   <span class="badge bg-danger ms-2" style="font-size: 0.7em;">Inactive</span>
-                  {% endif %}
-                  {% if s[13] %}
-                  <span class="badge bg-info ms-1" style="font-size: 0.7em;">
-                    <i class="fa fa-clock"></i> {{ s[13] }} Days
-                  </span>
                   {% endif %}
                 </td>
                 <td>
@@ -378,8 +867,7 @@
             {% set remaining = booked - loaded %}
 
             {% set invs = invoices_map.get(booking_id) %}
-            {% set ns = namespace(pending=0, search=(b[10]|string + ' ' + b[1] + ' ' + b[2] + ' ' + (b[19] or '') +
-            ' '
+            {% set ns = namespace(pending=0, search=(b[10]|string + ' ' + b[1] + ' ' + b[2] + ' ' + (b[19] or '') + ' '
             + (b[20] or '') + ' ' + (b[21] or ''))|lower) %}
             {% if invs %}
             {% for inv in invs %}
@@ -474,8 +962,7 @@
                       <small class="text-muted d-block">Remarks: {{ inv.qc_remarks }}</small>
                       {% endif %}
                       {% if inv.qc_at %}
-                      <small class="text-muted d-block">Verified on {{ inv.qc_at.strftime('%Y-%m-%d %H:%M')
-                        }}</small>
+                      <small class="text-muted d-block">Verified on {{ inv.qc_at.strftime('%Y-%m-%d %H:%M') }}</small>
                       {% endif %}
                     </div>
                     {% endif %}
@@ -602,8 +1089,7 @@
                   <div class="d-flex justify-content-between align-items-start mb-3">
                     <div>
                       <h6 class="mb-1"><strong class="text-primary">{{ b[10] }}</strong></h6>
-                      <p class="mb-1 text-muted small">{{ b[1] }} • <span class="text-capitalize">{{ b[2] }}</span>
-                      </p>
+                      <p class="mb-1 text-muted small">{{ b[1] }} • <span class="text-capitalize">{{ b[2] }}</span></p>
                       <div class="d-flex gap-2 mt-2">
                         <span class="badge bg-primary">{{ booked }} Qt Booked</span>
                         <span class="badge bg-success">{{ loaded }} Qt Loaded</span>
@@ -756,8 +1242,7 @@
             <span class="icon-box yellow"><i class="fa fa-file-invoice-dollar"></i></span>
             Final Hisab - Payment Pending
           </h5>
-          <span class="section-badge bg-warning text-dark" id="finalInvoiceCount">{{ final_invoice_uploaded|length
-            }}
+          <span class="section-badge bg-warning text-dark" id="finalInvoiceCount">{{ final_invoice_uploaded|length }}
             Pending</span>
         </div>
 
@@ -781,8 +1266,7 @@
                   <div class="d-flex justify-content-between align-items-start mb-3">
                     <div>
                       <h6 class="mb-1"><strong class="text-primary">{{ b[10] }}</strong></h6>
-                      <p class="mb-1 text-muted small">{{ b[1] }} • <span class="text-capitalize">{{ b[2] }}</span>
-                      </p>
+                      <p class="mb-1 text-muted small">{{ b[1] }} • <span class="text-capitalize">{{ b[2] }}</span></p>
                       <div class="d-flex gap-2 mt-2">
                         <span class="badge bg-primary">{{ booked }} Qt Booked</span>
                         <span class="badge bg-success">{{ loaded }} Qt Loaded</span>
@@ -843,8 +1327,7 @@
                         <div class="modal-dialog modal-dialog-centered">
                           <div class="modal-content">
                             <div class="modal-header">
-                              <h6 class="modal-title">Replace Invoice (Truck {{ inv.truck_number or loop.index }})
-                              </h6>
+                              <h6 class="modal-title">Replace Invoice (Truck {{ inv.truck_number or loop.index }})</h6>
                               <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
                             <form method="POST" action="/miller/edit_truck_final_invoice/{{ inv.id }}"

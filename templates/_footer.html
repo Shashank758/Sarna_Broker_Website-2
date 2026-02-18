@@ -1,99 +1,4 @@
 <!-- ================= UNIFIED FOOTER - SAARNA CANVESSARS ================= -->
-<style>
-  .sarna-footer {
-    background: #1e293b;
-    color: #e2e8f0;
-    padding: 60px 0 30px;
-    margin-top: auto;
-    font-size: 0.95rem;
-  }
-
-  .sarna-footer h5,
-  .sarna-footer h6 {
-    color: #fff;
-    font-weight: 700;
-    margin-bottom: 20px;
-    position: relative;
-    padding-bottom: 10px;
-  }
-
-  .sarna-footer h5::after,
-  .sarna-footer h6::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 40px;
-    height: 3px;
-    background: var(--primary);
-    border-radius: 2px;
-  }
-
-  .sarna-footer a {
-    color: #94a3b8;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    display: block;
-    margin-bottom: 10px;
-  }
-
-  .sarna-footer a:hover {
-    color: var(--primary-light);
-    transform: translateX(5px);
-  }
-
-  .sarna-footer ul {
-    padding: 0;
-    list-style: none;
-  }
-
-  .footer-social {
-    display: flex;
-    gap: 15px;
-    margin-top: 20px;
-  }
-
-  .footer-social a {
-    width: 40px;
-    height: 40px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
-    margin: 0;
-  }
-
-  .footer-social a:hover {
-    background: var(--primary);
-    color: #fff;
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(15, 155, 95, 0.3);
-  }
-
-  .footer-bottom {
-    margin-top: 50px;
-    padding-top: 25px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    font-size: 0.85rem;
-    color: #64748b;
-  }
-
-  .footer-bottom a {
-    color: #64748b;
-    display: inline-block;
-    margin: 0;
-  }
-
-  .footer-bottom a:hover {
-    color: #fff;
-    transform: none;
-  }
-</style>
-
 <footer class="sarna-footer">
   <div class="container">
     <div class="row g-4">
@@ -103,9 +8,9 @@
         <h5 class="mb-3">
           <i class="fa fa-seedling me-2"></i>Saarna Canvessars
         </h5>
-        <p style="color: #cbd5e1; line-height: 1.7;">
+        <p>
           India's trusted digital mandi platform connecting
-          <strong class="text-white">farmers, traders, and millers</strong> with
+          <strong>farmers, traders, and millers</strong> with
           transparency, trust, and speed.
         </p>
         <div class="footer-social">
@@ -120,18 +25,18 @@
       <div class="col-lg-2 col-md-6">
         <h6>Quick Links</h6>
         <ul>
-          <li><a href="/market"><i class="fa fa-angle-right me-2"></i> Market</a></li>
+          <li><a href="/market"><i class="fa fa-chevron-right"></i> Market</a></li>
           {% if session.role == 'buyer' %}
-          <li><a href="/buyer/active"><i class="fa fa-angle-right me-2"></i> Active Orders</a></li>
-          <li><a href="/buyer/loaded"><i class="fa fa-angle-right me-2"></i> Loaded Orders</a></li>
-          <li><a href="/buyer/payments"><i class="fa fa-angle-right me-2"></i> Payments</a></li>
+          <li><a href="/buyer/active"><i class="fa fa-chevron-right"></i> Active Orders</a></li>
+          <li><a href="/buyer/loaded"><i class="fa fa-chevron-right"></i> Loaded Orders</a></li>
+          <li><a href="/buyer/payments"><i class="fa fa-chevron-right"></i> Payments</a></li>
           {% elif session.role == 'miller' %}
-          <li><a href="/miller"><i class="fa fa-angle-right me-2"></i> Dashboard</a></li>
-          <li><a href="/miller/approved"><i class="fa fa-angle-right me-2"></i> Approved</a></li>
-          <li><a href="/miller/qc"><i class="fa fa-angle-right me-2"></i> Quality Check</a></li>
+          <li><a href="/miller"><i class="fa fa-chevron-right"></i> Dashboard</a></li>
+          <li><a href="/miller/approved"><i class="fa fa-chevron-right"></i> Approved</a></li>
+          <li><a href="/miller/qc"><i class="fa fa-chevron-right"></i> Quality Check</a></li>
           {% elif session.role == 'farmer' %}
-          <li><a href="/my_commodity"><i class="fa fa-angle-right me-2"></i> My Crops</a></li>
-          <li><a href="/post_crop"><i class="fa fa-angle-right me-2"></i> Post Crop</a></li>
+          <li><a href="/my_commodity"><i class="fa fa-chevron-right"></i> My Crops</a></li>
+          <li><a href="/post_crop"><i class="fa fa-chevron-right"></i> Post Crop</a></li>
           {% endif %}
         </ul>
       </div>
@@ -140,11 +45,11 @@
       <div class="col-lg-3 col-md-6">
         <h6>Our Services</h6>
         <ul>
-          <li><a href="#"><i class="fa fa-angle-right me-2"></i> Crop Trading</a></li>
-          <li><a href="#"><i class="fa fa-angle-right me-2"></i> Quality Assurance</a></li>
-          <li><a href="#"><i class="fa fa-angle-right me-2"></i> Secure Payments</a></li>
-          <li><a href="#"><i class="fa fa-angle-right me-2"></i> Real-time Tracking</a></li>
-          <li><a href="#"><i class="fa fa-angle-right me-2"></i> Miller Network</a></li>
+          <li><a href="#"><i class="fa fa-chevron-right"></i> Crop Trading</a></li>
+          <li><a href="#"><i class="fa fa-chevron-right"></i> Quality Assurance</a></li>
+          <li><a href="#"><i class="fa fa-chevron-right"></i> Secure Payments</a></li>
+          <li><a href="#"><i class="fa fa-chevron-right"></i> Real-time Tracking</a></li>
+          <li><a href="#"><i class="fa fa-chevron-right"></i> Miller Network</a></li>
         </ul>
       </div>
 
@@ -152,17 +57,21 @@
       <div class="col-lg-3 col-md-6">
         <h6>Contact Us</h6>
         <ul class="list-unstyled">
-          <li class="mb-3 d-flex align-items-start">
-            <i class="fa fa-phone mt-1 me-3 text-success"></i>
-            <span>+91 XXXXX XXXXX<br><small class="text-muted">Mon-Sat 9am-6pm</small></span>
+          <li class="mb-2">
+            <i class="fa fa-phone me-2" style="color: var(--accent);"></i>
+            +91 XXXXX XXXXX
           </li>
-          <li class="mb-3 d-flex align-items-start">
-            <i class="fa fa-envelope mt-1 me-3 text-success"></i>
-            <span>support@sarnamandi.com<br><small class="text-muted">Online Support</small></span>
+          <li class="mb-2">
+            <i class="fa fa-envelope me-2" style="color: var(--accent);"></i>
+            support@sarnamandi.com
           </li>
-          <li class="mb-3 d-flex align-items-start">
-            <i class="fa fa-location-dot mt-1 me-3 text-success"></i>
-            <span>Rajasthan, India<br><small class="text-muted">Headquarters</small></span>
+          <li class="mb-2">
+            <i class="fa fa-location-dot me-2" style="color: var(--accent);"></i>
+            Rajasthan, India
+          </li>
+          <li class="mb-2">
+            <i class="fa fa-clock me-2" style="color: var(--accent);"></i>
+            Mon - Sat: 9:00 AM - 6:00 PM
           </li>
         </ul>
       </div>
@@ -187,8 +96,8 @@
 </footer>
 
 <!-- Optional: Back to Top Button -->
-<button id="backToTop" class="btn btn-success shadow-lg"
-  style="position:fixed; bottom:30px; right:30px; display:none; width:50px; height:50px; border-radius:50%; padding:0; z-index:999; align-items:center; justify-content:center;"
+<button id="backToTop" class="btn btn-enterprise"
+  style="position:fixed; bottom:30px; right:30px; display:none; width:50px; height:50px; border-radius:50%; padding:0; z-index:999;"
   onclick="window.scrollTo({top:0, behavior:'smooth'})">
   <i class="fa fa-chevron-up"></i>
 </button>
@@ -200,6 +109,8 @@
     if (btn) {
       if (window.scrollY > 300) {
         btn.style.display = 'flex';
+        btn.style.alignItems = 'center';
+        btn.style.justifyContent = 'center';
       } else {
         btn.style.display = 'none';
       }
