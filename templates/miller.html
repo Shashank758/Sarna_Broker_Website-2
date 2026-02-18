@@ -5,603 +5,174 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Miller Dashboard | Saarna Canvessars</title>
-
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/style.css">
-
-  <style>
-    :root {
-      --primary: #0f9b5f;
-      --primary-dark: #0d8a54;
-      --primary-darker: #0a7548;
-      --primary-light: #12b36e;
-      --bg-light: #f4f7f6;
-      --card-bg: #ffffff;
-      --text-primary: #1e293b;
-      --text-muted: #64748b;
-      --border-color: #e2e8f0;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --info: #3b82f6;
-      --radius: 16px;
-      --shadow-sm: 0 1px 2px rgba(0, 0, 0, .05);
-      --shadow-md: 0 4px 15px rgba(0, 0, 0, .08);
-      --shadow-lg: 0 10px 40px rgba(0, 0, 0, .12);
-    }
-
-    /* ========== GLOBAL ========== */
-    body {
-      background: var(--bg-light);
-      font-family: 'Segoe UI', 'Inter', sans-serif;
-      color: var(--text-primary);
-      line-height: 1.6;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    main {
-      flex: 1;
-    }
-
-    /* ========== HERO DASHBOARD HEADER ========== */
-    .dashboard-hero {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 50%, var(--primary-darker) 100%);
-      color: #fff;
-      padding: 40px 0;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .dashboard-hero::before {
-      content: '';
-      position: absolute;
-      top: -100px;
-      right: -100px;
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .dashboard-hero::after {
-      content: '';
-      position: absolute;
-      bottom: -50px;
-      left: -50px;
-      width: 200px;
-      height: 200px;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .dashboard-hero h1 {
-      font-weight: 800;
-      font-size: 2rem;
-      margin-bottom: 8px;
-    }
-
-    .dashboard-hero p {
-      opacity: 0.9;
-      font-size: 1rem;
-      margin: 0;
-    }
-
-    /* ========== STAT CARDS ========== */
-    .stat-card {
-      background: #fff;
-      border-radius: var(--radius);
-      padding: 24px;
-      box-shadow: var(--shadow-md);
-      border: 1px solid rgba(0, 0, 0, .05);
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .stat-card .stat-icon {
-      width: 56px;
-      height: 56px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      color: #fff;
-    }
-
-    .stat-card .stat-icon.stocks {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    }
-
-    .stat-card .stat-icon.pending {
-      background: linear-gradient(135deg, var(--warning), #d97706);
-    }
-
-    .stat-card .stat-icon.approved {
-      background: linear-gradient(135deg, var(--success), #059669);
-    }
-
-    .stat-card .stat-icon.completed {
-      background: linear-gradient(135deg, var(--info), #2563eb);
-    }
-
-    .stat-card .stat-value {
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--text-primary);
-      line-height: 1;
-    }
-
-    .stat-card .stat-label {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .stat-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 4px;
-      height: 100%;
-      border-radius: var(--radius) 0 0 var(--radius);
-    }
-
-    .stat-card.stocks::before {
-      background: var(--primary);
-    }
-
-    .stat-card.pending::before {
-      background: var(--warning);
-    }
-
-    .stat-card.approved::before {
-      background: var(--success);
-    }
-
-    .stat-card.completed::before {
-      background: var(--info);
-    }
-
-    /* ========== QUICK ACTIONS ========== */
-    .quick-actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 20px;
-    }
-
-    .quick-action-btn {
-      background: rgba(255, 255, 255, 0.15);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .quick-action-btn:hover {
-      background: rgba(255, 255, 255, 0.25);
-      color: #fff;
-      transform: translateY(-2px);
-    }
-
-    /* ========== SECTION CARDS ========== */
-    .section-card {
-      background: var(--card-bg);
-      border-radius: var(--radius);
-      padding: 28px;
-      margin-bottom: 28px;
-      box-shadow: var(--shadow-md);
-      border: 1px solid rgba(0, 0, 0, .05);
-    }
-
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-      padding-bottom: 16px;
-      border-bottom: 2px solid var(--border-color);
-    }
-
-    .section-title {
-      font-weight: 700;
-      font-size: 1.15rem;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      color: var(--text-primary);
-      margin: 0;
-    }
-
-    .section-title .icon-box {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-    }
-
-    .section-title .icon-box.green {
-      background: rgba(15, 155, 95, 0.1);
-      color: var(--primary);
-    }
-
-    .section-title .icon-box.yellow {
-      background: rgba(245, 158, 11, 0.1);
-      color: var(--warning);
-    }
-
-    .section-title .icon-box.blue {
-      background: rgba(59, 130, 246, 0.1);
-      color: var(--info);
-    }
-
-    .section-title .icon-box.red {
-      background: rgba(239, 68, 68, 0.1);
-      color: var(--danger);
-    }
-
-    .section-badge {
-      font-size: 0.85rem;
-      padding: 8px 16px;
-      border-radius: 30px;
-      font-weight: 600;
-    }
-
-    /* ========== FORM STYLING ========== */
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .form-label {
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 8px;
-      font-size: 0.9rem;
-    }
-
-    .form-control,
-    .form-select {
-      border-radius: 10px;
-      padding: 12px 16px;
-      border: 2px solid var(--border-color);
-      font-size: 0.95rem;
-      transition: all 0.3s ease;
-    }
-
-    .form-control:focus,
-    .form-select:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(15, 155, 95, 0.15);
-    }
-
-    .form-control-sm {
-      padding: 8px 12px;
-      font-size: 0.85rem;
-    }
-
-    /* ========== BUTTONS ========== */
-    .btn-primary-custom {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: #fff;
-      border: none;
-      font-weight: 600;
-      border-radius: 10px;
-      padding: 14px 28px;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-    }
-
-    .btn-primary-custom:hover {
-      background: linear-gradient(135deg, var(--primary-dark), var(--primary-darker));
-      color: #fff;
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(15, 155, 95, 0.3);
-    }
-
-    /* ========== TABLE STYLING ========== */
-    .table-modern {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-    }
-
-    .table-modern thead th {
-      background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-      padding: 16px 14px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-muted);
-      border-bottom: 2px solid var(--primary);
-      text-align: center;
-    }
-
-    .table-modern tbody td {
-      padding: 16px 14px;
-      text-align: center;
-      vertical-align: middle;
-      border-bottom: 1px solid var(--border-color);
-      font-size: 0.9rem;
-    }
-
-    .table-modern tbody tr {
-      transition: all 0.2s ease;
-    }
-
-    .table-modern tbody tr:hover {
-      background: rgba(15, 155, 95, 0.03);
-    }
-
-    /* ========== ORDER CARDS ========== */
-    .order-card {
-      background: #fff;
-      border-radius: 14px;
-      border: 1px solid rgba(0, 0, 0, .08);
-      padding: 20px;
-      transition: all 0.3s ease;
-      height: 100%;
-    }
-
-    .order-card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-lg);
-      border-color: var(--primary);
-    }
-
-    .order-card .order-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 16px;
-    }
-
-    .order-card .order-id {
-      font-weight: 700;
-      color: var(--primary);
-      font-size: 1rem;
-    }
-
-    .order-card .order-meta {
-      color: var(--text-muted);
-      font-size: 0.85rem;
-    }
-
-    .order-card .order-badges {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin: 12px 0;
-    }
-
-    /* ========== TRUCK QC ITEM ========== */
-    .truck-qc-item {
-      background: linear-gradient(135deg, #f8fafc, #fff);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 12px;
-      transition: all 0.2s ease;
-    }
-
-    .truck-qc-item:hover {
-      border-color: var(--primary);
-      box-shadow: 0 4px 15px rgba(15, 155, 95, 0.1);
-    }
-
-    /* ========== FILTER BAR ========== */
-    .filter-bar {
-      background: linear-gradient(135deg, #f8fafc, #fff);
-      border: 1px solid var(--border-color);
-      border-radius: 14px;
-      padding: 20px;
-      margin-bottom: 24px;
-    }
-
-    .filter-pill {
-      padding: 8px 18px;
-      border-radius: 25px;
-      font-weight: 600;
-      font-size: 0.85rem;
-      border: 2px solid var(--border-color);
-      background: #fff;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .filter-pill:hover {
-      border-color: var(--primary);
-      color: var(--primary);
-    }
-
-    .filter-pill.active {
-      background: var(--primary);
-      color: #fff;
-      border-color: var(--primary);
-    }
-
-    /* ========== SCROLL CONTAINER ========== */
-    .scroll-container {
-      max-height: 70vh;
-      overflow-y: auto;
-      padding-right: 10px;
-    }
-
-    .scroll-container::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    .scroll-container::-webkit-scrollbar-thumb {
-      background: var(--primary);
-      border-radius: 10px;
-    }
-
-    .scroll-container::-webkit-scrollbar-track {
-      background: #f1f5f9;
-      border-radius: 10px;
-    }
-
-    /* ========== EMPTY STATE ========== */
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-    }
-
-    .empty-state i {
-      font-size: 48px;
-      color: var(--border-color);
-      margin-bottom: 16px;
-    }
-
-    .empty-state p {
-      color: var(--text-muted);
-      margin: 0;
-    }
-
-    /* ========== RESPONSIVE ========== */
-    @media(max-width:768px) {
-      .dashboard-hero h1 {
-        font-size: 1.5rem;
-      }
-
-      .stat-card {
-        padding: 18px;
-      }
-
-      .stat-card .stat-value {
-        font-size: 1.5rem;
-      }
-
-      .quick-actions {
-        justify-content: center;
-      }
-    }
-
-    /* ========== SMOOTH SCROLL ========== */
-    html {
-      scroll-behavior: smooth;
-    }
-  </style>
 </head>
 
 <body>
-
   {% include '_navbar.html' %}
 
-  <!-- FLASH MESSAGES -->
-  <div class="container mt-3">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    {% for category, message in messages %}
-    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show"
-      role="alert">
-      {{ message }}
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
-  </div>
-
-  <!-- ================= DASHBOARD HERO ================= -->
-  <section class="dashboard-hero">
-    <div class="container">
+  <!-- HERO SECTION -->
+  <header class="hero-premium">
+    <div class="hero-premium-decor-1"></div>
+    <div class="hero-premium-decor-2"></div>
+    <div class="container position-relative">
       <div class="row align-items-center">
         <div class="col-lg-8" data-aos="fade-right">
-          <h1><i class="fa fa-industry me-3"></i>{{ miller_name }}</h1>
-          <p class="mb-2"><i class="fa fa-map-marker-alt me-2"></i>{{ miller_address or 'Address not set' }}</p>
-          <p><i class="fa fa-chart-line me-2"></i>Manage your stock, approve orders, track quality & process payments —
-            all in one place</p>
+          <h1 class="display-5 fw-bold mb-2">Welcome, {{ miller_name }}</h1>
+          <p class="mb-3 opacity-75"><i class="fa fa-industry me-2 text-warning"></i>{{ session.get('user_address',
+            'Registered Miller') }}</p>
 
-          <div class="quick-actions">
-            <a href="/miller/post-stock" class="quick-action-btn">
-              <i class="fa fa-plus-circle"></i> New Commodity
+          <div class="d-flex flex-wrap gap-2 mt-4">
+            <a href="/miller/post" class="btn btn-warning shadow-lg fw-bold px-4">
+              <i class="fa fa-plus-circle"></i> Post New Stock
             </a>
-            <a href="#pending-orders" class="quick-action-btn">
-              <i class="fa fa-clock"></i> Pending Requests
+            <a href="#active-orders" class="btn btn-outline-light quick-action-btn">
+              <i class="fa fa-box-open"></i> Active Orders
             </a>
-            <a href="#quality-check" class="quick-action-btn">
-              <i class="fa fa-clipboard-check"></i> Quality Check
-            </a>
-            <a href="/miller/profile" class="quick-action-btn">
-              <i class="fa fa-user-cog"></i> Profile
-            </a>
+          </div>
+        </div>
+        <div class="col-lg-4 d-none d-lg-block text-end" data-aos="fade-left">
+          <!-- Potential for a dashboard illustration here -->
+          <div class="p-3 bg-white bg-opacity-10 rounded-4 backdrop-blur border border-white border-opacity-25">
+            <div class="d-flex align-items-center mb-3">
+              <div class="bg-white text-success rounded-circle p-3 me-3"
+                style="width:50px; height:50px; display:flex; align-items:center; justify-content:center;">
+                <i class="fa fa-chart-line fa-lg"></i>
+              </div>
+              <div class="text-start">
+                <small class="text-white-50 text-uppercase ls-1">Market Status</small>
+                <h5 class="mb-0 fw-bold">Active</h5>
+              </div>
+            </div>
+            <div
+              class="d-flex justify-content-between text-white-50 small border-top border-white border-opacity-25 pt-2">
+              <span>System Live</span>
+              <span class="text-white fw-bold"><i class="fa fa-check-circle me-1 text-success"></i>Online</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </section>
+  </header>
 
-  <main>
-    <!-- ================= POST STOCK (LINK) ================= -->
-    <div class="section-card" id="post-stock" data-aos="fade-up">
+  <main class="container pb-5">
+
+    <!-- STATS ROW -->
+    <div class="row g-4 mb-5" style="margin-top: -40px;">
+      <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="0">
+        <div class="card-premium h-100 d-flex flex-column justify-content-center">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <span class="text-muted small fw-bold text-uppercase ls-1">My Stocks</span>
+              <h2 class="mt-2 fw-bold text-success">{{ my_stocks|length }}</h2>
+            </div>
+            <div
+              style="width: 48px; height: 48px; background: var(--primary-surface); color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+              <i class="fa fa-cubes"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+        <div class="card-premium h-100 d-flex flex-column justify-content-center">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <span class="text-muted small fw-bold text-uppercase ls-1">Pending</span>
+              <h2 class="mt-2 fw-bold text-warning">{{ pending_approvals|length }}</h2>
+            </div>
+            <div
+              style="width: 48px; height: 48px; background: var(--warning-bg); color: var(--warning); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+              <i class="fa fa-hourglass-half"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
+        <div class="card-premium h-100 d-flex flex-column justify-content-center">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <span class="text-muted small fw-bold text-uppercase ls-1">Active Orders</span>
+              <h2 class="mt-2 fw-bold text-info">{{ approved_bookings|length }}</h2>
+            </div>
+            <div
+              style="width: 48px; height: 48px; background: var(--info-bg); color: var(--info); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+              <i class="fa fa-truck-loading"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
+        <div class="card-premium h-100 d-flex flex-column justify-content-center">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <span class="text-muted small fw-bold text-uppercase ls-1">Completed</span>
+              <h2 class="mt-2 fw-bold text-dark">{{ completed_orders_count }}</h2>
+            </div>
+            <div
+              style="width: 48px; height: 48px; background: #e2e8f0; color: #475569; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+              <i class="fa fa-history"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= POST STOCK CTA ================= -->
+    <div class="card-premium bg-light mb-4 border-start border-success border-5" id="post-stock" data-aos="fade-up">
       <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
-          <h5 class="section-title mb-1">
-            <span class="icon-box green"><i class="fa fa-plus-circle"></i></span>
+          <h5 class="fw-bold mb-1 text-dark">
+            <span
+              class="bg-success text-white rounded-circle p-1 me-2 d-inline-flex align-items-center justify-content-center"
+              style="width:32px; height:32px;"><i class="fa fa-plus small"></i></span>
             New Commodity
           </h5>
-          <p class="text-muted mb-0">Have new produce? List it on the market instantly.</p>
+          <p class="text-muted mb-0 small ms-1">Have new produce? List it on the market instantly.</p>
         </div>
-        <a href="/miller/post-stock" class="btn btn-success btn-lg shadow-sm">
-          <i class="fa fa-arrow-right me-2"></i> New Commodity
+        <a href="/miller/post-stock" class="btn btn-success fw-bold shadow-sm rounded-pill px-4">
+          <i class="fa fa-arrow-right me-2"></i> Post Stock
         </a>
       </div>
     </div>
 
     <!-- ================= LIVE STOCK ================= -->
-    <div class="section-card" data-aos="fade-up">
-      <div class="section-header">
-        <h5 class="section-title">
-          <span class="icon-box green"><i class="fa fa-warehouse"></i></span>
-          Live Rate
-        </h5>
-        <span class="section-badge bg-success">{{ stocks|length }} Active</span>
-      </div>
-      <div class="d-flex justify-content-end mb-2 pe-3">
-        <button class="btn btn-sm btn-outline-success me-2"
-          onclick="exportTableToExcel('liveStockTable', 'my_stock_rates.xlsx')">
-          <i class="fa fa-file-excel"></i> Export
-        </button>
-        <button class="btn btn-sm btn-outline-dark" onclick="printTable()">
-          <i class="fa fa-print"></i> Print
-        </button>
+    <div class="card-premium bg-white mb-4" data-aos="fade-up">
+      <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <div>
+          <h5 class="fw-bold mb-1">
+            <span class="text-success me-2"><i class="fa fa-warehouse"></i></span>
+            Live Rate
+          </h5>
+          <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">{{ stocks|length
+            }} Active</span>
+        </div>
+        <div>
+          <button class="btn btn-sm btn-outline-success me-2"
+            onclick="exportTableToExcel('liveStockTable', 'my_stock_rates.xlsx')">
+            <i class="fa fa-file-excel"></i> Export
+          </button>
+          <button class="btn btn-sm btn-outline-dark" onclick="printTable()">
+            <i class="fa fa-print"></i> Print
+          </button>
+        </div>
       </div>
 
       {% if stocks %}
       <div class="table-responsive">
-        <table class="table-modern" id="liveStockTable">
-          <thead>
+        <table class="table-premium" id="liveStockTable">
+          <thead class="bg-light">
             <tr>
-              <th>Crop</th>
-              <th>Quantity (Qt)</th>
-              <th>Price/Qt</th>
-              <th>Condition Note</th>
-              <th>Action</th>
+              <th class="text-uppercase small text-muted">Crop</th>
+              <th class="text-uppercase small text-muted">Quantity (Qt)</th>
+              <th class="text-uppercase small text-muted">Price/Qt</th>
+              <th class="text-uppercase small text-muted">Condition Note</th>
+              <th class="text-uppercase small text-muted text-center">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -609,43 +180,47 @@
             <form method="POST" action="/update_miller_stock/{{ s[0] }}">
               <tr>
                 <td>
-                  <span class="fw-bold text-capitalize">
-                    <i class="fa fa-seedling text-success me-2"></i>{{ s[2] }}
-                  </span>
-                  {% if s[9] == 'open' %}
-                  <span class="badge bg-success ms-2" style="font-size: 0.7em;">Live</span>
-                  {% else %}
-                  <span class="badge bg-danger ms-2" style="font-size: 0.7em;">Inactive</span>
-                  {% endif %}
-                  {% if s[13] %}
-                  <span class="badge bg-info ms-1" style="font-size: 0.7em;">
-                    <i class="fa fa-clock"></i> {{ s[13] }} Days
-                  </span>
-                  {% endif %}
+                  <div class="d-flex align-items-center">
+                    <div class="bg-light rounded-circle p-2 me-2 text-success">
+                      <i class="fa fa-seedling"></i>
+                    </div>
+                    <div>
+                      <span class="fw-bold text-capitalize d-block">{{ s[2] }}</span>
+                      {% if s[9] == 'open' %}
+                      <span class="badge bg-success" style="font-size: 0.65em;">Live</span>
+                      {% else %}
+                      <span class="badge bg-danger" style="font-size: 0.65em;">Inactive</span>
+                      {% endif %}
+                      {% if s[13] %}
+                      <span class="badge bg-info ms-1" style="font-size: 0.65em;">
+                        <i class="fa fa-clock"></i> {{ s[13] }} Days
+                      </span>
+                      {% endif %}
+                    </div>
+                  </div>
                 </td>
                 <td>
                   <input type="number" name="quantity" value="{{ s[3] }}" class="form-control form-control-sm"
-                    style="width:100px;margin:auto;" min="0">
+                    style="width:100px;" min="0">
                 </td>
                 <td>
-                  <input type="number" name="price" value="{{ s[4] }}" step="0.01" class="form-control form-control-sm"
-                    style="width:100px;margin:auto;">
+                  <div class="input-group input-group-sm" style="width: 120px;">
+                    <span class="input-group-text">₹</span>
+                    <input type="number" name="price" value="{{ s[4] }}" step="0.01" class="form-control">
+                  </div>
                 </td>
                 <td>
                   <input type="text" name="deduction" value="{{ s[7] }}" class="form-control form-control-sm"
-                    style="width:120px;margin:auto;">
+                    style="min-width:150px;">
                 </td>
-                <td>
+                <td class="text-center">
                   <div class="d-flex gap-2 justify-content-center">
-                    <!-- Update Button -->
-                    <button class="btn btn-sm btn-success" title="Update">
+                    <button class="btn btn-sm btn-success shadow-sm" title="Update">
                       <i class="fa fa-save"></i>
                     </button>
-
-                    <!-- Toggle Status Button -->
                     {% if s[9] == 'open' %}
                     <button type="submit" formaction="/miller/toggle_stock_status/{{ s[0] }}"
-                      class="btn btn-sm btn-warning" title="Unlive (Deactivate)">
+                      class="btn btn-sm btn-warning shadow-sm" title="Unlive (Deactivate)">
                       <i class="fa fa-eye-slash"></i>
                     </button>
                     {% else %}
@@ -654,9 +229,8 @@
                       <i class="fa fa-eye"></i>
                     </button>
                     {% endif %}
-
-                    <!-- Delete Button -->
-                    <button type="submit" formaction="/miller/delete_stock/{{ s[0] }}" class="btn btn-sm btn-danger"
+                    <button type="submit" formaction="/miller/delete_stock/{{ s[0] }}"
+                      class="btn btn-sm btn-danger shadow-sm"
                       onclick="return confirm('Are you sure you want to delete this commodity?')" title="Delete">
                       <i class="fa fa-trash"></i>
                     </button>
@@ -669,15 +243,18 @@
         </table>
       </div>
       {% else %}
-      <div class="empty-state">
-        <i class="fa fa-warehouse"></i>
-        <p>No stock posted yet. Use the form above to add your first stock!</p>
+      <div class="text-center py-5">
+        <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+          style="width: 80px; height: 80px;">
+          <i class="fa fa-warehouse fa-2x text-muted"></i>
+        </div>
+        <p class="text-muted">No stock posted yet.</p>
+        <a href="/miller/post" class="btn btn-primary btn-sm">Post Stock</a>
       </div>
       {% endif %}
     </div>
 
-    <!-- ================= ORDERS ================= -->
-    <!-- ================= ORDERS ================= -->
+    <!-- ================= ORDERS LOGIC ================= -->
     {% set pending = [] %}
     {% set approved = [] %}
     {% set rejected = [] %}
@@ -693,93 +270,132 @@
     {% endfor %}
 
     <!-- ================= BOOKING FILTER ================= -->
-    <div class="filter-bar" data-aos="fade-up">
-      <div class="row g-3 align-items-end">
-        <div class="col-md-3">
-          <label class="form-label"><i class="fa fa-filter me-2"></i>Filter Status</label>
-          <select id="statusFilter" class="form-select">
-            <option value="all">All Orders</option>
-            <option value="pending">Pending</option>
-            <option value="approved">Approved</option>
-            <option value="declined">Rejected</option>
-          </select>
-        </div>
-        <div class="col-md-3">
-          <label class="form-label"><i class="fa fa-user me-2"></i>Trader Name</label>
-          <input type="text" id="buyerFilter" class="form-control" placeholder="Search buyer...">
-        </div>
-        <div class="col-md-3">
-          <label class="form-label"><i class="fa fa-map-marker-alt me-2"></i>Location</label>
-          <input type="text" id="locationFilter" class="form-control" placeholder="Search city/state...">
-        </div>
-        <div class="col-md-3">
-          <label class="form-label"><i class="fa fa-seedling me-2"></i>Crop</label>
-          <input type="text" id="cropFilter" class="form-control" placeholder="Search crop...">
-        </div>
-        <div class="col-md-3">
-          <button onclick="clearFilters()" class="btn btn-outline-secondary w-100">
-            <i class="fa fa-times me-2"></i>Clear Filters
-          </button>
+    <div class="card border-0 shadow-sm mb-4" data-aos="fade-up">
+      <div class="card-body p-4">
+        <h6 class="fw-bold text-muted text-uppercase small mb-3 ls-1">Filter Orders</h6>
+        <div class="row g-3 align-items-end">
+          <div class="col-md-3">
+            <label class="form-label small fw-bold">Status</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0"><i class="fa fa-filter text-muted"></i></span>
+              <select id="statusFilter" class="form-select border-start-0 ps-0">
+                <option value="all">All Orders</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="declined">Rejected</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small fw-bold">Trader Name</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0"><i class="fa fa-user text-muted"></i></span>
+              <input type="text" id="buyerFilter" class="form-control border-start-0 ps-0"
+                placeholder="Search buyer...">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small fw-bold">Location</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0"><i
+                  class="fa fa-map-marker-alt text-muted"></i></span>
+              <input type="text" id="locationFilter" class="form-control border-start-0 ps-0"
+                placeholder="Search city/state...">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small fw-bold">Crop</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0"><i class="fa fa-seedling text-muted"></i></span>
+              <input type="text" id="cropFilter" class="form-control border-start-0 ps-0" placeholder="Search crop...">
+            </div>
+          </div>
+          <div class="col-12 text-end mt-3">
+            <button onclick="clearFilters()" class="btn btn-sm btn-outline-secondary">
+              <i class="fa fa-times me-2"></i>Clear Filters
+            </button>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- ================= PENDING ORDERS ================= -->
-    <div class="section-card" id="pending-orders" data-aos="fade-up">
-      <div class="section-header">
-        <h5 class="section-title">
-          <span class="icon-box yellow"><i class="fa fa-clock"></i></span>
-          Pending Order Requests
+    <div class="card-premium bg-white mb-4" id="pending-orders" data-aos="fade-up">
+      <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <h5 class="fw-bold mb-0">
+          <span class="text-warning me-2"><i class="fa fa-clock"></i></span>
+          Pending Requests
         </h5>
-        <span class="section-badge bg-warning text-dark">{{ pending|length }} Pending</span>
+        <span class="badge bg-warning text-dark border border-warning rounded-pill">{{ pending|length }} Pending</span>
       </div>
 
       {% if pending %}
-      <div class="row g-3">
+      <div class="row g-4">
         {% for b in pending %}
         <div class="col-md-6 col-lg-4 booking-row" data-status="pending" data-buyer="{{ b[1]|lower }}"
           data-crop="{{ b[2]|lower }}"
           data-location="{{ (b[19]|string + ' ' + b[20]|string + ' ' + b[21]|string)|lower }}">
-          <div class="order-card">
-            <div class="order-header">
-              <div>
-                <div class="order-id">{{ b[10] if b[10] else 'N/A' }}</div>
-                <div class="order-meta">{{ b[1] }} • <span class="text-capitalize">{{ b[2] }}</span></div>
+
+          <div class="card h-100 border-0 shadow-sm hover-shadow transition-all"
+            style="border-radius: var(--radius-md);">
+            <div class="card-body d-flex flex-column">
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                  <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Order #{{ b[10] if b[10]
+                    else 'N/A' }}</small>
+                  <h6 class="fw-bold mb-0 mt-1">{{ b[1] }}</h6>
+                  <div class="small text-muted"><i class="fa fa-map-marker-alt me-1"></i>{{ b[19] }}, {{ b[20] }}</div>
+                </div>
+                <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill">
+                  <i class="fa fa-clock me-1"></i>Pending
+                </span>
               </div>
-              <span class="badge bg-warning text-dark">
-                <i class="fa fa-clock me-1"></i>Pending
-              </span>
-            </div>
 
-            <div class="order-badges">
-              <span class="badge bg-primary"><i class="fa fa-weight-hanging me-1"></i>{{ b[3] }} Quintal</span>
-            </div>
+              <div class="mb-4">
+                <div class="d-flex align-items-center mb-2">
+                  <div class="bg-light rounded-circle p-2 me-2 text-primary">
+                    <i class="fa fa-seedling"></i>
+                  </div>
+                  <span class="fw-bold text-capitalize">{{ b[2] }}</span>
+                </div>
+                <div class="d-flex align-items-center">
+                  <div class="bg-light rounded-circle p-2 me-2 text-info">
+                    <i class="fa fa-weight-hanging"></i>
+                  </div>
+                  <span class="fw-bold">{{ b[3] }} Quintals</span>
+                </div>
+              </div>
 
-            <div class="d-grid gap-2 mt-3">
-              <a href="/miller/approve_booking/{{ b[0] }}" class="btn btn-success btn-sm">
-                <i class="fa fa-check me-2"></i>Approve Order
-              </a>
+              <div class="mt-auto d-grid gap-2">
+                <a href="/miller/approve_booking/{{ b[0] }}" class="btn btn-success shadow-sm">
+                  <i class="fa fa-check me-2"></i> Approve
+                </a>
 
-              <form method="POST" action="/miller/decline_booking/{{ b[0] }}">
-                <input name="reason" class="form-control form-control-sm mb-2" placeholder="Rejection reason..."
-                  required>
-                <button class="btn btn-outline-danger btn-sm w-100">
-                  <i class="fa fa-times me-2"></i>Reject
-                </button>
-              </form>
+                <form method="POST" action="/miller/decline_booking/{{ b[0] }}">
+                  <div class="input-group input-group-sm mb-2">
+                    <input name="reason" class="form-control" placeholder="Reason..." required>
+                    <button class="btn btn-outline-danger" type="submit">Reject</button>
+                  </div>
+                </form>
+              </div>
+
             </div>
           </div>
+
         </div>
         {% endfor %}
       </div>
       {% else %}
-      <div class="empty-state">
-        <i class="fa fa-inbox"></i>
-        <p>No pending orders at the moment. New requests will appear here.</p>
+      <div class="text-center py-5">
+        <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+          style="width: 60px; height: 60px;">
+          <i class="fa fa-inbox fa-lg text-muted"></i>
+        </div>
+        <p class="text-muted">No pending orders.</p>
       </div>
       {% endif %}
     </div>
-    <!-- APPROVED (Still Loading) -->
+    <!-- ================= APPROVED (Still Loading) ================= -->
     {% set approved_loading = [] %}
     {% set completed_loading_qc = [] %}
     {% set final_invoice_uploaded = [] %}
@@ -808,63 +424,61 @@
       else %} {# Loading Complete / Closed #} {% if ns.has_trucks and ns.all_paid %} {% set
       _=payment_completed.append(b) %} {% elif ns.has_trucks and ns.all_invoiced %} {# All invoices uploaded, payment
       pending #} {% set _=final_invoice_uploaded.append(b) %} {% else %} {# Needs QC or Invoice Upload #} {% set
-      _=completed_loading_qc.append(b) %} {% endif %} {% endif %} {% endfor %} <div class="section-header">
-      <h5 class="section-title">
-        <span class="icon-box green"><i class="fa fa-check-circle"></i></span>
-        Approved Orders (Still Loading)
-      </h5>
-      <span class="section-badge bg-success" id="approvedLoadingCount">{{ approved_loading|length }} Active</span>
-      </div>
-      <div class="d-flex justify-content-end mb-2 pe-3">
-        <button class="btn btn-sm btn-outline-success me-2"
-          onclick="exportTableToExcel('approvedOrdersTable', 'approved_orders_loading.xlsx')">
-          <i class="fa fa-file-excel"></i> Export
-        </button>
-        <button class="btn btn-sm btn-outline-dark" onclick="printTable()">
-          <i class="fa fa-print"></i> Print
-        </button>
+      _=completed_loading_qc.append(b) %} {% endif %} {% endif %} {% endfor %} <div class="card-premium bg-white mb-4"
+      data-aos="fade-up">
+      <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <div>
+          <h5 class="fw-bold mb-1">
+            <span class="text-success me-2"><i class="fa fa-truck-loading"></i></span>
+            Orders In-Progress (Loading)
+          </h5>
+          <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill"
+            id="approvedLoadingCount">{{ approved_loading|length }} Active</span>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-success"
+            onclick="exportTableToExcel('approvedOrdersTable', 'approved_orders_loading.xlsx')">
+            <i class="fa fa-file-excel"></i> Export
+          </button>
+          <button class="btn btn-sm btn-outline-dark" onclick="printTable()">
+            <i class="fa fa-print"></i> Print
+          </button>
+        </div>
       </div>
 
       <!-- Filter & Search (QC pending trucks) -->
-      <div class="filter-bar mb-4">
+      <div class="card border-0 bg-light p-3 mb-4 rounded-3">
         <div class="d-flex gap-2 flex-wrap align-items-center">
-          <button type="button" class="btn btn-sm btn-success approved-loading-filter-btn" data-filter="all"
-            onclick="filterApprovedLoading('all')">
-            <i class="fa fa-list me-1"></i> All
-          </button>
-          <button type="button" class="btn btn-sm btn-outline-secondary approved-loading-filter-btn"
-            data-filter="pending" onclick="filterApprovedLoading('pending')">
-            <i class="fa fa-clock me-1"></i> QC Pending
-          </button>
-          <button type="button" class="btn btn-sm btn-outline-secondary approved-loading-filter-btn"
-            data-filter="verified" onclick="filterApprovedLoading('verified')">
-            <i class="fa fa-check-circle me-1"></i> QC Verified
-          </button>
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-sm btn-white border approved-loading-filter-btn active"
+              data-filter="all" onclick="filterApprovedLoading('all')">All</button>
+            <button type="button" class="btn btn-sm btn-white border approved-loading-filter-btn" data-filter="pending"
+              onclick="filterApprovedLoading('pending')">QC Pending</button>
+            <button type="button" class="btn btn-sm btn-white border approved-loading-filter-btn" data-filter="verified"
+              onclick="filterApprovedLoading('verified')">QC Verified</button>
+          </div>
 
-          <div class="flex-grow-1" style="min-width:260px;">
-            <input type="text" id="approvedLoadingSearchInput" class="form-control"
-              placeholder="🔍 Search by Order ID, Buyer, Location, Crop, Truck..." onkeyup="searchApprovedLoading()">
+          <div class="flex-grow-1 position-relative" style="min-width:250px;">
+            <i class="fa fa-search position-absolute text-muted" style="left: 12px; top: 10px;"></i>
+            <input type="text" id="approvedLoadingSearchInput" class="form-control form-control-sm ps-5"
+              placeholder="Search by Order ID, Buyer, Location, Crop..." onkeyup="searchApprovedLoading()">
           </div>
         </div>
       </div>
 
       {% if approved_loading %}
       <div class="table-responsive">
-        <table class="table-modern" id="approvedOrdersTable">
-          <thead>
+        <table class="table-premium" id="approvedOrdersTable">
+          <thead class="bg-light">
             <tr>
-              <th>Order ID</th>
-              <th>Trader</th>
-              <th>Crop</th>
-              <th>Booked</th>
-              <th>Loaded</th>
-              <th>Remaining</th>
-              <th>Invoices</th>
-              <th>Status</th>
+              <th class="text-uppercase small text-muted">Order ID</th>
+              <th class="text-uppercase small text-muted">Trader</th>
+              <th class="text-uppercase small text-muted">Crop</th>
+              <th class="text-uppercase small text-muted">Progress</th>
+              <th class="text-uppercase small text-muted">Truck Log & QC</th>
             </tr>
           </thead>
           <tbody>
-
             {% for b in approved_loading %}
             {% set booking_id = b[0] %}
             {% set booked = b[3] %}
@@ -887,142 +501,120 @@
             {% set qc_row_status = 'none' if not invs else ('pending' if ns.pending > 0 else 'verified') %}
 
             <tr class="approved-loading-row" data-qc="{{ qc_row_status }}" data-search="{{ ns.search }}">
-              <td><strong class="text-primary">{{ b[10] }}</strong></td>
-              <td>{{ b[1] }}</td>
-              <td>{{ b[2] }}</td>
-
-              <td><span class="badge bg-primary">{{ booked }} Qt</span></td>
-
-              <td>
-                <span class="badge bg-success">{{ loaded }} Qt</span>
+              <td class="align-top"><strong class="text-primary">#{{ b[10] }}</strong></td>
+              <td class="align-top">
+                <div class="fw-bold">{{ b[1] }}</div>
+                <small class="text-muted"><i class="fa fa-map-marker-alt me-1"></i>{{ b[19] }}, {{ b[20] }}</small>
+              </td>
+              <td class="align-top">
+                <div class="d-flex align-items-center">
+                  <div class="bg-light rounded-circle p-1 me-2 text-success small">
+                    <i class="fa fa-seedling"></i>
+                  </div>
+                  <span class="text-capitalize">{{ b[2] }}</span>
+                </div>
               </td>
 
-              <td>
-                <span class="badge bg-warning">{{ remaining }} Qt</span>
-                {% if remaining > 0 %}
-                <button class="btn btn-outline-danger btn-sm ms-2" title="Close Remaining Qty" data-bs-toggle="modal"
-                  data-bs-target="#closeRemainingModal{{ booking_id }}">
-                  <i class="fa fa-times-circle"></i>
-                </button>
-                {% endif %}
-              </td>
-
-              <!-- QC Summary -->
-              <td>
-                {% if not invs %}
-                <span class="badge bg-secondary">No Trucks</span>
-                {% elif ns.pending > 0 %}
-                <span class="badge bg-warning text-dark">QC Pending: {{ ns.pending }}</span>
-                {% else %}
-                <span class="badge bg-success">QC Verified</span>
-                {% endif %}
+              <td class="align-top" style="min-width: 200px;">
+                <div class="d-flex justify-content-between mb-1 small">
+                  <span>Loaded: <strong>{{ loaded }}</strong></span>
+                  <span>Booked: <strong>{{ booked }}</strong></span>
+                </div>
+                <div class="progress mb-2" style="height: 6px;">
+                  <div class="progress-bar bg-success" role="progressbar"
+                    style="width: {{ (loaded / booked * 100)|round }}%"></div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span
+                    class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill small">
+                    Running...
+                  </span>
+                  {% if remaining > 0 %}
+                  <button class="btn btn-link btn-sm text-danger p-0 text-decoration-none small" title="Close Remaining"
+                    data-bs-toggle="modal" data-bs-target="#closeRemainingModal{{ booking_id }}">
+                    Close {{ remaining }} Qt <i class="fa fa-times-circle ms-1"></i>
+                  </button>
+                  {% endif %}
+                </div>
               </td>
 
               <!-- 🔴 PER LOADING INVOICES + QC (for loaded trucks even if order still loading) -->
-              <td>
+              <td class="align-top">
                 {% if invs %}
-                <ul class="list-unstyled mb-0">
+                <div class="d-flex flex-column gap-2">
                   {% for inv in invs %}
-                  <li class="mb-2 p-2 border rounded" style="background:#f8f9fa;">
-                    <div class="d-flex justify-content-between align-items-start gap-2">
-                      <div>
-                        <div class="fw-semibold">
+                  <div class="card border bg-light shadow-sm">
+                    <div class="card-body p-2">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="fw-bold text-dark small">
                           {% if inv.truck_number %}
-                          Truck {{ inv.truck_number }}
+                          <i class="fa fa-truck me-1 text-secondary"></i>{{ inv.truck_number }}
                           {% else %}
-                          Truck #{{ loop.index }}
+                          <i class="fa fa-truck me-1 text-secondary"></i>Truck #{{ loop.index }}
                           {% endif %}
-                          <span class="badge bg-info ms-2">{{ inv.qty }} Qt</span>
+                          <span class="badge bg-secondary ms-1">{{ inv.qty }} Qt</span>
                         </div>
 
-                        <a href="/static/uploads/bills/{{ inv.file }}" target="_blank"
-                          class="btn btn-sm btn-outline-primary mt-1">
-                          <i class="fa fa-file-invoice"></i> Invoice
-                        </a>
-
-                        <small class="text-muted d-block">{{ inv.date.strftime('%Y-%m-%d %H:%M') }}</small>
+                        {% if inv.qc_status == 'verified' %}
+                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill"
+                          style="font-size: 0.65em;">
+                          QC Verified
+                        </span>
+                        {% else %}
+                        <span
+                          class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill"
+                          style="font-size: 0.65em;">
+                          QC Pending
+                        </span>
+                        {% endif %}
                       </div>
 
-                      <div class="text-end">
-                        {% if inv.qc_status == 'verified' %}
-                        <span class="badge bg-success">✅ QC Verified</span>
-                        {% else %}
-                        <span class="badge bg-warning text-dark">⏳ QC Pending</span>
-                        {% endif %}
-
+                      <div class="d-flex justify-content-between align-items-center">
+                        <a href="/static/uploads/bills/{{ inv.file }}" target="_blank"
+                          class="btn btn-xs btn-outline-primary py-0" style="font-size: 0.7em;">
+                          <i class="fa fa-file-invoice"></i> View Inv
+                        </a>
                         <button type="button"
-                          class="btn btn-sm {% if inv.qc_status == 'verified' %}btn-outline-warning{% else %}btn-success{% endif %} mt-2"
-                          data-bs-toggle="collapse" data-bs-target="#qcCollapse{{ inv.id }}" aria-expanded="false">
-                          <i class="fa fa-clipboard-check"></i>
-                          {% if inv.qc_status == 'verified' %}Edit QC{% else %}Do QC{% endif %}
+                          class="btn btn-xs {% if inv.qc_status == 'verified' %}btn-outline-secondary{% else %}btn-success{% endif %} py-0"
+                          style="font-size: 0.7em;" data-bs-toggle="collapse" data-bs-target="#qcCollapse{{ inv.id }}"
+                          aria-expanded="false">
+                          <i class="fa fa-edit"></i> QC
                         </button>
                       </div>
-                    </div>
 
-                    {% if inv.qc_status == 'verified' %}
-                    <div class="mt-2">
-                      <small class="text-muted d-block">Net: {{ inv.qc_weight or inv.qty }} Qt • Moisture: {{
-                        inv.qc_moisture or '-' }}%</small>
-                      {% if inv.qc_remarks %}
-                      <small class="text-muted d-block">Remarks: {{ inv.qc_remarks }}</small>
-                      {% endif %}
-                      {% if inv.qc_at %}
-                      <small class="text-muted d-block">Verified on {{ inv.qc_at.strftime('%Y-%m-%d %H:%M') }}</small>
-                      {% endif %}
-                    </div>
-                    {% endif %}
-
-                    <!-- QC Collapse (more reliable than modal inside tables) -->
-                    <div class="collapse mt-2" id="qcCollapse{{ inv.id }}">
-                      <div class="card card-body">
-                        <div class="fw-semibold mb-2">
-                          {% if inv.qc_status == 'verified' %}
-                          Edit Quality Check -
-                          {% else %}
-                          Quality Check -
-                          {% endif %}
-                          {% if inv.truck_number %}
-                          Truck {{ inv.truck_number }}
-                          {% else %}
-                          Truck #{{ loop.index }}
-                          {% endif %}
+                      <!-- QC Collapse -->
+                      <div class="collapse mt-2" id="qcCollapse{{ inv.id }}">
+                        <div class="card card-body p-2 border shadow-sm">
+                          <form method="POST" action="/miller/update_qc/{{ inv.id }}">
+                            <div class="row g-1 mb-2">
+                              <div class="col-6">
+                                <label class="form-label small mb-0 fs-10 text-muted">Net Wt</label>
+                                <input type="number" step="0.01" name="qc_weight"
+                                  class="form-control form-control-sm py-0" value="{{ inv.qc_weight or inv.qty }}"
+                                  required>
+                              </div>
+                              <div class="col-6">
+                                <label class="form-label small mb-0 fs-10 text-muted">Moist %</label>
+                                <input type="number" step="0.01" name="qc_moisture"
+                                  class="form-control form-control-sm py-0" value="{{ inv.qc_moisture or '' }}"
+                                  required>
+                              </div>
+                            </div>
+                            <div class="mb-2">
+                              <input name="qc_remarks" class="form-control form-control-sm py-0"
+                                placeholder="Remarks..." value="{{ inv.qc_remarks or '' }}">
+                            </div>
+                            <button type="submit" class="btn btn-success btn-xs w-100 py-0">Save QC</button>
+                          </form>
                         </div>
-
-                        <form method="POST" action="/miller/update_qc/{{ inv.id }}">
-                          <div class="row g-2 mb-2">
-                            <div class="col-6">
-                              <label class="form-label small mb-1">Net Weight (Qt)</label>
-                              <input type="number" step="0.01" name="qc_weight" class="form-control form-control-sm"
-                                value="{{ inv.qc_weight or inv.qty }}" required>
-                            </div>
-                            <div class="col-6">
-                              <label class="form-label small mb-1">Moisture (%)</label>
-                              <input type="number" step="0.01" name="qc_moisture" class="form-control form-control-sm"
-                                value="{{ inv.qc_moisture or '' }}" required>
-                            </div>
-                          </div>
-                          <div class="mb-2">
-                            <label class="form-label small mb-1">Remarks (Optional)</label>
-                            <textarea name="qc_remarks" class="form-control form-control-sm" rows="2"
-                              placeholder="Quality notes, deductions, etc.">{{ inv.qc_remarks or '' }}</textarea>
-                          </div>
-                          <div class="d-flex gap-2">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse"
-                              data-bs-target="#qcCollapse{{ inv.id }}">
-                              Cancel
-                            </button>
-                            <button type="submit" class="btn btn-sm btn-success">
-                              <i class="fa fa-clipboard-check"></i> Save QC
-                            </button>
-                          </div>
-                        </form>
                       </div>
+
                     </div>
-                  </li>
+                  </div>
                   {% endfor %}
-                </ul>
+                </div>
                 {% else %}
-                <span class="text-muted small">No loading yet</span>
+                <span class="text-muted small fst-italic">No trucks loaded yet.</span>
                 {% endif %}
               </td>
             </tr>
@@ -1031,46 +623,50 @@
         </table>
       </div>
       {% else %}
-      <div class="empty-state">
-        <i class="fa fa-truck"></i>
-        <p>No orders currently being loaded.</p>
+      <div class="text-center py-5">
+        <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+          style="width: 60px; height: 60px;">
+          <i class="fa fa-truck-loading fa-lg text-muted"></i>
+        </div>
+        <p class="text-muted">No orders currently active.</p>
       </div>
       {% endif %}
       </div>
 
-      <!-- COMPLETED LOADING (QC Section) -->
-      <div class="section-card" id="quality-check" data-aos="fade-up">
-        <div class="section-header">
-          <h5 class="section-title">
-            <span class="icon-box blue"><i class="fa fa-clipboard-check"></i></span>
+      <!-- ================= COMPLETED LOADING (QC Section) ================= -->
+      <div class="card-premium bg-white mb-4" id="quality-check" data-aos="fade-up">
+        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+          <h5 class="fw-bold mb-0">
+            <span class="text-info me-2"><i class="fa fa-clipboard-check"></i></span>
             Completed Loading - Quality Check
           </h5>
-          <span class="section-badge bg-info" id="qcCount">{{ completed_loading_qc|length }} Orders</span>
+          <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle rounded-pill" id="qcCount">{{
+            completed_loading_qc|length }} Orders</span>
         </div>
 
         {% if completed_loading_qc %}
         <!-- Filter & Search Bar -->
-        <div class="filter-bar mb-4">
+        <div class="card border-0 bg-light p-3 mb-4 rounded-3">
           <div class="d-flex gap-2 flex-wrap align-items-center">
-            <button class="filter-pill active" data-filter="all" onclick="filterQC('all')">
-              <i class="fa fa-list me-1"></i> All
-            </button>
-            <button class="filter-pill" data-filter="pending" onclick="filterQC('pending')">
-              <i class="fa fa-clock me-1"></i> Pending QC
-            </button>
-            <button class="filter-pill" data-filter="verified" onclick="filterQC('verified')">
-              <i class="fa fa-check-circle me-1"></i> Verified
-            </button>
-            <div class="flex-grow-1" style="min-width:200px;">
-              <input type="text" id="qcSearchInput" class="form-control"
-                placeholder="🔍 Search by Order, Buyer, Location..." onkeyup="searchQC()">
+            <div class="btn-group" role="group">
+              <button class="btn btn-sm btn-white border filter-pill active" data-filter="all"
+                onclick="filterQC('all')">All</button>
+              <button class="btn btn-sm btn-white border filter-pill" data-filter="pending"
+                onclick="filterQC('pending')">Pending QC</button>
+              <button class="btn btn-sm btn-white border filter-pill" data-filter="verified"
+                onclick="filterQC('verified')">Verified</button>
+            </div>
+            <div class="flex-grow-1 position-relative" style="min-width:200px;">
+              <i class="fa fa-search position-absolute text-muted" style="left: 12px; top: 10px;"></i>
+              <input type="text" id="qcSearchInput" class="form-control form-control-sm ps-5"
+                placeholder="Search by Order, Buyer, Location..." onkeyup="searchQC()">
             </div>
           </div>
         </div>
 
         <!-- Scrollable Cards Container -->
-        <div class="qc-scroll-container">
-          <div class="row g-3" id="qcCardsContainer">
+        <div class="qc-scroll-container" style="max-height: 800px; overflow-y: auto;">
+          <div class="row g-4" id="qcCardsContainer">
             {% for b in completed_loading_qc %}
             {% set booking_id = b[0] %}
             {% set booked = b[3] %}
@@ -1087,144 +683,153 @@
             {% set final_invoice = b[17] %}
             {% set payment_at = b[18] %}
 
-            <div class="col-md-6 qc-card-item"
+            <div class="col-md-6 col-xl-4 qc-card-item"
               data-search="{{ (order_id|string + ' ' + buyer_name + ' ' + crop_name + ' ' + (b[19] or '') + ' ' + (b[20] or '') + ' ' + (b[21] or '')) | lower }}">
-              <div class="card border-0 shadow-sm h-100 completed-loading-card">
+              <div class="card h-100 border-0 shadow-sm completed-loading-card hover-shadow transition-all"
+                style="border-radius: var(--radius-md);">
                 <div class="card-body">
                   <div class="d-flex justify-content-between align-items-start mb-3">
                     <div>
-                      <h6 class="mb-1"><strong class="text-primary">{{ b[10] }}</strong></h6>
-                      <p class="mb-1 text-muted small">{{ b[1] }} • <span class="text-capitalize">{{ b[2] }}</span></p>
-                      <div class="d-flex gap-2 mt-2">
-                        <span class="badge bg-primary">{{ booked }} Qt Booked</span>
-                        <span class="badge bg-success">{{ loaded }} Qt Loaded</span>
-                      </div>
+                      <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Order #{{ b[10]
+                        }}</small>
+                      <h6 class="fw-bold mb-0 text-truncate" style="max-width: 180px;">{{ b[1] }}</h6>
+                      <div class="small text-muted text-capitalize">{{ b[2] }}</div>
+                    </div>
+                    <div class="text-end">
+                      <span
+                        class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill mb-1 d-block">{{
+                        booked }} Qt Booked</span>
+                      <span
+                        class="badge bg-success-subtle text-success border border-success-subtle rounded-pill d-block">{{
+                        loaded }} Qt Loaded</span>
                     </div>
                   </div>
 
                   <!-- Per-Truck Quality Checks -->
                   {% if invoices_map.get(booking_id) %}
-                  <div class="border-top pt-3">
-                    <small class="text-muted d-block mb-2 fw-semibold">
-                      <i class="fa fa-truck"></i> Truck Quality Checks:
+                  <div class="border-top pt-3 bg-light rounded-3 p-2 mt-3">
+                    <small class="text-muted d-block mb-2 fw-bold text-uppercase" style="font-size: 0.7rem;">
+                      <i class="fa fa-truck me-1"></i> Truck QC
                     </small>
 
-                    {% for inv in invoices_map[booking_id] %}
-                    <div class="mb-3 p-2 border rounded" style="background:#f8f9fa;">
-                      <div class="d-flex justify-content-between align-items-center mb-2">
-                        <div>
-                          <strong class="text-primary">
-                            {% if inv.truck_number %}
-                            Truck {{ inv.truck_number }}
-                            {% else %}
-                            Truck #{{ loop.index }}
-                            {% endif %}
-                          </strong>
-                          <span class="badge bg-info ms-2">{{ inv.qty }} Qt</span>
-                          <a href="/static/uploads/bills/{{ inv.file }}" target="_blank"
-                            class="btn btn-sm btn-outline-primary ms-2">
-                            <i class="fa fa-file-invoice"></i> Invoice
-                          </a>
-                        </div>
-                        {% if inv.qc_status == 'verified' %}
-                        <span class="badge bg-success">✅ Verified</span>
-                        {% else %}
-                        <span class="badge bg-warning">⏳ Pending QC</span>
-                        {% endif %}
-                      </div>
-
-                      {% if inv.qc_status == 'verified' %}
-                      <!-- Show verified QC details for this truck -->
-                      <div class="row g-2 mb-2">
-                        <div class="col-6">
-                          <small class="text-muted d-block">Net Weight</small>
-                          <strong>{{ inv.qc_weight or inv.qty }} Qt</strong>
-                        </div>
-                        <div class="col-6">
-                          <small class="text-muted d-block">Moisture</small>
-                          <strong>{{ inv.qc_moisture or '-' }}%</strong>
-                        </div>
-                      </div>
-                      {% if inv.qc_remarks %}
-                      <div class="mb-2">
-                        <small class="text-muted d-block">Remarks</small>
-                        <small>{{ inv.qc_remarks }}</small>
-                      </div>
-                      {% endif %}
-                      {% if inv.qc_at %}
-                      <small class="text-muted">Verified on {{ inv.qc_at.strftime('%Y-%m-%d %H:%M') }}</small>
-                      {% endif %}
-
-                      <button type="button" class="btn btn-sm btn-outline-warning w-100 mt-2" data-bs-toggle="collapse"
-                        data-bs-target="#qcEdit{{ inv.id }}">
-                        <i class="fa fa-pen-to-square"></i> Edit QC
-                      </button>
-
-                      <div class="collapse mt-2" id="qcEdit{{ inv.id }}">
-                        <form method="POST" action="/miller/update_qc/{{ inv.id }}">
-                          <div class="row g-2 mb-2">
-                            <div class="col-6">
-                              <label class="form-label small mb-1">Net Weight (Qt)</label>
-                              <input type="number" step="0.01" name="qc_weight" class="form-control form-control-sm"
-                                value="{{ inv.qc_weight or inv.qty }}" required>
+                    <div class="d-flex flex-column gap-2">
+                      {% for inv in invoices_map[booking_id] %}
+                      <div class="card border-0 shadow-sm">
+                        <div class="card-body p-2">
+                          <div class="d-flex justify-content-between align-items-center mb-1">
+                            <div>
+                              <span class="fw-bold text-dark small">
+                                {% if inv.truck_number %}
+                                {{ inv.truck_number }}
+                                {% else %}
+                                Truck #{{ loop.index }}
+                                {% endif %}
+                              </span>
+                              <span class="badge bg-secondary ms-1" style="font-size: 0.7em;">{{ inv.qty }} Qt</span>
                             </div>
-                            <div class="col-6">
-                              <label class="form-label small mb-1">Moisture (%)</label>
-                              <input type="number" step="0.01" name="qc_moisture" class="form-control form-control-sm"
-                                value="{{ inv.qc_moisture or '' }}" required>
-                            </div>
-                            <div class="col-12 mt-2">
-                              <label class="form-label small mb-1">Freight (Paid by Miller)</label>
-                              <input type="number" step="0.01" name="qc_freight" class="form-control form-control-sm"
-                                value="{{ inv.qc_freight or '' }}" placeholder="Freight">
+                            <a href="/static/uploads/bills/{{ inv.file }}" target="_blank"
+                              class="text-primary small text-decoration-none">
+                              <i class="fa fa-file-invoice"></i> Inv
+                            </a>
+                          </div>
+
+                          {% if inv.qc_status == 'verified' %}
+                          <!-- Show verified QC details -->
+                          <div
+                            class="d-flex justify-content-between align-items-center bg-success-subtle p-1 rounded mb-1">
+                            <span class="badge bg-success text-white border-0"
+                              style="font-size: 0.65em;">Verified</span>
+                            <div class="d-flex gap-2 small fw-bold text-success-emphasis">
+                              <span>{{ inv.qc_weight or inv.qty }} Qt</span>
+                              <span>{{ inv.qc_moisture or '-' }}% M</span>
                             </div>
                           </div>
-                          <div class="mb-2">
-                            <label class="form-label small mb-1">Remarks (Optional)</label>
-                            <textarea name="qc_remarks" class="form-control form-control-sm" rows="2"
-                              placeholder="Quality notes, deductions, etc.">{{ inv.qc_remarks or '' }}</textarea>
-                          </div>
-                          <button type="submit" class="btn btn-sm btn-success w-100">
-                            <i class="fa fa-clipboard-check"></i> Update QC
+
+                          {% if inv.qc_remarks %}
+                          <small class="d-block text-muted fst-italic lh-1" style="font-size: 0.75rem;">Note: {{
+                            inv.qc_remarks }}</small>
+                          {% endif %}
+
+                          <button type="button"
+                            class="btn btn-link btn-sm text-warning p-0 text-decoration-none small w-100 text-end mt-1"
+                            style="font-size: 0.75rem;" data-bs-toggle="collapse" data-bs-target="#qcEdit{{ inv.id }}">
+                            <i class="fa fa-pen-to-square"></i> Edit
                           </button>
-                        </form>
+
+                          <div class="collapse mt-2" id="qcEdit{{ inv.id }}">
+                            <div class="card card-body p-2 border bg-white">
+                              <form method="POST" action="/miller/update_qc/{{ inv.id }}">
+                                <div class="row g-1 mb-2">
+                                  <div class="col-6">
+                                    <label class="form-label small mb-0 fs-10 text-muted">Net Wt</label>
+                                    <input type="number" step="0.01" name="qc_weight"
+                                      class="form-control form-control-sm py-0" value="{{ inv.qc_weight or inv.qty }}"
+                                      required>
+                                  </div>
+                                  <div class="col-6">
+                                    <label class="form-label small mb-0 fs-10 text-muted">Moist %</label>
+                                    <input type="number" step="0.01" name="qc_moisture"
+                                      class="form-control form-control-sm py-0" value="{{ inv.qc_moisture or '' }}"
+                                      required>
+                                  </div>
+                                  <div class="col-12">
+                                    <label class="form-label small mb-0 fs-10 text-muted">Freight</label>
+                                    <input type="number" step="0.01" name="qc_freight"
+                                      class="form-control form-control-sm py-0" value="{{ inv.qc_freight or '' }}"
+                                      placeholder="Freight">
+                                  </div>
+                                </div>
+                                <div class="mb-2">
+                                  <input name="qc_remarks" class="form-control form-control-sm py-0"
+                                    placeholder="Remarks..." value="{{ inv.qc_remarks or '' }}">
+                                </div>
+                                <button type="submit" class="btn btn-sm btn-success w-100 py-0">Update</button>
+                              </form>
+                            </div>
+                          </div>
+
+                          {% else %}
+                          <!-- QC Form -->
+                          <div class="bg-warning-subtle p-1 rounded text-center mb-2">
+                            <span class="badge bg-warning text-dark border-0" style="font-size: 0.65em;">QC
+                              Pending</span>
+                          </div>
+
+                          <form method="POST" action="/miller/update_qc/{{ inv.id }}">
+                            <div class="row g-1 mb-2">
+                              <div class="col-6">
+                                <input type="number" step="0.01" name="qc_weight"
+                                  class="form-control form-control-sm py-0" placeholder="Net Qt" value="{{ inv.qty }}"
+                                  required>
+                              </div>
+                              <div class="col-6">
+                                <input type="number" step="0.01" name="qc_moisture"
+                                  class="form-control form-control-sm py-0" placeholder="Moist %"
+                                  value="{{ inv.qc_moisture or '' }}" required>
+                              </div>
+                              <div class="col-12 mt-1">
+                                <input type="number" step="0.01" name="qc_freight"
+                                  class="form-control form-control-sm py-0" value="{{ inv.qc_freight or '' }}"
+                                  placeholder="Freight (Optional)">
+                              </div>
+                            </div>
+                            <div class="mb-2">
+                              <input name="qc_remarks" class="form-control form-control-sm py-0"
+                                placeholder="Remarks (Optional)..." value="{{ inv.qc_remarks or '' }}">
+                            </div>
+                            <button class="btn btn-sm btn-success w-100 py-0">
+                              <i class="fa fa-check"></i> Save
+                            </button>
+                          </form>
+                          {% endif %}
+                        </div>
                       </div>
-                      {% else %}
-                      <!-- QC Form for this truck -->
-                      <form method="POST" action="/miller/update_qc/{{ inv.id }}" class="mt-2">
-                        <div class="row g-2 mb-2">
-                          <div class="col-6">
-                            <label class="form-label small mb-1">Net Weight (Qt)</label>
-                            <input type="number" step="0.01" name="qc_weight" class="form-control form-control-sm"
-                              placeholder="Net Qt" value="{{ inv.qty }}" required>
-                          </div>
-                          <div class="col-6">
-                            <label class="form-label small mb-1">Moisture (%)</label>
-                            <input type="number" step="0.01" name="qc_moisture" class="form-control form-control-sm"
-                              placeholder="%" value="{{ inv.qc_moisture or '' }}" required>
-                          </div>
-                          <div class="col-12 mt-2">
-                            <label class="form-label small mb-1">Freight (Paid by Miller)</label>
-                            <input type="number" step="0.01" name="qc_freight" class="form-control form-control-sm"
-                              value="{{ inv.qc_freight or '' }}" placeholder="Freight">
-                          </div>
-                        </div>
-                        <div class="mb-2">
-                          <label class="form-label small mb-1">Remarks (Optional)</label>
-                          <textarea name="qc_remarks" class="form-control form-control-sm" rows="2"
-                            placeholder="Quality notes, deductions, etc.">{{ inv.qc_remarks or '' }}</textarea>
-                        </div>
-                        <button class="btn btn-sm btn-success w-100">
-                          <i class="fa fa-clipboard-check"></i> Save QC for This Truck
-                        </button>
-                      </form>
-                      {% endif %}
+                      {% endfor %}
                     </div>
-                    {% endfor %}
                   </div>
                   {% else %}
-                  <div class="border-top pt-3">
-                    <p class="text-muted small mb-0">No loading invoices yet.</p>
+                  <div class="border-top pt-3 text-center">
+                    <p class="text-muted small mb-0 fst-italic">No loading invoices yet.</p>
                   </div>
                   {% endif %}
 
@@ -1236,24 +841,30 @@
         </div>
 
         {% else %}
-        <p class="text-muted">No completed loading orders yet.</p>
+        <div class="text-center py-5">
+          <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+            style="width: 60px; height: 60px;">
+            <i class="fa fa-clipboard-check fa-lg text-muted"></i>
+          </div>
+          <p class="text-muted">No completed loading orders yet.</p>
+        </div>
         {% endif %}
       </div>
 
-      <!-- FINAL HISAB UPLOADED - PAYMENT PENDING -->
-      <div class="section-card" id="final-hisab" data-aos="fade-up">
-        <div class="section-header">
-          <h5 class="section-title">
-            <span class="icon-box yellow"><i class="fa fa-file-invoice-dollar"></i></span>
+      <!-- ================= FINAL HISAB UPLOADED - PAYMENT PENDING ================= -->
+      <div class="card-premium bg-white mb-4" id="final-hisab" data-aos="fade-up">
+        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+          <h5 class="fw-bold mb-0">
+            <span class="text-warning me-2"><i class="fa fa-file-invoice-dollar"></i></span>
             Final Hisab - Payment Pending
           </h5>
-          <span class="section-badge bg-warning text-dark" id="finalInvoiceCount">{{ final_invoice_uploaded|length }}
-            Pending</span>
+          <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill"
+            id="finalInvoiceCount">{{ final_invoice_uploaded|length }} Pending</span>
         </div>
 
         {% if final_invoice_uploaded %}
         <div class="qc-scroll-container">
-          <div class="row g-3">
+          <div class="row g-4">
             {% for b in final_invoice_uploaded %}
             {% set booking_id = b[0] %}
             {% set booked = b[3] %}
@@ -1266,134 +877,107 @@
             {% set payment_at = b[18] %}
 
             <div class="col-md-6">
-              <div class="card border-0 shadow-sm h-100 completed-loading-card">
+              <div class="card h-100 border-0 shadow-sm completed-loading-card hover-shadow transition-all"
+                style="border-radius: var(--radius-md);">
                 <div class="card-body">
                   <div class="d-flex justify-content-between align-items-start mb-3">
                     <div>
-                      <h6 class="mb-1"><strong class="text-primary">{{ b[10] }}</strong></h6>
-                      <p class="mb-1 text-muted small">{{ b[1] }} • <span class="text-capitalize">{{ b[2] }}</span></p>
-                      <div class="d-flex gap-2 mt-2">
-                        <span class="badge bg-primary">{{ booked }} Qt Booked</span>
-                        <span class="badge bg-success">{{ loaded }} Qt Loaded</span>
-                      </div>
+                      <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Order #{{ b[10]
+                        }}</small>
+                      <h6 class="fw-bold mb-0">{{ b[1] }}</h6>
+                      <div class="small text-muted text-capitalize">{{ b[2] }}</div>
                     </div>
-                    <span class="badge bg-warning">💰 Payment Pending</span>
+                    <span class="badge bg-warning text-dark shadow-sm">💰 Payment Pending</span>
+                  </div>
+
+                  <div class="d-flex gap-2 mb-3">
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">{{
+                      booked }} Qt Booked</span>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">{{
+                      loaded }} Qt Loaded</span>
                   </div>
 
                   <!-- Truck Payment List -->
                   <div class="border-top pt-3">
                     {% if invoices_map.get(booking_id) %}
-                    <small class="text-muted d-block mb-3 fw-semibold">
-                      <i class="fa fa-truck"></i> Truck Payments
+                    <small class="text-muted d-block mb-3 fw-bold text-uppercase" style="font-size: 0.7rem;">
+                      <i class="fa fa-truck me-1"></i> Truck Payments
                     </small>
 
-                    {% for inv in invoices_map[booking_id] %}
-                    <div class="mb-3 p-3 border rounded bg-light">
-                      <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="fw-bold">
-                          {% if inv.truck_number %}
-                          Truck {{ inv.truck_number }}
-                          {% else %}
-                          Truck #{{ loop.index }}
-                          {% endif %}
-                        </span>
-                        <span class="badge bg-secondary">{{ inv.qty }} Qt</span>
-                      </div>
-
-                      {% if inv.final_invoice_file %}
-                      <div class="d-flex gap-2 mb-2">
-                        <a href="/static/uploads/bills/{{ inv.final_invoice_file }}" target="_blank"
-                          class="btn btn-sm btn-outline-primary flex-grow-1">
-                          <i class="fa fa-file-invoice"></i> View Invoice
-                        </a>
-
-                        <!-- Edit Truck Invoice Modal Trigger -->
-                        <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal"
-                          data-bs-target="#editTruckInv{{ inv.id }}">
-                          <i class="fa fa-pen"></i>
-                        </button>
-                      </div>
-
-                      <!-- Mark Payment Done Form -->
-                      {% if inv.payment_status == 'paid' %}
-                      <div class="alert alert-success py-1 px-2 mb-0 text-center small">
-                        <i class="fa fa-check-circle"></i> Payment Received
-                      </div>
-                      {% else %}
-                      <form method="POST" action="/miller/mark_truck_payment_done/{{ inv.id }}">
-                        <button class="btn btn-success btn-sm w-100">
-                          <i class="fa fa-check-circle"></i> Mark Payment Done
-                        </button>
-                      </form>
-                      {% endif %}
-
-                      <!-- Edit Modal -->
-                      <div class="modal fade" id="editTruckInv{{ inv.id }}" tabindex="-1">
-                        <div class="modal-dialog modal-dialog-centered">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <h6 class="modal-title">Replace Invoice (Truck {{ inv.truck_number or loop.index }})</h6>
-                              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <form method="POST" action="/miller/edit_truck_final_invoice/{{ inv.id }}"
-                              enctype="multipart/form-data">
-                              <div class="modal-body">
-                                <input type="file" name="truck_final_invoice" class="form-control form-control-sm"
-                                  accept=".pdf,image/*" required>
-                              </div>
-                              <div class="modal-footer">
-                                <button class="btn btn-warning btn-sm">Upload New</button>
-                              </div>
-                            </form>
-                          </div>
-                        </div>
-                      </div>
-
-                      {% else %}
-                      <span class="badge bg-warning text-dark w-100">Invoice Pending</span>
-                      {% endif %}
-                    </div>
-                    {% endfor %}
-                    {% else %}
-                    <p class="text-muted small">No trucks found.</p>
-                    {% endif %}
-                  </div>
-
-                  <!-- Per-Truck QC Summary -->
-                  {% if invoices_map.get(booking_id) %}
-                  <div class="border-top mt-3 pt-3">
-                    <small class="text-muted d-block mb-2 fw-semibold">
-                      <i class="fa fa-truck"></i> Truck QC Summary:
-                    </small>
-                    {% for inv in invoices_map[booking_id] %}
-                    <div class="mb-2 p-2 border rounded" style="background:#f8f9fa;">
-                      <div class="d-flex justify-content-between">
-                        <span>
-                          <strong>
+                    <div class="d-flex flex-column gap-3">
+                      {% for inv in invoices_map[booking_id] %}
+                      <div class="p-3 border rounded bg-light position-relative">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                          <span class="fw-bold text-dark">
                             {% if inv.truck_number %}
                             Truck {{ inv.truck_number }}
                             {% else %}
                             Truck #{{ loop.index }}
                             {% endif %}
-                          </strong>
-                          - {{ inv.qty }} Qt
-                        </span>
-                        {% if inv.qc_status == 'verified' %}
-                        <span class="badge bg-success">✅</span>
+                          </span>
+                          <span class="badge bg-secondary">{{ inv.qty }} Qt</span>
+                        </div>
+
+                        {% if inv.final_invoice_file %}
+                        <div class="d-flex gap-2 mb-2">
+                          <a href="/static/uploads/bills/{{ inv.final_invoice_file }}" target="_blank"
+                            class="btn btn-sm btn-outline-primary flex-grow-1">
+                            <i class="fa fa-file-invoice"></i> View Invoice
+                          </a>
+
+                          <!-- Edit Truck Invoice Modal Trigger -->
+                          <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal"
+                            data-bs-target="#editTruckInv{{ inv.id }}">
+                            <i class="fa fa-pen"></i>
+                          </button>
+                        </div>
+
+                        <!-- Mark Payment Done Form -->
+                        {% if inv.payment_status == 'paid' %}
+                        <div class="alert alert-success py-1 px-2 mb-0 text-center small">
+                          <i class="fa fa-check-circle"></i> Payment Received
+                        </div>
                         {% else %}
-                        <span class="badge bg-warning">⏳</span>
+                        <form method="POST" action="/miller/mark_truck_payment_done/{{ inv.id }}">
+                          <button class="btn btn-success btn-sm w-100 shadow-sm">
+                            <i class="fa fa-check-circle me-1"></i> Mark Payment Done
+                          </button>
+                        </form>
+                        {% endif %}
+
+                        <!-- Edit Modal -->
+                        <div class="modal fade" id="editTruckInv{{ inv.id }}" tabindex="-1">
+                          <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h6 class="modal-title">Replace Invoice (Truck {{ inv.truck_number or loop.index }})
+                                </h6>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                              </div>
+                              <form method="POST" action="/miller/edit_truck_final_invoice/{{ inv.id }}"
+                                enctype="multipart/form-data">
+                                <div class="modal-body">
+                                  <input type="file" name="truck_final_invoice" class="form-control form-control-sm"
+                                    accept=".pdf,image/*" required>
+                                </div>
+                                <div class="modal-footer">
+                                  <button class="btn btn-warning btn-sm">Upload New</button>
+                                </div>
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+
+                        {% else %}
+                        <span class="badge bg-warning text-dark w-100 py-2">Invoice Pending</span>
                         {% endif %}
                       </div>
-                      {% if inv.qc_status == 'verified' %}
-                      <small class="text-muted">
-                        Net: {{ inv.qc_weight or inv.qty }} Qt |
-                        Moisture: {{ inv.qc_moisture or '-' }}%
-                      </small>
-                      {% endif %}
+                      {% endfor %}
                     </div>
-                    {% endfor %}
+                    {% else %}
+                    <p class="text-muted small">No trucks found.</p>
+                    {% endif %}
                   </div>
-                  {% endif %}
                 </div>
               </div>
             </div>
@@ -1402,53 +986,62 @@
         </div>
 
         {% else %}
-        <p class="text-muted">No orders with final invoice uploaded yet.</p>
+        <div class="text-center py-5">
+          <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+            style="width: 60px; height: 60px;">
+            <i class="fa fa-file-invoice-dollar fa-lg text-muted"></i>
+          </div>
+          <p class="text-muted">No orders pending final payment.</p>
+        </div>
         {% endif %}
       </div>
 
-      <!-- REJECTED -->
-      <div class="section-card" id="rejected-orders" data-aos="fade-up">
-        <div class="section-header">
-          <h5 class="section-title">
-            <span class="icon-box red"><i class="fa fa-times-circle"></i></span>
+      <!-- ================= REJECTED ORDERS ================= -->
+      <div class="card-premium bg-white mb-5" id="rejected-orders" data-aos="fade-up">
+        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+          <h5 class="fw-bold mb-0">
+            <span class="text-danger me-2"><i class="fa fa-times-circle"></i></span>
             Rejected Orders
           </h5>
-          <span class="section-badge bg-danger">{{ rejected|length }} Rejected</span>
+          <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill">{{ rejected|length
+            }} Rejected</span>
         </div>
 
         {% if rejected %}
         <div class="table-responsive">
-          <table class="table-modern">
-            <thead>
+          <table class="table-premium">
+            <thead class="bg-light">
               <tr>
-                <th>Order ID</th>
-                <th>Trader</th>
-                <th>Crop</th>
-                <th>Quantity</th>
-                <th>Rejection Reason</th>
+                <th class="text-uppercase small text-muted">Order ID</th>
+                <th class="text-uppercase small text-muted">Trader</th>
+                <th class="text-uppercase small text-muted">Crop</th>
+                <th class="text-uppercase small text-muted">Quantity</th>
+                <th class="text-uppercase small text-muted">Rejection Reason</th>
               </tr>
             </thead>
             <tbody>
-
               {% for b in rejected %}
               <tr class="booking-row" data-status="declined" data-buyer="{{ b[1]|lower }}" data-crop="{{ b[2]|lower }}">
-
-                <td><strong class="text-primary">{{ b[10] if b[10] else 'N/A' }}</strong></td>
-                <td>{{ b[1] }}</td>
-                <td>{{ b[2] }}</td>
+                <td><strong class="text-primary">#{{ b[10] if b[10] else 'N/A' }}</strong></td>
+                <td class="fw-bold">{{ b[1] }}</td>
+                <td class="text-capitalize">{{ b[2] }}</td>
                 <td>
-                  <span class="badge bg-danger qty-badge">{{ b[3] }} Qt</span>
+                  <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill">{{ b[3] }}
+                    Qt</span>
                 </td>
-                <td>{{ b[5] }}</td>
+                <td class="text-danger small">{{ b[5] }}</td>
               </tr>
               {% endfor %}
             </tbody>
           </table>
         </div>
         {% else %}
-        <div class="empty-state">
-          <i class="fa fa-check-circle text-success"></i>
-          <p>No rejected orders. Great!</p>
+        <div class="text-center py-5">
+          <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+            style="width: 60px; height: 60px;">
+            <i class="fa fa-smile fa-lg text-success"></i>
+          </div>
+          <p class="text-muted">No rejected orders. Great!</p>
         </div>
         {% endif %}
 
@@ -1527,17 +1120,25 @@
             const searchText = card.dataset.search || '';
 
             // Check if this card has any pending trucks
-            const pendingBadges = card.querySelectorAll('.badge.bg-warning');
-            const verifiedBadges = card.querySelectorAll('.badge.bg-success');
-            const hasPending = pendingBadges.length > 0;
-            const allVerified = verifiedBadges.length > 0 && pendingBadges.length === 0;
+            // Robust check for both premium and standard badge classes
+            const pendingBadges = card.querySelectorAll('.badge.bg-warning, .badge.bg-warning-subtle');
+            const verifiedBadges = card.querySelectorAll('.badge.bg-success, .badge.bg-success-subtle');
 
-            // Status filter - check per-truck status
+            // We need to differentiate "Pending QC" badges from just any warning badge if possible, 
+            // but usually warning badge in this context means pending. 
+            // However, strictly counting them is a heuristic.
+
+            const hasPending = pendingBadges.length > 0;
+            // All verified if we have verified badges AND no pending badges
+            // (Assuming every truck has either pending or verified status)
+            const hasVerified = verifiedBadges.length > 0;
+
+            // Status filter logic
             let statusMatch = true;
             if (currentQCFilter === 'pending') {
               statusMatch = hasPending;
             } else if (currentQCFilter === 'verified') {
-              statusMatch = allVerified && verifiedBadges.length > 0;
+              statusMatch = hasVerified && !hasPending;
             }
 
             // Search filter
@@ -1570,8 +1171,12 @@
         function setApprovedLoadingButtonState(activeFilter) {
           document.querySelectorAll('.approved-loading-filter-btn').forEach(btn => {
             const isActive = btn.dataset.filter === activeFilter;
-            btn.classList.toggle('btn-success', isActive);
-            btn.classList.toggle('btn-outline-secondary', !isActive);
+            // Update for new button styles (white/border vs active)
+            if (isActive) {
+              btn.classList.add('active');
+            } else {
+              btn.classList.remove('active');
+            }
           });
         }
 
@@ -1634,24 +1239,29 @@
   {% set remaining = booked - loaded %}
   {% if remaining > 0 %}
   <div class="modal fade" id="closeRemainingModal{{ booking_id }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Close Remaining Quantity?</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title"><i class="fa fa-exclamation-triangle me-2"></i>Close Remaining Quantity?</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
         <form method="POST" action="/miller/close_remaining/{{ booking_id }}">
-          <div class="modal-body">
-            <p>You are about to close the remaining <strong>{{ remaining }} Qt</strong> for this order.</p>
-            <p class="text-muted small">This will return the remaining quantity to your stock and mark the order as
-              partially closed.</p>
+          <div class="modal-body p-4">
+            <div class="text-center mb-3">
+              <span class="display-6 text-danger fw-bold">{{ remaining }} Qt</span>
+              <p class="text-muted">Remaining Quantity</p>
+            </div>
+            <p>You are about to close the remaining quantity for this order. This action cannot be undone.</p>
+            <div class="alert alert-warning small">
+              <i class="fa fa-info-circle me-1"></i> The remaining stock will be returned to your inventory.
+            </div>
 
-            <label class="form-label">Reason for Closing</label>
+            <label class="form-label fw-bold">Reason for Closing</label>
             <input name="reason" class="form-control" placeholder="e.g. End of Season, Buyer Request..." required>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-danger">Confirm Close</button>
+          <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-danger">Confirm Close & Return Stock</button>
           </div>
         </form>
       </div>
@@ -1668,37 +1278,39 @@
 
   <!-- Manage Deduction Options Modal -->
   <div class="modal fade" id="manageDeductionsModal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Manage Condition Options</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title"><i class="fa fa-percent me-2"></i>Manage Condition Options</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
-        <div class="modal-body">
-          <h6 class="mb-3">Saved Options</h6>
-          <div class="list-group mb-4">
+        <div class="modal-body p-4">
+          <h6 class="fw-bold mb-3 border-bottom pb-2">Saved Options</h6>
+          <div class="list-group mb-4 shadow-sm">
             {% if deduction_options %}
             {% for opt in deduction_options %}
             <div class="list-group-item d-flex justify-content-between align-items-center">
               <span>{{ opt[1] }}</span>
               <form method="POST" action="/miller/delete_deduction_option/{{ opt[0] }}" class="m-0">
-                <button class="btn btn-sm btn-outline-danger" title="Remove">
+                <button class="btn btn-sm btn-outline-danger border-0" title="Remove">
                   <i class="fa fa-trash"></i>
                 </button>
               </form>
             </div>
             {% endfor %}
             {% else %}
-            <p class="text-muted small">No options saved yet.</p>
+            <div class="text-center py-3 text-muted border rounded bg-light">
+              <small>No custom options saved yet.</small>
+            </div>
             {% endif %}
           </div>
 
-          <h6 class="mb-3">Add New Option</h6>
+          <h6 class="fw-bold mb-3 border-bottom pb-2">Add New Option</h6>
           <form method="POST" action="/miller/add_deduction_option">
             <div class="input-group">
               <input type="text" name="text" class="form-control" placeholder="e.g. 2.5% moisture" required>
               <button class="btn btn-success">
-                <i class="fa fa-plus"></i> Add
+                <i class="fa fa-plus me-1"></i> Add
               </button>
             </div>
           </form>

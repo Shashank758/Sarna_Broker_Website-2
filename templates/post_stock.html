@@ -5,44 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Commodity | Saarna Canvessars</title>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
-
-    <style>
-        body {
-            background: #f4f7f6;
-            font-family: 'Segoe UI', 'Inter', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .page-header {
-            background: linear-gradient(135deg, #0f9b5f 0%, #0d8a54 100%);
-            color: #fff;
-            padding: 30px 0;
-            margin-bottom: 30px;
-        }
-
-        .form-card {
-            background: #fff;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-        }
-    </style>
 </head>
 
 <body>
 
     {% include '_navbar.html' %}
 
-    <!-- PAGE HEADER -->
-    <div class="page-header">
-        <div class="container">
+    <!-- HERO HEADER -->
+    <header class="hero-premium">
+        <div class="hero-premium-decor-1"></div>
+        <div class="hero-premium-decor-2"></div>
+        <div class="container position-relative">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <nav aria-label="breadcrumb">
@@ -52,25 +29,28 @@
                             <li class="breadcrumb-item active text-white" aria-current="page">New Commodity</li>
                         </ol>
                     </nav>
-                    <h4 class="mb-0 fw-bold"><i class="fa fa-plus-circle me-2"></i>New Commodity</h4>
+                    <h2 class="mb-0 fw-bold text-white"><i class="fa fa-plus-circle me-2 text-warning"></i>New Commodity
+                    </h2>
                 </div>
-                <a href="/miller" class="btn btn-light btn-sm fw-bold">
-                    <i class="fa fa-arrow-left me-1"></i> Back to Dashboard
+                <a href="/miller" class="btn btn-light btn-sm fw-bold shadow-sm">
+                    <i class="fa fa-arrow-left me-1"></i> Back
                 </a>
             </div>
         </div>
-    </div>
+    </header>
 
     <main class="container pb-5">
         <div class="row justify-content-center">
-            <div class="col-lg-8">
+            <div class="col-lg-8" style="margin-top: -40px;">
 
-                <div class="form-card" data-aos="fade-up">
+                <div class="card-premium bg-white" data-aos="fade-up">
+
                     {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                     {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show"
+                        role="alert" style="border-radius: var(--radius-md);">
+                        <i class="fa fa-info-circle me-2"></i> {{ message }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                     {% endfor %}
@@ -78,56 +58,76 @@
                     {% endwith %}
 
                     <form method="POST">
-                        <div class="row g-3">
+                        <div class="row g-4">
+                            <!-- Crop & Price -->
                             <div class="col-md-6">
-                                <label class="form-label fw-bold"><i class="fa fa-seedling me-2 text-success"></i>Crop
-                                    Type</label>
-                                <select name="crop" class="form-select" required>
-                                    <option value="">Select Crop</option>
-                                    <option value="wheat">🌾 Wheat</option>
-                                    <option value="chawal">🍚 Chawal (Rice)</option>
-                                    <option value="sarso">🌻 Sarso (Mustard)</option>
-                                    <option value="maize">🌽 Maize</option>
-                                    <option value="paddy">🌾 Paddy</option>
-                                    <option value="mustard oil cake">🧈 Mustard Oil Cake</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold"><i
-                                        class="fa fa-indian-rupee-sign me-2 text-warning"></i>Price / Quintal</label>
-                                <input type="number" name="price" class="form-control" min="1" step="0.01"
-                                    placeholder="e.g. 2500.50" required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold"><i
-                                        class="fa fa-weight-hanging me-2 text-success"></i>Quantity (Quintals)</label>
-                                <input type="number" name="quantity" class="form-control" min="1" placeholder="e.g. 100"
-                                    required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold"><i class="fa fa-clock me-2 text-info"></i>Duration
-                                    (Days)</label>
-                                <input type="number" name="duration" class="form-control" min="1" placeholder="e.g. 15">
-                                <small class="text-muted">Deadline calculated from approval date</small>
-                            </div>
-
-
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold"><i
-                                        class="fa fa-minus-circle me-2 text-danger"></i>Condition Note</label>
+                                <label class="form-label small text-muted fw-bold text-uppercase">Crop Type</label>
                                 <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i
+                                            class="fa fa-seedling text-success"></i></span>
+                                    <select name="crop" class="form-control border-start-0 ps-0" required>
+                                        <option value="">Select Crop...</option>
+                                        <option value="wheat">🌾 Wheat</option>
+                                        <option value="chawal">🍚 Chawal (Rice)</option>
+                                        <option value="sarso">🌻 Sarso (Mustard)</option>
+                                        <option value="maize">🌽 Maize</option>
+                                        <option value="paddy">🌾 Paddy</option>
+                                        <option value="mustard oil cake">🧈 Mustard Oil Cake</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted fw-bold text-uppercase">Price /
+                                    Quintal</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i
+                                            class="fa fa-indian-rupee-sign text-warning"></i></span>
+                                    <input type="number" name="price" class="form-control border-start-0 ps-0" min="1"
+                                        step="0.01" placeholder="0.00" required>
+                                </div>
+                            </div>
+
+                            <!-- Qty & Duration -->
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted fw-bold text-uppercase">Quantity
+                                    (Quintals)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i
+                                            class="fa fa-weight-hanging text-info"></i></span>
+                                    <input type="number" name="quantity" class="form-control border-start-0 ps-0"
+                                        min="1" placeholder="e.g. 100" required>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted fw-bold text-uppercase">Duration
+                                    (Days)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i
+                                            class="fa fa-clock text-primary"></i></span>
+                                    <input type="number" name="duration" class="form-control border-start-0 ps-0"
+                                        min="1" placeholder="e.g. 15">
+                                </div>
+                                <small class="text-muted" style="font-size: 0.75rem;">Deadline calculated from approval
+                                    date</small>
+                            </div>
+
+                            <!-- Deduction -->
+                            <div class="col-12">
+                                <label class="form-label small text-muted fw-bold text-uppercase">Condition / Deduction
+                                    Note</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i
+                                            class="fa fa-clipboard-list text-danger"></i></span>
                                     <input type="text" name="deduction" id="deductionInput"
-                                        placeholder="e.g. 2% moisture cut" class="form-control">
+                                        placeholder="e.g. 2% moisture cut" class="form-control border-start-0 ps-0">
                                     <button type="button"
                                         class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
                                         data-bs-toggle="dropdown"></button>
-                                    <ul class="dropdown-menu dropdown-menu-end">
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0">
                                         <li>
-                                            <h6 class="dropdown-header">Saved Options</h6>
+                                            <h6 class="dropdown-header text-uppercase small ls-1">Saved Options</h6>
                                         </li>
                                         {% if deduction_options %}
                                         {% for opt in deduction_options %}
@@ -140,51 +140,69 @@
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
-                                        <li><a class="dropdown-item text-primary" href="#" data-bs-toggle="modal"
-                                                data-bs-target="#manageDeductionsModal">
+                                        <li><a class="dropdown-item text-primary fw-bold" href="#"
+                                                data-bs-toggle="modal" data-bs-target="#manageDeductionsModal">
                                                 <i class="fa fa-cog me-1"></i> Manage Options
                                             </a></li>
                                     </ul>
                                 </div>
                             </div>
 
+                            <!-- Submit -->
                             <div class="col-12 mt-4">
-                                <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm">
-                                    <i class="fa fa-paper-plane me-2"></i> Post Commodity
+                                <button type="submit" class="btn btn-primary w-100 py-3 fs-5 shadow-lg">
+                                    <i class="fa fa-paper-plane me-2"></i> Post Validity
                                 </button>
                             </div>
                         </div>
                     </form>
                 </div>
+
+                <!-- Guidance Info -->
+                <div class="text-center mt-4 text-muted small">
+                    <p><i class="fa fa-shield-alt me-1"></i> Verified Posting · Visible to all buyers within range.</p>
+                </div>
+
             </div>
         </div>
     </main>
 
-    <!-- Manage Deductions Modal (Same as in dashboard) -->
+    {% include '_footer.html' %}
+
+    <!-- Manage Deductions Modal -->
     <div class="modal fade" id="manageDeductionsModal" tabindex="-1">
         <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Manage Condition Options</h5>
+            <div class="modal-content shadow-lg border-0" style="border-radius: var(--radius-lg);">
+                <div class="modal-header bg-light border-bottom-0">
+                    <h5 class="modal-title fw-bold text-dark">Manage Deduction Options</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <form method="POST" action="/miller/add_deduction_option" class="mb-3">
+                <div class="modal-body p-4">
+                    <form action="/miller/add_deduction_option" method="POST" class="mb-4">
+                        <label class="form-label small fw-bold text-muted">Add New Option</label>
                         <div class="input-group">
-                            <input name="text" class="form-control" placeholder="New option..." required>
-                            <button class="btn btn-success"><i class="fa fa-plus"></i></button>
+                            <input type="text" name="deduction_text" class="form-control" placeholder="e.g. 1% Dust"
+                                required>
+                            <button type="submit" class="btn btn-success"><i class="fa fa-plus"></i> Add</button>
                         </div>
                     </form>
-                    <ul class="list-group">
+
+                    <h6 class="fw-bold mb-3 border-bottom pb-2">Your Saved Options</h6>
+                    <ul class="list-group list-group-flush">
+                        {% if deduction_options %}
                         {% for opt in deduction_options %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            {{ opt[1] }}
-                            <form method="POST" action="/miller/delete_deduction_option/{{ opt[0] }}" class="d-inline">
-                                <button class="btn btn-sm btn-outline-danger border-0"><i
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>{{ opt[1] }}</span>
+                            <form action="/miller/delete_deduction_option/{{ opt[0] }}" method="POST"
+                                onsubmit="return confirm('Delete this option?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger border-0"><i
                                         class="fa fa-trash"></i></button>
                             </form>
                         </li>
                         {% endfor %}
+                        {% else %}
+                        <li class="list-group-item text-muted text-center italic">No saved options yet.</li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
@@ -201,6 +219,62 @@
             document.getElementById('deductionInput').value = text;
         }
     </script>
+</body>
+
+</html>
+
+<div class="col-12 mt-4">
+    <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm">
+        <i class="fa fa-paper-plane me-2"></i> Post Commodity
+    </button>
+</div>
+</div>
+</form>
+</div>
+</div>
+</div>
+</main>
+
+<!-- Manage Deductions Modal (Same as in dashboard) -->
+<div class="modal fade" id="manageDeductionsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Manage Condition Options</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="/miller/add_deduction_option" class="mb-3">
+                    <div class="input-group">
+                        <input name="text" class="form-control" placeholder="New option..." required>
+                        <button class="btn btn-success"><i class="fa fa-plus"></i></button>
+                    </div>
+                </form>
+                <ul class="list-group">
+                    {% for opt in deduction_options %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ opt[1] }}
+                        <form method="POST" action="/miller/delete_deduction_option/{{ opt[0] }}" class="d-inline">
+                            <button class="btn btn-sm btn-outline-danger border-0"><i class="fa fa-trash"></i></button>
+                        </form>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ duration: 600, once: true });
+
+    function selectDeduction(text) {
+        document.getElementById('deductionInput').value = text;
+    }
+</script>
 
 </body>
 

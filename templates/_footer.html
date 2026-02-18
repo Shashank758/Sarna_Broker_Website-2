@@ -9,8 +9,8 @@
           <i class="fa fa-seedling me-2"></i>Saarna Canvessars
         </h5>
         <p>
-          India's trusted digital mandi platform connecting 
-          <strong>farmers, traders, and millers</strong> with 
+          India's trusted digital mandi platform connecting
+          <strong>farmers, traders, and millers</strong> with
           transparency, trust, and speed.
         </p>
         <div class="footer-social">
@@ -21,99 +21,122 @@
         </div>
       </div>
 
-      <!-- QUICK LINKS -->
-      <div class="col-lg-2 col-md-6">
-        <h6>Quick Links</h6>
-        <ul>
-          <li><a href="/market"><i class="fa fa-chevron-right"></i> Market</a></li>
-          {% if session.role == 'buyer' %}
-          <li><a href="/buyer/active"><i class="fa fa-chevron-right"></i> Active Orders</a></li>
-          <li><a href="/buyer/loaded"><i class="fa fa-chevron-right"></i> Loaded Orders</a></li>
-          <li><a href="/buyer/payments"><i class="fa fa-chevron-right"></i> Payments</a></li>
-          {% elif session.role == 'miller' %}
-          <li><a href="/miller"><i class="fa fa-chevron-right"></i> Dashboard</a></li>
-          <li><a href="/miller/approved"><i class="fa fa-chevron-right"></i> Approved</a></li>
-          <li><a href="/miller/qc"><i class="fa fa-chevron-right"></i> Quality Check</a></li>
-          {% elif session.role == 'farmer' %}
-          <li><a href="/my_commodity"><i class="fa fa-chevron-right"></i> My Crops</a></li>
-          <li><a href="/post_crop"><i class="fa fa-chevron-right"></i> Post Crop</a></li>
-          {% endif %}
-        </ul>
-      </div>
+      <!-- ================= PREMIUM FOOTER ================= -->
+      <footer
+        style="background: var(--primary-dark); color: rgba(255,255,255,0.8); padding: 60px 0 30px; margin-top: auto;">
+        <div class="container">
+          <div class="row g-4">
+            <!-- Brand Column -->
+            <div class="col-lg-4 mb-4 mb-lg-0">
+              <div class="d-flex align-items-center gap-3 mb-3">
+                <div
+                  style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; border-radius: 10px; color: white;">
+                  <i class="fa fa-seedling"></i>
+                </div>
+                <h5 class="m-0 text-white fw-bold">Saarna Canvessars</h5>
+              </div>
+              <p style="font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px;">
+                India's most trusted premium digital mandi platform. Connecting Millers, Farmers, and Buyers with
+                transparency and trust.
+              </p>
+              <div class="d-flex gap-3">
+                <a href="#" class="btn btn-sm"
+                  style="background: rgba(255,255,255,0.1); color: white; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;"><i
+                    class="fab fa-facebook-f"></i></a>
+                <a href="#" class="btn btn-sm"
+                  style="background: rgba(255,255,255,0.1); color: white; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;"><i
+                    class="fab fa-twitter"></i></a>
+                <a href="#" class="btn btn-sm"
+                  style="background: rgba(255,255,255,0.1); color: white; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;"><i
+                    class="fab fa-instagram"></i></a>
+                <a href="#" class="btn btn-sm"
+                  style="background: rgba(255,255,255,0.1); color: white; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;"><i
+                    class="fab fa-linkedin-in"></i></a>
+              </div>
+            </div>
 
-      <!-- SERVICES -->
-      <div class="col-lg-3 col-md-6">
-        <h6>Our Services</h6>
-        <ul>
-          <li><a href="#"><i class="fa fa-chevron-right"></i> Crop Trading</a></li>
-          <li><a href="#"><i class="fa fa-chevron-right"></i> Quality Assurance</a></li>
-          <li><a href="#"><i class="fa fa-chevron-right"></i> Secure Payments</a></li>
-          <li><a href="#"><i class="fa fa-chevron-right"></i> Real-time Tracking</a></li>
-          <li><a href="#"><i class="fa fa-chevron-right"></i> Miller Network</a></li>
-        </ul>
-      </div>
+            <!-- Quick Links -->
+            <div class="col-6 col-lg-2">
+              <h6 class="text-white fw-bold mb-3 text-uppercase" style="font-size: 0.8rem; letter-spacing: 1px;">
+                Platform</h6>
+              <ul class="list-unstyled">
+                <li class="mb-2"><a href="/market" class="text-decoration-none hover-white"
+                    style="color: inherit; transition: 0.2s;">Market</a></li>
+                <li class="mb-2"><a href="/login" class="text-decoration-none hover-white"
+                    style="color: inherit; transition: 0.2s;">Login</a></li>
+                <li class="mb-2"><a href="/register" class="text-decoration-none hover-white"
+                    style="color: inherit; transition: 0.2s;">Register</a></li>
+                <li class="mb-2"><a href="#" class="text-decoration-none hover-white"
+                    style="color: inherit; transition: 0.2s;">About Us</a></li>
+              </ul>
+            </div>
 
-      <!-- CONTACT -->
-      <div class="col-lg-3 col-md-6">
-        <h6>Contact Us</h6>
-        <ul class="list-unstyled">
-          <li class="mb-2">
-            <i class="fa fa-phone me-2" style="color: var(--accent);"></i>
-            +91 XXXXX XXXXX
-          </li>
-          <li class="mb-2">
-            <i class="fa fa-envelope me-2" style="color: var(--accent);"></i>
-            support@sarnamandi.com
-          </li>
-          <li class="mb-2">
-            <i class="fa fa-location-dot me-2" style="color: var(--accent);"></i>
-            Rajasthan, India
-          </li>
-          <li class="mb-2">
-            <i class="fa fa-clock me-2" style="color: var(--accent);"></i>
-            Mon - Sat: 9:00 AM - 6:00 PM
-          </li>
-        </ul>
-      </div>
+            <!-- Legal -->
+            <div class="col-6 col-lg-2">
+              <h6 class="text-white fw-bold mb-3 text-uppercase" style="font-size: 0.8rem; letter-spacing: 1px;">Legal
+              </h6>
+              <ul class="list-unstyled">
+                <li class="mb-2"><a href="#" class="text-decoration-none hover-white"
+                    style="color: inherit; transition: 0.2s;">Privacy Policy</a></li>
+                <li class="mb-2"><a href="#" class="text-decoration-none hover-white"
+                    style="color: inherit; transition: 0.2s;">Terms of Service</a></li>
+                <li class="mb-2"><a href="#" class="text-decoration-none hover-white"
+                    style="color: inherit; transition: 0.2s;">Disclaimer</a></li>
+              </ul>
+            </div>
 
-    </div>
+            <!-- Contact -->
+            <div class="col-lg-4">
+              <h6 class="text-white fw-bold mb-3 text-uppercase" style="font-size: 0.8rem; letter-spacing: 1px;">Contact
+                Us</h6>
+              <ul class="list-unstyled" style="font-size: 0.9rem;">
+                <li class="mb-3 d-flex gap-3">
+                  <i class="fa fa-map-marker-alt" style="color: var(--accent); margin-top: 4px;"></i>
+                  <span>123 Agri Tech Park, Sector 4,<br>New Delhi, India - 110001</span>
+                </li>
+                <li class="mb-3 d-flex gap-3">
+                  <i class="fa fa-phone-alt" style="color: var(--accent);"></i>
+                  <span>+91 98765 43210</span>
+                </li>
+                <li class="mb-3 d-flex gap-3">
+                  <i class="fa fa-envelope" style="color: var(--accent);"></i>
+                  <span>support@saarnacanvessars.com</span>
+                </li>
+              </ul>
+            </div>
+          </div>
 
-    <!-- BOTTOM BAR -->
-    <div class="footer-bottom">
-      <div class="row align-items-center">
-        <div class="col-md-6 text-md-start text-center mb-2 mb-md-0">
-          © 2026 <strong>Saarna Canvessars</strong>. All Rights Reserved.
+          <hr style="border-color: rgba(255,255,255,0.1); margin: 30px 0;">
+
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-center"
+            style="font-size: 0.85rem;">
+            <p class="mb-2 mb-md-0">&copy; {{ now_year }} Saarna Canvessars. All rights reserved.</p>
+            <div>
+              Designed for <span style="color: var(--accent);">Excellence</span>
+            </div>
+          </div>
         </div>
-        <div class="col-md-6 text-md-end text-center">
-          <a href="#" class="me-3">Privacy Policy</a>
-          <a href="#" class="me-3">Terms of Service</a>
-          <a href="#">Support</a>
-        </div>
-      </div>
-    </div>
+      </footer>
 
-  </div>
-</footer>
-
-<!-- Optional: Back to Top Button -->
-<button id="backToTop" class="btn btn-enterprise" 
+      <!-- Optional: Back to Top Button -->
+      <button id="backToTop" class="btn btn-enterprise"
         style="position:fixed; bottom:30px; right:30px; display:none; width:50px; height:50px; border-radius:50%; padding:0; z-index:999;"
         onclick="window.scrollTo({top:0, behavior:'smooth'})">
-  <i class="fa fa-chevron-up"></i>
-</button>
+        <i class="fa fa-chevron-up"></i>
+      </button>
 
-<script>
-// Back to Top Button Logic
-window.addEventListener('scroll', function() {
-  const btn = document.getElementById('backToTop');
-  if (btn) {
-    if (window.scrollY > 300) {
-      btn.style.display = 'flex';
-      btn.style.alignItems = 'center';
-      btn.style.justifyContent = 'center';
-    } else {
-      btn.style.display = 'none';
-    }
-  }
-});
-</script>
+      <script>
+        // Back to Top Button Logic
+        window.addEventListener('scroll', function () {
+          const btn = document.getElementById('backToTop');
+          if (btn) {
+            if (window.scrollY > 300) {
+              btn.style.display = 'flex';
+              btn.style.alignItems = 'center';
+              btn.style.justifyContent = 'center';
+            } else {
+              btn.style.display = 'none';
+            }
+          }
+        });
+      </script>
