@@ -585,12 +585,13 @@ def inject_pending_counts():
         """, (miller_id,))
         m_orders = cur.fetchone()[0]
         
-        # 2. Pending QC
+        # 2. Pending QC (Verification OR Final Hisab upload)
         cur.execute("""
             SELECT count(*) FROM loading_invoices li
             JOIN miller_bookings mb ON li.booking_id = mb.id
             JOIN miller_stock ms ON mb.stock_id = ms.id
-            WHERE ms.miller_id=%s AND (li.qc_status IS NULL OR li.qc_status='pending')
+            WHERE ms.miller_id=%s 
+              AND (li.qc_status IS NULL OR li.qc_status != 'verified' OR li.final_invoice_file IS NULL)
         """, (miller_id,))
         m_qc = cur.fetchone()[0]
         
@@ -1750,8 +1751,8 @@ ORDER BY mb.created_at DESC
     active_stocks_count = len(stocks)
     pending_bookings_count = len(pending_list)
     approved_bookings_count = len(approved_loading)
-    # QC Status is at index 9 in the rows query results
-    qc_pending_count = sum(1 for r in rows if (r[9] is None or r[9] == 'pending'))
+    # QC Pending: Verification OR Final Hisab upload
+    qc_pending_count = sum(1 for r in rows if (r[9] != 'verified' or r[11] is None))
 
     con.close()
 
@@ -2098,35 +2099,18 @@ def miller_qc_page():
             "qc_claim": r[20]
         })
 
-    # 3️⃣ FILTER ONLY COMPLETED LOADING → QC REQUIRED
+    # 3️⃣ FILTER BOOKINGS WITH PENDING QC ACTIONS (Verification or Hisab)
     completed_loading_qc = []
-    EPS = 1e-6
-
+    
     for b in bookings:
-        booked = b[3]
-        loaded = b[7] or 0
-        payment_status = b[16]
-        final_invoice = b[17]
-
-        try:
-            booked_val = float(booked or 0)
-        except (TypeError, ValueError):
-            booked_val = 0
-
-        try:
-            loaded_val = float(loaded or 0)
-        except (TypeError, ValueError):
-            loaded_val = 0
-
-        # Calculate if all truck invoices are uploaded
+        # Show in QC list if there are any trucks that haven't been verified OR haven't had a hisab uploaded
         listing_invoices = invoices_map.get(b[0], [])
-        all_trucks_invoiced = False
-        if listing_invoices:
-            all_trucks_invoiced = all(inv['final_invoice_file'] for inv in listing_invoices)
+        has_pending_truck_action = any(
+            inv['qc_status'] != 'verified' or not inv['final_invoice_file'] 
+            for inv in listing_invoices
+        )
         
-        # Logic: Show in QC list if (Fully Loaded OR Overloaded OR Partial Closed) AND (Payment Pending) AND (Not All Truck Invoices Uploaded)
-        # removing 'not final_invoice' check as we don't use booking level invoice now
-        if (loaded_val >= (booked_val - EPS) or b[8] == 'partial_closed') and payment_status != 'paid' and not all_trucks_invoiced:
+        if has_pending_truck_action:
             completed_loading_qc.append(b)
 
     con.close()
