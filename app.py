@@ -5474,6 +5474,22 @@ def debug_bookings():
     con.close()
     return render_template("debug_bookings.html", bookings=rows, stocks=stocks)
 
+def run_migrations():
+    """Run all schema upgrades."""
+    upgrade_db()
+    upgrade_miller_stock_status()
+    upgrade_staff_system()
+    upgrade_loading_invoices()
+    upgrade_loading_invoices_debit_note()
+    upgrade_loading_invoices_extended_qc()
+    upgrade_partial_loading()
+    upgrade_users_table()
+    upgrade_password_resets_table()
+    upgrade_miller_stock_auto_approve()
+    upgrade_miller_booking_truck_status()
+    upgrade_buyer_profile_table()
+    # Add any other upgrades here
+
 if __name__ == "__main__":
     init_db()
     try:
