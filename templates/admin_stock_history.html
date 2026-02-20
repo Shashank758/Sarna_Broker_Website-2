@@ -3,142 +3,247 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Rate update history | Sarna Broker</title>
-
+  <title>Rate History | Saarna Admin</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="/static/css/style.css">
-  <link rel="stylesheet" href="/static/css/print.css">
+
+  <style>
+    :root {
+      --admin-sidebar-width: 280px;
+      --admin-bg: #f8fafc;
+      --admin-sidebar-bg: #0f172a;
+    }
+
+    body {
+      background: var(--admin-bg);
+      font-family: Inter, Segoe UI, sans-serif;
+    }
+
+    /* SIDEBAR (Consistent with Admin Dashboard) */
+    .admin-sidebar {
+      width: var(--admin-sidebar-width);
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      background: var(--admin-sidebar-bg);
+      color: white;
+      padding: 30px 20px;
+      z-index: 1000;
+    }
+
+    .sidebar-brand {
+      padding: 0 10px 30px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 30px;
+    }
+
+    .sidebar-brand h4 {
+      font-weight: 800;
+      color: #fff;
+      margin: 0;
+    }
+
+    .admin-nav {
+      list-style: none;
+      padding: 0;
+    }
+
+    .admin-nav li {
+      margin-bottom: 8px;
+    }
+
+    .admin-nav a {
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      padding: 12px 18px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .admin-nav a:hover,
+    .admin-nav li.active a {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    /* CONTENT */
+    .admin-content {
+      margin-left: var(--admin-sidebar-width);
+      padding: 40px;
+    }
+
+    .history-card {
+      background: #fff;
+      border-radius: 30px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .table-enterprise thead th {
+      background: #f8fafc;
+      padding: 20px 24px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #64748b;
+      font-weight: 800;
+      border-bottom: 2px solid #f1f5f9;
+    }
+
+    .table-enterprise tbody td {
+      padding: 20px 24px;
+      vertical-align: middle;
+      font-weight: 600;
+      color: #334155;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .search-control {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 10px 20px;
+      font-weight: 600;
+    }
+
+    .search-control:focus {
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(10, 138, 84, 0.1);
+      border-color: #0a8a54;
+    }
+
+    .price-delta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .price-chip {
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 800;
+    }
+
+    .price-old {
+      background: #f1f5f9;
+      color: #64748b;
+      text-decoration: line-through;
+    }
+
+    .price-new {
+      background: #f0fdf4;
+      color: #166534;
+    }
+  </style>
 </head>
 
 <body>
 
-  <!-- ================= TOP NAVBAR ================= -->
-  <nav class="admin-navbar">
-    <div class="nav-left">
-      <img src="static/image/Sarna broker.png" alt="Logo">
-      <span>Sarna Broker</span>
+  <aside class="admin-sidebar">
+    <div class="sidebar-brand">
+      <h4>SAARNA <span>ADMIN</span></h4>
     </div>
+    <ul class="admin-nav">
+      <li><a href="/admin"><i class="fa fa-chart-pie"></i> Overview</a></li>
+      <li><a href="/admin/users"><i class="fa fa-users"></i> Account Access</a></li>
+      <li><a href="/admin/stock"><i class="fa fa-tags"></i> Market Pricing</a></li>
+      <li class="active"><a href="/admin/stock-history"><i class="fa fa-history"></i> Rate History</a></li>
+      <li><a href="/admin/bookings"><i class="fa fa-shopping-cart"></i> Global Orders</a></li>
+      <li><a href="/admin/miller-profiles"><i class="fa fa-industry"></i> Industry Network</a></li>
+      <li><a href="/admin/buyer-profiles"><i class="fa fa-store"></i> Trader Network</a></li>
+      <li><a href="/admin/logs"><i class="fa fa-clipboard-list"></i> Audit Logs</a></li>
+    </ul>
+  </aside>
 
-    <center><b>JAI SHREE SHYAM</b></center>
-
-    <div class="nav-right">
-      <span class="admin-name">
-        <i class="fa fa-user-circle"></i> Admin
-      </span>
-      <img src="static/image/images.png" alt="Logo">
-    </div>
-  </nav>
-
-  <div class="admin-container">
-
-    <!-- SIDEBAR -->
-    <aside class="admin-sidebar">
-      <h4>Sarna Broker</h4>
-      <ul>
-        <li><a href="/admin"><i class="fa fa-gauge"></i> Dashboard</a></li>
-
-        <li><a href="/admin/users"><i class="fa fa-users"></i> Users</a></li>
-        <li><a href="/admin/stock"><i class="fa fa-box"></i> Latest rate </a></li>
-        <li class="active"><i class="fa fa-history"></i> Rate update history</li>
-        <li><a href="/admin/bookings"><i class="fa fa-shopping-cart"></i> Bookings</a></li>
-        <li><a href="/admin/miller-profiles"><i class="fa fa-industry"></i> Miller Profiles</a></li>
-        <li><a href="/admin/buyer-profiles"><i class="fa fa-store"></i> Trader Profiles</a></li>
-        <li><a href="/admin/logs"><i class="fa fa-list"></i> Admin Logs</a></li>
-        <li>
-          <i class="fa fa-right-from-bracket"></i>
-          <a href="/logout">Logout</a>
-        </li>
-      </ul>
-    </aside>
-
-    <!-- MAIN -->
-    <main class="admin-main">
-
-      <div class="admin-top">
-        <h5>📜 Miller Rate update history</h5>
-        <span class="admin-badge">Admin</span>
+  <main class="admin-content">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+      <div>
+        <h2 class="fw-800 text-dark mb-1">Rate Modification Audit</h2>
+        <p class="text-muted fw-600 mb-0">Historical trail of commodity valuation and inventory adjustments.</p>
       </div>
+      <div class="d-flex gap-3">
+        <input type="text" id="historySearch" class="form-control search-control" style="width: 350px;"
+          placeholder="Search Miller or Selection Date...">
+        <button class="btn btn-white border fw-800"
+          onclick="exportTableToExcel('historyTable', 'saarna_rate_history.xlsx')"><i
+            class="fa fa-file-excel me-2"></i>Export History</button>
+      </div>
+    </div>
 
-      <!-- ================= MILLER UPDATE HISTORY ================= -->
-      <div class="table-card mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h6>Miller Rate update history</h6>
-          <div class="d-flex gap-2">
-            <button class="btn btn-sm btn-outline-success"
-              onclick="exportTableToExcel('historyTable', 'stock_history.xlsx')">
-              <i class="fa fa-file-excel"></i> Export
-            </button>
-            <button class="btn btn-sm btn-outline-dark" onclick="printTable()">
-              <i class="fa fa-print"></i> Print
-            </button>
-            <input type="text" id="historySearch" class="form-control form-control-sm" style="width: 250px;"
-              placeholder="Search Miller, Date...">
-          </div>
-        </div>
-
-        <table class="table table-striped table-sm" id="historyTable">
-          <tr>
-            <th>Miller</th>
-            <th>Old Price</th>
-            <th>New Price</th>
-            <th>Old Qty</th>
-            <th>New Qty</th>
-            <th>Date</th>
-          </tr>
-          {% for h in history %}
-          <tr class="history-row">
-            <td class="history-miller">{{ h[8] }}</td>
-            <td>₹{{ h[3] }}</td>
-            <td>₹{{ h[4] }}</td>
-            <td>{{ h[5] }}</td>
-            <td>{{ h[6] }}</td>
-            <td class="history-date">{{ h[7] }}</td>
-          </tr>
-          {% endfor %}
+    <div class="history-card">
+      <div class="table-responsive">
+        <table class="table table-enterprise m-0" id="historyTable">
+          <thead>
+            <tr>
+              <th>Industrial Source</th>
+              <th>Pricing Delta</th>
+              <th>Inventory Delta</th>
+              <th>Event Timestamp</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for h in history %}
+            <tr class="history-row" data-search="{{ (h[8] + ' ' + h[7])|lower }}">
+              <td>
+                <div class="fw-800 text-dark">{{ h[8] }}</div>
+              </td>
+              <td>
+                <div class="price-delta">
+                  <span class="price-chip price-old">₹{{ h[3] }}</span>
+                  <i class="fa fa-arrow-right text-muted small"></i>
+                  <span class="price-chip price-new">₹{{ h[4] }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="d-flex align-items-center gap-2 small fw-800">
+                  <span class="text-muted">{{ h[5] }} Qt</span>
+                  <i class="fa fa-angles-right text-muted opacity-25"></i>
+                  <span class="text-dark">{{ h[6] }} Qt</span>
+                </div>
+              </td>
+              <td>
+                <div class="small fw-800 text-muted">{{ h[7] }}</div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
         </table>
       </div>
 
-    </main>
-  </div>
-
-  </div>
+      {% if not history %}
+      <div class="text-center py-5">
+        <i class="fa fa-history text-muted opacity-25 fs-1 mb-3"></i>
+        <h5 class="fw-800 text-muted">No Historical Events</h5>
+        <p class="text-muted fw-600">Rate updates will be archived here.</p>
+      </div>
+      {% endif %}
+    </div>
+  </main>
 
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
   <script>
-    function exportTableToExcel(tableId, filename = 'data-export.xlsx') {
+    function exportTableToExcel(tableId, filename = 'export.xlsx') {
       let table = document.getElementById(tableId);
-      if (!table) {
-        alert("Table not found to export!");
-        return;
-      }
-      let clone = table.cloneNode(true);
-      clone.querySelectorAll('.no-export').forEach(el => el.remove());
-      let wb = XLSX.utils.table_to_book(clone, { sheet: "Sheet1" });
+      let wb = XLSX.utils.table_to_book(table, { sheet: "Rate History" });
       XLSX.writeFile(wb, filename);
     }
 
-    function printTable() {
-      window.print();
-    }
-
-    document.getElementById('historySearch').addEventListener('keyup', function () {
-      let filter = this.value.toLowerCase();
-      let rows = document.querySelectorAll('.history-row');
-
-      rows.forEach(row => {
-        let miller = row.querySelector('.history-miller').textContent.toLowerCase();
-        let date = row.querySelector('.history-date').textContent.toLowerCase();
-
-        if (miller.includes(filter) || date.includes(filter)) {
-          row.style.display = '';
-        } else {
-          row.style.display = 'none';
-        }
+    document.getElementById('historySearch').addEventListener('input', function (e) {
+      const term = e.target.value.toLowerCase();
+      document.querySelectorAll('.history-row').forEach(row => {
+        const searchData = row.dataset.search;
+        row.style.display = searchData.includes(term) ? '' : 'none';
       });
     });
   </script>
-
 </body>
 
 </html>

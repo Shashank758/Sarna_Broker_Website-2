@@ -3,241 +3,397 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard | Sarna Broker</title>
-
+    <title>Admin Command Center | Saarna Canvessars</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="/static/css/print.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --admin-sidebar-width: 280px;
+            --admin-bg: #f1f5f9;
+            --admin-sidebar-bg: #0f172a;
+        }
+
+        body {
+            background: var(--admin-bg);
+            font-family: Inter, Segoe UI, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* SIDEBAR */
+        .admin-sidebar {
+            width: var(--admin-sidebar-width);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background: var(--admin-sidebar-bg);
+            color: white;
+            padding: 30px 20px;
+            z-index: 1000;
+        }
+
+        .sidebar-brand {
+            padding: 0 10px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .sidebar-brand h4 {
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #fff;
+            margin: 0;
+        }
+
+        .admin-nav {
+            list-style: none;
+            padding: 0;
+        }
+
+        .admin-nav li {
+            margin-bottom: 8px;
+        }
+
+        .admin-nav a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            padding: 12px 18px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .admin-nav a:hover,
+        .admin-nav li.active a {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .admin-nav i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        /* MAIN CONTENT */
+        .admin-content {
+            margin-left: var(--admin-sidebar-width);
+            padding: 40px;
+            min-height: 100vh;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .admin-header h2 {
+            font-weight: 800;
+            color: #1e293b;
+            margin: 0;
+            letter-spacing: -1px;
+        }
+
+        /* STAT CARDS */
+        .admin-stat-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 24px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .admin-stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #1e293b;
+            line-height: 1;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        /* TABLE */
+        .admin-table-card {
+            background: #fff;
+            border-radius: 24px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .admin-table thead th {
+            background: #f8fafc;
+            padding: 16px 24px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .admin-table tbody td {
+            padding: 20px 24px;
+            border-bottom: 1px solid #f1f5f9;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .badge-admin {
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    </style>
 </head>
 
 <body>
 
-    <!-- ================= TOP NAVBAR ================= -->
-    <nav class="admin-navbar">
-        <div class="nav-left">
-            <img src="static/image/Sarna broker.png" alt="Logo">
-            <span>Sarna Broker</span>
+    <aside class="admin-sidebar">
+        <div class="sidebar-brand">
+            <h4>SAARNA <span>ADMIN</span></h4>
+        </div>
+        <ul class="admin-nav">
+            <li class="active"><a href="/admin"><i class="fa fa-chart-pie"></i> Overview</a></li>
+            <li><a href="/admin/users"><i class="fa fa-users"></i> Account Access</a></li>
+            <li><a href="/admin/stock"><i class="fa fa-tags"></i> Market Pricing</a></li>
+            <li><a href="/admin/stock-history"><i class="fa fa-history"></i> Rate History</a></li>
+            <li><a href="/admin/bookings"><i class="fa fa-shopping-cart"></i> Global Orders</a></li>
+            <li><a href="/admin/miller-profiles"><i class="fa fa-industry"></i> Industry Network</a></li>
+            <li><a href="/admin/buyer-profiles"><i class="fa fa-store"></i> Trader Network</a></li>
+            <li><a href="/admin/logs"><i class="fa fa-clipboard-list"></i> Audit Logs</a></li>
+            <li class="mt-5"><a href="/logout" class="text-danger"><i class="fa fa-sign-out-alt"></i> Terminate
+                    Session</a></li>
+        </ul>
+    </aside>
+
+    <main class="admin-content">
+        <header class="admin-header">
+            <div>
+                <h2>Command Center</h2>
+                <p class="text-muted fw-600 mb-0">Platform oversight and market intelligence.</p>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="text-end">
+                    <div class="fw-800 text-dark">Administrative Authority</div>
+                    <div class="small text-muted fw-600">Sarna Broker Operations</div>
+                </div>
+                <div class="rounded-pill bg-white border p-1 ps-3 d-flex align-items-center gap-3">
+                    <span class="small fw-800">SYSTEM STABLE</span>
+                    <div class="bg-success rounded-circle" style="width: 10px; height: 10px;"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- STATS GRID -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="admin-stat-card">
+                    <div class="stat-icon bg-primary-subtle text-primary">
+                        <i class="fa fa-shopping-bag"></i>
+                    </div>
+                    <div class="stat-label">Total Trade Volume</div>
+                    <div class="stat-value">{{ total_bookings }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="admin-stat-card">
+                    <div class="stat-icon bg-success-subtle text-success">
+                        <i class="fa fa-indian-rupee-sign"></i>
+                    </div>
+                    <div class="stat-label">Estimated Revenue</div>
+                    <div class="stat-value">₹{{ total_revenue|format_currency if total_revenue is defined else
+                        total_revenue }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="admin-stat-card">
+                    <div class="stat-icon bg-warning-subtle text-warning">
+                        <i class="fa fa-clock"></i>
+                    </div>
+                    <div class="stat-label">Pending Settlements</div>
+                    <div class="stat-value">{{ pending_bookings }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="admin-stat-card">
+                    <div class="stat-icon bg-info-subtle text-info">
+                        <i class="fa fa-warehouse"></i>
+                    </div>
+                    <div class="stat-label">Live Inventory</div>
+                    <div class="stat-value">{{ total_stock_qty }} Qt</div>
+                </div>
+            </div>
         </div>
 
-        <center><b>JAI SHREE SHYAM</b></center>
+        <div class="row g-4 mb-4">
+            <div class="col-lg-8">
+                <div class="admin-table-card h-100 p-4">
+                    <h5 class="fw-800 text-dark mb-4">Market Velocity <span class="small text-muted fw-400 ms-2">7 Day
+                            Projection</span></h5>
+                    <canvas id="bookingsChart" height="280"></canvas>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="admin-table-card h-100 p-4">
+                    <h5 class="fw-800 text-dark mb-4">Network Distribution</h5>
 
-        <div class="nav-right">
-            <span class="admin-name">
-                <i class="fa fa-user-circle"></i> Admin
-            </span>
-            <img src="static/image/images.png" alt="Logo">
+                    <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-4 mb-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center"
+                                style="width: 40px; height: 40px;"><i class="fa fa-check"></i></div>
+                            <span class="fw-800">Verified Entities</span>
+                        </div>
+                        <span class="fs-5 fw-800">{{ approved_users }}</span>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-4 mb-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center"
+                                style="width: 40px; height: 40px;"><i class="fa fa-hourglass-half"></i></div>
+                            <span class="fw-800">Pending Approvals</span>
+                        </div>
+                        <span class="fs-5 fw-800">{{ pending_users }}</span>
+                    </div>
+
+                    <div class="mt-4 pt-2">
+                        <h6 class="fw-800 text-muted small text-uppercase mb-3">Composition Breakdown</h6>
+                        <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+                            <span class="fw-600">Industrial Millers</span>
+                            <span class="fw-800">{{ miller_count }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+                            <span class="fw-600">Commodity Traders</span>
+                            <span class="fw-800">{{ buyer_count }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-600">Direct Farmers</span>
+                            <span class="fw-800">{{ farmer_count }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </nav>
 
-    <div class="admin-container">
-
-        <!-- SIDEBAR -->
-        <aside class="admin-sidebar">
-            <h4>Sarna Broker</h4>
-            <ul>
-                <li class="active"><i class="fa fa-gauge"></i> Dashboard</li>
-                <li><a href="/admin/users"><i class="fa fa-users"></i> Users</a></li>
-                <li><a href="/admin/stock"><i class="fa fa-box"></i> Latest rate</a></li>
-                <li><a href="/admin/stock-history"><i class="fa fa-history"></i> Rate update history</a></li>
-                <li><a href="/admin/bookings"><i class="fa fa-shopping-cart"></i> Bookings</a></li>
-                <li><a href="/admin/miller-profiles"><i class="fa fa-industry"></i> Miller Profiles</a></li>
-                <li><a href="/admin/buyer-profiles"><i class="fa fa-store"></i> Trader Profiles</a></li>
-                <li><a href="/admin/logs"><i class="fa fa-list"></i> Admin Logs</a></li>
-                <li>
-                    <i class="fa fa-right-from-bracket"></i>
-                    <a href="/logout">Logout</a>
-                </li>
-            </ul>
-        </aside>
-
-        <!-- MAIN -->
-        <main class="admin-main">
-            <div class="admin-top">
-                <h5>📊 Admin Dashboard Overview</h5>
-                <span class="admin-badge">Admin Control</span>
+        <!-- RECENT ACTIVITY -->
+        <div class="admin-table-card">
+            <div class="p-4 bg-white border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="fw-800 text-dark mb-0">Recent Trade Executions</h5>
+                <a href="/admin/bookings"
+                    class="btn btn-link fw-800 text-primary p-0 text-decoration-none small">Explore All <i
+                        class="fa fa-arrow-right ms-1"></i></a>
             </div>
-
-            <!-- STATS GRID -->
-            <div class="row g-4 mt-2">
-                <div class="col-md-3">
-                    <div class="card shadow-sm border-0 border-start border-primary border-4">
-                        <div class="card-body">
-                            <h6 class="text-muted small text-uppercase">Total Bookings</h6>
-                            <h3 class="fw-bold mb-0">{{ total_bookings }}</h3>
-                            <div class="text-primary mt-2">
-                                <i class="fa fa-shopping-bag"></i> Lifetime
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card shadow-sm border-0 border-start border-success border-4">
-                        <div class="card-body">
-                            <h6 class="text-muted small text-uppercase">Total Revenue</h6>
-                            <h3 class="fw-bold mb-0">₹{{ total_revenue|format_currency if total_revenue is defined else
-                                total_revenue }}</h3>
-                            <div class="text-success mt-2">
-                                <i class="fa fa-indian-rupee-sign"></i> Brokerage Volume
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card shadow-sm border-0 border-start border-warning border-4">
-                        <div class="card-body">
-                            <h6 class="text-muted small text-uppercase">Pending Bookings</h6>
-                            <h3 class="fw-bold mb-0">{{ pending_bookings }}</h3>
-                            <div class="text-warning mt-2">
-                                <i class="fa fa-clock"></i> Awaiting Action
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card shadow-sm border-0 border-start border-info border-4">
-                        <div class="card-body">
-                            <h6 class="text-muted small text-uppercase">Live Stock Qty</h6>
-                            <h3 class="fw-bold mb-0">{{ total_stock_qty }} Qt</h3>
-                            <div class="text-info mt-2">
-                                <i class="fa fa-warehouse"></i> Current Inventory
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="table-responsive">
+                <table class="table admin-table m-0">
+                    <thead>
+                        <tr>
+                            <th>Shipment ID</th>
+                            <th>Fulfillment Source (Miller)</th>
+                            <th>Market Destination (Trader)</th>
+                            <th>Commodity</th>
+                            <th>Load Weight</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in bookings[:8] %}
+                        <tr>
+                            <td><span class="fw-800 text-primary">{{ b[11] if b[11] else 'N/A' }}</span></td>
+                            <td>{{ b[2] }}</td>
+                            <td>{{ b[1] }}</td>
+                            <td><span class="text-capitalize">{{ b[3] }}</span></td>
+                            <td>{{ b[4] }} Qt</td>
+                            <td>
+                                {% if b[7] == 'pending' %}
+                                <span class="badge-admin bg-warning-subtle text-warning-emphasis">PENDING</span>
+                                {% elif b[7] == 'approved' %}
+                                <span class="badge-admin bg-success-subtle text-success">VERIFIED</span>
+                                {% else %}
+                                <span class="badge-admin bg-danger-subtle text-danger">CANCELLED</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-
-            <!-- CHARTS & SECONDARY STATS -->
-            <div class="row g-4 mt-4">
-                <div class="col-md-8">
-                    <div class="card shadow-sm border-0">
-                        <div class="card-body">
-                            <h6 class="fw-bold mb-4"><i class="fa fa-chart-line me-2"></i>Booking Trends (Last 7 Days)
-                            </h6>
-                            <canvas id="bookingsChart" height="250"></canvas>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card shadow-sm border-0">
-                        <div class="card-body">
-                            <h6 class="fw-bold mb-4"><i class="fa fa-users me-2"></i>User Statistics</h6>
-                            <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
-                                <span>Approved Users</span>
-                                <span class="badge bg-success">{{ approved_users }}</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
-                                <span>Pending Approvals</span>
-                                <span class="badge bg-warning text-dark">{{ pending_users }}</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
-                                <span>Blocked Accounts</span>
-                                <span class="badge bg-danger">{{ blocked_users }}</span>
-                            </div>
-
-                            <div class="mt-4 pt-2">
-                                <h6 class="fw-bold small text-uppercase text-muted mb-3">User Distribution</h6>
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span>Millers</span>
-                                    <span class="fw-bold">{{ miller_count }}</span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span>Traders (Buyers)</span>
-                                    <span class="fw-bold">{{ buyer_count }}</span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span>Farmers</span>
-                                    <span class="fw-bold">{{ farmer_count }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- RECENT ACTIVITY TABLE -->
-            <div class="card shadow-sm border-0 mt-4">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="fw-bold mb-0"><i class="fa fa-history me-2"></i>Recent Bookings</h6>
-                        <a href="/admin/bookings" class="btn btn-sm btn-link text-decoration-none">View All <i
-                                class="fa fa-arrow-right small"></i></a>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Order ID</th>
-                                    <th>Trader</th>
-                                    <th>Miller</th>
-                                    <th>Crop</th>
-                                    <th>Qty</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for b in bookings[:5] %}
-                                <tr>
-                                    <td class="fw-bold text-primary">{{ b[11] if b[11] else 'N/A' }}</td>
-                                    <td>{{ b[1] }}</td>
-                                    <td>{{ b[2] }}</td>
-                                    <td>{{ b[3] }}</td>
-                                    <td>{{ b[4] }} Qt</td>
-                                    <td>
-                                        {% if b[7] == 'pending' %}
-                                        <span class="badge bg-warning text-dark">Pending</span>
-                                        {% elif b[7] == 'approved' %}
-                                        <span class="badge bg-success">Approved</span>
-                                        {% else %}
-                                        <span class="badge bg-danger">Declined</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-        </main>
-    </div>
+        </div>
+    </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Bookings Trend Chart
         const ctx = document.getElementById('bookingsChart').getContext('2d');
         const bookingsChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: {{ recent_bookings_dates| tojson }},
         datasets: [{
-            label: 'Bookings',
+            label: 'Trade Volume',
             data: {{ recent_bookings_counts| tojson }},
-            borderColor: '#0f9b5f',
-            backgroundColor: 'rgba(15, 155, 95, 0.1)',
+            borderColor: '#0a8a54',
+            backgroundColor: 'rgba(10, 138, 84, 0.05)',
             fill: true,
             tension: 0.4,
-            pointRadius: 4,
-            pointBackgroundColor: '#0f9b5f'
-        }]
-      },
+            pointRadius: 6,
+            pointHoverRadius: 8,
+            pointBackgroundColor: '#fff',
+            pointBorderColor: '#0a8a54',
+            pointBorderWidth: 3
+                }]
+            },
         options: {
             responsive: true,
-                plugins: {
+                maintainAspectRatio: false,
+                    plugins: {
                 legend: { display: false }
             },
             scales: {
                 y: {
                     beginAtZero: true,
-                        ticks: { stepSize: 1 }
+                        grid: { display: true, color: '#f1f5f9' },
+                    ticks: { stepSize: 1, font: { weight: '600' } }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { weight: '600' } }
                 }
             }
         }
-    });
+        });
     </script>
-
 </body>
 
 </html>

@@ -3,178 +3,271 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>User Management | Sarna Broker</title>
-
+    <title>Account Access | Saarna Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="/static/css/print.css">
+
+    <style>
+        :root {
+            --admin-sidebar-width: 280px;
+            --admin-bg: #f8fafc;
+            --admin-sidebar-bg: #0f172a;
+        }
+
+        body {
+            background: var(--admin-bg);
+            font-family: Inter, Segoe UI, sans-serif;
+        }
+
+        /* SIDEBAR (Consistent with Admin Dashboard) */
+        .admin-sidebar {
+            width: var(--admin-sidebar-width);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background: var(--admin-sidebar-bg);
+            color: white;
+            padding: 30px 20px;
+            z-index: 1000;
+        }
+
+        .sidebar-brand {
+            padding: 0 10px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .sidebar-brand h4 {
+            font-weight: 800;
+            color: #fff;
+            margin: 0;
+        }
+
+        .admin-nav {
+            list-style: none;
+            padding: 0;
+        }
+
+        .admin-nav li {
+            margin-bottom: 8px;
+        }
+
+        .admin-nav a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            padding: 12px 18px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .admin-nav a:hover,
+        .admin-nav li.active a {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        /* CONTENT */
+        .admin-content {
+            margin-left: var(--admin-sidebar-width);
+            padding: 40px;
+        }
+
+        .users-card {
+            background: #fff;
+            border-radius: 30px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .table-enterprise thead th {
+            background: #f8fafc;
+            padding: 20px 24px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #64748b;
+            font-weight: 800;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .table-enterprise tbody td {
+            padding: 24px;
+            vertical-align: middle;
+            font-weight: 600;
+            color: #334155;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 14px;
+            background: #f1f5f9;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+
+        .search-control {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 10px 20px;
+            font-weight: 600;
+        }
+
+        .search-control:focus {
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(10, 138, 84, 0.1);
+            border-color: #0a8a54;
+        }
+    </style>
 </head>
 
 <body>
 
-    <!-- ================= TOP NAVBAR ================= -->
-    <nav class="admin-navbar">
-        <div class="nav-left">
-            <img src="static/image/Sarna broker.png" alt="Logo">
-            <span>Sarna Broker</span>
+    <aside class="admin-sidebar">
+        <div class="sidebar-brand">
+            <h4>SAARNA <span>ADMIN</span></h4>
+        </div>
+        <ul class="admin-nav">
+            <li><a href="/admin"><i class="fa fa-chart-pie"></i> Overview</a></li>
+            <li class="active"><a href="/admin/users"><i class="fa fa-users"></i> Account Access</a></li>
+            <li><a href="/admin/stock"><i class="fa fa-tags"></i> Market Pricing</a></li>
+            <li><a href="/admin/stock-history"><i class="fa fa-history"></i> Rate History</a></li>
+            <li><a href="/admin/bookings"><i class="fa fa-shopping-cart"></i> Global Orders</a></li>
+            <li><a href="/admin/miller-profiles"><i class="fa fa-industry"></i> Industry Network</a></li>
+            <li><a href="/admin/buyer-profiles"><i class="fa fa-store"></i> Trader Network</a></li>
+            <li><a href="/admin/logs"><i class="fa fa-clipboard-list"></i> Audit Logs</a></li>
+        </ul>
+    </aside>
+
+    <main class="admin-content">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h2 class="fw-800 text-dark mb-1">Account Access Console</h2>
+                <p class="text-muted fw-600 mb-0">Entity verification and identity lifecycle management.</p>
+            </div>
+            <div class="d-flex gap-3">
+                <input type="text" id="userSearch" class="form-control search-control" style="width: 350px;"
+                    placeholder="Search Name, Email, or Network Role...">
+            </div>
         </div>
 
-        <center><b>JAI SHREE SHYAM</b></center>
-
-        <div class="nav-right">
-            <span class="admin-name">
-                <i class="fa fa-user-circle"></i> Admin
-            </span>
-            <img src="static/image/images.png" alt="Logo">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show mb-4 border-0 shadow-sm"
+            style="border-radius: 16px;">
+            <div class="fw-800 small">{{ message }}</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
-    </nav>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
 
-    <div class="admin-container">
-
-        <!-- SIDEBAR -->
-        <aside class="admin-sidebar">
-            <h4>Sarna Broker</h4>
-            <ul>
-                <li><a href="/admin"><i class="fa fa-gauge"></i> Dashboard</a></li>
-                <li class="active"><i class="fa fa-users"></i> Users</li>
-                <li><a href="/admin/stock"><i class="fa fa-box"></i> Latest rate</a></li>
-                <li><a href="/admin/stock-history"><i class="fa fa-history"></i> Rate update history</a></li>
-                <li><a href="/admin/bookings"><i class="fa fa-shopping-cart"></i> Bookings</a></li>
-                <li><a href="/admin/miller-profiles"><i class="fa fa-industry"></i> Miller Profiles</a></li>
-                <li><a href="/admin/buyer-profiles"><i class="fa fa-store"></i> Trader Profiles</a></li>
-                <li><a href="/admin/logs"><i class="fa fa-list"></i> Admin Logs</a></li>
-                <li>
-                    <i class="fa fa-right-from-bracket"></i>
-                    <a href="/logout">Logout</a>
-                </li>
-            </ul>
-        </aside>
-
-        <!-- MAIN -->
-        <main class="admin-main">
-            <div class="admin-top">
-                <h5>👥 User Access Control</h5>
-                <span class="admin-badge">Admin Control</span>
-            </div>
-
-            <!-- FLASH MESSAGES -->
-            {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-            {% for category, message in messages %}
-            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show mt-3"
-                role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            {% endfor %}
-            {% endif %}
-            {% endwith %}
-
-            <div class="table-card mt-5">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6>Registered Users (Excluding Admins)</h6>
-                    <div class="d-flex gap-2">
-                        <input type="text" id="userSearch" class="form-control form-control-sm" style="width: 250px;"
-                            placeholder="Search Name, Email, Role...">
-                    </div>
-                </div>
-
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover align-middle" id="userTable">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>ID</th>
-                                <th>User Details</th>
-                                <th>Role</th>
-                                <th>Status</th>
-                                <th>Staff Info</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for u in all_users %}
-                            <tr class="user-row">
-                                <td>{{ u[0] }}</td>
-                                <td>
-                                    <div class="fw-bold name-cell">{{ u[1] }}</div>
-                                    <div class="small text-muted email-cell">{{ u[2] }}</div>
-                                </td>
-                                <td class="role-cell">
-                                    {% if u[3] == 'miller' %}
-                                    <span class="badge bg-primary">Miller</span>
-                                    {% elif u[3] == 'buyer' %}
-                                    <span class="badge bg-success">Trader (Buyer)</span>
-                                    {% elif u[3] == 'farmer' %}
-                                    <span class="badge bg-info">Farmer</span>
-                                    {% else %}
-                                    <span class="badge bg-secondary">{{ u[3] }}</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if u[4] == 'approved' %}
-                                    <span class="badge bg-success">Approved</span>
-                                    {% elif u[4] == 'pending' %}
-                                    <span class="badge bg-warning text-dark">Pending</span>
+        <div class="users-card">
+            <div class="table-responsive">
+                <table class="table table-enterprise m-0" id="userTable">
+                    <thead>
+                        <tr>
+                            <th>Identity</th>
+                            <th>Network Role</th>
+                            <th>Verification</th>
+                            <th>Tenancy</th>
+                            <th class="text-end">Command</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in all_users %}
+                        <tr class="user-row" data-search="{{ (u[1] + ' ' + u[2] + ' ' + u[3])|lower }}">
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="user-avatar text-uppercase">{{ u[1][0] }}</div>
+                                    <div>
+                                        <div class="fw-800 text-dark">{{ u[1] }}</div>
+                                        <div class="small text-muted fw-600">{{ u[2] }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% if u[3] == 'miller' %}<span
+                                    class="badge bg-primary-subtle text-primary fw-800 px-3 py-1 rounded-pill">INDUSTRIAL
+                                    MILLER</span>
+                                {% elif u[3] == 'buyer' %}<span
+                                    class="badge bg-success-subtle text-success fw-800 px-3 py-1 rounded-pill">COMMODITY
+                                    TRADER</span>
+                                {% elif u[3] == 'farmer' %}<span
+                                    class="badge bg-info-subtle text-info fw-800 px-3 py-1 rounded-pill">ROOT
+                                    FARMER</span>
+                                {% else %}<span class="badge bg-light text-muted fw-800 px-3 py-1 rounded-pill">{{
+                                    u[3]|upper }}</span>{% endif %}
+                            </td>
+                            <td>
+                                {% if u[4] == 'approved' %}<span
+                                    class="badge-admin bg-success-subtle text-success">VERIFIED</span>
+                                {% elif u[4] == 'pending' %}<span
+                                    class="badge-admin bg-warning-subtle text-warning-emphasis">AWAITING REVIEW</span>
+                                {% elif u[4] == 'blocked' %}<span
+                                    class="badge-admin bg-danger-subtle text-danger">RESTRICTED</span>
+                                {% else %}<span class="badge-admin bg-light text-muted">{{ u[4]|upper }}</span>{% endif
+                                %}
+                            </td>
+                            <td>
+                                {% if u[5] %}
+                                <div class="small fw-800 text-primary"><i class="fa fa-id-badge me-1"></i>STAFF ACCESS
+                                </div>
+                                <div class="small text-muted fw-600">Attached to {{ u[6] if u[6] else 'Root Unit' }}
+                                </div>
+                                {% else %}
+                                <div class="small text-muted fw-600">Primary Tenant Account</div>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group shadow-sm rounded-pill overflow-hidden">
+                                    {% if u[4] == 'pending' %}
+                                    <a href="/admin/approve_user/{{ u[0] }}" class="btn btn-success btn-sm px-3"
+                                        title="Grant Access"><i class="fa fa-check"></i></a>
+                                    <a href="/admin/reject_user/{{ u[0] }}" class="btn btn-danger btn-sm px-3"
+                                        onclick="return confirm('Terminate this application?')" title="Deny Access"><i
+                                            class="fa fa-times"></i></a>
+                                    {% elif u[4] == 'approved' %}
+                                    <a href="/admin/block_user/{{ u[0] }}"
+                                        class="btn btn-white border text-danger btn-sm px-3"
+                                        onclick="return confirm('Suspend this account?')" title="Restrict Access"><i
+                                            class="fa fa-ban"></i></a>
                                     {% elif u[4] == 'blocked' %}
-                                    <span class="badge bg-danger">Blocked</span>
-                                    {% else %}
-                                    <span class="badge bg-secondary">{{ u[4] }}</span>
+                                    <a href="/admin/unblock_user/{{ u[0] }}"
+                                        class="btn btn-white border text-success btn-sm px-3" title="Restore Access"><i
+                                            class="fa fa-unlock"></i></a>
                                     {% endif %}
-                                </td>
-                                <td>
-                                    {% if u[5] %}
-                                    <div class="small text-muted">
-                                        <i class="fa fa-id-badge"></i> Staff Member<br>
-                                        <i class="fa fa-industry"></i> Miller: {{ u[6] if u[6] else 'N/A' }}
-                                    </div>
-                                    {% else %}
-                                    <span class="text-muted small">Standard Account</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <div class="btn-group">
-                                        {% if u[4] == 'pending' %}
-                                        <a href="/admin/approve_user/{{ u[0] }}" class="btn btn-sm btn-success"
-                                            title="Approve"><i class="fa fa-check"></i></a>
-                                        <a href="/admin/reject_user/{{ u[0] }}" class="btn btn-sm btn-danger"
-                                            onclick="return confirm('Reject this user?')" title="Reject"><i
-                                                class="fa fa-times"></i></a>
-                                        {% elif u[4] == 'approved' %}
-                                        <a href="/admin/block_user/{{ u[0] }}" class="btn btn-sm btn-outline-danger"
-                                            onclick="return confirm('Block this user?')" title="Block"><i
-                                                class="fa fa-ban"></i></a>
-                                        {% elif u[4] == 'blocked' %}
-                                        <a href="/admin/unblock_user/{{ u[0] }}" class="btn btn-sm btn-outline-success"
-                                            title="Unblock"><i class="fa fa-unlock"></i></a>
-                                        {% endif %}
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-        </main>
-    </div>
+        </div>
+    </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.getElementById('userSearch').addEventListener('keyup', function () {
-            let filter = this.value.toLowerCase();
-            let rows = document.querySelectorAll('.user-row');
-
-            rows.forEach(row => {
-                let name = row.querySelector('.name-cell').textContent.toLowerCase();
-                let email = row.querySelector('.email-cell').textContent.toLowerCase();
-                let role = row.querySelector('.role-cell').textContent.toLowerCase();
-
-                if (name.includes(filter) || email.includes(filter) || role.includes(filter)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+        document.getElementById('userSearch').addEventListener('input', function (e) {
+            const term = e.target.value.toLowerCase();
+            document.querySelectorAll('.user-row').forEach(row => {
+                const searchData = row.dataset.search;
+                row.style.display = searchData.includes(term) ? '' : 'none';
             });
         });
     </script>

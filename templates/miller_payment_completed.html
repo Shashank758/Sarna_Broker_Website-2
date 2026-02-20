@@ -1,254 +1,169 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-  <meta charset="UTF-8">
-  <title>Payment Completed | Miller</title>
+{% block title %}Payment Completed | Saarna Canvessars{% endblock %}
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/style.css">
+{% block extra_css %}
+<style>
+  .completed-hero {
+    background: linear-gradient(135deg, var(--success) 0%, #065f46 100%);
+    color: white;
+    padding: 50px 0 90px;
+    border-radius: 0 0 50px 50px;
+    box-shadow: var(--shadow-xl);
+  }
 
-  <style>
-    body {
-      background: var(--bg-light);
-      font-family: Inter, Segoe UI, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+  .completed-container {
+    margin-top: -60px;
+    padding-bottom: 80px;
+  }
 
-    /* PAGE HEADER */
-    .page-header {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-      color: #fff;
-      padding: 25px 0;
-      margin-bottom: 30px;
-    }
+  .settled-card {
+    background: #fff;
+    border-radius: 24px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+    margin-bottom: 30px;
+    transition: var(--transition);
+  }
 
-    .page-header h4 {
-      font-weight: 700;
-      margin: 0;
-    }
+  .settled-header {
+    background: #f0fdf4;
+    padding: 24px;
+    border-bottom: 1px solid #dcfce7;
+  }
 
-    .page-header .breadcrumb {
-      margin: 0;
-      background: none;
-      padding: 0;
-    }
+  .settled-truck-box {
+    background: #fcfcfc;
+    border: 1px solid var(--border-light);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
 
-    .page-header .breadcrumb a {
-      color: rgba(255, 255, 255, 0.8);
-      text-decoration: none;
-    }
+  .settled-badge {
+    background: #dcfce7;
+    color: #166534;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 800;
+    padding: 6px 14px;
+    border-radius: 50px;
+  }
+</style>
+{% endblock %}
 
-    .page-header .breadcrumb a:hover {
-      color: #fff;
-    }
+{% block content %}
+<section class="completed-hero">
+  <div class="container text-center">
+    <h2 class="fw-800 text-white mb-2" data-aos="fade-up">Revenue Ledger</h2>
+    <p class="text-white opacity-75 fw-600 mb-5" data-aos="fade-up" data-aos-delay="100">Archived record of successfully
+      settled industrial trade payments.</p>
 
-    /* SECTION */
-    .section-card {
-      background: #fff;
-      border-radius: 18px;
-      box-shadow: var(--shadow-md);
-      border: 1px solid rgba(0, 0, 0, .05);
-      padding: 25px;
-    }
-
-    /* SCROLL */
-    .qc-scroll-container {
-      max-height: 70vh;
-      overflow-y: auto;
-    }
-
-    /* PAYMENT CARD */
-    .payment-card {
-      border-radius: 14px;
-      transition: all 0.3s ease;
-      border: 1px solid rgba(0, 0, 0, .08);
-    }
-
-    .payment-card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    main {
-      flex: 1;
-    }
-  </style>
-</head>
-
-<body>
-
-  {% include '_navbar.html' %}
-
-  <!-- PAGE HEADER -->
-  <div class="page-header">
-    <div class="container">
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <nav class="breadcrumb mb-2">
-            <a href="/miller"><i class="fa fa-home"></i> Dashboard</a>
-            <span class="mx-2">/</span>
-            <span>Payment Completed</span>
-          </nav>
-          <h4><i class="fa fa-check-circle me-2"></i>Payment Completed</h4>
-        </div>
-        <div class="d-flex gap-2">
-          <input type="text" id="paidSearch" class="form-control form-control-sm" style="width: 250px;"
-            placeholder="Search Order, Buyer, Truck...">
-          <a href="/miller" class="btn btn-light">
-            <i class="fa fa-arrow-left me-1"></i> Back
-          </a>
-        </div>
-      </div>
+    <div class="d-flex justify-content-center" data-aos="fade-up" data-aos-delay="200">
+      <input type="text" id="paidSearch" class="search-enterprise"
+        placeholder="Search Shipment, Buyer, or Logistics Ref..." style="max-width: 450px;">
     </div>
   </div>
+</section>
 
-  <main>
-    <div class="container mb-5">
+<div class="container completed-container">
+  {% if payment_completed %}
+  <div id="completedGrid">
+    {% for b in payment_completed %}
+    {% set booking_id = b[0] %}
+    {% set trucks = invoices_map.get(booking_id, []) %}
 
-      <!-- ================= PAYMENT COMPLETED ================= -->
-      {% if payment_completed %}
-      <div class="section-card" data-aos="fade-up">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h6 class="fw-bold mb-0">
-            <i class="fa fa-check-circle text-success"></i>
-            Payment Completed
-          </h6>
-          <span class="badge bg-success">
-            {{ payment_completed|length }} Orders
-          </span>
+    <div class="settled-card" data-aos="fade-up" data-search="{{ b[10]|lower }} {{ b[1]|lower }} {{ b[2]|lower }}">
+      <div class="settled-header d-flex justify-content-between align-items-center">
+        <div>
+          <span class="badge bg-success-subtle text-success fw-800 mb-1 rounded-pill px-3">{{ b[10] }}</span>
+          <h5 class="fw-800 mb-0">{{ b[1] }} · <span class="text-capitalize">{{ b[2] }}</span></h5>
         </div>
+        <div class="text-end">
+          <span class="settled-badge"><i class="fa fa-check-double me-2"></i>Fully Reconciled</span>
+        </div>
+      </div>
 
-        <div class="qc-scroll-container">
-          <div class="row g-3">
-
-            {% for b in payment_completed %}
-            {% set booking_id = b[0] %}
-            {% set booked = b[3] %}
-            {% set loaded = b[7] %}
-            {% set order_id = b[10] %}
-            {% set buyer_name = b[1] %}
-            {% set crop_name = b[2] %}
-            {% set final_invoice = b[17] %}
-            {% set payment_at = b[18] %}
-
-            <div class="col-md-6" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
-              <div class="card border-0 shadow-sm h-100 payment-card">
-                <div class="card-body">
-
-                  <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                      <h6 class="mb-1 text-primary fw-bold">{{ order_id }}</h6>
-                      <p class="mb-1 text-muted small">
-                        {{ buyer_name }} • {{ crop_name|capitalize }}
-                      </p>
-                      <div class="d-flex gap-2 mt-2">
-                        <span class="badge bg-primary">{{ booked }} Qt Booked</span>
-                        <span class="badge bg-success">{{ loaded }} Qt Loaded</span>
-                        {% if b[8] == 'partial_closed' %}
-                        <span class="badge bg-warning text-dark"><i class="fa fa-lock"></i> Closed</span>
-                        {% endif %}
-                      </div>
-                    </div>
-                    <span class="badge bg-success">✅ Payment Completed</span>
-                  </div>
-
-                  <div class="border-top pt-3">
-                    {% if invoices_map.get(booking_id) %}
-                    <small class="text-muted fw-bold d-block mb-2"><i class="fa fa-truck"></i> Paid Trucks</small>
-                    {% for inv in invoices_map[booking_id] %}
-                    <div class="mb-2 p-2 border rounded bg-light">
-                      <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="fw-bold small">
-                          Truck {% if inv.truck_number %}{{ inv.truck_number }}{% else %}#{{ loop.index }}{% endif %}
-                        </span>
-                        <span class="badge bg-success" style="font-size:0.7rem;">Payment Received</span>
-                      </div>
-                      <div class="d-flex justify-content-between small text-muted">
-                        <span>Qty: {{ inv.qty }} Qt</span>
-                        <span>Rate: ₹{{ b[19] }}/Qt</span>
-                        <span>Amt: ₹{{ (inv.qty * b[19] if b[19] else 0) | round(2) }}</span>
-                        {% if inv.qc_freight %}
-                        <span class="d-block text-end text-success w-100" style="font-size: 0.8em;">Freight: ₹{{
-                          inv.qc_freight }}</span>
-                        {% endif %}
-                      </div>
-
-                      {% if inv.qc_broken or inv.qc_karda or inv.qc_oil or inv.qc_mitti or inv.qc_ssa or inv.qc_claim %}
-                      <div class="row g-1 mt-1 small text-muted border-top border-light pt-1">
-                        {% if inv.qc_broken %}<div class="col-6">Broken: {{ inv.qc_broken }}%</div>{% endif %}
-                        {% if inv.qc_karda %}<div class="col-6">Karda: {{ inv.qc_karda }}</div>{% endif %}
-                        {% if inv.qc_oil %}<div class="col-6">Oil: {{ inv.qc_oil }}%</div>{% endif %}
-                        {% if inv.qc_mitti %}<div class="col-6">Mitti: {{ inv.qc_mitti }}</div>{% endif %}
-                        {% if inv.qc_ssa %}<div class="col-6">SSA: {{ inv.qc_ssa }}</div>{% endif %}
-                        {% if inv.qc_claim %}<div class="col-6 text-danger">Claim: ₹{{ inv.qc_claim }}</div>{% endif %}
-                      </div>
-                      {% endif %}
-                    </div>
-                    {% if inv.final_invoice_file %}
-                    <a href="/static/bills/{{ inv.final_invoice_file }}" target="_blank"
-                      class="btn btn-sm btn-outline-primary w-100 mt-2">
-                      <i class="fa fa-file-invoice"></i> View Final Invoice
-                    </a>
-                    {% endif %}
-                    {% if inv.payment_at %}
-                    <small class="text-muted d-block text-center mt-1">Paid: {{ inv.payment_at.strftime('%Y-%m-%d
-                      %H:%M') }}</small>
-                    {% endif %}
-                  </div>
-                  {% endfor %}
-                  {% else %}
-                  <p class="text-muted small">No payment details found.</p>
-                  {% endif %}
-                </div>
-
+      <div class="p-4">
+        <div class="row g-3">
+          {% if trucks %}
+          {% for inv in trucks %}
+          <div class="col-lg-4 col-md-6">
+            <div class="settled-truck-box">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="fw-800 text-dark">{{ inv.truck_number or 'Truck #' ~ loop.index }}</div>
+                <div class="text-muted fw-800 small">{{ inv.qty }} Qt</div>
               </div>
+
+              <div class="bg-light rounded-3 p-3 mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                  <span class="small text-muted fw-600">Reconciled Amount</span>
+                  <span class="small fw-800 text-dark">₹{{ (inv.qty * b[19] if b[19] else 0)|format_currency }}</span>
+                </div>
+                {% if inv.qc_freight %}
+                <div class="d-flex justify-content-between border-top border-warning-subtle pt-1 mt-1">
+                  <span class="small text-muted fw-600">Freight Paid</span>
+                  <span class="small fw-800 text-success">₹{{ inv.qc_freight }}</span>
+                </div>
+                {% endif %}
+
+                {% if inv.qc_claim %}
+                <div class="d-flex justify-content-between border-top border-danger-subtle pt-1 mt-1">
+                  <span class="small text-muted fw-600">Deductions/Claims</span>
+                  <span class="small fw-800 text-danger">₹{{ inv.qc_claim }}</span>
+                </div>
+                {% endif %}
+              </div>
+
+              <div class="d-grid">
+                {% if inv.final_invoice_file %}
+                <a href="/static/uploads/bills/{{ inv.final_invoice_file }}" target="_blank"
+                  class="btn btn-white border fw-800 btn-sm py-2">
+                  <i class="fa fa-receipt me-2"></i>Settlement Doc
+                </a>
+                {% else %}
+                <span class="text-muted small text-center fw-600 italic">No document attached</span>
+                {% endif %}
+              </div>
+              {% if inv.payment_at %}
+              <div class="text-center mt-3 small text-muted fw-600 italic" style="font-size: 0.7rem;">
+                Settled on {{ inv.payment_at.strftime('%d %b %Y, %H:%M') }}
+              </div>
+              {% endif %}
             </div>
           </div>
           {% endfor %}
-
+          {% else %}
+          <div class="col-12 text-center py-4 bg-light rounded-4">
+            <p class="text-muted fw-600 mb-0">No per-truck records found. Total contract settled globally.</p>
+          </div>
+          {% endif %}
         </div>
       </div>
     </div>
-    {% else %}
-    <div class="section-card text-center py-5" data-aos="fade-up">
-      <i class="fa fa-check-circle fa-3x text-muted mb-3"></i>
-      <p class="text-muted mb-0">No completed payments yet.</p>
-    </div>
-    {% endif %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-5 bg-white rounded-5 shadow-sm">
+    <i class="fa fa-receipt text-muted fs-1 opacity-25 mb-3"></i>
+    <h4 class="fw-800 text-muted">No Settlement Records</h4>
+    <p class="text-muted fw-600">Completed payments will be archived here.</p>
+  </div>
+  {% endif %}
+</div>
 
-    </div>
-  </main>
+{% endblock %}
 
-  {% include '_footer.html' %}
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script>
-    AOS.init({ duration: 600, once: true });
-
-    document.getElementById('paidSearch').addEventListener('keyup', function () {
-      let filter = this.value.toLowerCase();
-      let cards = document.querySelectorAll('.payment-card');
-
-      cards.forEach(card => {
-        let col = card.closest('.col-md-6');
-        let text = card.textContent.toLowerCase();
-
-        if (text.includes(filter)) {
-          if (col) col.style.display = '';
-          else card.style.display = '';
-        } else {
-          if (col) col.style.display = 'none';
-          else card.style.display = 'none';
-        }
-      });
+{% block extra_js %}
+<script>
+  document.getElementById('paidSearch').addEventListener('input', function (e) {
+    const term = e.target.value.toLowerCase();
+    document.querySelectorAll('.settled-card').forEach(card => {
+      const content = card.dataset.search;
+      card.style.display = content.includes(term) ? '' : 'none';
     });
-  </script>
-</body>
-
-</html>
+  });
+</script>
+{% endblock %}

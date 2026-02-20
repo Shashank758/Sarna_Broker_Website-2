@@ -1,182 +1,141 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-  <meta charset="UTF-8">
-  <title>Rejected Orders | Miller</title>
+{% block title %}Rejected Orders | Saarna Canvessars{% endblock %}
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/style.css">
+{% block extra_css %}
+<style>
+  .rejected-hero {
+    background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%);
+    color: white;
+    padding: 50px 0 90px;
+    border-radius: 0 0 50px 50px;
+    box-shadow: var(--shadow-xl);
+  }
 
-  <style>
-    body {
-      background: var(--bg-light);
-      font-family: Inter, Segoe UI, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+  .rejected-container {
+    margin-top: -60px;
+    padding-bottom: 80px;
+  }
 
-    /* PAGE HEADER */
-    .page-header {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-      color: #fff;
-      padding: 25px 0;
-      margin-bottom: 30px;
-    }
+  .premium-rejected-card {
+    background: #fff;
+    border-radius: 30px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-2xl);
+    overflow: hidden;
+  }
 
-    .page-header h4 {
-      font-weight: 700;
-      margin: 0;
-    }
+  .table-rejected {
+    margin-bottom: 0;
+  }
 
-    .page-header .breadcrumb {
-      margin: 0;
-      background: none;
-      padding: 0;
-    }
+  .table-rejected thead th {
+    background: #fdf2f2;
+    padding: 20px 24px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #991b1b;
+    font-weight: 800;
+    border-bottom: 2px solid #fee2e2;
+  }
 
-    .page-header .breadcrumb a {
-      color: rgba(255, 255, 255, 0.8);
-      text-decoration: none;
-    }
+  .table-rejected tbody td {
+    padding: 24px;
+    vertical-align: middle;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-light);
+  }
 
-    .page-header .breadcrumb a:hover {
-      color: #fff;
-    }
+  .table-rejected tbody tr:hover {
+    background-color: #fffafb;
+  }
 
-    /* SECTION */
-    .section-card {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: var(--shadow-md);
-      padding: 25px;
-      border: 1px solid rgba(0, 0, 0, .05);
-    }
+  .reason-text {
+    font-style: italic;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+</style>
+{% endblock %}
 
-    /* TABLE */
-    .table th {
-      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-      font-weight: 600;
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #495057;
-      border-bottom: 2px solid #dc3545;
-    }
+{% block content %}
+<section class="rejected-hero">
+  <div class="container text-center">
+    <h2 class="fw-800 text-white mb-2" data-aos="fade-up">Archived Rejections</h2>
+    <p class="text-white opacity-75 fw-600 mb-5" data-aos="fade-up" data-aos-delay="100">Historical record of declined
+      or cancelled booking requests.</p>
 
-    .table td {
-      vertical-align: middle;
-      padding: 15px 12px;
-    }
-
-    .table tbody tr {
-      transition: all 0.2s ease;
-    }
-
-    .table tbody tr:hover {
-      background: rgba(220, 53, 69, 0.05);
-    }
-
-    main {
-      flex: 1;
-    }
-  </style>
-</head>
-
-<body>
-
-  {% include '_navbar.html' %}
-
-  <!-- PAGE HEADER -->
-  <div class="page-header">
-    <div class="container">
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <nav class="breadcrumb mb-2">
-            <a href="/miller"><i class="fa fa-home"></i> Dashboard</a>
-            <span class="mx-2">/</span>
-            <span>Rejected Orders</span>
-          </nav>
-          <h4><i class="fa fa-times-circle me-2"></i>Rejected Orders</h4>
-        </div>
-        <div class="d-flex gap-2">
-          <input type="text" id="rejectedSearch" class="form-control form-control-sm" style="width: 250px;"
-            placeholder="Search Order, Trader, Crop...">
-          <a href="/miller" class="btn btn-light">
-            <i class="fa fa-arrow-left me-1"></i> Back
-          </a>
-        </div>
-      </div>
+    <div class="d-flex justify-content-center" data-aos="fade-up" data-aos-delay="200">
+      <input type="text" id="rejectedSearch" class="search-enterprise"
+        placeholder="Search Order, Trader, or Commodity..." style="max-width: 450px;">
     </div>
   </div>
+</section>
 
-  <main>
-    <div class="container mb-5">
-
-      <!-- ================= REJECTED ORDERS ================= -->
-      <div class="section-card" data-aos="fade-up" id="rejected-orders">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h5 class="fw-bold mb-0">
-            <i class="fa fa-times-circle text-danger me-2"></i>
-            Rejected Orders
-          </h5>
-          <span class="badge bg-danger fs-6">{{ rejected|length }} Orders</span>
-        </div>
-
-        {% if rejected %}
-        <div class="table-responsive">
-          <table class="table table-bordered align-middle">
-            <thead>
-              <tr>
-                <th>Order ID</th>
-                <th>Trader</th>
-                <th>Crop</th>
-                <th>Qty</th>
-                <th>Reason</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {% for b in rejected %}
-              <tr class="booking-row" data-status="declined" data-buyer="{{ b[1]|lower }}" data-crop="{{ b[2]|lower }}">
-
-                <td>
-                  <strong class="text-primary">
-                    {{ b[10] if b[10] else 'N/A' }}
-                  </strong>
-                </td>
-                <td>{{ b[1] }}</td>
-                <td class="text-capitalize">{{ b[2] }}</td>
-                <td>
-                  <span class="badge bg-danger">{{ b[3] }} Qt</span>
-                </td>
-                <td>
-                  <span class="text-muted">{{ b[5] or '—' }}</span>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        {% else %}
-        <div class="text-center py-4">
-          <i class="fa fa-check-circle fa-3x text-success mb-3"></i>
-          <p class="text-muted mb-0">No rejected orders. Great!</p>
-        </div>
-        {% endif %}
+<div class="container rejected-container">
+  <div class="premium-rejected-card" data-aos="fade-up">
+    <div class="p-4 border-bottom d-flex justify-content-between align-items-center bg-white">
+      <h5 class="fw-800 mb-0"><i class="fa fa-archive text-danger me-2"></i>Rejection History</h5>
+      <div class="badge bg-danger-subtle text-danger rounded-pill px-4 py-2 fw-800">
+        {{ rejected|length }} ARCHIVED ORDERS
       </div>
-
     </div>
-  </main>
 
-  {% include '_footer.html' %}
+    <div class="table-responsive">
+      <table class="table table-rejected">
+        <thead>
+          <tr>
+            <th>Shipment ID</th>
+            <th>Trader</th>
+            <th>Commodity</th>
+            <th>Requested Qty</th>
+            <th>Rejection Rationale</th>
+          </tr>
+        </thead>
+        <tbody id="rejectedTableBody">
+          {% for b in rejected %}
+          <tr class="rejected-row" data-search="{{ (b[10]|string + ' ' + b[1] + ' ' + b[2])|lower }}">
+            <td><span class="fw-800 text-dark">{{ b[10] if b[10] else 'N/A' }}</span></td>
+            <td>
+              <div class="fw-800 mb-0">{{ b[1] }}</div>
+              <div class="small text-muted fw-600">Enterprise Buyer</div>
+            </td>
+            <td>
+              <div class="badge bg-light text-muted fw-800 border px-3 rounded-pill text-capitalize">{{ b[2] }}</div>
+            </td>
+            <td>
+              <div class="fw-800 text-danger">{{ b[3] }} Qt</div>
+            </td>
+            <td>
+              <p class="reason-text mb-0">{{ b[5] or 'Policy constraint or market volatility' }}</p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script>AOS.init({ duration: 600, once: true });</script>
-</body>
+    {% if not rejected %}
+    <div class="text-center py-5">
+      <i class="fa fa-check-double text-success opacity-25 fs-1 mb-3"></i>
+      <h5 class="fw-800 text-muted">No Rejection Data</h5>
+      <p class="text-muted fw-600">Your operation has maintained zero rejected orders thus far.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
 
-</html>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.getElementById('rejectedSearch').addEventListener('input', function (e) {
+    const term = e.target.value.toLowerCase();
+    document.querySelectorAll('.rejected-row').forEach(row => {
+      const content = row.dataset.search;
+      row.style.display = content.includes(term) ? '' : 'none';
+    });
+  });
+</script>
+{% endblock %}

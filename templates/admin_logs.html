@@ -3,107 +3,209 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Admin Logs | Sarna Broker</title>
+    <title>Audit Logs | Saarna Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="/static/css/print.css">
+
+    <style>
+        :root {
+            --admin-sidebar-width: 280px;
+            --admin-bg: #f8fafc;
+            --admin-sidebar-bg: #0f172a;
+        }
+
+        body {
+            background: var(--admin-bg);
+            font-family: Inter, Segoe UI, sans-serif;
+        }
+
+        /* SIDEBAR (Consistent with Admin Dashboard) */
+        .admin-sidebar {
+            width: var(--admin-sidebar-width);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background: var(--admin-sidebar-bg);
+            color: white;
+            padding: 30px 20px;
+            z-index: 1000;
+        }
+
+        .sidebar-brand {
+            padding: 0 10px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .sidebar-brand h4 {
+            font-weight: 800;
+            color: #fff;
+            margin: 0;
+        }
+
+        .admin-nav {
+            list-style: none;
+            padding: 0;
+        }
+
+        .admin-nav li {
+            margin-bottom: 8px;
+        }
+
+        .admin-nav a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            padding: 12px 18px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .admin-nav a:hover,
+        .admin-nav li.active a {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        /* CONTENT */
+        .admin-content {
+            margin-left: var(--admin-sidebar-width);
+            padding: 40px;
+        }
+
+        .logs-card {
+            background: #fff;
+            border-radius: 30px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .table-enterprise thead th {
+            background: #f8fafc;
+            padding: 20px 24px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #64748b;
+            font-weight: 800;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .table-enterprise tbody td {
+            padding: 20px 24px;
+            vertical-align: middle;
+            font-weight: 600;
+            color: #334155;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .log-time {
+            color: #64748b;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .action-chip {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+    </style>
 </head>
 
 <body>
 
-    <!-- ================= TOP NAVBAR ================= -->
-    {% include '_navbar.html' %}
+    <aside class="admin-sidebar">
+        <div class="sidebar-brand">
+            <h4>SAARNA <span>ADMIN</span></h4>
+        </div>
+        <ul class="admin-nav">
+            <li><a href="/admin"><i class="fa fa-chart-pie"></i> Overview</a></li>
+            <li><a href="/admin/users"><i class="fa fa-users"></i> Account Access</a></li>
+            <li><a href="/admin/stock"><i class="fa fa-tags"></i> Market Pricing</a></li>
+            <li><a href="/admin/stock-history"><i class="fa fa-history"></i> Rate History</a></li>
+            <li><a href="/admin/bookings"><i class="fa fa-shopping-cart"></i> Global Orders</a></li>
+            <li><a href="/admin/miller-profiles"><i class="fa fa-industry"></i> Industry Network</a></li>
+            <li><a href="/admin/buyer-profiles"><i class="fa fa-store"></i> Trader Network</a></li>
+            <li class="active"><a href="/admin/logs"><i class="fa fa-clipboard-list"></i> Audit Logs</a></li>
+        </ul>
+    </aside>
 
-    <div class="admin-container">
-
-        <!-- SIDEBAR -->
-        <aside class="admin-sidebar">
-            <h4>Sarna Broker</h4>
-            <ul>
-                <li><a href="/admin"><i class="fa fa-gauge"></i> Dashboard</a></li>
-                <li><a href="/admin/users"><i class="fa fa-users"></i> Users</a></li>
-                <li><a href="/admin/stock"><i class="fa fa-box"></i> Latest rate</a></li>
-                <li><a href="/admin/stock-history"><i class="fa fa-history"></i> Rate update history</a></li>
-                <li><a href="/admin/bookings"><i class="fa fa-truck"></i> Bookings</a></li>
-                <li><a href="/admin/miller-profiles"><i class="fa fa-industry"></i> Miller Profiles</a></li>
-                <li><a href="/admin/buyer-profiles"><i class="fa fa-store"></i> Buyer Profiles</a></li>
-                <li class="active"><a href="/admin/logs"><i class="fa fa-list"></i> Admin Logs</a></li>
-            </ul>
-        </aside>
-
-        <!-- CONTENT -->
-        <main class="admin-content">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2>Admin Activity Logs</h2>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-sm btn-outline-success"
-                        onclick="exportTableToExcel('logsTable', 'activity_logs.xlsx')">
-                        <i class="fa fa-file-excel"></i> Export
-                    </button>
-                    <button class="btn btn-sm btn-outline-dark" onclick="printTable()">
-                        <i class="fa fa-print"></i> Print
-                    </button>
-                </div>
+    <main class="admin-content">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h2 class="fw-800 text-dark mb-1">Security Audit Logs</h2>
+                <p class="text-muted fw-600 mb-0">Immutable record of all administrative and platform operations.</p>
             </div>
-
-            <div class="card shadow-sm">
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0" id="logsTable">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Role</th>
-                                    <th>Name</th>
-                                    <th>Action</th>
-                                    <th>Target ID</th>
-                                    <th>Details</th>
-                                    <th>Time</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for log in logs %}
-                                <tr>
-                                    <td>{{ log[0] }}</td>
-                                    <td><span class="badge bg-secondary">{{ log[2] }}</span></td>
-                                    <td>{{ log[1] }}</td>
-                                    <td><strong>{{ log[3] }}</strong></td>
-                                    <td>{{ log[4] }}</td>
-                                    <td>{{ log[5] }}</td>
-                                    <td>{{ log[6].strftime('%d-%m-%Y %I:%M %p') }}</td>
-                                </tr>
-                                {% else %}
-                                <tr>
-                                    <td colspan="7" class="text-center py-4 text-muted">No logs found.</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+            <div class="d-flex gap-3">
+                <button class="btn btn-white border fw-800"
+                    onclick="exportTableToExcel('logsTable', 'saarna_audit_logs.xlsx')"><i
+                        class="fa fa-file-excel me-2"></i>Download Ledger</button>
             </div>
+        </div>
 
-        </main>
-    </div>
+        <div class="logs-card">
+            <div class="table-responsive">
+                <table class="table table-enterprise m-0" id="logsTable">
+                    <thead>
+                        <tr>
+                            <th>Security ID</th>
+                            <th>Identity</th>
+                            <th>Execution</th>
+                            <th>Reference</th>
+                            <th>Context Details</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        <tr>
+                            <td><span class="text-muted small fw-800">#{{ log[0] }}</span></td>
+                            <td>
+                                <div class="fw-800 text-dark">{{ log[1] }}</div>
+                                <div class="badge bg-light text-muted border fw-800 rounded-pill"
+                                    style="font-size: 0.6rem;">{{ log[2]|upper }}</div>
+                            </td>
+                            <td>
+                                <span class="action-chip bg-primary-subtle text-primary">{{ log[3] }}</span>
+                            </td>
+                            <td><span class="fw-800 text-muted">ID: {{ log[4] }}</span></td>
+                            <td>
+                                <div class="small fw-600 text-dark" style="max-width: 300px;">{{ log[5] }}</div>
+                            </td>
+                            <td>
+                                <div class="log-time">{{ log[6].strftime('%d %b %Y · %I:%M %p') }}</div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <i class="fa fa-shield-halved text-muted opacity-25 fs-1 mb-3"></i>
+                                <h5 class="fw-800 text-muted">No Integrity Violations</h5>
+                                <p class="text-muted fw-600">The audit trail is currently empty.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script>
-        function exportTableToExcel(tableId, filename = 'data-export.xlsx') {
+        function exportTableToExcel(tableId, filename = 'export.xlsx') {
             let table = document.getElementById(tableId);
-            if (!table) {
-                alert("Table not found to export!");
-                return;
-            }
-            let clone = table.cloneNode(true);
-            clone.querySelectorAll('.no-export').forEach(el => el.remove());
-            let wb = XLSX.utils.table_to_book(clone, { sheet: "Sheet1" });
+            let wb = XLSX.utils.table_to_book(table, { sheet: "Audit Logs" });
             XLSX.writeFile(wb, filename);
-        }
-
-        function printTable() {
-            window.print();
         }
     </script>
 </body>

@@ -1,275 +1,300 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-  <meta charset="UTF-8">
-  <title>Miller Profile | Sarna Broker</title>
+{% block title %}Miller Profile | Saarna Canvessars{% endblock %}
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/style.css">
+{% block extra_css %}
+<style>
+  .profile-hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 60px 0;
+    margin-bottom: 40px;
+    border-radius: 0 0 40px 40px;
+    box-shadow: var(--shadow-xl);
+  }
 
-  <style>
-    body {
-      background: var(--bg-light);
-      font-family: "Segoe UI", sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+  .premium-profile-card {
+    background: #fff;
+    border-radius: 30px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-2xl);
+    overflow: hidden;
+    margin-top: -80px;
+    position: relative;
+    z-index: 10;
+  }
 
-    /* PAGE HEADER */
-    .page-header {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-      color: #fff;
-      padding: 25px 0;
-      margin-bottom: 30px;
-    }
+  .profile-sidebar {
+    background: #fafafa;
+    border-right: 1px solid var(--border);
+    padding: 40px;
+  }
 
-    .page-header h4 {
-      font-weight: 700;
-      margin: 0;
-    }
+  .profile-main {
+    padding: 40px;
+  }
 
-    .page-header .breadcrumb {
-      margin: 0;
-      background: none;
-      padding: 0;
-    }
+  .form-section-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    font-weight: 800;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--primary-subtle);
+  }
 
-    .page-header .breadcrumb a {
-      color: rgba(255, 255, 255, 0.8);
-      text-decoration: none;
-    }
+  .enterprise-input {
+    background: #f8fafc;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-weight: 600;
+    transition: var(--transition);
+  }
 
-    .page-header .breadcrumb a:hover {
-      color: #fff;
-    }
+  .enterprise-input:focus {
+    background: #fff;
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 4px rgba(10, 138, 84, 0.1);
+    outline: none;
+  }
 
-    /* CARD */
-    .profile-card {
-      background: #fff;
-      border-radius: 16px;
-      padding: 30px;
-      box-shadow: var(--shadow-md);
-      border: 1px solid rgba(0, 0, 0, .05);
-    }
+  .doc-upload-item {
+    background: #f8fafc;
+    border: 1.5px dashed var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    transition: var(--transition);
+    margin-bottom: 24px;
+  }
 
-    /* FORM */
-    .form-label {
-      font-weight: 600;
-      font-size: 14px;
-      color: #495057;
-    }
+  .doc-upload-item:hover {
+    border-color: var(--primary);
+    background: #fff;
+  }
 
-    .form-control {
-      border-radius: 10px;
-      padding: 12px 15px;
-      border: 1px solid #e0e0e0;
-      transition: all 0.3s ease;
-    }
+  .staff-panel {
+    background: #ffffff;
+    border-radius: 24px;
+    border: 1px solid var(--border);
+    padding: 30px;
+    margin-top: 40px;
+    box-shadow: var(--shadow-lg);
+  }
 
-    .form-control:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(15, 155, 95, 0.15);
-    }
+  .premium-avatar-circle {
+    width: 100px;
+    height: 100px;
+    background: var(--primary-gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-lg);
+  }
+</style>
+{% endblock %}
 
-    /* DOCUMENT */
-    .doc-box {
-      border: 2px dashed var(--primary);
-      padding: 15px;
-      border-radius: 12px;
-      text-align: center;
-      background: linear-gradient(135deg, rgba(15, 155, 95, 0.03) 0%, rgba(15, 155, 95, 0.01) 100%);
-    }
+{% block content %}
+<section class="profile-hero">
+  <div class="container text-center">
+    <h1 class="fw-800 text-white mb-2">Industry Profile</h1>
+    <p class="text-white opacity-75 fw-600 mb-5">Manage your rice mill identity and operational team.</p>
+  </div>
+</section>
 
-    /* STAFF SECTION */
-    .staff-section {
-      background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
-      border-radius: 12px;
-      padding: 20px;
-      border: 1px solid #e9ecef;
-    }
-
-    main {
-      flex: 1;
-    }
-  </style>
-</head>
-
-<body>
-
-  {% include '_navbar.html' %}
-
-  <!-- PAGE HEADER -->
-  <div class="page-header">
-    <div class="container">
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <nav class="breadcrumb mb-2">
-            <a href="/miller"><i class="fa fa-home"></i> Dashboard</a>
-            <span class="mx-2">/</span>
-            <span>Profile</span>
-          </nav>
-          <h4><i class="fa fa-user-check me-2"></i>Miller Profile & Verification</h4>
+<div class="container mb-5 pb-5">
+  <div class="premium-profile-card" data-aos="fade-up">
+    <div class="row g-0">
+      <div class="col-lg-4 profile-sidebar text-center">
+        <div class="d-flex justify-content-center mb-4">
+          <div class="premium-avatar-circle">
+            {{ (profile[2][0]|upper) if (profile and profile[2]) else 'M' }}
+          </div>
         </div>
-        <a href="/miller" class="btn btn-light">
-          <i class="fa fa-arrow-left me-1"></i> Back
-        </a>
+        <h4 class="fw-800 text-dark mb-1">{{ profile[2] if profile else 'Rice Mill' }}</h4>
+        <div class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fw-800 mb-4">VERIFIED MILLER</div>
+
+        <div class="alert alert-info border-0 rounded-4 p-4 small text-start mt-4">
+          <h6 class="fw-800 mb-2"><i class="fa fa-shield-check me-2"></i>Security Info</h6>
+          <p class="mb-0 opacity-75">Your registration and compliance documents are stored securely for regulatory
+            audits.</p>
+        </div>
+
+        <div class="mt-5">
+          <a href="/logout" class="btn btn-link text-danger fw-800 text-decoration-none">Sign Out <i
+              class="fa fa-sign-out ms-1"></i></a>
+        </div>
+      </div>
+
+      <div class="col-lg-8 profile-main">
+        {% if session.is_staff %}
+        <div class="alert alert-warning border-0 rounded-4 p-4 d-flex align-items-center mb-4">
+          <i class="fa fa-user-lock fs-4 text-warning me-3"></i>
+          <div>
+            <h6 class="fw-800 mb-0">Restricted Access</h6>
+            <p class="small mb-0 opacity-75">Staff members are not authorized to modify the primary mill profile.</p>
+          </div>
+        </div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+          <div class="row">
+            <div class="col-12">
+              <h6 class="form-section-title">Administrative Details</h6>
+            </div>
+            <div class="col-md-6 mb-4">
+              <label class="form-label fw-800 small text-uppercase">Mill / Firm Name</label>
+              <input class="form-control enterprise-input" name="mill_name" value="{{ profile[2] if profile else '' }}"
+                required {{ 'disabled' if session.is_staff else '' }}>
+            </div>
+            <div class="col-md-6 mb-4">
+              <label class="form-label fw-800 small text-uppercase">Owner Name</label>
+              <input class="form-control enterprise-input" name="owner_name" value="{{ profile[3] if profile else '' }}"
+                {{ 'disabled' if session.is_staff else '' }}>
+            </div>
+
+            <div class="col-md-4 mb-4">
+              <label class="form-label fw-800 small text-uppercase">Owner Phone</label>
+              <input class="form-control enterprise-input" name="owner_phone"
+                value="{{ profile[7] if profile else '' }}" required {{ 'disabled' if session.is_staff else '' }}>
+            </div>
+            <div class="col-md-4 mb-4">
+              <label class="form-label fw-800 small text-uppercase">Accountant</label>
+              <input class="form-control enterprise-input" name="accountant_phone"
+                value="{{ profile[8] if profile else '' }}" {{ 'disabled' if session.is_staff else '' }}>
+            </div>
+            <div class="col-md-4 mb-4">
+              <label class="form-label fw-800 small text-uppercase">Staff Mobile</label>
+              <input class="form-control enterprise-input" name="staff_phone"
+                value="{{ profile[9] if profile else '' }}" {{ 'disabled' if session.is_staff else '' }}>
+            </div>
+
+            <div class="col-12 mb-4">
+              <label class="form-label fw-800 small text-uppercase">Complete Business Address</label>
+              <textarea class="form-control enterprise-input" name="address" rows="3" required {{ 'disabled' if
+                session.is_staff else '' }}>{{ profile[4] if profile else '' }}</textarea>
+            </div>
+
+            <div class="col-md-6 mb-5">
+              <label class="form-label fw-800 small text-uppercase">City</label>
+              <input class="form-control enterprise-input" name="city" value="{{ profile[5] if profile else '' }}"
+                required {{ 'disabled' if session.is_staff else '' }}>
+            </div>
+            <div class="col-md-6 mb-5">
+              <label class="form-label fw-800 small text-uppercase">State</label>
+              <input class="form-control enterprise-input" name="state" value="{{ profile[6] if profile else '' }}"
+                required {{ 'disabled' if session.is_staff else '' }}>
+            </div>
+
+            <div class="col-12">
+              <h6 class="form-section-title">Compliance Documents</h6>
+            </div>
+
+            <!-- GSST -->
+            <div class="col-12 mb-4">
+              <div class="doc-upload-item">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <div>
+                    <h6 class="fw-800 mb-1">GST Registration</h6>
+                    <p class="text-muted small mb-0 fw-600">Digital copy of GSTIN certificate</p>
+                  </div>
+                  {% if profile and profile[10] %}
+                  <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-800"><i
+                      class="fa fa-check-circle me-1"></i> VERIFIED</span>
+                  {% else %}
+                  <span
+                    class="badge bg-warning-subtle text-warning-emphasis px-3 py-2 rounded-pill fw-800">PENDING</span>
+                  {% endif %}
+                </div>
+                <div class="d-flex gap-2">
+                  <input type="file" class="form-control" name="gst_doc" accept="image/*,.pdf" {{ 'disabled' if
+                    session.is_staff else '' }}>
+                  {% if profile and profile[10] %}
+                  <a href="{{ url_for('static', filename='uploads/miller_docs/' + profile[10]) }}" target="_blank"
+                    class="btn btn-light border fw-800 small px-4">View</a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- MANDI -->
+            <div class="col-12 mb-4">
+              <div class="doc-upload-item">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <div>
+                    <h6 class="fw-800 mb-1">Mandi license</h6>
+                    <p class="text-muted small mb-0 fw-600">Valid Mandi trade permit copy</p>
+                  </div>
+                  {% if profile and profile[11] %}
+                  <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-800"><i
+                      class="fa fa-check-circle me-1"></i> VERIFIED</span>
+                  {% else %}
+                  <span
+                    class="badge bg-warning-subtle text-warning-emphasis px-3 py-2 rounded-pill fw-800">PENDING</span>
+                  {% endif %}
+                </div>
+                <div class="d-flex gap-2">
+                  <input type="file" class="form-control" name="mandi_doc" accept="image/*,.pdf" {{ 'disabled' if
+                    session.is_staff else '' }}>
+                  {% if profile and profile[11] %}
+                  <a href="{{ url_for('static', filename='uploads/miller_docs/' + profile[11]) }}" target="_blank"
+                    class="btn btn-light border fw-800 small px-4">View</a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            {% if not session.is_staff %}
+            <div class="col-12 mt-4">
+              <button class="btn btn-primary rounded-pill px-5 fw-800 py-3 shadow-lg">Save Profile Changes</button>
+            </div>
+            {% endif %}
+          </div>
+        </form>
       </div>
     </div>
   </div>
 
-  <main>
-    <div class="container mb-5">
-
-      {% if session.is_staff %}
-      <div class="alert alert-danger alert-dismissible fade show" role="alert" data-aos="fade-down">
-        <i class="fa fa-exclamation-triangle me-2"></i>
-        Staff members cannot edit miller profile.
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  {% if not session.is_staff %}
+  <div class="staff-panel" data-aos="fade-up">
+    <div class="d-flex align-items-center mb-4">
+      <div class="bg-enterprise text-white rounded-circle p-2 me-3"
+        style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+        <i class="fa fa-users-cog"></i>
       </div>
-      {% endif %}
-
-      <!-- ================= PROFILE FORM ================= -->
-      <div class="profile-card" data-aos="fade-up">
-
-        {% if error %}
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-          <strong>Error:</strong> {{ error }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        {% endif %}
-
-        <form method="POST" enctype="multipart/form-data" class="card p-4 shadow-sm">
-
-          <!-- OWNER NAME -->
-          <label class="form-label">Owner Name</label>
-          <input class="form-control mb-2" name="owner_name" value="{{ profile[3] if profile else '' }}">
-
-          <!-- MILL NAME -->
-          <label class="form-label">Mill / Firm Name</label>
-          <input class="form-control mb-2" name="mill_name" value="{{ profile[2] if profile else '' }}" required>
-
-          <!-- OWNER PHONE -->
-          <label class="form-label">Owner Mobile Number</label>
-          <input class="form-control mb-2" name="owner_phone" value="{{ profile[7] if profile else '' }}" required>
-
-          <!-- ACCOUNTANT PHONE -->
-          <label class="form-label">Accountant Mobile Number</label>
-          <input class="form-control mb-2" name="accountant_phone" value="{{ profile[8] if profile else '' }}">
-
-          <!-- STAFF PHONE -->
-          <label class="form-label">Staff Mobile Number</label>
-          <input class="form-control mb-2" name="staff_phone" value="{{ profile[9] if profile else '' }}">
-
-          <!-- ADDRESS -->
-          <label class="form-label">Complete Address</label>
-          <textarea class="form-control mb-3" name="address" required>
-      {{ profile[4] if profile else '' }}
-      </textarea>
-
-          <div class="row">
-            <div class="col-md-6">
-              <label class="form-label">City</label>
-              <input class="form-control mb-3" name="city" value="{{ profile[5] if profile else '' }}"
-                placeholder="e.g. Gonda" required>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">State</label>
-              <input class="form-control mb-3" name="state" value="{{ profile[6] if profile else '' }}"
-                placeholder="e.g. Uttar Pradesh" required>
-            </div>
-          </div>
-
-          <!-- GST DOC -->
-          <label class="form-label">GST Certificate</label>
-          {% if profile and profile[10] %}
-          <div class="alert alert-success mb-2">
-            <i class="fa fa-check-circle"></i> Document uploaded:
-            <a href="{{ url_for('static', filename='uploads/miller_docs/' + profile[10]) }}" target="_blank"
-              class="text-decoration-none">
-              {{ profile[10] }}
-            </a>
-          </div>
-          {% else %}
-          <div class="alert alert-warning mb-2">
-            <i class="fa fa-exclamation-circle"></i> No document uploaded yet
-          </div>
-          {% endif %}
-          <input type="file" class="form-control mb-2" name="gst_doc" accept="image/*,.pdf">
-
-          <!-- MANDI DOC -->
-          <label class="form-label">Mandi License</label>
-          {% if profile and profile[11] %}
-          <div class="alert alert-success mb-2">
-            <i class="fa fa-check-circle"></i> Document uploaded:
-            <a href="{{ url_for('static', filename='uploads/miller_docs/' + profile[11]) }}" target="_blank"
-              class="text-decoration-none">
-              {{ profile[11] }}
-            </a>
-          </div>
-          {% else %}
-          <div class="alert alert-warning mb-2">
-            <i class="fa fa-exclamation-circle"></i> No document uploaded yet
-          </div>
-          {% endif %}
-          <input type="file" class="form-control mb-2" name="mandi_doc" accept="image/*,.pdf">
-
-          <!-- OTHER DOC -->
-          <label class="form-label">Other Document</label>
-          {% if profile and profile[12] %}
-          <div class="alert alert-success mb-2">
-            <i class="fa fa-check-circle"></i> Document uploaded:
-            <a href="{{ url_for('static', filename='uploads/miller_docs/' + profile[12]) }}" target="_blank"
-              class="text-decoration-none">
-              {{ profile[12] }}
-            </a>
-          </div>
-          {% else %}
-          <div class="alert alert-warning mb-2">
-            <i class="fa fa-exclamation-circle"></i> No document uploaded yet
-          </div>
-          {% endif %}
-          <input type="file" class="form-control mb-3" name="other_doc" accept="image/*,.pdf">
-
-          <button class="btn btn-success w-100">
-            Save Profile
-          </button>
-        </form>
-        <hr class="my-4">
-
-        <div class="staff-section" data-aos="fade-up" data-aos-delay="100">
-          <h5 class="mb-3">👷 Create Staff Account</h5>
-
-          <form method="POST" action="/miller/create_staff" class="row g-3">
-            <div class="col-md-4">
-              <input class="form-control" name="name" placeholder="Staff Name" required>
-            </div>
-            <div class="col-md-4">
-              <input class="form-control" name="email" type="email" placeholder="Staff Email" required>
-            </div>
-            <div class="col-md-4">
-              <input class="form-control" name="password" type="password" placeholder="Password" required>
-            </div>
-            <div class="col-12">
-              <button class="btn btn-success">
-                ➕ Create Staff
-              </button>
-            </div>
-          </form>
-        </div>
-
-      </div>
+      <h4 class="fw-800 mb-0">Team & Staff Access</h4>
     </div>
-  </main>
 
-  {% include '_footer.html' %}
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script>AOS.init({ duration: 600, once: true });</script>
-</body>
-
-</html>
+    <form method="POST" action="/miller/create_staff">
+      <p class="text-muted fw-600 mb-4">Create sub-accounts for your warehouse managers or accountants.</p>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label fw-800 small text-muted text-uppercase">Full Name</label>
+          <input class="form-control enterprise-input" name="name" placeholder="Staff member name" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-800 small text-muted text-uppercase">Login Email</label>
+          <input class="form-control enterprise-input" name="email" type="email" placeholder="staff@firm.com" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-800 small text-muted text-uppercase">Secure Password</label>
+          <input class="form-control enterprise-input" name="password" type="password" placeholder="••••••••" required>
+        </div>
+        <div class="col-12 mt-4 text-end">
+          <button class="btn btn-dark rounded-pill px-5 fw-800 py-2 shadow-md">
+            <i class="fa fa-user-plus me-2"></i> Create Staff Account
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,193 +1,233 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trader Profile | Saarna Canvessars</title>
+{% extends "base.html" %}
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/css/style.css">
+{% block title %}Trader Profile | Saarna Canvessars{% endblock %}
 
+{% block extra_css %}
 <style>
-body{
-  background: var(--bg);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
+  .profile-hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 60px 0;
+    margin-bottom: 40px;
+    border-radius: 0 0 40px 40px;
+    box-shadow: var(--shadow-xl);
+  }
 
-/* HEADER */
-.profile-header{
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-  color:#fff;
-  padding:20px 24px;
-  border-radius: var(--radius-lg);
-  margin-top:25px;
-  margin-bottom:25px;
-  box-shadow: 0 8px 30px rgba(15,155,95,0.25);
-}
-.profile-header h4{
-  margin:0;
-  font-weight:700;
-}
-.profile-header small{
-  opacity:.9;
-}
+  .premium-profile-card {
+    background: #fff;
+    border-radius: 30px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-2xl);
+    overflow: hidden;
+    margin-top: -80px;
+    position: relative;
+    z-index: 10;
+  }
 
-/* CARD */
-.profile-card{
-  background:#fff;
-  border-radius: var(--radius-lg);
-  padding:28px;
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--border);
-}
+  .profile-sidebar {
+    background: #fafafa;
+    border-right: 1px solid var(--border);
+    padding: 40px;
+  }
 
-/* FORM */
-.form-label{
-  font-weight:600;
-  font-size:14px;
-  color: var(--text);
-}
+  .profile-main {
+    padding: 40px;
+  }
 
-/* BUTTON */
-.btn-save{
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-  color:#fff;
-  border: none;
-  font-weight: 600;
-  padding: 12px 24px;
-  border-radius: var(--radius-sm);
-  transition: var(--transition);
-}
-.btn-save:hover{
-  background: linear-gradient(135deg, var(--primary-light), var(--primary));
-  color:#fff;
-  transform: translateY(-2px);
-}
-main.content-area {
-  flex: 1;
-}
+  .doc-upload-item {
+    background: #f8fafc;
+    border: 1.5px dashed var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    transition: var(--transition);
+    margin-bottom: 24px;
+  }
+
+  .doc-upload-item:hover {
+    border-color: var(--primary);
+    background: #fff;
+  }
+
+  .doc-status {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    margin-left: 10px;
+  }
+
+  .form-section-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    font-weight: 800;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--primary-subtle);
+  }
+
+  .enterprise-input {
+    background: #f8fafc;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-weight: 600;
+    transition: var(--transition);
+  }
+
+  .enterprise-input:focus {
+    background: #fff;
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 4px rgba(10, 138, 84, 0.1);
+    outline: none;
+  }
+
+  .premium-avatar-circle {
+    width: 100px;
+    height: 100px;
+    background: var(--primary-gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-lg);
+  }
 </style>
-</head>
+{% endblock %}
 
-<body>
-
-<!-- NAVBAR -->
-{% include '_navbar.html' %}
-
-<main class="content-area">
-<div class="container mb-5">
-
-<!-- ================= HEADER ================= -->
-<div class="profile-header d-flex justify-content-between align-items-center">
-  <div>
-    <h4 class="mb-1"><i class="fa fa-user-tie"></i> Trader Profile</h4>
-    <small>Complete your profile for mandi transactions</small>
+{% block content %}
+<section class="profile-hero">
+  <div class="container text-center">
+    <h1 class="fw-800 text-white mb-2">My Trade Profile</h1>
+    <p class="text-white opacity-75 fw-600 mb-5">Manage your firm identity and verification documents.</p>
   </div>
-  <div class="d-flex gap-2">
-    <a href="/market" class="btn btn-light btn-sm">
-      <i class="fa fa-arrow-left"></i> Back
-    </a>
-    <a href="/logout" class="btn btn-danger btn-sm">
-      <i class="fa fa-right-from-bracket"></i> Logout
-    </a>
+</section>
+
+<div class="container mb-5 pb-5">
+  <div class="premium-profile-card">
+    <div class="row g-0">
+      <div class="col-lg-4 profile-sidebar">
+        <div class="text-center mb-5">
+          <div class="d-flex justify-content-center">
+            <div class="premium-avatar-circle">
+              {{ profile.owner_name[0]|upper if (profile and profile.owner_name) else 'T' }}
+            </div>
+          </div>
+          <h4 class="fw-800 text-dark mb-1">{{ profile.shop_name if profile else 'Trade Firm' }}</h4>
+          <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fw-800">PARTNER TRADER</span>
+        </div>
+
+        <div class="alert alert-info border-0 rounded-4 p-4 small">
+          <div class="d-flex align-items-center mb-2">
+            <i class="fa fa-shield-check fs-4 text-info me-3"></i>
+            <h6 class="fw-800 mb-0">Identity Protection</h6>
+          </div>
+          <p class="mb-0 opacity-75">Your documents are encrypted and shared only with verified millers during trade
+            cycles.</p>
+        </div>
+
+        <div class="mt-5 text-center">
+          <a href="/logout" class="btn btn-link text-danger fw-800 text-decoration-none">Terminate Session <i
+              class="fa fa-sign-out ms-2"></i></a>
+        </div>
+      </div>
+
+      <div class="col-lg-8 profile-main">
+        <form method="POST" enctype="multipart/form-data">
+          <div class="row">
+            <div class="col-12">
+              <h6 class="form-section-title">Firm Information</h6>
+            </div>
+            <div class="col-md-6 mb-4">
+              <label class="form-label fw-800 small text-uppercase">Owner Full Name</label>
+              <input class="form-control enterprise-input" name="owner_name"
+                value="{{ profile.owner_name if profile else '' }}" placeholder="Legal name of the owner" required>
+            </div>
+            <div class="col-md-6 mb-4">
+              <label class="form-label fw-800 small text-uppercase">Shop / Firm Name</label>
+              <input class="form-control enterprise-input" name="shop_name"
+                value="{{ profile.shop_name if profile else '' }}" placeholder="Registered firm name" required>
+            </div>
+            <div class="col-md-12 mb-4">
+              <label class="form-label fw-800 small text-uppercase">Mobile Number</label>
+              <input class="form-control enterprise-input" name="phone" value="{{ profile.phone if profile else '' }}"
+                placeholder="Contact for trade alerts" required>
+            </div>
+            <div class="col-md-12 mb-5">
+              <label class="form-label fw-800 small text-uppercase">Registered Office Address</label>
+              <textarea class="form-control enterprise-input" name="address" rows="3"
+                placeholder="Complete mailing address" required>{{ profile.address if profile else '' }}</textarea>
+            </div>
+
+            <div class="col-12">
+              <h6 class="form-section-title">KYC & Compliance Documents</h6>
+            </div>
+
+            <!-- GST -->
+            <div class="col-12 mb-4">
+              <div class="doc-upload-item">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <div>
+                    <h6 class="fw-800 mb-1">GST Certificate</h6>
+                    <p class="text-muted small mb-0 fw-500">Government issued GSTIN document (PDF/Image)</p>
+                  </div>
+                  {% if profile and profile.gst_doc %}
+                  <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-800"><i
+                      class="fa fa-check-circle me-1"></i> VERIFIED</span>
+                  {% else %}
+                  <span class="badge bg-warning-subtle text-warning px-3 py-2 rounded-pill fw-800">NOT UPLOADED</span>
+                  {% endif %}
+                </div>
+                <div class="d-flex gap-2">
+                  <input type="file" class="form-control" name="gst_doc" accept="image/*,.pdf">
+                  {% if profile and profile.gst_doc %}
+                  <a target="_blank" href="{{ url_for('static', filename='uploads/miller_docs/' + profile.gst_doc) }}"
+                    class="btn btn-light border fw-800 small px-4">View</a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- LICENSE -->
+            <div class="col-12 mb-4">
+              <div class="doc-upload-item">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <div>
+                    <h6 class="fw-800 mb-1">Trade License</h6>
+                    <p class="text-muted small mb-0 fw-500">Shop Act or Local Body trade permit</p>
+                  </div>
+                  {% if profile and profile.license_doc %}
+                  <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-800"><i
+                      class="fa fa-check-circle me-1"></i> VERIFIED</span>
+                  {% else %}
+                  <span class="badge bg-warning-subtle text-warning px-3 py-2 rounded-pill fw-800">NOT UPLOADED</span>
+                  {% endif %}
+                </div>
+                <div class="d-flex gap-2">
+                  <input type="file" class="form-control" name="license_doc" accept="image/*,.pdf">
+                  {% if profile and profile.license_doc %}
+                  <a target="_blank"
+                    href="{{ url_for('static', filename='uploads/miller_docs/' + profile.license_doc) }}"
+                    class="btn btn-light border fw-800 small px-4">View</a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-5 p-4 bg-primary-subtle rounded-4 d-flex justify-content-between align-items-center">
+            <div class="small fw-600 text-primary-emphasis"><i class="fa fa-info-circle me-2"></i> Changes will update
+              your global trade identity.</div>
+            <button type="submit" class="btn btn-primary rounded-pill px-5 fw-800 py-3 shadow-lg">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
-
-<!-- ================= PROFILE FORM ================= -->
-<div class="profile-card">
-
-  <form method="POST" enctype="multipart/form-data" class="card p-4 shadow-sm">
-
-    <!-- OWNER NAME -->
-    <label class="form-label">Owner Name</label>
-    <input class="form-control mb-2"
-           name="owner_name"
-           value="{{ profile.owner_name if profile else '' }}"
-           placeholder="Owner full name">
-
-    <!-- SHOP / FIRM NAME -->
-    <label class="form-label">Shop / Firm Name</label>
-    <input class="form-control mb-2"
-           name="shop_name"
-           value="{{ profile.shop_name if profile else '' }}"
-           required>
-
-    <!-- OWNER PHONE -->
-    <label class="form-label">Owner Mobile Number</label>
-    <input class="form-control mb-2"
-           name="phone"
-           value="{{ profile.phone if profile else '' }}"
-           required>
-
-    <!-- ADDRESS -->
-    <label class="form-label">Complete Address</label>
-    <textarea class="form-control mb-3"
-              name="address"
-              required>{{ profile.address if profile else '' }}</textarea>
-
-    <!-- GST DOC -->
-    <label class="form-label">GST Certificate</label>
-    {% if profile and profile.gst_doc %}
-      <div class="alert alert-success py-2 px-3 d-flex justify-content-between align-items-center">
-        <span><i class="fa fa-check-circle"></i> {{ profile.gst_doc }}</span>
-        <a class="btn btn-sm btn-outline-primary"
-           target="_blank"
-           href="{{ url_for('static', filename='uploads/miller_docs/' + profile.gst_doc) }}">
-           View
-        </a>
-      </div>
-    {% else %}
-      <div class="alert alert-warning py-2 px-3"><i class="fa fa-exclamation-circle"></i> Not uploaded</div>
-    {% endif %}
-    <input type="file" class="form-control mb-3" name="gst_doc" accept="image/*,.pdf">
-
-    <!-- TRADE LICENSE -->
-    <label class="form-label">Trade License / Shop Act</label>
-    {% if profile and profile.license_doc %}
-      <div class="alert alert-success py-2 px-3 d-flex justify-content-between align-items-center">
-        <span><i class="fa fa-check-circle"></i> {{ profile.license_doc }}</span>
-        <a class="btn btn-sm btn-outline-primary"
-           target="_blank"
-           href="{{ url_for('static', filename='uploads/miller_docs/' + profile.license_doc) }}">
-           View
-        </a>
-      </div>
-    {% else %}
-      <div class="alert alert-warning py-2 px-3"><i class="fa fa-exclamation-circle"></i> Not uploaded</div>
-    {% endif %}
-    <input type="file" class="form-control mb-3" name="license_doc" accept="image/*,.pdf">
-
-    <!-- OTHER DOC -->
-    <label class="form-label">Other Document</label>
-    {% if profile and profile.other_doc %}
-      <div class="alert alert-success py-2 px-3 d-flex justify-content-between align-items-center">
-        <span><i class="fa fa-check-circle"></i> {{ profile.other_doc }}</span>
-        <a class="btn btn-sm btn-outline-primary"
-           target="_blank"
-           href="{{ url_for('static', filename='uploads/miller_docs/' + profile.other_doc) }}">
-           View
-        </a>
-      </div>
-    {% else %}
-      <div class="alert alert-warning py-2 px-3"><i class="fa fa-exclamation-circle"></i> Not uploaded</div>
-    {% endif %}
-    <input type="file" class="form-control mb-3" name="other_doc" accept="image/*,.pdf">
-
-    <button class="btn btn-save w-100 mt-2">
-      <i class="fa fa-save"></i> Save Profile
-    </button>
-
-  </form>
-</div>
-</main>
-
-<!-- FOOTER -->
-{% include '_footer.html' %}
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% endblock %}

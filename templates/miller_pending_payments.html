@@ -1,138 +1,137 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>Pending Payments | Miller</title>
+{% block title %}Pending Payments | Saarna Canvessars{% endblock %}
 
-    <!-- Bootstrap & Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="/static/css/style.css">
+{% block extra_css %}
+<style>
+    .pending-hero {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        padding: 50px 0 90px;
+        border-radius: 0 0 50px 50px;
+        box-shadow: var(--shadow-xl);
+    }
 
-    <style>
-        body {
-            background: var(--bg-light);
-            font-family: Inter, Segoe UI, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+    .pending-container {
+        margin-top: -60px;
+        padding-bottom: 80px;
+    }
 
-        .page-header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: #fff;
-            padding: 25px 0;
-            margin-bottom: 30px;
-        }
+    .revenue-card {
+        background: #fff;
+        border-radius: 24px;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-xl);
+        overflow: hidden;
+        margin-bottom: 30px;
+        transition: var(--transition);
+    }
 
-        .section-card {
-            background: #fff;
-            border-radius: 18px;
-            box-shadow: var(--shadow-md);
-            padding: 25px;
-            margin-bottom: 30px;
-        }
+    .revenue-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-2xl);
+    }
 
-        .completed-loading-card {
-            border-radius: 14px;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(0, 0, 0, .08);
-            height: 100%;
-        }
+    .revenue-header {
+        background: #fffcf0;
+        padding: 24px;
+        border-bottom: 1px solid #fef3c7;
+    }
 
-        .completed-loading-card:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-2px);
-        }
-    </style>
-</head>
+    .truck-payment-box {
+        background: #fcfcfc;
+        border: 1px solid var(--border-light);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 16px;
+    }
 
-<body>
+    .amount-display {
+        background: #f1f5f9;
+        border-radius: 12px;
+        padding: 10px 15px;
+    }
 
-    {% include '_navbar.html' %}
+    .amount-label {
+        font-size: 0.6rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-muted);
+        font-weight: 800;
+        display: block;
+    }
 
-    <!-- PAGE HEADER -->
-    <div class="page-header">
-        <div class="container">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <nav class="breadcrumb mb-2">
-                        <a href="/miller" class="text-white-50 text-decoration-none"><i class="fa fa-home"></i>
-                            Dashboard</a>
-                        <span class="mx-2 text-white-50">/</span>
-                        <span class="text-white">Pending Payments</span>
-                    </nav>
-                    <h4 class="mb-0 fw-bold"><i class="fa fa-clock text-warning me-2"></i>Pending Payments</h4>
-                </div>
-                <div class="d-flex gap-2">
-                    <input type="text" id="pendingSearch" class="form-control form-control-sm" style="width: 250px;"
-                        placeholder="Search Order, Buyer, Truck...">
-                    <a href="/miller" class="btn btn-light shadow-sm">
-                        <i class="fa fa-arrow-left me-1"></i> Back
-                    </a>
-                </div>
-            </div>
+    .amount-value {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #b45309;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="pending-hero">
+    <div class="container text-center">
+        <h2 class="fw-800 text-white mb-2" data-aos="fade-up">Outstanding Receivables</h2>
+        <p class="text-white opacity-75 fw-600 mb-5" data-aos="fade-up" data-aos-delay="100">Monitor and reconcile
+            pending trade payments from logistics fulfillment.</p>
+
+        <div class="d-flex justify-content-center" data-aos="fade-up" data-aos-delay="200">
+            <input type="text" id="pendingSearch" class="search-enterprise"
+                placeholder="Search Order, Buyer, or Truck Ref..." style="max-width: 450px;">
         </div>
     </div>
+</section>
 
-    <main class="flex-grow-1">
-        <div class="container mb-5">
+<div class="container pending-container">
+    {% if all_bookings %}
+    <div id="pendingGrid">
+        {% for b in all_bookings %}
+        {% set booking_id = b[0] %}
+        {% set trucks = invoices_map.get(booking_id, []) %}
 
-            {% if all_bookings %}
-            {% for b in all_bookings %}
-            {% set booking_id = b[0] %}
-            {% set order_id = b[10] %}
-            {% set buyer_name = b[1] %}
-            {% set crop_name = b[2] %}
-            {% set price = b[19] %}
-            {% set trucks = invoices_map.get(booking_id, []) %}
-
-            {% if trucks %}
-            <div class="section-card booking-section">
-                <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
-                    <div>
-                        <h5 class="fw-bold text-primary mb-0">{{ order_id }}</h5>
-                        <small class="text-muted">{{ buyer_name }} • {{ crop_name|capitalize }}</small>
-                    </div>
-                    <span class="badge bg-warning text-dark">{{ trucks|length }} Trucks Pending Pay</span>
+        {% if trucks %}
+        <div class="revenue-card" data-aos="fade-up" data-search="{{ b[10]|lower }} {{ b[1]|lower }} {{ b[2]|lower }}">
+            <div class="revenue-header d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="badge bg-warning-subtle text-warning-emphasis fw-800 mb-1 rounded-pill px-3">{{ b[10]
+                        }}</span>
+                    <h5 class="fw-800 mb-0">{{ b[1] }} · <span class="text-capitalize">{{ b[2] }}</span></h5>
                 </div>
+                <div class="text-end">
+                    <div
+                        class="badge bg-white text-warning-emphasis border border-warning-subtle fw-800 px-3 py-2 rounded-pill">
+                        {{ trucks|length }} TRUCKS PENDING
+                    </div>
+                </div>
+            </div>
 
+            <div class="p-4">
                 <div class="row g-3">
                     {% for truck in trucks %}
-                    {% set truck_id = truck.id %}
-                    {% set truck_num = truck.truck_number or loop.index %}
-                    {% set truck_qty = truck.qty %}
-                    {% set final_invoice = truck.final_invoice_file %}
-                    {% set amount = truck_qty * price %}
-
-                    <div class="col-md-6 col-lg-4">
-                        <div class="card completed-loading-card p-3">
-                            <div class="d-flex justify-content-between mb-2">
-                                <h6 class="fw-bold mb-0">Truck {{ truck_num }}</h6>
-                                <span class="badge bg-light text-dark border">{{ truck_qty }} Qt</span>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="truck-payment-box">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="fw-800 text-dark">{{ truck.truck_number or 'Truck #' ~ loop.index }}</div>
+                                <div class="text-muted fw-800 small">{{ truck.qty }} Qt</div>
                             </div>
 
-                            <div class="mb-3">
-                                <small class="text-muted d-block">Price: ₹{{ price }}/Qt</small>
-                                <strong class="text-success fs-5">₹{{ amount }}</strong>
+                            <div class="amount-display mb-3">
+                                <span class="amount-label">Payable Amount</span>
+                                <span class="amount-value text-success">₹{{ (truck.qty * b[19])|format_currency
+                                    }}</span>
                                 {% if truck.qc_freight %}
-                                <div class="mt-1 small text-success fw-bold">
-                                    <i class="fa fa-truck-fast"></i> Freight: ₹{{ truck.qc_freight }}
-                                </div>
+                                <div class="small fw-800 text-primary mt-1"><i class="fa fa-truck-fast me-1"></i>
+                                    Freight: ₹{{ truck.qc_freight }}</div>
                                 {% endif %}
                             </div>
 
                             <div class="d-grid gap-2">
-                                <a href="/static/uploads/bills/{{ final_invoice }}" target="_blank"
-                                    class="btn btn-outline-primary btn-sm">
-                                    <i class="fa fa-eye me-1"></i> View Invoice
-                                </a>
-
-                                <form method="POST" action="/miller/mark_truck_payment_done/{{ truck_id }}">
-                                    <button class="btn btn-success btn-sm w-100">
-                                        <i class="fa fa-check-circle me-1"></i> Mark Payment Done
-                                    </button>
+                                <a href="/static/uploads/bills/{{ truck.final_invoice_file }}" target="_blank"
+                                    class="btn btn-white border fw-800 btn-sm py-2">View Hisab</a>
+                                <form method="POST" action="/miller/mark_truck_payment_done/{{ truck.id }}">
+                                    <button class="btn btn-enterprise btn-sm w-100 fw-800 py-2 rounded-pill">Mark
+                                        Received</button>
                                 </form>
                             </div>
                         </div>
@@ -140,36 +139,29 @@
                     {% endfor %}
                 </div>
             </div>
-            {% endif %}
-            {% endfor %}
-
-            {% else %}
-            <div class="text-center py-5">
-                <i class="fa fa-check-circle text-muted" style="font-size: 3rem;"></i>
-                <p class="text-muted mt-3">No pending payments found.</p>
-            </div>
-            {% endif %}
-
         </div>
-    </main>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5 bg-white rounded-5 shadow-sm">
+        <i class="fa fa-hand-holding-dollar text-muted fs-1 opacity-25 mb-3"></i>
+        <h4 class="fw-800 text-muted">No Pending Dues</h4>
+        <p class="text-muted fw-600">All trade accounts are currently settled.</p>
+    </div>
+    {% endif %}
+</div>
 
-    {% include '_footer.html' %}
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.getElementById('pendingSearch').addEventListener('keyup', function () {
-            let filter = this.value.toLowerCase();
-            let cards = document.querySelectorAll('.booking-section');
+{% endblock %}
 
-            cards.forEach(card => {
-                let text = card.textContent.toLowerCase();
-                if (text.includes(filter)) {
-                    card.style.display = '';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
+{% block extra_js %}
+<script>
+    document.getElementById('pendingSearch').addEventListener('input', function (e) {
+        const term = e.target.value.toLowerCase();
+        document.querySelectorAll('.revenue-card').forEach(card => {
+            const content = card.dataset.search;
+            card.style.display = content.includes(term) ? '' : 'none';
         });
-    </script>
-</body>
-
-</html>
+    });
+</script>
+{% endblock %}

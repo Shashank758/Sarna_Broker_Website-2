@@ -1,161 +1,274 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Farmer Dashboard | Sarna Broker</title>
+{% extends "base.html" %}
 
-<!-- Bootstrap -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+{% block title %}Farmer Dashboard | Saarna Canvessars{% endblock %}
 
-<!-- Font Awesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+{% block extra_css %}
+<style>
+  .farmer-hero {
+    background: linear-gradient(135deg, var(--accent) 0%, #15803d 100%);
+    color: white;
+    padding: 60px 0;
+    margin-bottom: 40px;
+    border-radius: 0 0 40px 40px;
+    box-shadow: var(--shadow-xl);
+  }
 
-<link rel="stylesheet" href="/static/css/style.css">
-</head>
+  .stat-card-farmer {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 24px;
+    border-radius: 20px;
+    transition: var(--transition);
+    text-align: center;
+    flex: 1;
+  }
 
-<body class="bg-light">
+  .stat-card-farmer:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.2);
+  }
 
-<!-- ================= HEADER ================= -->
-<div class="market-header">
-  <div class="d-flex justify-content-between align-items-center">
-    <div>
-      <h4 class="mb-0">Farmer Dashboard</h4>
-      <small class="opacity-75">Manage your crops & prices</small>
-    </div>
-    <a href="/post_crop" class="btn btn-light fw-semibold">
-      <i class="fa fa-plus"></i> Add Crop
-    </a>
-  </div>
-</div>
+  .premium-crop-card {
+    background: #fff;
+    border-radius: 24px;
+    border: 1px solid var(--border);
+    transition: var(--transition);
+    margin-bottom: 30px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
 
-<!-- ================= STATS ================= -->
-<div class="container mt-4">
-  <div class="row g-3">
-    <div class="col-md-4">
-      <div class="stat-box">
-        <i class="fa fa-seedling"></i>
-        <div>
-          <h6>Total Crops</h6>
-          <p>{{ crops|length }}</p>
+  .premium-crop-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-2xl);
+  }
+
+  .crop-banner {
+    height: 200px;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .crop-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .crop-banner i {
+    font-size: 4rem;
+    color: var(--primary-light);
+    opacity: 0.3;
+  }
+
+  .status-badge-premium {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 800;
+    font-size: 0.75rem;
+    box-shadow: var(--shadow-md);
+    letter-spacing: 0.5px;
+  }
+
+  .badge-active {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  .badge-sold {
+    background: var(--text-dark);
+    color: #fff;
+  }
+
+  .crop-body {
+    padding: 30px;
+    flex-grow: 1;
+  }
+
+  .crop-price-circle {
+    width: 80px;
+    height: 80px;
+    background: #fdf6e6;
+    border: 2px solid #f59e0b;
+    color: #f59e0b;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    bottom: -40px;
+    right: 30px;
+    box-shadow: var(--shadow-lg);
+    z-index: 5;
+  }
+
+  .action-bar-farmer {
+    padding: 20px 30px;
+    background: #fafafa;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    gap: 12px;
+  }
+
+  .search-minimal {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 10px 16px;
+    color: white;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: var(--transition);
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .search-minimal::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .search-minimal:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="farmer-hero">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-7" data-aos="fade-right">
+        <div class="d-flex align-items-center mb-3">
+          <span class="badge bg-white text-dark rounded-pill px-3 py-2 fw-800 me-3">ANNADATA</span>
+          <span class="text-white opacity-75 small fw-600"><i class="fa fa-tractor me-1"></i> Farmer Dashboard</span>
+        </div>
+        <h1 class="display-5 fw-800 text-white mb-2">Grow your trade</h1>
+        <p class="text-white opacity-75 fs-5 mb-4">You have listed <strong>{{ crops|length }} crops</strong> for sale.
+        </p>
+
+        <div class="d-flex gap-4 flex-wrap mt-5">
+          <div class="stat-card-farmer">
+            <small class="text-white-50 d-block text-uppercase fw-800 fs-xs mb-1">Listed</small>
+            <span class="fs-2 fw-800">{{ crops|length }}</span>
+          </div>
+          <div class="stat-card-farmer">
+            <small class="text-white-50 d-block text-uppercase fw-800 fs-xs mb-1">Available</small>
+            <span class="fs-2 fw-800 text-warning">{{ crops|selectattr(8,'equalto',0)|list|length }}</span>
+          </div>
+          <div class="stat-card-farmer">
+            <small class="text-white-50 d-block text-uppercase fw-800 fs-xs mb-1">Sold out</small>
+            <span class="fs-2 fw-800 text-white">{{ crops|selectattr(8,'equalto',1)|list|length }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-5 text-end d-none d-lg-block" data-aos="zoom-in">
+        <div class="position-relative">
+          <a href="/post_crop" class="btn btn-white btn-lg rounded-pill px-5 py-3 fw-800 shadow-xl mb-4">
+            <i class="fa fa-plus-circle me-2"></i> List New Commodity
+          </a>
+        </div>
+        <div class="mt-2">
+          <input type="text" id="cropSearch" class="search-minimal ms-auto" placeholder="Find listed crops...">
         </div>
       </div>
     </div>
+  </div>
+</section>
 
-    <div class="col-md-4">
-      <div class="stat-box">
-        <i class="fa fa-check-circle"></i>
-        <div>
-          <h6>Active</h6>
-          <p>{{ crops|selectattr(8,'equalto',0)|list|length }}</p>
+<div class="container mb-5 pb-5">
+  {% if crops %}
+  <div class="row mt-4">
+    {% for c in crops %}
+    <div class="col-md-6 col-lg-6 mb-4 crop-wrapper" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
+      <div class="premium-crop-card">
+        <div class="crop-banner">
+          {% if c[7] %}
+          <img src="{{ url_for('static', filename='uploads/crops/' + c[7]) }}" alt="{{ c[2] }}">
+          {% else %}
+          <i class="fa fa-leaf"></i>
+          {% endif %}
+
+          <span class="status-badge-premium {{ 'badge-sold' if c[8]==1 else 'badge-active' }}">
+            {{ 'SOLD OUT' if c[8]==1 else 'AVAILABLE' }}
+          </span>
+
+          <div class="crop-price-circle">
+            <span class="small fw-800" style="line-height: 1;">₹{{ c[4] }}</span>
+            <span class="very-small fw-600 opacity-75">/Qt</span>
+          </div>
+        </div>
+
+        <div class="crop-body">
+          <div class="d-flex justify-content-between align-items-start mb-4">
+            <div>
+              <h3 class="fw-800 text-dark mb-1 text-capitalize">{{ c[2] }}</h3>
+              <div class="text-muted small fw-600"><i class="fa fa-map-marker-alt me-1"></i>{{ c[6] }}</div>
+            </div>
+          </div>
+
+          <div class="row g-3 px-3 py-3 bg-light rounded-4">
+            <div class="col-4 border-end">
+              <label class="detail-label d-block text-center" style="font-size: 0.6rem;">Quantity</label>
+              <span class="fw-800 d-block text-center">{{ c[5] }} Qt</span>
+            </div>
+            <div class="col-4 border-end">
+              <label class="detail-label d-block text-center" style="font-size: 0.6rem;">Variety</label>
+              <span class="fw-800 d-block text-center text-truncate">{{ c[3] or 'Standard' }}</span>
+            </div>
+            <div class="col-4">
+              <label class="detail-label d-block text-center" style="font-size: 0.6rem;">Trade ID</label>
+              <span class="fw-700 d-block text-center text-muted">#{{ c[0] }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-bar-farmer">
+          <a href="/edit_crop/{{ c[0] }}" class="btn btn-light border flex-grow-1 fw-800 py-2"><i
+              class="fa fa-edit me-2"></i>Edit</a>
+          <a href="/delete_crop/{{ c[0] }}" class="btn btn-outline-danger fw-800 py-2 px-3"
+            onclick="return confirm('Delete this listing?')"><i class="fa fa-trash"></i></a>
+
+          {% if c[8] == 0 %}
+          <a href="/mark_sold/{{ c[0] }}" class="btn btn-dark fw-800 py-2 px-4 shadow-sm">Mark Sold</a>
+          {% endif %}
         </div>
       </div>
     </div>
-
-    <div class="col-md-4">
-      <div class="stat-box">
-        <i class="fa fa-lock"></i>
-        <div>
-          <h6>Sold</h6>
-          <p>{{ crops|selectattr(8,'equalto',1)|list|length }}</p>
-        </div>
-      </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-5 bg-white rounded-5 border-2 border-dashed mt-4 shadow-sm">
+    <div class="mb-4">
+      <i class="fa fa-seedling text-muted fs-1 opacity-25"></i>
     </div>
+    <h4 class="fw-800 text-muted">No Crops Listed Yet</h4>
+    <p class="text-muted mb-4">Join the marketplace by listing your first commodity today.</p>
+    <a href="/post_crop" class="btn btn-enterprise rounded-pill px-5 fw-800 py-3 shadow-lg">Start Selling</a>
   </div>
+  {% endif %}
 </div>
 
-<!-- ================= CROPS SHOWCASE ================= -->
-<div class="container mt-4 mb-5">
+<script>
+  document.getElementById('cropSearch').addEventListener('keyup', function () {
+    let filter = this.value.toLowerCase();
+    let wrappers = document.querySelectorAll('.crop-wrapper');
 
-<div class="row g-4">
-
-{% for c in crops %}
-<div class="col-lg-6">
-
-  <div class="crop-modern-card flex-column">
-
-    <!-- IMAGE BANNER -->
-    <div class="crop-img" style="width:100%; height:230px;">
-      {% if c[7] %}
-        <img src="{{ url_for('static', filename='uploads/crops/' + c[7]) }}">
-      {% else %}
-        <i class="fa fa-leaf"></i>
-      {% endif %}
-
-      <span class="status-chip {{ 'sold' if c[8]==1 else 'active' }}">
-        {{ 'Sold' if c[8]==1 else 'Active' }}
-      </span>
-    </div>
-
-    <!-- CARD BODY -->
-    <div class="crop-content">
-
-      <div class="d-flex justify-content-between align-items-center">
-        <h5 class="mb-1">{{ c[2]|capitalize }}</h5>
-        <span class="price-big">₹{{ c[4] }}</span>
-      </div>
-
-      <p class="text-muted mb-2">
-        <i class="fa fa-location-dot"></i> {{ c[6] }}
-      </p>
-
-      <!-- INFO GRID -->
-      <div class="crop-meta">
-        <div>
-          <small>Quantity</small>
-          <strong>{{ c[5] }}</strong>
-        </div>
-        <div>
-          <small>Variety</small>
-          <strong>{{ c[3] or 'N/A' }}</strong>
-        </div>
-        <div>
-          <small>Status</small>
-          <strong>{{ 'Active' if c[8]==0 else 'Sold' }}</strong>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- ACTION FOOTER -->
-    <div class="crop-actions px-3 pb-3">
-      <a href="/edit_crop/{{ c[0] }}" class="btn btn-outline-success btn-sm">
-        <i class="fa fa-pen"></i> Edit
-      </a>
-
-      <a href="/delete_crop/{{ c[0] }}" class="btn btn-outline-danger btn-sm">
-        <i class="fa fa-trash"></i>
-      </a>
-
-      {% if c[8] == 0 %}
-      <a href="/mark_sold/{{ c[0] }}" class="btn btn-success btn-sm">
-        Mark Sold
-      </a>
-      {% endif %}
-    </div>
-
-  </div>
-
-</div>
-{% endfor %}
-
-</div>
-</div>
-
-<!-- ================= BOTTOM NAV ================= -->
-<div class="bottom-nav">
-  <div class="nav-item">
-    <a href="/market"><i class="fa fa-store"></i><br>Market</a>
-  </div>
-  <div class="nav-item active">
-    <i class="fa fa-seedling"></i><br>Dashboard
-  </div>
-  <div class="nav-item">
-    <a href="/post_crop"><i class="fa fa-plus-circle"></i><br>Sell</a>
-  </div>
-  <div class="nav-item">
-    <a href="/profile"><i class="fa fa-user"></i><br>Profile</a>
-  </div>
-</div>
-
-</body>
-</html>
+    wrappers.forEach(wrap => {
+      let text = wrap.textContent.toLowerCase();
+      wrap.style.display = text.includes(filter) ? '' : 'none';
+    });
+  });
+</script>
+{% endblock %}

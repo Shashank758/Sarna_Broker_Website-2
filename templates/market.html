@@ -1,458 +1,604 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marketplace | Saarna Canvessars</title>
+{% block title %}Marketplace | Saarna Canvessars{% endblock %}
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css">
+{% block extra_css %}
+<style>
+    .market-hero {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: white;
+        padding: 60px 0;
+        margin-bottom: 40px;
+        border-radius: 0 0 40px 40px;
+        box-shadow: var(--shadow-xl);
+        position: relative;
+        overflow: hidden;
+    }
 
-    <style>
-        :root {
-            --primary: #0f9b5f;
-            --primary-dark: #0d8a54;
-            --primary-light: #12b36e;
-            --bg-light: #f8fafc;
-            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            --radius: 16px;
+    .market-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('/static/image/login_bg.png') center center;
+        background-size: cover;
+        opacity: 0.1;
+        mix-blend-mode: overlay;
+    }
+
+    .stat-card-premium {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 24px;
+        border-radius: 20px;
+        transition: var(--transition);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        flex: 1;
+        min-width: 160px;
+    }
+
+    .stat-card-premium:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.15);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        opacity: 0.8;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+    }
+
+    .stat-value {
+        font-size: 1.75rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+
+    .nav-pills-premium {
+        gap: 12px;
+        margin-bottom: 32px;
+    }
+
+    .nav-pills-premium .nav-link {
+        border-radius: 12px;
+        padding: 12px 24px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: var(--text-light);
+        background: #fff;
+        border: 1px solid var(--border);
+        transition: var(--transition);
+    }
+
+    .nav-pills-premium .nav-link.active {
+        background: var(--primary);
+        color: #fff;
+        border-color: var(--primary);
+        box-shadow: 0 8px 20px rgba(10, 138, 84, 0.2);
+    }
+
+    .premium-stock-card {
+        background: #fff;
+        border-radius: 24px;
+        border: 1px solid var(--border);
+        transition: var(--transition);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .premium-stock-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-2xl);
+        border-color: var(--primary-light);
+    }
+
+    .stock-visual {
+        background: var(--primary-subtle);
+        padding: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .stock-visual i {
+        font-size: 3rem;
+        color: var(--primary);
+        filter: drop-shadow(0 4px 10px rgba(10, 138, 84, 0.2));
+    }
+
+    .live-indicator {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        background: #fff;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 800;
+        color: var(--primary);
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .pulse-dot {
+        width: 6px;
+        height: 6px;
+        background: var(--primary);
+        border-radius: 50%;
+        animation: pulse-dot 1.5s infinite;
+    }
+
+    @keyframes pulse-dot {
+        0% {
+            transform: scale(1);
+            opacity: 1;
         }
 
-        body {
-            background-color: var(--bg-light);
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            color: #1e293b;
+        50% {
+            transform: scale(1.5);
+            opacity: 0.5;
         }
 
-        .market-hero {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            padding: 2rem 0;
-            margin-bottom: 2rem;
-            border-bottom-left-radius: 40px;
-            border-bottom-right-radius: 40px;
-            box-shadow: 0 4px 20px rgba(15, 155, 95, 0.2);
+        100% {
+            transform: scale(1);
+            opacity: 1;
         }
+    }
 
-        .stat-pill {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 1rem 1.5rem;
-            border-radius: var(--radius);
-            transition: transform 0.3s ease;
-        }
+    .stock-info {
+        padding: 24px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
 
-        .stat-pill:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.15);
-        }
+    .stock-price {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: var(--text);
+        letter-spacing: -0.5px;
+        margin-bottom: 12px;
+    }
 
-        .nav-tabs-custom {
-            border: none;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
+    .stock-price small {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
 
-        .nav-tabs-custom .nav-link {
-            border: none;
-            border-radius: 30px;
-            padding: 0.8rem 1.5rem;
-            color: #64748b;
-            font-weight: 600;
-            background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-        }
+    .stock-meta {
+        background: var(--bg);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 20px;
+    }
 
-        .nav-tabs-custom .nav-link.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 4px 15px rgba(15, 155, 95, 0.3);
-        }
+    .meta-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 0.85rem;
+    }
 
-        .stock-card {
-            background: white;
-            border-radius: var(--radius);
-            border: 1px solid #e2e8f0;
-            transition: all 0.3s ease;
-            height: 100%;
-            overflow: hidden;
-        }
+    .meta-item:last-child {
+        margin-bottom: 0;
+    }
 
-        .stock-card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--card-shadow);
-            border-color: var(--primary);
-        }
+    .meta-label {
+        color: var(--text-muted);
+        font-weight: 500;
+    }
 
-        .stock-header {
-            background: #f8fafc;
-            padding: 1.25rem;
-            border-bottom: 1px solid #e2e8f0;
-        }
+    .meta-value {
+        color: var(--text);
+        font-weight: 700;
+    }
 
-        .stock-body {
-            padding: 1.25rem;
-        }
+    .btn-premium-book {
+        background: var(--primary-gradient);
+        color: #fff;
+        border: none;
+        padding: 14px;
+        border-radius: 12px;
+        font-weight: 700;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
 
-        .price-tag {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--primary);
-        }
+    .btn-premium-book:hover {
+        background: var(--primary-gradient-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(10, 138, 84, 0.3);
+        color: #fff;
+    }
 
-        .badge-status {
-            padding: 0.5rem 1rem;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-        }
+    .order-summary-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 30px;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-md);
+    }
 
-        .btn-book {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 0.8rem;
-            border-radius: 12px;
-            font-weight: 700;
-            width: 100%;
-            transition: all 0.3s ease;
-        }
+    .modal-premium {
+        border-radius: 30px;
+        overflow: hidden;
+    }
 
-        .btn-book:hover {
-            background: var(--primary-dark);
-            box-shadow: 0 4px 12px rgba(15, 155, 95, 0.3);
-            transform: scale(1.02);
-        }
+    .modal-gradient-header {
+        background: var(--primary-gradient);
+        color: #fff;
+        padding: 30px;
+        border: none;
+    }
+</style>
+{% endblock %}
 
-        .summary-card {
-            background: white;
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            border-left: 5px solid var(--primary);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            background: white;
-            border-radius: var(--radius);
-            border: 2px dashed #e2e8f0;
-        }
-    </style>
-</head>
-
-<body>
-
-    {% include '_navbar.html' %}
-
-    <section class="market-hero">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-7" data-aos="fade-right">
-                    <h1 class="fw-bold mb-2">Welcome, {{ buyer_name }}</h1>
-                    <p class="mb-4 opacity-75"><i class="fa fa-map-marker-alt me-2"></i>{{ buyer_address }}</p>
-                    <div class="d-flex gap-3 flex-wrap">
-                        <div class="stat-pill text-center">
-                            <small class="d-block opacity-75 mb-1">Total Booked</small>
-                            <span class="fs-4 fw-bold">{{ total_booked }} Qt</span>
-                        </div>
-                        <div class="stat-pill text-center">
-                            <small class="d-block opacity-75 mb-1">Total Loaded</small>
-                            <span class="fs-4 fw-bold text-info">{{ total_loaded }} Qt</span>
-                        </div>
-                        <div class="stat-pill text-center">
-                            <small class="d-block opacity-75 mb-1">Remaining</small>
-                            <span class="fs-4 fw-bold text-warning">{{ total_remaining }} Qt</span>
-                        </div>
-                    </div>
+{% block content %}
+<section class="market-hero">
+    <div class="container position-relative" style="z-index: 2;">
+        <div class="row align-items-center">
+            <div class="col-lg-7" data-aos="fade-right">
+                <div class="d-flex align-items-center mb-3">
+                    <span class="badge bg-white text-primary rounded-pill px-3 py-2 fw-800 me-3">LIVE MANDI</span>
+                    <span class="text-white opacity-75 small fw-600"><i class="fa fa-clock me-1"></i> Market Open</span>
                 </div>
-                <div class="col-lg-5 text-end d-none d-lg-block" data-aos="zoom-in">
-                    <img src="/static/image/Sarna broker.png" alt="Sarna Broker"
-                        style="max-height: 180px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));">
+                <h1 class="display-5 fw-800 text-white mb-2">Welcome, {{ buyer_name }}</h1>
+                <p class="text-white opacity-75 fs-5 mb-4"><i class="fa fa-map-marker-alt me-2"></i>{{ buyer_address }}
+                </p>
+
+                <div class="d-flex gap-4 flex-wrap mt-5">
+                    <div class="stat-card-premium">
+                        <span class="stat-label">Total Booked</span>
+                        <span class="stat-value" data-count="{{ total_booked }}">0</span>
+                    </div>
+                    <div class="stat-card-premium">
+                        <span class="stat-label">Total Loaded</span>
+                        <span class="stat-value text-accent" data-count="{{ total_loaded }}">0</span>
+                    </div>
+                    <div class="stat-card-premium">
+                        <span class="stat-label">Pending</span>
+                        <span class="stat-value text-warning" data-count="{{ total_remaining }}">0</span>
+                    </div>
                 </div>
             </div>
+            <div class="col-lg-5 text-end d-none d-lg-block" data-aos="zoom-in">
+                <img src="/static/image/Sarna broker.png" alt="Sarna Broker"
+                    style="max-height: 240px; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.3));">
+            </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <div class="container mb-5">
-        <!-- FLASH MESSAGES -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        {% for category, message in messages %}
-        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show rounded-pill px-4 shadow-sm"
-            role="alert">
-            <i class="fa {{ 'fa-exclamation-circle' if category == 'error' else 'fa-check-circle' }} me-2"></i>
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
+<div class="container mb-5 pb-5">
+    <ul class="nav nav-pills nav-pills-premium justify-content-center" id="marketTabs" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active" id="live-rates-tab" data-bs-toggle="tab" data-bs-target="#live-rates"
+                type="button" role="tab">
+                <i class="fa fa-chart-line me-2"></i>Live Market Rates
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="my-orders-tab" data-bs-toggle="tab" data-bs-target="#my-orders" type="button"
+                role="tab">
+                <i class="fa fa-shopping-bag me-2"></i>My Bookings
+                {% if requested_bookings|length > 0 %}
+                <span class="ms-2 px-2 py-1 bg-danger text-white rounded-pill" style="font-size: 0.7rem;">{{
+                    requested_bookings|length }}</span>
+                {% endif %}
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="farmers-crops-tab" data-bs-toggle="tab" data-bs-target="#farmers-crops"
+                type="button" role="tab">
+                <i class="fa fa-wheat-awn me-2"></i>Farmer Collections
+            </button>
+        </li>
+    </ul>
 
-        <ul class="nav nav-tabs nav-tabs-custom" id="marketTabs" role="tablist">
-            <li class="nav-item">
-                <button class="nav-link active" id="live-rates-tab" data-bs-toggle="tab" data-bs-target="#live-rates"
-                    type="button" role="tab">
-                    <i class="fa fa-bolt me-2"></i>Live Market Rates
-                </button>
-            </li>
-            <li class="nav-item">
-                <button class="nav-link" id="my-orders-tab" data-bs-toggle="tab" data-bs-target="#my-orders"
-                    type="button" role="tab">
-                    <i class="fa fa-shopping-cart me-2"></i>My Bookings
-                    {% if requested_bookings|length > 0 %}
-                    <span class="badge bg-danger rounded-pill ms-2">{{ requested_bookings|length }}</span>
-                    {% endif %}
-                </button>
-            </li>
-            <li class="nav-item">
-                <button class="nav-link" id="farmers-crops-tab" data-bs-toggle="tab" data-bs-target="#farmers-crops"
-                    type="button" role="tab">
-                    <i class="fa fa-seedling me-2"></i>Farmer Collections
-                </button>
-            </li>
-        </ul>
-
-        <div class="tab-content" id="marketTabsContent">
-            <!-- LIVE RATES TAB -->
-            <div class="tab-pane fade show active" id="live-rates" role="tabpanel">
-                <div class="row g-4">
-                    {% if miller_stocks %}
-                    {% for stock in miller_stocks %}
-                    <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
-                        <div class="stock-card">
-                            <div class="stock-header d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h5 class="fw-bold mb-0 text-capitalize">{{ stock[2] }}</h5>
-                                    <small class="text-muted"><i class="fa fa-industry me-1"></i>{{ stock[10] }}</small>
-                                </div>
-                                <span class="badge-status bg-success-subtle text-success">Live Now</span>
-                            </div>
-                            <div class="stock-body">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <div class="price-tag">₹{{ stock[4] }}<small
-                                            class="fs-6 text-muted fw-normal">/Qt</small></div>
-                                    <div class="text-end">
-                                        <span class="d-block fw-bold">{{ stock[3] }} Qt</span>
-                                        <small class="text-muted">Available</small>
-                                    </div>
-                                </div>
-
-                                <div class="mb-3 p-3 bg-light rounded-3">
-                                    <div class="d-flex justify-content-between small mb-1">
-                                        <span>Location:</span>
-                                        <span class="fw-bold">{{ stock[13] }}, {{ stock[14] }}</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between small">
-                                        <span>Condition:</span>
-                                        <span class="text-primary fw-bold">{{ stock[5] }}</span>
-                                    </div>
-                                </div>
-
-                                {% if session.role != 'admin' %}
-                                <button class="btn btn-book" data-bs-toggle="modal"
-                                    data-bs-target="#bookModal{{ stock[0] }}">
-                                    <i class="fa fa-shopping-basket me-2"></i>Book Now
-                                </button>
-                                {% endif %}
+    <div class="tab-content mt-4" id="marketTabsContent">
+        <!-- LIVE RATES TAB -->
+        <div class="tab-pane fade show active" id="live-rates" role="tabpanel">
+            <div class="row g-4">
+                {% if miller_stocks %}
+                {% for stock in miller_stocks %}
+                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
+                    <div class="premium-stock-card">
+                        <div class="stock-visual">
+                            <i class="fa fa-seedling"></i>
+                            <div class="live-indicator">
+                                <div class="pulse-dot"></div> LIVE
                             </div>
                         </div>
-                    </div>
+                        <div class="stock-info">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <h5 class="fw-800 text-capitalize mb-0">{{ stock[2] }}</h5>
+                                <span
+                                    class="badge bg-primary-subtle text-primary border-primary-subtle border">Available</span>
+                            </div>
+                            <small class="text-muted fw-600 mb-3"><i class="fa fa-industry me-1"></i>{{ stock[10]
+                                }}</small>
 
-                    <!-- Booking Modal -->
-                    <div class="modal fade" id="bookModal{{ stock[0] }}" tabindex="-1">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-                                <div class="modal-header border-0 pb-0">
-                                    <h5 class="fw-bold">Book {{ stock[2] }}</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            <div class="stock-price">
+                                ₹{{ stock[4] }}<small>/Quintal</small>
+                            </div>
+
+                            <div class="stock-meta">
+                                <div class="meta-item">
+                                    <span class="meta-label">Quantity</span>
+                                    <span class="meta-value">{{ stock[3] }} Qt</span>
                                 </div>
-                                <form action="/book_miller_stock/{{ stock[0] }}" method="POST">
-                                    <div class="modal-body p-4">
-                                        <p class="text-muted small mb-4">You are booking from <strong>{{ stock[10]
-                                                }}</strong> at <strong>₹{{ stock[4] }}</strong> per quintal.</p>
+                                <div class="meta-item">
+                                    <span class="meta-label">Location</span>
+                                    <span class="meta-value">{{ stock[13] }}, {{ stock[14] }}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Condition</span>
+                                    <span class="meta-value text-primary">{{ stock[5] }}</span>
+                                </div>
+                            </div>
 
-                                        <div class="mb-3">
-                                            <label class="form-label fw-bold small">Quantity to Book (Qt)</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white border-end-0"><i
-                                                        class="fa fa-weight-hanging text-primary"></i></span>
-                                                <input type="number" name="quantity" class="form-control border-start-0"
-                                                    step="0.01" max="{{ stock[3] }}" required
-                                                    placeholder="Enter quantity in quintals">
+                            {% if session.role != 'admin' %}
+                            <button class="btn btn-premium-book" data-bs-toggle="modal"
+                                data-bs-target="#bookModal{{ stock[0] }}">
+                                <i class="fa fa-file-signature me-2"></i>Book Stock
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Booking Modal -->
+                <div class="modal fade" id="bookModal{{ stock[0] }}" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content modal-premium border-0 shadow-2xl">
+                            <div class="modal-gradient-header position-relative">
+                                <h4 class="fw-800 mb-1">Confirm Booking</h4>
+                                <p class="mb-0 opacity-75">Secure these rates before they change.</p>
+                                <button type="button" class="btn-close btn-close-white position-absolute"
+                                    style="top: 20px; right: 20px;" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form action="/book_miller_stock/{{ stock[0] }}" method="POST">
+                                <div class="modal-body p-4 pt-5">
+                                    <div class="d-flex align-items-center mb-4 p-3 bg-light rounded-4">
+                                        <div class="flex-shrink-0 me-3">
+                                            <div class="bg-white rounded-3 shadow-sm p-2">
+                                                <i class="fa fa-industry text-primary fs-3"></i>
                                             </div>
-                                            <small class="text-muted mt-2 d-block">Max available: {{ stock[3] }}
-                                                Qt</small>
                                         </div>
+                                        <div>
+                                            <h6 class="fw-700 mb-0">{{ stock[10] }}</h6>
+                                            <small class="text-muted">{{ stock[2] }} @ ₹{{ stock[4] }}/Qt</small>
+                                        </div>
+                                    </div>
 
-                                        <div class="p-3 bg-primary-subtle text-primary rounded-3 small">
-                                            <i class="fa fa-info-circle me-2"></i>Once booked, the miller will reach out
-                                            to you for verification and loading details.
+                                    <div class="mb-4">
+                                        <label class="form-label fw-700 small text-uppercase">Booking Quantity
+                                            (Quintals)</label>
+                                        <div class="input-group input-group-lg">
+                                            <span class="input-group-text bg-light border-0"><i
+                                                    class="fa fa-weight-hanging text-muted"></i></span>
+                                            <input type="number" name="quantity" class="form-control bg-light border-0"
+                                                step="0.01" max="{{ stock[3] }}" required placeholder="0.00">
+                                            <span class="input-group-text bg-light border-0 fw-700">QT</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mt-2">
+                                            <small class="text-muted">Max Capacity: {{ stock[3] }} Qt</small>
+                                            <small class="text-primary fw-600">Secure Rate</small>
                                         </div>
                                     </div>
-                                    <div class="modal-footer border-0 pt-0">
-                                        <button type="button" class="btn btn-light rounded-pill px-4"
-                                            data-bs-dismiss="modal">Cancel</button>
-                                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Confirm
-                                            Booking</button>
+
+                                    <div class="alert alert-info border-0 rounded-4 p-3 d-flex align-items-center mb-0">
+                                        <i class="fa fa-shield-halved me-3 fs-3 text-info"></i>
+                                        <small class="fw-500">Upon confirmation, our brokers will verify the stock and
+                                            coordinate loading with {{ stock[10] }}.</small>
                                     </div>
-                                </form>
-                            </div>
+                                </div>
+                                <div class="modal-footer border-0 p-4">
+                                    <button type="submit" class="btn btn-premium-book w-100 py-3">
+                                        Finalize Trade <i class="fa fa-check-circle ms-2"></i>
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
-                    {% endfor %}
-                    {% else %}
-                    <div class="col-12">
-                        <div class="empty-state">
-                            <i class="fa fa-store-slash fa-4x text-muted mb-3 d-block"></i>
-                            <h3>No Live Rates Available</h3>
-                            <p class="text-muted">Currently, there are no live stocks listed by millers. Check back
-                                later.</p>
-                        </div>
-                    </div>
-                    {% endif %}
                 </div>
+                {% endfor %}
+                {% else %}
+                <div class="col-12 text-center py-5">
+                    <div class="empty-state-visual mb-4">
+                        <i class="fa fa-store-slash text-muted fs-1 opacity-25"></i>
+                    </div>
+                    <h3 class="fw-800 text-muted">No Live Market Rates</h3>
+                    <p class="text-muted">Currently, there are no live stocks listed by millers. Please check back
+                        later.</p>
+                </div>
+                {% endif %}
             </div>
+        </div>
 
-            <!-- MY ORDERS TAB -->
-            <div class="tab-pane fade" id="my-orders" role="tabpanel">
-                <div class="row g-4">
-                    <div class="col-lg-4">
-                        <div class="summary-card mb-4" data-aos="fade-up">
-                            <h6 class="fw-bold text-uppercase small text-muted mb-3">Order Summary</h6>
-                            <h2 class="fw-bold mb-4">{{ my_bookings|length }} <span
-                                    class="fs-6 fw-normal text-muted">Active Bookings</span></h2>
+        <!-- MY ORDERS TAB -->
+        <div class="tab-pane fade" id="my-orders" role="tabpanel">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="order-summary-card" data-aos="fade-up">
+                        <h6 class="fw-800 text-uppercase small text-muted mb-4 pb-2 border-bottom">Portfolio Overview
+                        </h6>
+                        <div class="mb-4">
+                            <h2 class="fw-800 mb-1">{{ my_bookings|length }}</h2>
+                            <p class="text-muted fw-600">Active Trade Cycles</p>
+                        </div>
 
-                            <div class="list-group list-group-flush">
-                                <a href="/buyer/requested"
-                                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-center border-0 px-0 mb-2">
-                                    <span><i class="fa fa-hourglass-half text-warning me-2"></i>Pending Requests</span>
-                                    <span class="badge bg-warning text-dark rounded-pill">{{ requested_bookings|length
-                                        }}</span>
-                                </a>
-                                <a href="/buyer/active"
-                                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-center border-0 px-0 mb-2">
-                                    <span><i class="fa fa-truck text-primary me-2"></i>Active Loads</span>
-                                    <span class="badge bg-primary rounded-pill">{{ my_bookings|length }}</span>
-                                </a>
-                                <a href="/buyer/loaded"
-                                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-center border-0 px-0">
-                                    <span><i class="fa fa-check-circle text-success me-2"></i>Fully Loaded</span>
-                                    <span class="badge bg-success rounded-pill">{{ loaded_bookings|length }}</span>
-                                </a>
-                            </div>
+                        <div class="list-group list-group-flush">
+                            <a href="/buyer/requested"
+                                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0 py-3 border-0 border-bottom">
+                                <span class="fw-600"><i class="fa fa-hourglass-half text-warning me-2"></i>Pending
+                                    Confirmation</span>
+                                <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill px-3">{{
+                                    requested_bookings|length }}</span>
+                            </a>
+                            <a href="/buyer/active"
+                                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0 py-3 border-0 border-bottom">
+                                <span class="fw-600"><i class="fa fa-truck-ramp-box text-primary me-2"></i>In-Transit /
+                                    Active</span>
+                                <span class="badge bg-primary-subtle text-primary rounded-pill px-3">{{
+                                    my_bookings|length }}</span>
+                            </a>
+                            <a href="/buyer/loaded"
+                                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0 py-3 border-0">
+                                <span class="fw-600"><i class="fa fa-check-double text-success me-2"></i>Completed
+                                    Trades</span>
+                                <span class="badge bg-success-subtle text-success rounded-pill px-3">{{
+                                    loaded_bookings|length }}</span>
+                            </a>
+                        </div>
+
+                        <div class="mt-4 pt-2">
+                            <a href="/buyer/active" class="btn btn-outline-primary w-100 rounded-pill fw-700">Detailed
+                                Analytics</a>
                         </div>
                     </div>
+                </div>
 
-                    <div class="col-lg-8">
-                        {% if my_bookings %}
-                        {% for b in my_bookings[:5] %}
-                        <div class="card border-0 shadow-sm mb-3 rounded-4 overflow-hidden" data-aos="fade-left">
-                            <div class="card-body p-4">
-                                <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <div>
-                                        <span class="badge bg-primary-subtle text-primary mb-2">Order #{{ b[9] if b[9]
-                                            else 'N/A' }}</span>
-                                        <h5 class="fw-bold mb-0 text-capitalize">{{ b[1] }}</h5>
-                                        <small class="text-muted">Miller: {{ b[20] }}</small>
+                <div class="col-lg-8">
+                    {% if my_bookings %}
+                    <div class="row g-3">
+                        {% for b in my_bookings[:6] %}
+                        <div class="col-12" data-aos="fade-left" data-aos-delay="{{ loop.index * 50 }}">
+                            <div class="card border-0 shadow-sm rounded-4 hover-lift">
+                                <div class="card-body p-4">
+                                    <div class="d-flex justify-content-between align-items-start mb-4">
+                                        <div>
+                                            <div class="d-flex align-items-center mb-2">
+                                                <span class="badge bg-light text-muted fw-700 me-2">#{{ b[9] if b[9]
+                                                    else 'ORDER' }}</span>
+                                                <span class="badge bg-primary-subtle text-primary fw-700">IN
+                                                    PROGRESS</span>
+                                            </div>
+                                            <h5 class="fw-800 text-capitalize mb-1">{{ b[1] }}</h5>
+                                            <small class="text-muted fw-500">Miller Partnership: {{ b[20] }}</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <h4 class="fw-800 text-primary mb-0">{{ b[2] }} QT</h4>
+                                            <small class="text-muted fw-600">Total Booked</small>
+                                        </div>
                                     </div>
-                                    <div class="text-end">
-                                        <h5 class="fw-bold text-primary mb-0">{{ b[2] }} Qt</h5>
-                                        <small class="text-muted">Booked Qty</small>
-                                    </div>
-                                </div>
-                                <div class="progress mb-2" style="height: 10px; border-radius: 10px;">
+
                                     {% set percent = (b[3] / b[2] * 100) if b[2] > 0 else 0 %}
-                                    <div class="progress-bar bg-success progress-bar-striped progress-bar-animated"
-                                        style="width: {{ percent }}%"></div>
-                                </div>
-                                <div class="d-flex justify-content-between small text-muted">
-                                    <span>{{ b[3] }} Qt Loaded</span>
-                                    <span>{{ percent|round(1) }}% Complete</span>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="flex-grow-1">
+                                            <div class="progress"
+                                                style="height: 12px; border-radius: 6px; background: var(--bg);">
+                                                <div class="progress-bar bg-primary rounded-pill"
+                                                    style="width: {{ percent }}%"></div>
+                                            </div>
+                                        </div>
+                                        <span class="fw-800 text-primary small">{{ percent|round(0) }}%</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mt-2">
+                                        <small class="text-muted fw-600">{{ b[3] }} Qt Loaded</small>
+                                        <small class="text-muted fw-600">{{ (b[2] - b[3]) }} Qt Remaining</small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         {% endfor %}
-                        <div class="text-center mt-3">
-                            <a href="/buyer/active" class="btn btn-outline-primary rounded-pill px-4">View All My
-                                Bookings</a>
-                        </div>
-                        {% else %}
-                        <div class="empty-state">
-                            <i class="fa fa-shopping-bag fa-3x text-muted mb-3 d-block"></i>
-                            <p>You haven't made any bookings yet.</p>
-                            <button class="btn btn-primary rounded-pill px-4"
-                                onclick="document.getElementById('live-rates-tab').click()">Start Shopping</button>
-                        </div>
-                        {% endif %}
                     </div>
-                </div>
-            </div>
-
-            <!-- FARMER CROPS TAB -->
-            <div class="tab-pane fade" id="farmers-crops" role="tabpanel">
-                <div class="row g-4">
-                    {% if crops %}
-                    {% for crop in crops %}
-                    <div class="col-md-6 col-lg-4">
-                        <div class="stock-card">
-                            <div class="stock-header">
-                                <h5 class="fw-bold mb-0 text-capitalize">{{ crop[1] }}</h5>
-                                <small class="text-muted"><i class="fa fa-user me-1"></i>Farmer: {{ crop[13] if
-                                    crop|length > 13 else 'User' }}</small>
-                            </div>
-                            <div class="stock-body">
-                                <div class="d-flex justify-content-between mb-3">
-                                    <div>
-                                        <span class="d-block fw-bold fs-5">{{ crop[2] }} Qt</span>
-                                        <small class="text-muted">Quantity</small>
-                                    </div>
-                                    <div class="text-end">
-                                        <span class="d-block fw-bold text-success fs-5">₹{{ crop[3] }}</span>
-                                        <small class="text-muted">Expected Price</small>
-                                    </div>
-                                </div>
-                                <div class="p-2 bg-light rounded small mb-3">
-                                    <i class="fa fa-info-circle me-1"></i> {{ crop[5] or 'No details provided' }}
-                                </div>
-                                <button class="btn btn-outline-success w-100 rounded-3">
-                                    <i class="fa fa-phone me-2"></i>Contact Farmer
-                                </button>
-                            </div>
-                        </div>
+                    {% if my_bookings|length > 6 %}
+                    <div class="text-center mt-4">
+                        <a href="/buyer/active" class="btn btn-link text-primary fw-800 text-decoration-none">View Full
+                            Portfolio <i class="fa fa-arrow-right ms-2"></i></a>
                     </div>
-                    {% endfor %}
+                    {% endif %}
                     {% else %}
-                    <div class="col-12">
-                        <div class="empty-state">
-                            <i class="fa fa-tractor fa-4x text-muted mb-3 d-block"></i>
-                            <h3>No Farmer Collections</h3>
-                            <p class="text-muted">Crops directly listed by farmers will appear here.</p>
+                    <div class="text-center py-5 bg-white rounded-4 border-2 border-dashed">
+                        <div class="mb-4 mt-3">
+                            <i class="fa fa-shopping-cart text-muted fs-1 opacity-25"></i>
                         </div>
+                        <h4 class="fw-800 text-muted">No Active Bookings</h4>
+                        <p class="text-muted mb-4">You haven't initiated any trades yet.</p>
+                        <button class="btn btn-primary rounded-pill px-5 fw-800"
+                            onclick="document.getElementById('live-rates-tab').click()">Browse Market</button>
                     </div>
                     {% endif %}
                 </div>
             </div>
         </div>
+
+        <!-- FARMER CROPS TAB -->
+        <div class="tab-pane fade" id="farmers-crops" role="tabpanel">
+            <div class="row g-4">
+                {% if crops %}
+                {% for crop in crops %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="premium-stock-card">
+                        <div class="stock-visual" style="background: #fdf6e6;">
+                            <i class="fa fa-wheat-awn" style="color: #f59e0b;"></i>
+                            <div class="live-indicator" style="color: #f59e0b;">
+                                <div class="pulse-dot" style="background: #f59e0b;"></div> FARMER LISTING
+                            </div>
+                        </div>
+                        <div class="stock-info">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <h5 class="fw-800 text-capitalize mb-0">{{ crop[1] }}</h5>
+                                <span
+                                    class="badge bg-warning-subtle text-warning border-warning-subtle border">Direct</span>
+                            </div>
+                            <small class="text-muted fw-600 mb-3"><i class="fa fa-user me-1"></i>Farmer: {{ crop[13] if
+                                crop|length > 13 else 'User' }}</small>
+
+                            <div class="stock-price text-accent">
+                                ₹{{ crop[3] }}<small>/Quintal</small>
+                            </div>
+
+                            <div class="stock-meta">
+                                <div class="meta-item">
+                                    <span class="meta-label">Quantity</span>
+                                    <span class="meta-value">{{ crop[2] }} Qt</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Details</span>
+                                    <span class="meta-value text-truncate" style="max-width: 120px;">{{ crop[5] or 'N/A'
+                                        }}</span>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-outline-enterprise w-100 rounded-pill fw-800 py-3">
+                                <i class="fa fa-phone me-2"></i>Contact Seller
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="col-12 text-center py-5">
+                    <div class="empty-state-visual mb-4">
+                        <i class="fa fa-tractor text-muted fs-1 opacity-25"></i>
+                    </div>
+                    <h3 class="fw-800 text-muted">No Farmer Collections</h3>
+                    <p class="text-muted">Crops directly listed by farmers in your region will appear here.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
     </div>
-
-    {% include '_footer.html' %}
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
-        AOS.init({
-            duration: 800,
-            once: true
-        });
-    </script>
-</body>
-
-</html>
+</div>
+{% endblock %}

@@ -1,158 +1,191 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Paid Orders | Saarna Canvessars</title>
+{% block title %}Paid Orders | Saarna Canvessars{% endblock %}
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-    rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/style.css">
+{% block extra_css %}
+<style>
+  .financial-header {
+    background: #fff;
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 30px;
+  }
 
-  <style>
-    body {
-      background: var(--bg);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+  .payment-card-premium {
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    transition: var(--transition);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
 
-    .card-pay {
-      background: #fff;
-      border-radius: var(--radius-lg);
-      padding: 20px;
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-md);
-      transition: var(--transition);
-    }
+  .payment-card-premium:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-light);
+  }
 
-    .card-pay:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-hover);
-    }
+  .payment-strip {
+    padding: 10px 20px;
+    background: #f0fdf4;
+    color: #166534;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    display: flex;
+    justify-content: space-between;
+  }
 
-    .amount {
-      font-size: 20px;
-      font-weight: 800;
-      color: var(--primary);
-    }
+  .payment-body {
+    padding: 24px;
+    flex-grow: 1;
+  }
 
-    main {
-      flex: 1;
-    }
-  </style>
-</head>
+  .payment-amount {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary);
+    letter-spacing: -0.5px;
+  }
 
-<body>
+  .payment-meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-light);
+  }
 
-  <!-- NAVBAR -->
-  {% include '_navbar.html' %}
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+  }
 
-  <main>
-    <div class="container mt-4 mb-5">
+  .meta-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
 
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <h4 class="fw-bold mb-1">
-            <i class="fa fa-circle-check text-success"></i>
-            Paid Orders
-          </h4>
-        </div>
+  .meta-value {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text);
+  }
 
-        <div class="d-flex gap-2">
-          <input type="text" id="paymentSearch" class="form-control form-control-sm" style="width: 250px;"
-            placeholder="Search Order, Truck, Location...">
-          <a href="/market" class="btn btn-outline-secondary btn-sm">
-            <i class="fa fa-arrow-left"></i> Back to Market
-          </a>
-        </div>
+  .search-minimal {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: var(--transition);
+    width: 100%;
+    max-width: 320px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="financial-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4">
+    <div>
+      <div class="d-flex align-items-center mb-1">
+        <div class="bg-success-subtle text-success rounded-pill p-2 px-3 fw-800 fs-xs me-3">SETTLED</div>
+        <h3 class="fw-800 mb-0">Financial Ledger</h3>
       </div>
+      <p class="text-muted mb-0 fw-500">Track all completed payments and download digital tax invoices.</p>
+    </div>
+    <div class="position-relative">
+      <input type="text" id="paymentSearch" class="search-minimal" placeholder="Filter by Order, Miller, Truck...">
+      <i class="fa fa-search position-absolute text-muted"
+        style="right: 16px; top: 50%; transform: translateY(-50%);"></i>
+    </div>
+  </div>
 
-      {% if payments %}
-      <div class="row g-3">
-        {% for p in payments %}
-        <div class="col-md-6">
-          <div class="card-pay">
-
-            <div class="d-flex justify-content-between">
-              <div>
-                <div class="fw-bold text-primary">{{ p[0] }}</div>
-                <div class="text-muted small">{{ p[1] }}</div>
-                <div class="badge bg-light text-dark border mt-1">
-                  <i class="fa fa-truck me-1"></i> {{ p[8] or 'Truck' }}
-                </div>
-              </div>
-              <span class="badge bg-success" style="height:fit-content;">Paid</span>
+  {% if payments %}
+  <div class="row g-4">
+    {% for p in payments %}
+    <div class="col-md-6 col-lg-4 payment-wrapper" data-aos="fade-up" data-aos-delay="{{ loop.index * 20 }}">
+      <div class="payment-card-premium">
+        <div class="payment-strip">
+          <span><i class="fa fa-check-circle me-1"></i> SETTLEMENT COMPLETED</span>
+          <span>{{ p[6].strftime('%d %b %Y') }}</span>
+        </div>
+        <div class="payment-body">
+          <div class="d-flex justify-content-between align-items-start mb-4">
+            <div>
+              <h6 class="fw-800 text-primary mb-1">Order #{{ p[0] }}</h6>
+              <div class="badge bg-light text-muted fw-700 font-monospace">{{ p[8] or 'CONSIGNMENT' }}</div>
             </div>
-
-            <hr>
-
-            <div class="d-flex justify-content-between">
-              <div>
-                <small class="text-muted">Quantity</small><br>
-                <strong>{{ p[2] }} Qt</strong>
-              </div>
-              <div>
-                <small class="text-muted">Price</small><br>
-                <strong>₹{{ p[3] }}</strong>
-              </div>
-              <div>
-                <small class="text-muted">Total</small><br>
-                <span class="amount">₹{{ p[4] }}</span>
-              </div>
+            <div class="text-end">
+              <span class="meta-label">Total Value</span>
+              <div class="payment-amount">₹{{ p[4]|format_currency }}</div>
             </div>
+          </div>
 
-            <hr>
-
-            <div class="d-flex justify-content-between align-items-center">
-              <small class="text-muted">
-                <i class="fa fa-industry"></i> {{ p[7] }}
-                {% if p[9] %} <span class="text-muted small">({{ p[9] }})</span> {% endif %}<br>
-                <i class="fa fa-clock"></i> {{ p[6].strftime('%Y-%m-%d %H:%M') }}
-              </small>
-
-              <a href="/static/uploads/bills/{{ p[5] }}" target="_blank" class="btn btn-sm btn-primary">
-                <i class="fa fa-file-invoice"></i> Invoice
-              </a>
+          <div class="p-3 bg-light rounded-4 mb-4">
+            <div class="d-flex align-items-center mb-2">
+              <i class="fa fa-industry text-muted me-2"></i>
+              <span class="fw-700 text-truncate">{{ p[7] }}</span>
             </div>
+            <div class="d-flex align-items-center small text-muted">
+              <i class="fa fa-wheat-awn me-2"></i>
+              <span class="fw-600">{{ p[1] }} · {{ p[2] }} Qt @ ₹{{ p[3] }}/Qt</span>
+            </div>
+          </div>
 
+          <div class="payment-meta-grid">
+            <div class="meta-item">
+              <span class="meta-label">Location</span>
+              <span class="meta-value text-truncate">{{ p[9] or 'Rajasthan, India' }}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Settle Date</span>
+              <span class="meta-value">{{ p[6].strftime('%H:%M %p') }}</span>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <a href="/static/uploads/bills/{{ p[5] }}" target="_blank"
+              class="btn btn-primary-subtle w-100 rounded-pill fw-800 py-2">
+              <i class="fa fa-file-invoice-dollar me-2"></i> Digital Invoice
+            </a>
           </div>
         </div>
-        {% endfor %}
       </div>
-      {% else %}
-      <p class="text-muted">No completed payments yet.</p>
-      {% endif %}
-
     </div>
-  </main>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-5 bg-white rounded-4 border-2 border-dashed mt-4">
+    <div class="mb-4">
+      <i class="fa fa-receipt text-muted fs-1 opacity-25"></i>
+    </div>
+    <h4 class="fw-800 text-muted">No Payment History</h4>
+    <p class="text-muted mb-0">Your financial settlement history will appear here once trades are completed.</p>
+  </div>
+  {% endif %}
+</div>
 
-  <!-- FOOTER -->
-  {% include '_footer.html' %}
+<script>
+  document.getElementById('paymentSearch').addEventListener('keyup', function () {
+    let filter = this.value.toLowerCase();
+    let wrappers = document.querySelectorAll('.payment-wrapper');
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    document.getElementById('paymentSearch').addEventListener('keyup', function () {
-      let filter = this.value.toLowerCase();
-      let cards = document.querySelectorAll('.card-pay');
-
-      cards.forEach(card => {
-        let col = card.closest('.col-md-6');
-        let text = card.textContent.toLowerCase();
-
-        if (text.includes(filter)) {
-          if (col) col.style.display = '';
-          else card.style.display = '';
-        } else {
-          if (col) col.style.display = 'none';
-          else card.style.display = 'none';
-        }
-      });
+    wrappers.forEach(wrap => {
+      let text = wrap.textContent.toLowerCase();
+      wrap.style.display = text.includes(filter) ? '' : 'none';
     });
-  </script>
-</body>
-
-</html>
+  });
+</script>
+{% endblock %}

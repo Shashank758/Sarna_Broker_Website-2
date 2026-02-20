@@ -3,178 +3,242 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Miller Profiles | Sarna Broker</title>
-
+  <title>Industry Network | Saarna Admin</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="/static/css/style.css">
-  <link rel="stylesheet" href="/static/css/print.css">
+
+  <style>
+    :root {
+      --admin-sidebar-width: 280px;
+      --admin-bg: #f8fafc;
+      --admin-sidebar-bg: #0f172a;
+    }
+
+    body {
+      background: var(--admin-bg);
+      font-family: Inter, Segoe UI, sans-serif;
+    }
+
+    /* SIDEBAR (Consistent with Admin Dashboard) */
+    .admin-sidebar {
+      width: var(--admin-sidebar-width);
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      background: var(--admin-sidebar-bg);
+      color: white;
+      padding: 30px 20px;
+      z-index: 1000;
+    }
+
+    .sidebar-brand {
+      padding: 0 10px 30px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 30px;
+    }
+
+    .sidebar-brand h4 {
+      font-weight: 800;
+      color: #fff;
+      margin: 0;
+    }
+
+    .admin-nav {
+      list-style: none;
+      padding: 0;
+    }
+
+    .admin-nav li {
+      margin-bottom: 8px;
+    }
+
+    .admin-nav a {
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      padding: 12px 18px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .admin-nav a:hover,
+    .admin-nav li.active a {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    /* CONTENT */
+    .admin-content {
+      margin-left: var(--admin-sidebar-width);
+      padding: 40px;
+    }
+
+    .profiles-card {
+      background: #fff;
+      border-radius: 30px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .table-enterprise thead th {
+      background: #f8fafc;
+      padding: 20px 24px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #64748b;
+      font-weight: 800;
+      border-bottom: 2px solid #f1f5f9;
+    }
+
+    .table-enterprise tbody td {
+      padding: 24px;
+      vertical-align: middle;
+      font-weight: 600;
+      color: #334155;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .search-control {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 10px 20px;
+      font-weight: 600;
+    }
+
+    .search-control:focus {
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(10, 138, 84, 0.1);
+      border-color: #0a8a54;
+    }
+
+    .doc-btn {
+      padding: 6px 14px;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+  </style>
 </head>
 
 <body>
 
-  <!-- ================= TOP NAVBAR ================= -->
-  <nav class="admin-navbar">
-    <div class="nav-left">
-      <img src="static/image/Sarna broker.png" alt="Logo">
-      <span>Sarna Broker</span>
+  <aside class="admin-sidebar">
+    <div class="sidebar-brand">
+      <h4>SAARNA <span>ADMIN</span></h4>
     </div>
+    <ul class="admin-nav">
+      <li><a href="/admin"><i class="fa fa-chart-pie"></i> Overview</a></li>
+      <li><a href="/admin/users"><i class="fa fa-users"></i> Account Access</a></li>
+      <li><a href="/admin/stock"><i class="fa fa-tags"></i> Market Pricing</a></li>
+      <li><a href="/admin/stock-history"><i class="fa fa-history"></i> Rate History</a></li>
+      <li><a href="/admin/bookings"><i class="fa fa-shopping-cart"></i> Global Orders</a></li>
+      <li class="active"><a href="/admin/miller-profiles"><i class="fa fa-industry"></i> Industry Network</a></li>
+      <li><a href="/admin/buyer-profiles"><i class="fa fa-store"></i> Trader Network</a></li>
+      <li><a href="/admin/logs"><i class="fa fa-clipboard-list"></i> Audit Logs</a></li>
+    </ul>
+  </aside>
 
-    <center><b>JAI SHREE SHYAM</b></center>
-
-    <div class="nav-right">
-      <span class="admin-name">
-        <i class="fa fa-user-circle"></i> Admin
-      </span>
-      <img src="static/image/images.png" alt="Logo">
-    </div>
-  </nav>
-
-  <div class="admin-container">
-
-    <!-- SIDEBAR -->
-    <aside class="admin-sidebar">
-      <h4>Sarna Broker</h4>
-      <ul>
-        <li><a href="/admin"><i class="fa fa-gauge"></i> Dashboard</a></li>
-
-        <li><a href="/admin/users"><i class="fa fa-users"></i> Users</a></li>
-        <li><a href="/admin/stock"><i class="fa fa-box"></i> Latest rate </a></li>
-        <li><a href="/admin/stock-history"><i class="fa fa-history"></i> Rate update history</a></li>
-        <li><a href="/admin/bookings"><i class="fa fa-shopping-cart"></i> Bookings</a></li>
-        <li class="active"><i class="fa fa-industry"></i> Miller Profiles</li>
-        <li><a href="/admin/buyer-profiles"><i class="fa fa-store"></i> Trader Profiles</a></li>
-        <li><a href="/admin/logs"><i class="fa fa-list"></i> Admin Logs</a></li>
-        <li>
-          <i class="fa fa-right-from-bracket"></i>
-          <a href="/logout">Logout</a>
-        </li>
-      </ul>
-    </aside>
-
-    <!-- MAIN -->
-    <main class="admin-main">
-
-      <div class="admin-top">
-        <h5>🏭 Miller Profiles</h5>
-        <span class="admin-badge">Admin</span>
+  <main class="admin-content">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+      <div>
+        <h2 class="fw-800 text-dark mb-1">Industrial Network</h2>
+        <p class="text-muted fw-600 mb-0">Operational directory of verifying processing units.</p>
       </div>
+      <div class="d-flex gap-3">
+        <input type="text" id="millerSearch" class="form-control search-control" style="width: 350px;"
+          placeholder="Filter by Name, Unit, or Location...">
+        <button class="btn btn-white border fw-800"
+          onclick="exportTableToExcel('millerTable', 'saarna_millers.xlsx')"><i
+            class="fa fa-file-excel me-2"></i>Export</button>
+      </div>
+    </div>
 
-      <!-- ================= MILLER PROFILES ================= -->
-      <div class="table-card mt-5">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h6>🏭 Miller Profiles</h6>
-          <div class="d-flex gap-2">
-            <button class="btn btn-sm btn-outline-success"
-              onclick="exportTableToExcel('millerTable', 'miller_profiles.xlsx')">
-              <i class="fa fa-file-excel"></i> Export
-            </button>
-            <button class="btn btn-sm btn-outline-dark" onclick="printTable()">
-              <i class="fa fa-print"></i> Print
-            </button>
-            <input type="text" id="millerSearch" class="form-control form-control-sm" style="width: 250px;"
-              placeholder="Search Name, Mill, Phone, Address...">
-          </div>
-        </div>
-
-        {% if miller_profiles %}
-        <table class="table table-bordered table-striped table-sm align-middle" id="millerTable">
-          <tr class="table-info">
-            <th>Miller Name</th>
-            <th>Mill Name</th>
-            <th>Owner Phone</th>
-            <th>Address</th>
-            <th>GST Doc</th>
-            <th>Mandi Doc</th>
-            <th>Other Doc</th>
-            <th>Created</th>
-          </tr>
-
-          {% for m in miller_profiles %}
-          <tr class="miller-row">
-            <td class="miller-data">{{ m[1] }}</td>
-            <td class="miller-data">{{ m[2] }}</td>
-            <td class="miller-data">{{ m[3] }}</td>
-            <td class="miller-data">{{ m[4] }}</td>
-            <td>
-              {% if m[5] %}
-              <a href="{{ url_for('static', filename='uploads/miller_docs/' + m[5]) }}" target="_blank"
-                class="btn btn-sm btn-outline-success">
-                <i class="fa fa-file"></i> View
-              </a>
-              {% else %}
-              <span class="text-muted">—</span>
-              {% endif %}
-            </td>
-            <td>
-              {% if m[6] %}
-              <a href="{{ url_for('static', filename='uploads/miller_docs/' + m[6]) }}" target="_blank"
-                class="btn btn-sm btn-outline-success">
-                <i class="fa fa-file"></i> View
-              </a>
-              {% else %}
-              <span class="text-muted">—</span>
-              {% endif %}
-            </td>
-            <td>
-              {% if m[7] %}
-              <a href="{{ url_for('static', filename='uploads/miller_docs/' + m[7]) }}" target="_blank"
-                class="btn btn-sm btn-outline-success">
-                <i class="fa fa-file"></i> View
-              </a>
-              {% else %}
-              <span class="text-muted">—</span>
-              {% endif %}
-            </td>
-            <td>{{ m[8] }}</td>
-          </tr>
-          {% endfor %}
+    <div class="profiles-card">
+      <div class="table-responsive">
+        <table class="table table-enterprise m-0" id="millerTable">
+          <thead>
+            <tr>
+              <th>Miller Profile</th>
+              <th>Industrial Unit</th>
+              <th>Operational Contact</th>
+              <th>Verification Docs</th>
+              <th>Onboarded</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in miller_profiles %}
+            <tr class="miller-row" data-search="{{ (m[1] + ' ' + m[2] + ' ' + m[4])|lower }}">
+              <td>
+                <div class="fw-800 text-dark">{{ m[1] }}</div>
+              </td>
+              <td>
+                <div class="fw-800 text-primary mb-1">{{ m[2] }}</div>
+                <div class="small text-muted fw-600"><i class="fa fa-location-dot me-1"></i>{{ m[4] }}</div>
+              </td>
+              <td>
+                <div class="fw-800 text-dark"><i class="fa fa-phone me-2 text-muted"></i>{{ m[3] }}</div>
+              </td>
+              <td>
+                <div class="d-flex flex-wrap gap-2">
+                  {% if m[5] %}<a href="{{ url_for('static', filename='uploads/miller_docs/' + m[5]) }}" target="_blank"
+                    class="doc-btn btn-success-subtle text-success"><i class="fa fa-file-contract"></i> GST</a>{% endif
+                  %}
+                  {% if m[6] %}<a href="{{ url_for('static', filename='uploads/miller_docs/' + m[6]) }}" target="_blank"
+                    class="doc-btn btn-primary-subtle text-primary"><i class="fa fa-file-shield"></i> MANDI</a>{% endif
+                  %}
+                  {% if m[7] %}<a href="{{ url_for('static', filename='uploads/miller_docs/' + m[7]) }}" target="_blank"
+                    class="doc-btn btn-secondary-subtle text-muted"><i class="fa fa-file-circle-plus"></i> OTHER</a>{%
+                  endif %}
+                  {% if not m[5] and not m[6] and not m[7] %}<span class="small text-muted fw-600 italic">No docs
+                    found</span>{% endif %}
+                </div>
+              </td>
+              <td>
+                <div class="small fw-800 text-dark">{{ m[8] }}</div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
         </table>
-        {% else %}
-        <p class="text-muted">No miller profiles submitted yet.</p>
-        {% endif %}
       </div>
 
-    </main>
-  </div>
+      {% if not miller_profiles %}
+      <div class="text-center py-5">
+        <i class="fa fa-industry text-muted opacity-25 fs-1 mb-3"></i>
+        <h5 class="fw-800 text-muted">No Industrial Profiles</h5>
+        <p class="text-muted fw-600">Onboarded millers will be listed here.</p>
+      </div>
+      {% endif %}
+    </div>
+  </main>
 
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
   <script>
-    function exportTableToExcel(tableId, filename = 'data-export.xlsx') {
+    function exportTableToExcel(tableId, filename = 'export.xlsx') {
       let table = document.getElementById(tableId);
-      if (!table) {
-        alert("Table not found to export!");
-        return;
-      }
-      let clone = table.cloneNode(true);
-      clone.querySelectorAll('.no-export').forEach(el => el.remove());
-      let wb = XLSX.utils.table_to_book(clone, { sheet: "Sheet1" });
+      let wb = XLSX.utils.table_to_book(table, { sheet: "Millers" });
       XLSX.writeFile(wb, filename);
     }
 
-    function printTable() {
-      window.print();
-    }
-
-    document.getElementById('millerSearch').addEventListener('keyup', function () {
-      let filter = this.value.toLowerCase();
-      let rows = document.querySelectorAll('.miller-row');
-
-      rows.forEach(row => {
-        // Check multiple columns
-        let text = Array.from(row.querySelectorAll('.miller-data'))
-          .map(td => td.textContent.toLowerCase())
-          .join(' ');
-
-        if (text.includes(filter)) {
-          row.style.display = '';
-        } else {
-          row.style.display = 'none';
-        }
+    document.getElementById('millerSearch').addEventListener('input', function (e) {
+      const term = e.target.value.toLowerCase();
+      document.querySelectorAll('.miller-row').forEach(row => {
+        const searchData = row.dataset.search;
+        row.style.display = searchData.includes(term) ? '' : 'none';
       });
     });
   </script>
-
 </body>
 
 </html>

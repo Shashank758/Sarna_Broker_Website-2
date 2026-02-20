@@ -1,27 +1,115 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Edit Crop | Sarna Broker</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
+{% extends "base.html" %}
 
-<div class="card">
-    <h2>Edit Crop</h2>
+{% block title %}Edit Commodity | Saarna Canvessars{% endblock %}
 
-    <form method="POST">
+{% block extra_css %}
+<style>
+    .form-hero {
+        background: linear-gradient(135deg, var(--accent) 0%, #15803d 100%);
+        color: white;
+        padding: 40px 0;
+        margin-bottom: 40px;
+        border-radius: 0 0 40px 40px;
+    }
 
-        <input name="crop" value="{{ crop[2] }}" required>
-        <input name="variety" value="{{ crop[3] }}">
-        <input name="price" type="number" step="0.01" value="{{ crop[4] }}" required>
-        <input name="quantity" type="number" step="0.01" value="{{ crop[5] }}" required>
-        <input name="location" value="{{ crop[6] }}" required>
+    .premium-form-card {
+        background: #fff;
+        border-radius: 30px;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-2xl);
+        overflow: hidden;
+        margin-top: -60px;
+        padding: 40px;
+    }
 
-        <button type="submit">Update Crop</button>
-    </form>
+    .form-section-title {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--text-muted);
+        font-weight: 800;
+        margin-bottom: 24px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #f0fdf4;
+    }
 
-    <a href="/my_commodity">Cancel</a>
+    .enterprise-input {
+        background: #f8fafc;
+        border: 2px solid transparent;
+        border-radius: 12px;
+        padding: 14px 18px;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+
+    .enterprise-input:focus {
+        background: #fff;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
+        outline: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="form-hero">
+    <div class="container text-center">
+        <h2 class="fw-800 text-white mb-2">Update Listing</h2>
+        <p class="text-white opacity-75 fw-600">Modify your commodity details to match current market conditions.</p>
+    </div>
+</section>
+
+<div class="container mb-5 pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="premium-form-card">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-12">
+                            <h6 class="form-section-title">Commodity Details</h6>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label fw-800 small text-uppercase">Crop Name</label>
+                            <input type="text" name="crop" class="form-control enterprise-input" value="{{ crop[2] }}"
+                                required>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label fw-800 small text-uppercase">Variety / Grade</label>
+                            <input type="text" name="variety" class="form-control enterprise-input"
+                                value="{{ crop[3] }}">
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label fw-800 small text-uppercase">Expected Price (₹/Qt)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 fw-800">₹</span>
+                                <input type="number" name="price" step="0.01" class="form-control enterprise-input"
+                                    value="{{ crop[4] }}" required>
+                                <span class="input-group-text bg-light border-0 fw-800">/Qt</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label fw-800 small text-uppercase">Total Quantity (Quintals)</label>
+                            <input type="number" name="quantity" step="0.01" class="form-control enterprise-input"
+                                value="{{ crop[5] }}" required>
+                        </div>
+
+                        <div class="col-12 mb-4">
+                            <label class="form-label fw-800 small text-uppercase">Mandi / Village Location</label>
+                            <input type="text" name="location" class="form-control enterprise-input"
+                                value="{{ crop[6] }}" required>
+                        </div>
+                    </div>
+
+                    <div
+                        class="mt-4 p-4 bg-light rounded-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+                        <a href="/my_commodity" class="btn btn-link text-muted fw-800 text-decoration-none">Cancel
+                            Changes</a>
+                        <button type="submit" class="btn btn-enterprise rounded-pill px-5 fw-800 py-3 shadow-lg">Save &
+                            Update Listing</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
-
-</body>
-</html>
+{% endblock %}

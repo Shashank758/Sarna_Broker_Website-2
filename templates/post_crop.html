@@ -1,96 +1,170 @@
+{% extends "base.html" %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Post Crop | Sarna Broker</title>
+{% block title %}Post Commodity | Saarna Canvessars{% endblock %}
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link rel="stylesheet" href="/static/css/style.css">
-</head>
+{% block extra_css %}
+<style>
+  .form-hero {
+    background: linear-gradient(135deg, var(--accent) 0%, #15803d 100%);
+    color: white;
+    padding: 40px 0;
+    margin-bottom: 40px;
+    border-radius: 0 0 40px 40px;
+  }
 
-<body class="bg-light">
+  .premium-form-card {
+    background: #fff;
+    border-radius: 30px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-2xl);
+    overflow: hidden;
+    margin-top: -60px;
+    padding: 40px;
+  }
 
-<!-- HEADER -->
-<div class="market-header">
-  <div class="d-flex align-items-center justify-content-between">
-    <div class="d-flex align-items-center">
-      <a href="/my_commodity" class="me-3 text-white">
-        <i class="fa fa-arrow-left"></i>
-      </a>
-      <div>
-        <h5 class="mb-0">Post Crop</h5>
-        <small class="opacity-75">List your crop for buyers</small>
+  .form-section-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    font-weight: 800;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f0fdf4;
+  }
+
+  .enterprise-input {
+    background: #f8fafc;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-weight: 600;
+    transition: var(--transition);
+  }
+
+  .enterprise-input:focus {
+    background: #fff;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
+    outline: none;
+  }
+
+  .upload-zone {
+    background: #f8fafc;
+    border: 2px dashed var(--border);
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    transition: var(--transition);
+    cursor: pointer;
+  }
+
+  .upload-zone:hover {
+    border-color: var(--accent);
+    background: #fff;
+  }
+
+  .upload-icon {
+    width: 64px;
+    height: 64px;
+    background: #f0fdf4;
+    color: var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 1.5rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="form-hero">
+  <div class="container text-center">
+    <h2 class="fw-800 text-white mb-2">List New Commodity</h2>
+    <p class="text-white opacity-75 fw-600">Share your harvest with verified buyers across India.</p>
+  </div>
+</section>
+
+<div class="container mb-5 pb-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="premium-form-card">
+        <form method="POST" enctype="multipart/form-data">
+          <div class="row">
+            <div class="col-12">
+              <h6 class="form-section-title">Commodity Basics</h6>
+            </div>
+            <div class="col-md-6 mb-4">
+              <label class="form-label fw-800 small text-uppercase">Crop Name</label>
+              <input type="text" name="crop" class="form-control enterprise-input" placeholder="e.g. Sharbati Wheat"
+                required>
+            </div>
+            <div class="col-md-6 mb-4">
+              <label class="form-label fw-800 small text-uppercase">Variety / Grade</label>
+              <input type="text" name="variety" class="form-control enterprise-input" placeholder="e.g. Grade A+">
+            </div>
+            <div class="col-md-6 mb-4">
+              <label class="form-label fw-800 small text-uppercase">Expected Price (₹/Qt)</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light border-0 fw-800">₹</span>
+                <input type="number" name="price" step="0.01" class="form-control enterprise-input" placeholder="0.00"
+                  required>
+                <span class="input-group-text bg-light border-0 fw-800">/Qt</span>
+              </div>
+            </div>
+            <div class="col-md-6 mb-4">
+              <label class="form-label fw-800 small text-uppercase">Total Quantity (Quintals)</label>
+              <input type="number" name="quantity" step="0.01" class="form-control enterprise-input" placeholder="0.00"
+                required>
+            </div>
+
+            <div class="col-12 mb-5">
+              <label class="form-label fw-800 small text-uppercase">Mandi / Village Location</label>
+              <input type="text" name="location" class="form-control enterprise-input"
+                placeholder="e.g. Nohar Mandi, Rajasthan" required>
+            </div>
+
+            <div class="col-12">
+              <h6 class="form-section-title">Visual Showcase</h6>
+            </div>
+            <div class="col-12 mb-5">
+              <div class="upload-zone" onclick="document.getElementById('crop_image').click()">
+                <div class="upload-icon">
+                  <i class="fa fa-camera"></i>
+                </div>
+                <h6 class="fw-800 mb-1">Upload Commodity Photo</h6>
+                <p class="small text-muted mb-3">Professional photos help sell 30% faster.</p>
+                <input type="file" id="crop_image" name="image" accept="image/*" class="d-none" required
+                  onchange="updateFileName(this)">
+                <div id="file-name" class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 d-none"></div>
+                <button type="button" class="btn btn-light border fw-800 rounded-pill px-4 mt-2">Select Media</button>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="mt-4 p-4 bg-light rounded-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+            <a href="/my_commodity" class="btn btn-link text-muted fw-800 text-decoration-none">Discard & Return</a>
+            <button type="submit" class="btn btn-enterprise rounded-pill px-5 fw-800 py-3 shadow-lg">Confirm & List
+              Commodity</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
 </div>
 
-<!-- FORM -->
-<div class="container mt-4 mb-5">
-  <div class="post-crop-card">
-
-    <form method="POST" enctype="multipart/form-data">
-
-      <!-- CROP NAME -->
-      <div class="form-group">
-        <label>Crop Name</label>
-        <input type="text" name="crop" class="form-control" placeholder="e.g. Wheat" required>
-      </div>
-
-      <!-- VARIETY -->
-      <div class="form-group">
-        <label>Variety</label>
-        <input type="text" name="variety" class="form-control" placeholder="e.g. HD-2967">
-      </div>
-
-      <!-- PRICE -->
-      <div class="form-group">
-        <label>Price (₹ per unit)</label>
-        <div class="input-group">
-          <span class="input-group-text">₹</span>
-          <input type="number" name="price" step="0.01" class="form-control" placeholder="Price" required>
-        </div>
-      </div>
-
-      <!-- QUANTITY -->
-      <div class="form-group">
-        <label>Quantity</label>
-        <input type="number" name="quantity" step="0.01" class="form-control" placeholder="Quantity" required>
-      </div>
-
-      <!-- LOCATION -->
-      <div class="form-group">
-        <label>Location</label>
-        <input type="text" name="location" class="form-control" placeholder="Village, District, State" required>
-      </div>
-
-      <!-- IMAGE -->
-      <div class="form-group">
-        <label>Upload Crop Image</label>
-        <div class="file-upload">
-          <input type="file" name="image" accept="image/*" required>
-          <span><i class="fa fa-upload"></i> Choose image</span>
-        </div>
-      </div>
-
-      <!-- SUBMIT -->
-      <button type="submit" class="btn btn-success w-100 mt-3">
-        <i class="fa fa-paper-plane"></i> Post Crop
-      </button>
-
-    </form>
-
-  </div>
-</div>
-
-<!-- BOTTOM NAV -->
-<div class="bottom-nav">
-  <div class="nav-item"><a href="/market"><i class="fa fa-store"></i><br>Market</a></div>
-  <div class="nav-item active"><i class="fa fa-circle-plus"></i><br>Sell</div>
-  <div class="nav-item"><a href="/profile"><i class="fa fa-user"></i><br>Profile</a></div>
-</div>
-
-</body>
-</html>
+<script>
+  function updateFileName(input) {
+    let namePanel = document.getElementById('file-name');
+    if (input.files && input.files[0]) {
+      namePanel.textContent = "Selected: " + input.files[0].name;
+      namePanel.classList.remove('d-none');
+    } else {
+      namePanel.classList.add('d-none');
+    }
+  }
+</script>
+{% endblock %}

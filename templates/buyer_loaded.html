@@ -1,428 +1,244 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Loaded Orders | Saarna Canvessars</title>
+{% block title %}Loaded Orders | Saarna Canvessars{% endblock %}
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-    rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/style.css">
+{% block extra_css %}
+<style>
+  .tracking-header {
+    background: #fff;
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 30px;
+  }
 
-  <style>
-    body {
-      background: var(--bg);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+  .order-card-premium {
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    transition: var(--transition);
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
 
-    /* ================= CARD ================= */
-    .order-card {
-      background: #fff;
-      border-radius: 18px;
-      border: 1px solid #e6e9ef;
-      box-shadow: 0 10px 28px rgba(0, 0, 0, .08);
-      margin-bottom: 18px;
-      overflow: hidden;
-    }
+  .order-status-strip {
+    padding: 12px 24px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
-    /* ================= HEADER ================= */
-    .order-header {
-      padding: 16px 22px;
-      background: linear-gradient(90deg, #e9f7ef, #ffffff);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-    }
+  .status-loaded {
+    background: #f0fdf4;
+    color: #166534;
+  }
 
-    .order-id {
-      font-weight: 900;
-      font-size: 1.05rem;
-      color: #157347;
-    }
+  .order-main {
+    padding: 30px;
+  }
 
-    .order-sub {
-      font-size: .85rem;
-      color: #6c757d;
-    }
+  .order-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
 
-    .badge-loaded {
-      background: #198754;
-      color: #fff;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-weight: 800;
-      font-size: .75rem;
-    }
+  .order-meta {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 24px;
+  }
 
-    .badge-pending {
-      background: #ffc107;
-      color: #212529;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-weight: 800;
-      font-size: .75rem;
-    }
+  .settlement-panel {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid var(--border-light);
+  }
 
-    /* ================= BODY ================= */
-    .order-body {
-      padding: 22px
-    }
+  .truck-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 24px;
+  }
 
-    .section-title {
-      font-weight: 900;
-      font-size: .8rem;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
+  .truck-card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    padding: 20px;
+    transition: var(--transition);
+  }
 
-    .kv {
-      display: flex;
-      justify-content: space-between;
-      background: #f8f9fa;
-      padding: 10px 14px;
-      border-radius: 10px;
-      margin-bottom: 10px;
-      font-weight: 600;
-    }
+  .qc-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 800;
+  }
 
-    .invoice-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #fff;
-      border: 1px solid #eee;
-      padding: 10px 14px;
-      border-radius: 10px;
-      margin-bottom: 8px;
-    }
+  .qc-verified {
+    background: #dcfce7;
+    color: #166534;
+  }
 
-    /* ================= PAGINATION ================= */
-    .pagination .page-link {
-      border-radius: 10px;
-      font-weight: 700;
-    }
+  .search-minimal {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: var(--transition);
+    width: 100%;
+    max-width: 320px;
+  }
+</style>
+{% endblock %}
 
-    /* ================= FOOTER ================= */
-    .footer {
-      background: linear-gradient(135deg, #0b1c2d, #102a43);
-      color: #cfd6df;
-      padding: 40px 0 20px;
-    }
-
-    .footer h6 {
-      color: #fff;
-      font-weight: 800
-    }
-
-    .footer a {
-      color: #cfd6df;
-      text-decoration: none
-    }
-
-    .footer a:hover {
-      color: #fff
-    }
-
-    .footer-bottom {
-      border-top: 1px solid rgba(255, 255, 255, .15);
-      margin-top: 20px;
-      padding-top: 15px;
-      text-align: center;
-      font-size: .85rem;
-    }
-  </style>
-</head>
-
-<body>
-
-  <!-- ================= NAVBAR ================= -->
-  {% include '_navbar.html' %}
-
-  <!-- ================= CONTENT ================= -->
-  <div class="container mt-4 mb-5">
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h4 class="fw-bold text-success mb-0">
-        <i class="fa fa-check-circle"></i> Loaded Orders
-      </h4>
-      <input type="text" id="loadedSearch" class="form-control form-control-sm" style="width: 250px;"
-        placeholder="Search Order ID, Miller, Crop...">
-    </div>
-
-    {% set per_page = 5 %}
-    {% set page = request.args.get('page', 1, type=int) %}
-    {% set total = orders|length %}
-    {% set pages = (total // per_page) + (1 if total % per_page else 0) %}
-    {% set start = (page - 1) * per_page %}
-    {% set end = start + per_page %}
-
-    {% if orders %}
-    {% for o in orders[start:end] %}
-
-    <div class="order-card">
-
-      <!-- HEADER -->
-      <div class="order-header" data-bs-toggle="collapse" data-bs-target="#order{{ o.id }}">
-        <div>
-          <div class="order-id">Order #{{ o.order_id }}</div>
-          <div class="order-sub">{{ o.crop }} · {{ o.loaded }} Qt</div>
-          <div class="order-sub">Miller: {{ o.miller_name }}</div>
-        </div>
-        <div>
-          {% if o.payment_status == 'paid' %}
-          <span class="badge-loaded">Paid</span>
-          {% elif o.final_invoice and o.payment_status != 'paid' %}
-          <span class="badge-pending">Invoice Uploaded</span>
-          {% else %}
-          <span class="badge-pending">Pending</span>
-          {% endif %}
-          <i class="fa fa-chevron-down ms-2"></i>
-        </div>
+{% block content %}
+<div class="container py-5">
+  <div class="tracking-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4">
+    <div>
+      <div class="d-flex align-items-center mb-1">
+        <div class="bg-success-subtle text-success rounded-pill p-2 px-3 fw-800 fs-xs me-3">COMPLETED</div>
+        <h3 class="fw-800 mb-0">Loaded Orders</h3>
       </div>
-
-      <!-- BODY -->
-      <div id="order{{ o.id }}" class="collapse">
-        <div class="order-body">
-
-          <div class="row g-4">
-
-            <div class="col-md-6">
-              <div class="section-title">Order Summary</div>
-              <div class="kv"><span>Booked</span><span>{{ o.booked }} Qt</span></div>
-              <div class="kv"><span>Loaded</span><span>{{ o.loaded }} Qt</span></div>
-              <div class="kv"><span>Date</span><span>{{ o.loaded_at }}</span></div>
-            </div>
-
-            <div class="col-md-6">
-              <div class="section-title">Truck Quality Checks</div>
-              {% if o.invoices %}
-              {% for inv in o.invoices %}
-              <div class="mb-3 p-2 border rounded" style="background:#f8f9fa;">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                  <div>
-                    <strong class="text-primary">
-                      {% if inv.truck_number %}
-                      Truck {{ inv.truck_number }}
-                      {% else %}
-                      Truck #{{ loop.index }}
-                      {% endif %}
-                    </strong>
-                    <span class="badge bg-info ms-2">{{ inv.qty }} Qt</span>
-                  </div>
-                  {% if inv.qc_status == 'verified' %}
-                  <span class="badge bg-success">✅ Verified</span>
-                  {% else %}
-                  <span class="badge bg-warning">⏳ Pending QC</span>
-                  {% endif %}
-                </div>
-
-                {% if inv.qc_status == 'verified' %}
-                <div class="kv"><span>Net Weight</span><span>{{ inv.qc_weight or inv.qty }} Qt</span></div>
-                <div class="kv"><span>Moisture</span><span>{{ inv.qc_moisture or '-' }}%</span></div>
-                {% if inv.qc_remarks %}
-                <div class="kv"><span>Remarks</span><span>{{ inv.qc_remarks }}</span></div>
-                {% endif %}
-                {% if inv.qc_freight %}
-                <div class="kv"><span>Freight (Paid)</span><span class="text-success fw-bold">₹{{ inv.qc_freight
-                    }}</span></div>
-                {% endif %}
-                {% if inv.qc_at %}
-                <small class="text-muted d-block mt-2">Verified on {{ inv.qc_at.strftime('%Y-%m-%d %H:%M') }}</small>
-                {% endif %}
-                {% else %}
-                <span class="text-muted small">Waiting for miller QC verification</span>
-                {% endif %}
-              </div>
-              {% endfor %}
-              {% else %}
-              <span class="text-muted">No loading invoices found</span>
-              {% endif %}
-            </div>
-
-            <div class="col-12">
-              <div class="section-title">Loading Invoices</div>
-              {% if o.invoices %}
-              {% for inv in o.invoices %}
-              <div class="invoice-item">
-                <div>
-                  <span>
-                    {% if inv.truck_number %}
-                    <strong>{{ inv.truck_number }}</strong> – <strong>{{ inv.qty }} Qt</strong>
-                    {% else %}
-                    <strong>Truck #{{ loop.index }}</strong> – <strong>{{ inv.qty }} Qt</strong>
-                    {% endif %}
-                  </span>
-                  {% if inv.date %}
-                  <br><small class="text-muted">{{ inv.date.strftime('%Y-%m-%d %H:%M') }}</small>
-                  {% endif %}
-                </div>
-                <div class="d-flex gap-1">
-                  <a href="/static/uploads/bills/{{ inv.file }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                    <i class="fa fa-eye"></i> View
-                  </a>
-                  <button class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                    data-bs-target="#editInvoice{{ inv.id }}">
-                    <i class="fa fa-edit"></i> Edit
-                  </button>
-
-                  <!-- Edit Invoice Modal -->
-                  <div class="modal fade" id="editInvoice{{ inv.id }}" tabindex="-1">
-                    <div class="modal-dialog">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h5 class="modal-title">Edit Loading Invoice</h5>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <form method="POST" action="/buyer/edit_loading_invoice/{{ inv.id }}"
-                          enctype="multipart/form-data">
-                          <div class="modal-body">
-                            <div class="mb-3">
-                              <label class="form-label">Truck Number</label>
-                              <input type="text" name="truck_number" class="form-control"
-                                value="{{ inv.truck_number or '' }}" placeholder="e.g. MH12AB1234">
-                            </div>
-                            <div class="mb-3">
-                              <label class="form-label">Upload New Invoice</label>
-                              <input type="file" name="invoice" class="form-control" accept=".pdf,image/*" required>
-                              <small class="text-muted">This will replace the existing invoice for {{ inv.qty }}
-                                Qt.</small>
-                            </div>
-                          </div>
-                          <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-warning">
-                              <i class="fa fa-upload"></i> Replace Invoice
-                            </button>
-                          </div>
-                        </form>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {% endfor %}
-              {% else %}
-              <span class="text-muted">No invoices uploaded</span>
-              {% endif %}
-            </div>
-
-            <div class="col-12">
-              <div class="section-title">Payment Status</div>
-              {% if o.invoices %}
-              <div class="list-group list-group-flush border rounded">
-                {% for inv in o.invoices %}
-                <div class="list-group-item d-flex justify-content-between align-items-center bg-light p-2">
-                  <div>
-                    <div class="fw-bold small">{{ inv.truck_number or 'Truck #' ~ loop.index }}</div>
-                    <div class="text-muted very-small" style="font-size:0.75rem;">{{ inv.qty }} Qt</div>
-                  </div>
-                  <div class="text-end">
-                    {% if inv.payment_status == 'paid' %}
-                    <span class="badge bg-success">Paid</span>
-                    {% elif inv.final_invoice_file %}
-                    <span class="badge bg-warning text-dark">Unpaid</span>
-                    {% else %}
-                    <span class="badge bg-secondary">Pending Inv</span>
-                    {% endif %}
-
-                    {% if inv.final_invoice_file %}
-                    <a href="/buyer/debit_note/{{ inv.id }}"
-                      class="d-block mt-1 badge bg-white text-primary border border-primary text-decoration-none">
-                      <i class="fa fa-eye"></i> View Bill
-                    </a>
-                    {% endif %}
-                  </div>
-                </div>
-                {% endfor %}
-              </div>
-              {% else %}
-              <p class="text-muted small">No trucks available for payment info.</p>
-              {% endif %}
-            </div>
-
-
-            <!-- 🔥 UPDATE LOADING BAR (ALLOWED OVERLOADING) -->
-            {% if o.loading_status != 'partial_closed' %}
-            <div class="col-12 mt-3">
-              <h6 class="fw-bold mb-2 text-primary"><i class="fa fa-truck-loading me-1"></i> Add More Loading (Overload)
-              </h6>
-              <form method="POST" action="/buyer/update_loading/{{ o.id }}" enctype="multipart/form-data"
-                class="update-bar row g-2 align-items-center">
-
-                <div class="col-md-3">
-                  <input type="number" name="load_qty" class="form-control" min="0.01" step="0.01"
-                    placeholder="Qty to load" required>
-                </div>
-
-                <div class="col-md-3">
-                  <input type="text" name="truck_number" class="form-control" placeholder="Truck number" required>
-                </div>
-
-                <div class="col-md-4">
-                  <input type="file" name="invoice" class="form-control" required>
-                </div>
-
-                <div class="col-md-2 d-grid">
-                  <button class="update-btn">
-                    <i class="fa fa-plus-circle"></i> Add
-                  </button>
-                </div>
-
-              </form>
-            </div>
-            {% endif %}
-
-          </div>
-
-        </div>
-      </div>
+      <p class="text-muted mb-0 fw-500">Archived view of your fully loaded and settled trades.</p>
     </div>
-
-    {% endfor %}
-    {% else %}
-    <p class="text-muted">No loaded orders found</p>
-    {% endif %}
-
-    <!-- PAGINATION -->
-    {% if pages > 1 %}
-    <nav class="mt-4">
-      <ul class="pagination justify-content-center">
-        {% for p in range(1,pages+1) %}
-        <li class="page-item {% if p==page %}active{% endif %}">
-          <a class="page-link" href="?page={{ p }}">{{ p }}</a>
-        </li>
-        {% endfor %}
-      </ul>
-    </nav>
-    {% endif %}
-
+    <div class="position-relative">
+      <input type="text" id="loadedSearch" class="search-minimal" placeholder="Filter by ID, Miller or Crop...">
+      <i class="fa fa-search position-absolute text-muted"
+        style="right: 16px; top: 50%; transform: translateY(-50%);"></i>
+    </div>
   </div>
 
-  <!-- FOOTER -->
-  {% include '_footer.html' %}
+  {% if orders %}
+  {% for o in orders %}
+  <div class="order-card-premium-wrapper" data-aos="fade-up" data-aos-delay="{{ loop.index * 30 }}">
+    <div class="order-card-premium">
+      <div class="order-status-strip status-loaded">
+        <span><i class="fa fa-check-double me-2"></i> FULLY LOADED & SETTLED</span>
+        <span>COMPLETED ON {{ o.loaded_at or 'N/A' }}</span>
+      </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    document.getElementById('loadedSearch').addEventListener('keyup', function () {
-      let filter = this.value.toLowerCase();
-      let cards = document.querySelectorAll('.order-card');
+      <div class="order-main">
+        <div class="row align-items-start">
+          <div class="col-lg-8">
+            <div class="order-title">{{ o.crop|capitalize }} · {{ o.loaded }} Qt</div>
+            <div class="order-meta">
+              <span class="badge bg-light text-muted fw-800 me-2">#{{ o.order_id }}</span>
+              <span>Miller: <strong>{{ o.miller_name }}</strong></span>
+            </div>
 
-      cards.forEach(card => {
-        let text = card.textContent.toLowerCase();
-        if (text.includes(filter)) {
-          card.style.display = '';
-        } else {
-          card.style.display = 'none';
-        }
-      });
+            <div class="settlement-panel mt-4">
+              <div class="row g-4">
+                <div class="col-md-6 border-end">
+                  <h6 class="fw-800 text-uppercase small text-muted mb-3">Load Finality</h6>
+                  <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted fw-600 small">Total Booked:</span>
+                    <span class="fw-800">{{ o.booked }} Qt</span>
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <span class="text-muted fw-600 small">Actual Loaded:</span>
+                    <span class="fw-800 text-success">{{ o.loaded }} Qt</span>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <h6 class="fw-800 text-uppercase small text-muted mb-3">Settlement Document</h6>
+                  {% if o.final_invoice %}
+                  <a href="/static/uploads/bills/{{ o.final_invoice }}" target="_blank"
+                    class="btn btn-outline-primary w-100 rounded-pill fw-800 py-2">
+                    <i class="fa fa-file-invoice me-2"></i> View Final Bill
+                  </a>
+                  {% else %}
+                  <div class="small text-muted italic">Final invoice not yet attached.</div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 text-center text-lg-end">
+            <div
+              class="p-4 bg-success-subtle rounded-4 h-100 d-flex flex-column justify-content-center border-success-subtle border">
+              <div class="fs-1 text-success mb-2"><i class="fa fa-circle-check"></i></div>
+              <h5 class="fw-800 text-success-emphasis mb-1">Payment Done</h5>
+              <p class="small text-success-emphasis mb-0 opacity-75">Trade successfully finalized on the platform.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-5">
+          <h6 class="fw-800 text-uppercase small text-muted mb-4 pb-2 border-bottom">Consignment Breakdown</h6>
+          {% if o.invoices %}
+          <div class="truck-grid">
+            {% for inv in o.invoices %}
+            <div class="truck-card">
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                  <div class="fw-800 text-primary fs-5">{{ inv.truck_number or 'Truck #' ~ loop.index }}</div>
+                  <small class="text-muted fw-700">QTY: {{ inv.qty }} Qt</small>
+                </div>
+                <span class="qc-badge qc-verified">VERIFIED</span>
+              </div>
+
+              <div class="mt-3 py-2 border-top border-bottom border-light">
+                <div class="d-flex justify-content-between small mb-1">
+                  <span class="text-muted fw-600">QC Weight:</span>
+                  <span class="fw-800">{{ inv.qc_weight or inv.qty }} Qt</span>
+                </div>
+                <div class="d-flex justify-content-between small">
+                  <span class="text-muted fw-600">Moisture:</span>
+                  <span class="fw-800">{{ inv.qc_moisture or 'N/A' }}%</span>
+                </div>
+              </div>
+
+              <div class="mt-3 d-flex gap-2">
+                <a href="/static/uploads/bills/{{ inv.file }}" target="_blank"
+                  class="btn btn-light border flex-grow-1 fw-700 small py-2"><i class="fa fa-eye me-1"></i> View
+                  Bill</a>
+                {% if inv.final_invoice_file %}
+                <a href="/buyer/debit_note/{{ inv.id }}" class="btn btn-primary-subtle fw-800 py-2 small px-3">Debit
+                  Note</a>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  {% else %}
+  <div class="text-center py-5 bg-white rounded-4 border-2 border-dashed mt-4">
+    <div class="mb-4">
+      <i class="fa fa-box-archive text-muted fs-1 opacity-25"></i>
+    </div>
+    <h4 class="fw-800 text-muted">No Loaded Orders</h4>
+    <p class="text-muted mb-0">Completed consignment histories will appear here.</p>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+  document.getElementById('loadedSearch').addEventListener('keyup', function () {
+    let filter = this.value.toLowerCase();
+    let wrappers = document.querySelectorAll('.order-card-premium-wrapper');
+
+    wrappers.forEach(wrap => {
+      let text = wrap.textContent.toLowerCase();
+      wrap.style.display = text.includes(filter) ? '' : 'none';
     });
-  </script>
-</body>
-
-</html>
+  });
+</script>
+{% endblock %}

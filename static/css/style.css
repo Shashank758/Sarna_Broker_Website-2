@@ -4,51 +4,37 @@
    Version 2.0 - Enhanced
 ========================= */
 :root {
-    /* Primary Green Palette */
-    --primary: #0f9b5f;
-    --primary-dark: #0d8a54;
-    --primary-darker: #0a7548;
-    --primary-light: #12b36e;
-    --primary-lighter: #4ade80;
-    --primary-subtle: #e8f5f0;
-    --primary-gradient: linear-gradient(135deg, #0f9b5f 0%, #0d8a54 50%, #0a7548 100%);
-    --primary-gradient-hover: linear-gradient(135deg, #12b36e 0%, #0f9b5f 50%, #0d8a54 100%);
+    /* Primary Green Palette - More Enterprise */
+    --primary: #0a8a54;
+    --primary-dark: #065f3a;
+    --primary-darker: #044329;
+    --primary-light: #10b981;
+    --primary-lighter: #34d399;
+    --primary-subtle: #f0fdf4;
+    --primary-gradient: linear-gradient(135deg, #0f9b5f 0%, #065f3a 100%);
+    --primary-gradient-hover: linear-gradient(135deg, #10b981 0%, #0f9b5f 100%);
 
     /* Secondary Colors */
-    --secondary: #1e6f5c;
-    --accent: #25d366;
+    --secondary: #334155;
+    --accent: #22c55e;
     --accent-gold: #f59e0b;
 
-    /* Neutrals */
-    --bg: #f4f7f6;
-    --bg-dark: #0b1c2d;
-    --bg-pattern: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230f9b5f' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    /* Neutrals - Cleaner */
+    --bg: #f8fafc;
+    --bg-white: #ffffff;
+    --bg-dark: #0f172a;
     --card: #ffffff;
-    --text: #1e293b;
-    --text-light: #64748b;
+    --text: #0f172a;
+    --text-light: #475569;
     --text-muted: #94a3b8;
     --border: #e2e8f0;
     --border-light: #f1f5f9;
 
     /* Status Colors */
     --success: #10b981;
-    --success-light: #d1fae5;
     --warning: #f59e0b;
-    --warning-light: #fef3c7;
     --danger: #ef4444;
-    --danger-light: #fee2e2;
     --info: #3b82f6;
-    --info-light: #dbeafe;
-
-    /* Legacy (for backward compatibility) */
-    --mandi-brown: #0f9b5f;
-    --mandi-dark: #0d8a54;
-    --mandi-light: #e8f5f0;
-    --mandi-bg: #f4f7f6;
-    --mandi-card: #ffffff;
-    --mandi-text: #1e293b;
-    --mandi-border: #e2e8f0;
-    --mandi-success: #10b981;
 
     /* Spacing & Radius */
     --radius: 12px;
@@ -57,29 +43,16 @@
     --radius-sm: 8px;
     --radius-full: 9999px;
 
-    /* Shadows - Enhanced */
-    --shadow-xs: 0 1px 2px rgba(0, 0, 0, .05);
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, .06);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, .08);
-    --shadow-lg: 0 16px 48px rgba(0, 0, 0, .12);
-    --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, .25);
-    --shadow-hover: 0 12px 32px rgba(15, 155, 95, .2);
-    --shadow-glow: 0 0 40px rgba(15, 155, 95, .3);
-    --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, .06);
+    /* Shadows - Premium */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+    --shadow-glow: 0 0 20px rgba(15, 155, 95, 0.2);
 
     /* Transitions */
-    --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-
-    /* Z-Index Scale */
-    --z-dropdown: 1000;
-    --z-sticky: 1020;
-    --z-fixed: 1030;
-    --z-modal-backdrop: 1040;
-    --z-modal: 1050;
-    --z-tooltip: 1080;
+    --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* =========================

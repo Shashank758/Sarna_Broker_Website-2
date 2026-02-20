@@ -1,56 +1,21 @@
-<!-- ================= UNIFIED FOOTER - SAARNA CANVESSARS ================= -->
+<!-- ================= UNIFIED FOOTER ================= -->
 <footer class="sarna-footer">
   <div class="container">
     <div class="row g-4">
-
-      <!-- BRAND & ABOUT -->
-      <div class="col-lg-4 col-md-6">
-        <h5 class="mb-3">
-          <i class="fa fa-seedling me-2"></i>Saarna Canvessars
-        </h5>
-        <p>
-          India's trusted digital mandi platform connecting
-          <strong>farmers, traders, and millers</strong> with
-          transparency, trust, and speed.
-        </p>
+      <!-- Brand & About -->
+      <div class="col-lg-4">
+        <div class="footer-brand mb-3">
+          <i class="fa fa-seedling me-2"></i>
+          <span class="fw-bold text-white fs-4">Saarna <span class="fw-light">Canvessars</span></span>
+        </div>
+        <p>India's trusted digital mandi platform. We empower agricultural trade with transparency, speed, and real-time
+          data for millers, traders, and farmers.</p>
         <div class="footer-social">
-          <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-          <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+          <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
           <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
         </div>
-      </div>
-
-      <!-- QUICK LINKS -->
-      <div class="col-lg-2 col-md-6">
-        <h6>Quick Links</h6>
-        <ul>
-          <li><a href="/market"><i class="fa fa-chevron-right"></i> Market</a></li>
-          {% if session.role == 'buyer' %}
-          <li><a href="/buyer/active"><i class="fa fa-chevron-right"></i> Active Orders</a></li>
-          <li><a href="/buyer/loaded"><i class="fa fa-chevron-right"></i> Loaded Orders</a></li>
-          <li><a href="/buyer/payments"><i class="fa fa-chevron-right"></i> Payments</a></li>
-          {% elif session.role == 'miller' %}
-          <li><a href="/miller"><i class="fa fa-chevron-right"></i> Dashboard</a></li>
-          <li><a href="/miller/approved"><i class="fa fa-chevron-right"></i> Approved</a></li>
-          <li><a href="/miller/qc"><i class="fa fa-chevron-right"></i> Quality Check</a></li>
-          {% elif session.role == 'farmer' %}
-          <li><a href="/my_commodity"><i class="fa fa-chevron-right"></i> My Crops</a></li>
-          <li><a href="/post_crop"><i class="fa fa-chevron-right"></i> Post Crop</a></li>
-          {% endif %}
-        </ul>
-      </div>
-
-      <!-- SERVICES -->
-      <div class="col-lg-3 col-md-6">
-        <h6>Our Services</h6>
-        <ul>
-          <li><a href="#"><i class="fa fa-chevron-right"></i> Crop Trading</a></li>
-          <li><a href="#"><i class="fa fa-chevron-right"></i> Quality Assurance</a></li>
-          <li><a href="#"><i class="fa fa-chevron-right"></i> Secure Payments</a></li>
-          <li><a href="#"><i class="fa fa-chevron-right"></i> Real-time Tracking</a></li>
-          <li><a href="#"><i class="fa fa-chevron-right"></i> Miller Network</a></li>
-        </ul>
       </div>
 
       <!-- CONTACT -->

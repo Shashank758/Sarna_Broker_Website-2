@@ -1,469 +1,323 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-  <meta charset="UTF-8">
-  <title>Approved Orders | Miller</title>
+{% block title %}Approved Orders | Saarna Canvessars{% endblock %}
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/style.css">
+{% block extra_css %}
+<style>
+  .approved-hero {
+    background: linear-gradient(135deg, var(--success) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 50px 0 90px;
+    border-radius: 0 0 50px 50px;
+    box-shadow: var(--shadow-xl);
+  }
 
-  <style>
-    body {
-      background: var(--bg-light);
-      font-family: Inter, Segoe UI, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+  .approved-container {
+    margin-top: -60px;
+    padding-bottom: 80px;
+  }
 
-    /* PAGE HEADER */
-    .page-header {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-      color: #fff;
-      padding: 25px 0;
-      margin-bottom: 30px;
-    }
+  .premium-table-card {
+    background: #fff;
+    border-radius: 30px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-2xl);
+    overflow: hidden;
+  }
 
-    .page-header h4 {
-      font-weight: 700;
-      margin: 0;
-    }
+  .table-enterprise {
+    margin-bottom: 0;
+  }
 
-    .page-header .breadcrumb {
-      margin: 0;
-      background: none;
-      padding: 0;
-    }
+  .table-enterprise thead th {
+    background: #f8fafc;
+    padding: 20px 24px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    font-weight: 800;
+    border-bottom: 2px solid var(--border-light);
+  }
 
-    .page-header .breadcrumb a {
-      color: rgba(255, 255, 255, 0.8);
-      text-decoration: none;
-    }
+  .table-enterprise tbody td {
+    padding: 24px;
+    vertical-align: middle;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-light);
+  }
 
-    .page-header .breadcrumb a:hover {
-      color: #fff;
-    }
+  .table-enterprise tbody tr:hover {
+    background-color: #fcfdfd;
+  }
 
-    /* SECTION */
-    .section-card {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: var(--shadow-md);
-      padding: 25px;
-      border: 1px solid rgba(0, 0, 0, .05);
-    }
+  .pill-filter {
+    background: #f1f5f9;
+    border: none;
+    padding: 8px 24px;
+    border-radius: 50px;
+    font-weight: 800;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    transition: var(--transition);
+  }
 
-    /* TABLE ENHANCEMENTS */
-    .table {
-      margin-bottom: 0;
-    }
+  .pill-filter.active {
+    background: var(--primary);
+    color: white;
+    box-shadow: var(--shadow-md);
+  }
 
-    .table th {
-      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-      font-weight: 600;
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #495057;
-      border-bottom: 2px solid var(--primary);
-    }
+  .qc-snippet-box {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 16px;
+    border: 1px solid var(--border-light);
+    margin-bottom: 12px;
+  }
 
-    .table td {
-      vertical-align: middle;
-      padding: 15px 12px;
-    }
+  .search-enterprise {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    border-radius: 50px;
+    padding: 10px 25px;
+    width: 100%;
+    max-width: 400px;
+    font-weight: 600;
+  }
 
-    .table tbody tr {
-      transition: all 0.2s ease;
-    }
+  .search-enterprise::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+  }
 
-    .table tbody tr:hover {
-      background: rgba(15, 155, 95, 0.05);
-      transform: scale(1.005);
-    }
+  .search-enterprise:focus {
+    background: rgba(255, 255, 255, 0.25);
+    outline: none;
+    border-color: #fff;
+  }
+</style>
+{% endblock %}
 
-    /* INVOICE ITEM */
-    .invoice-item {
-      padding: 8px 12px;
-      background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
-      border-radius: 8px;
-      margin-bottom: 8px;
-      border: 1px solid #e9ecef;
-      transition: all 0.2s ease;
-    }
+{% block content %}
+<section class="approved-hero">
+  <div class="container text-center">
+    <h2 class="fw-800 text-white mb-2" data-aos="fade-up">Approved Pipeline</h2>
+    <p class="text-white opacity-75 fw-600 mb-5" data-aos="fade-up" data-aos-delay="100">Live tracking of contracted
+      shipments and active loading operations.</p>
 
-    .invoice-item:hover {
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    main {
-      flex: 1;
-    }
-  </style>
-</head>
-
-<body>
-
-  {% include '_navbar.html' %}
-
-  <!-- PAGE HEADER -->
-  <div class="page-header">
-    <div class="container">
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <nav class="breadcrumb mb-2">
-            <a href="/miller"><i class="fa fa-home"></i> Dashboard</a>
-            <span class="mx-2">/</span>
-            <span>Approved Orders</span>
-          </nav>
-          <h4><i class="fa fa-check-circle me-2"></i>Approved Orders</h4>
-        </div>
-        <a href="/miller" class="btn btn-light">
-          <i class="fa fa-arrow-left me-1"></i> Back
-        </a>
-      </div>
+    <div class="d-flex justify-content-center" data-aos="fade-up" data-aos-delay="200">
+      <input type="text" id="approvedLoadingSearchInput" class="search-enterprise"
+        placeholder="Search Shipment, Buyer, or Truck..." onkeyup="searchApprovedLoading()">
     </div>
   </div>
+</section>
 
-  <main>
-    <div class="container mb-5">
-
-      <!-- ================= DATA SPLIT ================= -->
-      {% set approved_loading = [] %}
-      {% for b in approved %}
-      {% set booked = b[3] %}
-      {% set loaded = b[7] %}
-      {% if b[8] != 'partial_closed' and b[16] != 'paid' %} {% set _=approved_loading.append(b) %} {% endif %} {% endfor
-      %} <!--=================APPROVED LOADING=================-->
-      <div class="section-card" data-aos="fade-up" id="approved-loading">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h5 class="fw-bold mb-0">
-            <i class="fa fa-check-circle text-success me-2"></i>
-            Approved Orders (Active)
-          </h5>
-          <span class="badge bg-success fs-6" id="approvedLoadingCount">{{ approved_loading|length }} Orders</span>
-        </div>
-
-        <!-- Filter & Search (QC pending trucks) -->
-        <div class="row g-2 align-items-center mb-3">
-          <div class="col-md-6">
-            <div class="btn-group" role="group" aria-label="QC Filter">
-              <button type="button" class="btn btn-sm btn-success approved-loading-filter-btn" data-filter="all"
-                onclick="filterApprovedLoading('all')">All</button>
-              <button type="button" class="btn btn-sm btn-outline-secondary approved-loading-filter-btn"
-                data-filter="pending" onclick="filterApprovedLoading('pending')">QC Pending</button>
-              <button type="button" class="btn btn-sm btn-outline-secondary approved-loading-filter-btn"
-                data-filter="verified" onclick="filterApprovedLoading('verified')">QC Verified</button>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <input type="text" id="approvedLoadingSearchInput" class="form-control form-control-sm"
-              placeholder="Search by Order ID, Buyer, Crop, Truck..." onkeyup="searchApprovedLoading()">
-          </div>
-        </div>
-
-        {% if approved_loading %}
-        <div class="table-responsive">
-          <table class="table table-bordered align-middle">
-            <thead class="table-light">
-              <tr>
-                <th>Order ID</th>
-                <th>Trader</th>
-                <th>Crop</th>
-                <th>Booked</th>
-                <th>Loaded</th>
-                <th>Remaining</th>
-                <th>Invoices</th>
-                <th>Close Reason</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {% for b in approved_loading %}
-              {% set booking_id = b[0] %}
-              {% set booked = b[3] %}
-              {% set loaded = b[7] %}
-              {% set remaining = booked - loaded %}
-
-              {% set invs = invoices_map.get(booking_id) %}
-              {% set ns = namespace(pending=0, search=(b[10]|string + ' ' + b[1] + ' ' + b[2])|lower) %}
-              {% if invs %}
-              {% for inv in invs %}
-              {% if inv.qc_status != 'verified' %}
-              {% set ns.pending = ns.pending + 1 %}
-              {% endif %}
-              {% if inv.truck_number %}
-              {% set ns.search = ns.search + ' ' + (inv.truck_number|string|lower) %}
-              {% endif %}
-              {% endfor %}
-              {% endif %}
-              {% set qc_row_status = 'none' if not invs else ('pending' if ns.pending > 0 else 'verified') %}
-
-              <tr class="approved-loading-row" data-qc="{{ qc_row_status }}" data-search="{{ ns.search }}">
-                <td><strong class="text-primary">{{ b[10] }}</strong></td>
-                <td>{{ b[1] }}</td>
-                <td class="text-capitalize">{{ b[2] }}</td>
-
-                <td><span class="badge bg-primary">{{ booked }} Qt</span></td>
-                <td><span class="badge bg-success">{{ loaded }} Qt</span></td>
-                <td>
-                  {% if remaining > 0 %}
-                  <span class="badge bg-warning text-dark">{{ remaining }} Qt Remaining</span>
-                  {% elif remaining < 0 %} <span class="badge bg-danger">{{ remaining|abs }} Qt Overloaded</span>
-                    {% else %}
-                    <span class="badge bg-success">Fully Loaded</span>
-                    {% endif %}
-
-                    <button class="btn btn-outline-danger btn-sm ms-2" title="Close Order" data-bs-toggle="modal"
-                      data-bs-target="#closeRemainingModal{{ booking_id }}">
-                      <i class="fa fa-times-circle"></i>
-                    </button>
-                </td>
-
-                <!-- Invoices + QC (for loaded trucks even if order still loading) -->
-                <td>
-                  {% if invs and ns.pending > 0 %}
-                  <span class="badge bg-warning text-dark mb-2 d-inline-block">QC Pending: {{ ns.pending }}</span>
-
-                  {% for inv in invs %}
-                  {% if inv.qc_status != 'verified' %}
-                  <div class="mb-2 p-2 border rounded" style="background:#f8f9fa;">
-                    <div class="d-flex justify-content-between align-items-start gap-2">
-                      <div>
-                        <div class="fw-semibold">
-                          {% if inv.truck_number %}
-                          Truck {{ inv.truck_number }}
-                          {% else %}
-                          Truck #{{ loop.index }}
-                          {% endif %}
-                          <span class="badge bg-info ms-2">{{ inv.qty }} Qt</span>
-                        </div>
-
-                        <a href="/static/uploads/bills/{{ inv.file }}" target="_blank"
-                          class="btn btn-sm btn-outline-primary mt-1">
-                          <i class="fa fa-file-invoice"></i> Invoice
-                        </a>
-
-                        <small class="text-muted d-block">{{ inv.date.strftime('%Y-%m-%d %H:%M') }}</small>
-                      </div>
-
-                      <div class="text-end">
-                        {% if inv.qc_status == 'verified' %}
-                        <span class="badge bg-success">✅ QC Verified</span>
-                        {% else %}
-                        <span class="badge bg-warning text-dark">⏳ QC Pending</span>
-                        {% endif %}
-
-                        <button type="button"
-                          class="btn btn-sm {% if inv.qc_status == 'verified' %}btn-outline-warning{% else %}btn-success{% endif %} mt-2"
-                          data-bs-toggle="collapse" data-bs-target="#qcCollapse{{ inv.id }}" aria-expanded="false">
-                          <i class="fa fa-clipboard-check"></i>
-                          {% if inv.qc_status == 'verified' %}Edit QC{% else %}Do QC{% endif %}
-                        </button>
-                      </div>
-                    </div>
-
-                    {% if inv.qc_status == 'verified' %}
-                    <div class="mt-2">
-                      <small class="text-muted d-block">Net: {{ inv.qc_weight or inv.qty }} Qt • Moisture: {{
-                        inv.qc_moisture or '-' }}%</small>
-                      {% if inv.qc_remarks %}
-                      <small class="text-muted d-block">Remarks: {{ inv.qc_remarks }}</small>
-                      {% endif %}
-                      {% if inv.qc_at %}
-                      <small class="text-muted d-block">Verified on {{ inv.qc_at.strftime('%Y-%m-%d %H:%M') }}</small>
-                      {% endif %}
-                    </div>
-                    {% endif %}
-
-                    <!-- QC Collapse (more reliable than modal inside tables) -->
-                    <div class="collapse mt-2" id="qcCollapse{{ inv.id }}">
-                      <div class="card card-body">
-                        <div class="fw-semibold mb-2">
-                          {% if inv.qc_status == 'verified' %}
-                          Edit Quality Check -
-                          {% else %}
-                          Quality Check -
-                          {% endif %}
-                          {% if inv.truck_number %}
-                          Truck {{ inv.truck_number }}
-                          {% else %}
-                          Truck #{{ loop.index }}
-                          {% endif %}
-                        </div>
-
-                        <form method="POST" action="/miller/update_qc/{{ inv.id }}">
-                          <div class="row g-2 mb-2">
-                            <div class="col-6">
-                              <label class="form-label small mb-1">Net Weight (Qt)</label>
-                              <input type="number" step="0.01" name="qc_weight" class="form-control form-control-sm"
-                                value="{{ inv.qc_weight or inv.qty }}" required>
-                            </div>
-                            <div class="col-6">
-                              <label class="form-label small mb-1">Moisture (%)</label>
-                              <input type="number" step="0.01" name="qc_moisture" class="form-control form-control-sm"
-                                value="{{ inv.qc_moisture or '' }}" required>
-                            </div>
-                            <div class="col-12 mt-2">
-                              <label class="form-label small mb-1">Freight (Paid by Miller)</label>
-                              <input type="number" step="0.01" name="qc_freight" class="form-control form-control-sm"
-                                value="{{ inv.qc_freight or '' }}" placeholder="Enter freight amount">
-                            </div>
-                          </div>
-                          <div class="mb-2">
-                            <label class="form-label small mb-1">Remarks (Optional)</label>
-                            <textarea name="qc_remarks" class="form-control form-control-sm" rows="2"
-                              placeholder="Quality notes, deductions, etc.">{{ inv.qc_remarks or '' }}</textarea>
-                          </div>
-                          <div class="d-flex gap-2">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse"
-                              data-bs-target="#qcCollapse{{ inv.id }}">
-                              Cancel
-                            </button>
-                            <button type="submit" class="btn btn-sm btn-success">
-                              <i class="fa fa-clipboard-check"></i> Save QC
-                            </button>
-                          </div>
-                        </form>
-                      </div>
-                    </div>
-                  </div>
-                  {% endif %} <!-- End if qc != verified -->
-                  {% endfor %}
-                  {% else %}
-                  {% if invs %}
-                  <span class="text-success small"><i class="fa fa-check-circle"></i> All loaded items verified</span>
-                  {% else %}
-                  <span class="text-muted small">No loading yet</span>
-                  {% endif %}
-                  {% endif %}
-                </td>
-
-                <!-- Close Reason -->
-                <td>
-                  {% if b[8] == 'partial_closed' and b[9] %}
-                  <span class="badge bg-warning text-dark">
-                    <i class="fa fa-lock"></i> Closed
-                  </span>
-                  <div class="small text-muted mt-1">{{ b[9] }}</div>
-                  {% else %}
-                  <span class="text-muted small">—</span>
-                  {% endif %}
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        {% else %}
-        <p class="text-muted mb-0">No orders currently loading.</p>
-        {% endif %}
-      </div>
-    </div>
-
-    </div>
-  </main>
-
-
-  <!-- ================= MODALS ================= -->
-  {% for b in approved_loading %}
-  {% set booking_id = b[0] %}
-  {% set booked = b[3] %}
-  {% set loaded = b[7] %}
-  {% set remaining = booked - loaded %}
-  <div class="modal fade" id="closeRemainingModal{{ booking_id }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Close Order?</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <form method="POST" action="/miller/close_remaining/{{ booking_id }}">
-          <div class="modal-body">
-            {% if remaining > 0 %}
-            <p>You are about to close the remaining <strong>{{ remaining }} Qt</strong> for this order.</p>
-            <p class="text-muted small">This will return the remaining quantity to your stock and mark the order as
-              partially closed.</p>
-            {% elif remaining < 0 %} <p>This order is overloaded by <strong>{{ remaining|abs }} Qt</strong>.</p>
-              <p class="text-muted small">Closing this order will mark it as complete.</p>
-              {% else %}
-              <p>This order is fully loaded. Closing it will mark it as complete.</p>
-              {% endif %}
-
-              <label class="form-label">Reason for Closing</label>
-              <input name="reason" class="form-control" placeholder="e.g. End of Season, Buyer Request..." required>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-danger">Confirm Close</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
+<div class="container approved-container">
+  {% set approved_loading = [] %}
+  {% for b in approved %}
+  {% if b[8] != 'partial_closed' and b[16] != 'paid' %}
+  {% set _=approved_loading.append(b) %}
+  {% endif %}
   {% endfor %}
 
-  {% include '_footer.html' %}
+  <div class="premium-table-card" data-aos="fade-up">
+    <div class="p-4 border-bottom d-flex justify-content-between align-items-center bg-white">
+      <div class="d-flex gap-2">
+        <button class="pill-filter active approved-loading-filter-btn" data-filter="all"
+          onclick="filterApprovedLoading('all')">All Shipments</button>
+        <button class="pill-filter approved-loading-filter-btn" data-filter="pending"
+          onclick="filterApprovedLoading('pending')">Pending QC</button>
+        <button class="pill-filter approved-loading-filter-btn" data-filter="verified"
+          onclick="filterApprovedLoading('verified')">Verified QC</button>
+      </div>
+      <div class="badge bg-primary-subtle text-primary rounded-pill px-4 py-2 fw-800" id="approvedLoadingCount">
+        {{ approved_loading|length }} ACTIVE TRADES
+      </div>
+    </div>
 
-  <script>
-    // ================= Approved Loading Filter & Search =================
-    let currentApprovedLoadingFilter = 'all';
+    <div class="table-responsive">
+      <table class="table table-enterprise">
+        <thead>
+          <tr>
+            <th>Shipment ID</th>
+            <th>Trader Info</th>
+            <th>Commodity</th>
+            <th>Contract Weight</th>
+            <th>Logistics Status</th>
+            <th>Truck Logs</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in approved_loading %}
+          {% set booking_id = b[0] %}
+          {% set booked = b[3] %}
+          {% set loaded = b[7] %}
+          {% set remaining = booked - loaded %}
 
-    function setApprovedLoadingButtonState(activeFilter) {
-      document.querySelectorAll('.approved-loading-filter-btn').forEach(btn => {
-        const isActive = btn.dataset.filter === activeFilter;
-        btn.classList.toggle('btn-success', isActive);
-        btn.classList.toggle('btn-outline-secondary', !isActive);
-      });
-    }
+          {% set invs = invoices_map.get(booking_id) %}
+          {% set ns = namespace(pending=0, search=(b[10]|string + ' ' + b[1] + ' ' + b[2])|lower) %}
+          {% if invs %}
+          {% for inv in invs %}
+          {% if inv.qc_status != 'verified' %}{% set ns.pending = ns.pending + 1 %}{% endif %}
+          {% if inv.truck_number %}{% set ns.search = ns.search + ' ' + (inv.truck_number|string|lower) %}{% endif %}
+          {% endfor %}
+          {% endif %}
+          {% set qc_row_status = 'none' if not invs else ('pending' if ns.pending > 0 else 'verified') %}
 
-    function filterApprovedLoading(status) {
-      currentApprovedLoadingFilter = status;
-      setApprovedLoadingButtonState(status);
-      applyApprovedLoadingFilter();
-    }
+          <tr class="approved-loading-row" data-qc="{{ qc_row_status }}" data-search="{{ ns.search }}">
+            <td><span class="fw-800 text-dark">{{ b[10] }}</span></td>
+            <td>
+              <div class="fw-800 mb-0">{{ b[1] }}</div>
+              <div class="small text-muted fw-600">Enterprise Buyer</div>
+            </td>
+            <td>
+              <div class="badge bg-light text-dark fw-800 border px-3 rounded-pill text-capitalize">{{ b[2] }}</div>
+            </td>
+            <td>
+              <div class="fw-800">{{ booked }} Qt</div>
+              <div class="small text-muted fw-600">Total Contract</div>
+            </td>
+            <td>
+              {% if loaded > 0 %}
+              <div class="progress mb-2" style="height: 6px; border-radius: 10px;">
+                {% set percent = (loaded / booked * 100)|round|int %}
+                <div class="progress-bar bg-success" role="progressbar" style="width: {{ [percent, 100]|min }}%"></div>
+              </div>
+              <div class="d-flex justify-content-between small fw-800">
+                <span class="text-success">{{ loaded }} Qt Loaded</span>
+                <span class="text-muted">{{ remaining if remaining > 0 else 0 }} Qt Left</span>
+              </div>
+              {% else %}
+              <span class="badge bg-warning-subtle text-warning-emphasis fw-800 px-3 py-2 rounded-pill">AWAITING
+                LOADING</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if invs %}
+              <div class="d-flex flex-column gap-2">
+                {% for inv in invs %}
+                <div class="qc-snippet-box small">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="fw-800">{{ inv.truck_number or 'Truck #' ~ loop.index }}</span>
+                    {% if inv.qc_status == 'verified' %}
+                    <i class="fa fa-circle-check text-success"></i>
+                    {% else %}
+                    <i class="fa fa-clock text-warning"></i>
+                    {% endif %}
+                  </div>
+                  <div class="text-muted fw-600">{{ inv.qty }} Qt</div>
+                </div>
+                {% endfor %}
+              </div>
+              {% else %}
+              <span class="text-muted small fw-600">No trucks logged</span>
+              {% endif %}
+            </td>
+            <td class="text-end">
+              <div class="btn-group shadow-sm rounded-pill overflow-hidden">
+                <a href="/miller/qc" class="btn btn-white border fw-800 px-3 btn-sm">QC Analysis</a>
+                <button class="btn btn-light border fw-800 px-3 btn-sm" data-bs-toggle="modal"
+                  data-bs-target="#closeRemainingModal{{ booking_id }}">
+                  <i class="fa fa-lock text-danger"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
-    function searchApprovedLoading() {
-      applyApprovedLoadingFilter();
-    }
+    {% if not approved_loading %}
+    <div class="text-center py-5">
+      <i class="fa fa-inbox text-muted opacity-25 fs-1 mb-3"></i>
+      <h5 class="fw-800 text-muted">No Active Shipments</h5>
+      <p class="text-muted fw-600">Approved orders will appear here once loading begins.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
 
-    function applyApprovedLoadingFilter() {
-      const searchTerm = (document.getElementById('approvedLoadingSearchInput')?.value || '').toLowerCase();
-      const rows = document.querySelectorAll('.approved-loading-row');
-      let visibleCount = 0;
+<!-- Modals -->
+{% for b in approved_loading %}
+{% set booking_id = b[0] %}
+{% set booked = b[3] %}
+{% set loaded = b[7] %}
+{% set remaining = booked - loaded %}
+<div class="modal fade" id="closeRemainingModal{{ booking_id }}" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 30px;">
+      <div class="modal-header border-0 pt-4 px-4">
+        <h5 class="fw-800 mb-0">Contract Fulfillment</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" action="/miller/close_remaining/{{ booking_id }}">
+        <div class="modal-body px-4">
+          <div class="bg-light rounded-4 p-3 mb-4">
+            <div class="fw-800 text-primary mb-1">{{ b[10] }}</div>
+            <div class="small text-muted fw-600">{{ b[1] }} · {{ b[2]|capitalize }}</div>
+          </div>
 
-      rows.forEach(row => {
-        const qc = row.dataset.qc || 'none';
-        const searchText = row.dataset.search || '';
+          {% if remaining > 0 %}
+          <p class="fw-600 text-dark">Closing this shipment will release the remaining <strong>{{ remaining }}
+              Qt</strong> back to your open stock.</p>
+          {% else %}
+          <p class="fw-600 text-dark">This shipment is fully loaded. Closing it will mark the contract as complete.</p>
+          {% endif %}
 
-        const statusMatch = (currentApprovedLoadingFilter === 'all') || (qc === currentApprovedLoadingFilter);
-        const searchMatch = !searchTerm || searchText.includes(searchTerm);
+          <label class="form-label fw-800 small text-muted text-uppercase mt-3">Closing Reason</label>
+          <input name="reason" class="form-control enterprise-input"
+            placeholder="e.g. Loading completed, end of season..." required>
+        </div>
+        <div class="modal-footer border-0 px-4 pb-4">
+          <button type="button" class="btn btn-light fw-800 px-4" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-danger fw-800 px-5 rounded-pill shadow-lg">Finalize Closure</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endfor %}
 
-        if (statusMatch && searchMatch) {
-          row.style.display = '';
-          visibleCount++;
-        } else {
-          row.style.display = 'none';
-        }
-      });
+{% endblock %}
 
-      const countBadge = document.getElementById('approvedLoadingCount');
-      if (countBadge) {
-        countBadge.textContent = `${visibleCount} Orders`;
+{% block extra_js %}
+<script>
+  let currentFilter = 'all';
+
+  function filterApprovedLoading(status) {
+    currentFilter = status;
+    document.querySelectorAll('.approved-loading-filter-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.filter === status);
+    });
+    applyFilters();
+  }
+
+  function searchApprovedLoading() {
+    applyFilters();
+  }
+
+  function applyFilters() {
+    const searchTerm = (document.getElementById('approvedLoadingSearchInput')?.value || '').toLowerCase();
+    const rows = document.querySelectorAll('.approved-loading-row');
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+      const qc = row.dataset.qc || 'none';
+      const searchData = row.dataset.search || '';
+      const statusMatch = (currentFilter === 'all') || (qc === currentFilter);
+      const searchMatch = searchData.includes(searchTerm);
+
+      if (statusMatch && searchMatch) {
+        row.style.display = '';
+        visibleCount++;
+      } else {
+        row.style.display = 'none';
       }
-    }
-
-    // Init
-    setApprovedLoadingButtonState('all');
-    window.addEventListener('load', applyApprovedLoadingFilter);
-  </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script>AOS.init({ duration: 600, once: true });</script>
-</body>
-
-</html>
+    });
+    document.getElementById('approvedLoadingCount').textContent = `${visibleCount} ACTIVE TRADES`;
+  }
+</script>
+{% endblock %}
