@@ -339,12 +339,13 @@ CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
         stock_id INTEGER,
         buyer_id INTEGER,
-        quantity INTEGER,
+        quantity DECIMAL(10,2),
         status VARCHAR(20) DEFAULT 'pending',
         order_id VARCHAR(20),
         price DECIMAL(10,2),
         loading_status VARCHAR(20) DEFAULT 'pending',
         loaded_qty DECIMAL(10,2) DEFAULT 0,
+        loaded_at TIMESTAMP,
         reason TEXT,
         decision_at TIMESTAMP,
         close_reason TEXT,
@@ -4137,6 +4138,8 @@ def book_miller_stock(stock_id):
         flash("Quantity must be greater than 0.", "error")
         return redirect("/market")
 
+    logger.debug(f"DEBUG: Booking request for stock_id: {stock_id}, qty: {qty}")
+    
     con = get_db()
     cur = con.cursor()
 
@@ -4149,10 +4152,13 @@ def book_miller_stock(stock_id):
     row = cur.fetchone()
 
     if not row:
+        logger.debug("DEBUG: Stock not found")
         flash("Stock not found.", "error")
     elif row[1] != 'open':
+        logger.debug(f"DEBUG: Stock status is {row[1]}, not open")
         flash("Stock is closed or unavailable.", "error")
     elif row[0] < qty:
+        logger.debug(f"DEBUG: Insufficient stock. Available: {row[0]}, Requested: {qty}")
         flash(f"Insufficient stock quantity. Available: {row[0]}", "error")
     else:
         current_price = row[2]
@@ -4160,12 +4166,14 @@ def book_miller_stock(stock_id):
         
         # Auto-approve logic: If threshold > 0 AND booking qty <= threshold
         is_auto_approved = (auto_approve_min_qty > 0 and qty <= auto_approve_min_qty)
+        logger.debug(f"DEBUG: Auto-approve: {is_auto_approved} (threshold: {auto_approve_min_qty})")
         
         initial_status = 'approved' if is_auto_approved else 'pending'
 
         # Generate order ID
         try:
             order_id = generate_next_order_id()
+            logger.debug(f"DEBUG: Generated order_id: {order_id}")
             
             # Create booking
             cur.execute("""
@@ -4176,6 +4184,7 @@ def book_miller_stock(stock_id):
     """, (stock_id, session["user_id"], qty, initial_status, order_id, current_price))
             
             booking_id = cur.fetchone()[0]  # was lastrowid
+            logger.debug(f"DEBUG: Created booking_id: {booking_id}")
             
             # If auto-approved, we should probably set decision_at as well?
             if is_auto_approved:
@@ -5450,7 +5459,8 @@ def patch_db_schema():
             "qc_at": "TIMESTAMP",
             "bill_document": "VARCHAR(255)",
             "truck_status": "VARCHAR(50)",
-            "deadline_at": "TIMESTAMP"
+            "deadline_at": "TIMESTAMP",
+            "loaded_at": "TIMESTAMP"
         }
 
         for col, col_type in new_cols.items():

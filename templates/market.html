@@ -274,7 +274,7 @@
                                     <h5 class="fw-bold">Book {{ stock[2] }}</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                 </div>
-                                <form action="/buyer/confirm_booking/{{ stock[0] }}" method="POST">
+                                <form action="/book_miller_stock/{{ stock[0] }}" method="POST">
                                     <div class="modal-body p-4">
                                         <p class="text-muted small mb-4">You are booking from <strong>{{ stock[10]
                                                 }}</strong> at <strong>₹{{ stock[4] }}</strong> per quintal.</p>
