@@ -1,6 +1,5 @@
 <!-- ================= UNIFIED NAVBAR - SAARNA CANVESSARS ================= -->
 <nav class="navbar navbar-expand-lg sarna-navbar">
-  <link rel="stylesheet" href="/static/css/print.css">
   <div class="container">
     <!-- Brand -->
     <a class="navbar-brand"
@@ -225,38 +224,3 @@
     </div>
   </div>
 </nav>
-
-<!-- ================= GLOBAL EXPORT & PRINT SCRIPTS ================= -->
-<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-<script>
-  /**
-   * Export an HTML table to Excel
-   * @param {string} tableId - ID of the table to export
-   * @param {string} filename - Name of the downloaded file
-   */
-  function exportTableToExcel(tableId, filename = 'data-export.xlsx') {
-    let table = document.getElementById(tableId);
-    if (!table) {
-      alert("Table not found to export!");
-      return;
-    }
-
-    // Clone table to avoid modifying the view
-    let clone = table.cloneNode(true);
-
-    // Remove Action columns if any (assumed to be last or with specific class)
-    // For simplicity, we just export what's visible. 
-    // We can add logic to remove '.no-export' elements if needed.
-    clone.querySelectorAll('.no-export').forEach(el => el.remove());
-
-    let wb = XLSX.utils.table_to_book(clone, { sheet: "Sheet1" });
-    XLSX.writeFile(wb, filename);
-  }
-
-  /**
-   * Print the current page with print-specific CSS
-   */
-  function printTable() {
-    window.print();
-  }
-</script>
