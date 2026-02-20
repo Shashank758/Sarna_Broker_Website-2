@@ -1697,6 +1697,10 @@ ORDER BY mb.created_at DESC
     final_invoice_uploaded = [b for b in bookings if b[17] and b[16] != 'paid'] # Using COALESCE(p.status) and p.invoice_file indices
     payment_completed = [b for b in bookings if b[16] == 'paid']
 
+    # ✅ FETCH DEDUCTION OPTIONS
+    cur.execute("SELECT id, text FROM miller_deduction_options WHERE miller_id=%s ORDER BY created_at DESC", (miller_id,))
+    deduction_options = cur.fetchall()
+
     # 🔹 FETCH PER-TRUCK LOADING INVOICES WITH QC DATA AND FINAL INVOICE
     cur.execute("""
     SELECT li.id, li.booking_id, li.loaded_qty, li.invoice_file, li.truck_number, li.created_at,
