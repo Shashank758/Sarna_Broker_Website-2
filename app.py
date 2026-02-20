@@ -3616,7 +3616,7 @@ ORDER BY mb.created_at DESC
 
     loaded_bookings = [
         b for b in my_bookings
-        if b[8] == 'loaded'
+        if b[8] in ('loaded', 'partial_closed')
     ]
 
     rejected_bookings = [
@@ -4080,22 +4080,7 @@ def buyer_loaded():
     if session.get("role") != "buyer":
         return redirect("/")
     orders = get_buyer_orders("loaded")
-    
-    # Filter out orders where all invoices are paid AND loaded quantity is fully covered
-    filtered_orders = []
-    for o in orders:
-        invoices = o.get("invoices", [])
-        loaded_qty = float(o.get("loaded") or 0)
-        invoiced_qty = sum(float(i.get("qty") or 0) for i in invoices)
-        
-        # Check if fully paid
-        all_paid = invoices and all(i.get("payment_status") == "paid" for i in invoices)
-        fully_invoiced = abs(loaded_qty - invoiced_qty) < 1.0 # 1 Qt tolerance
-        
-        if not (all_paid and fully_invoiced):
-            filtered_orders.append(o)
-            
-    return render_template("buyer_loaded.html", page_title="Loaded Orders", orders=filtered_orders)
+    return render_template("buyer_loaded.html", page_title="Loaded Orders", orders=orders)
 
    
 @app.route("/buyer/payments")
