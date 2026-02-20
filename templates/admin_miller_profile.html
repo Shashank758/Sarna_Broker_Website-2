@@ -1,28 +1,132 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-<title>Miller Profile (Admin)</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>Miller Profile Details | Sarna Broker</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/print.css">
 </head>
-<body class="container mt-4">
 
-<h4>Miller Profile</h4>
+<body>
 
-<ul class="list-group">
-  <li class="list-group-item"><b>Name:</b> {{ miller[0] }}</li>
-  <li class="list-group-item"><b>Email:</b> {{ miller[1] }}</li>
-  <li class="list-group-item"><b>Mill Name:</b> {{ miller[2] }}</li>
-  <li class="list-group-item"><b>Phone:</b> {{ miller[3] }}</li>
-  <li class="list-group-item"><b>Address:</b> {{ miller[4] }}</li>
-  <li class="list-group-item">
-    <b>Document:</b>
-    {% if miller[5] %}
-      <a href="/static/uploads/miller_docs/{{ miller[5] }}" target="_blank">View</a>
-    {% else %}
-      Not uploaded
-    {% endif %}
-  </li>
-</ul>
+  <!-- ================= TOP NAVBAR ================= -->
+  <nav class="admin-navbar">
+    <div class="nav-left">
+      <img src="/static/image/Sarna broker.png" alt="Logo">
+      <span>Sarna Broker</span>
+    </div>
 
+    <center><b>JAI SHREE SHYAM</b></center>
+
+    <div class="nav-right">
+      <span class="admin-name">
+        <i class="fa fa-user-circle"></i> Admin
+      </span>
+      <img src="/static/image/images.png" alt="Logo">
+    </div>
+  </nav>
+
+  <div class="admin-container">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+      <h4>Sarna Broker</h4>
+      <ul>
+        <li><a href="/admin"><i class="fa fa-gauge"></i> Dashboard</a></li>
+        <li><a href="/admin/users"><i class="fa fa-users"></i> Users</a></li>
+        <li><a href="/admin/stock"><i class="fa fa-box"></i> Latest rate</a></li>
+        <li><a href="/admin/stock-history"><i class="fa fa-history"></i> Rate update history</a></li>
+        <li><a href="/admin/bookings"><i class="fa fa-shopping-cart"></i> Bookings</a></li>
+        <li class="active"><i class="fa fa-industry"></i> Miller Profiles</li>
+        <li><a href="/admin/buyer-profiles"><i class="fa fa-store"></i> Trader Profiles</a></li>
+        <li><a href="/admin/logs"><i class="fa fa-list"></i> Admin Logs</a></li>
+        <li>
+          <i class="fa fa-right-from-bracket"></i>
+          <a href="/logout">Logout</a>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="admin-main">
+      <div class="admin-top">
+        <div class="d-flex align-items-center gap-3">
+          <a href="/admin/miller-profiles" class="btn btn-outline-secondary btn-sm"><i class="fa fa-arrow-left"></i>
+            Back</a>
+          <h5 class="mb-0">🏭 Miller Profile: {{ miller[2] if miller[2] else miller[0] }}</h5>
+        </div>
+        <span class="admin-badge">Admin View</span>
+      </div>
+
+      <div class="row mt-5">
+        <div class="col-md-8">
+          <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+              <h6 class="fw-bold border-bottom pb-2 mb-4"><i class="fa fa-building me-2"></i>Business Information</h6>
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <label class="small text-muted text-uppercase">Mill Name</label>
+                  <div class="fw-bold fs-5">{{ miller[2] if miller[2] else 'Not Provided' }}</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="small text-muted text-uppercase">Owner / Contact</label>
+                  <div class="fw-bold fs-5">{{ miller[0] }}</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="small text-muted text-uppercase">Email Address</label>
+                  <div>{{ miller[1] }}</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="small text-muted text-uppercase">Phone Number</label>
+                  <div class="fw-bold text-primary">{{ miller[3] if miller[3] else 'Not Provided' }}</div>
+                </div>
+                <div class="col-12">
+                  <label class="small text-muted text-uppercase">Mill Address</label>
+                  <p class="mb-0">{{ miller[4] if miller[4] else 'Address not specified' }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card shadow-sm border-0">
+            <div class="card-body">
+              <h6 class="fw-bold border-bottom pb-2 mb-4"><i class="fa fa-file-contract me-2"></i>Documents</h6>
+              {% if miller[5] %}
+              <div class="d-flex align-items-center p-3 bg-light rounded-3 mb-3">
+                <div class="me-3">
+                  <i class="fa fa-file-pdf fa-2x text-danger"></i>
+                </div>
+                <div class="flex-grow-1">
+                  <div class="small fw-bold">GST Registration</div>
+                  <small class="text-muted">Verification Document</small>
+                </div>
+                <a href="/static/uploads/docs/{{ miller[5] }}" target="_blank"
+                  class="btn btn-sm btn-outline-primary">View</a>
+              </div>
+              {% else %}
+              <div class="text-center py-4 text-muted">
+                <i class="fa fa-file-circle-xmark fa-2x mb-3 d-block"></i>
+                <p class="small mb-0">No documents uploaded yet.</p>
+              </div>
+              {% endif %}
+
+              <div class="alert alert-info small mt-4">
+                <i class="fa fa-info-circle me-2"></i>This information is used for invoicing and verification purposes.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
