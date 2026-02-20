@@ -142,6 +142,21 @@ def get_miller_phone(miller_id):
     return phone
 
 
+# ---------------- JINJA FILTERS ----------------
+@app.template_filter('format_currency')
+def format_currency(value):
+    try:
+        if value is None: return "0"
+        return "{:,.2f}".format(float(value))
+    except (ValueError, TypeError):
+        return value
+
+@app.template_filter('tojson')
+def to_json_filter(value):
+    import json
+    return json.dumps(value)
+
+
 def get_phone_for_password_reset(user_id, role=None, is_staff=0, parent_miller_id=None):
     """Get a phone number suitable for password reset SMS.
 
