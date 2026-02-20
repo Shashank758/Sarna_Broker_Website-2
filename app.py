@@ -5,7 +5,7 @@ import os
 import secrets
 import hashlib
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from twilio.rest import Client
@@ -154,7 +154,11 @@ def format_currency(value):
 @app.template_filter('tojson')
 def to_json_filter(value):
     import json
-    return json.dumps(value)
+    def json_serial(obj):
+        if isinstance(obj, (datetime, date)):
+            return obj.isoformat()
+        raise TypeError ("Type %s not serializable" % type(obj))
+    return json.dumps(value, default=json_serial)
 
 
 def get_phone_for_password_reset(user_id, role=None, is_staff=0, parent_miller_id=None):
