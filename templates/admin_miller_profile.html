@@ -181,6 +181,14 @@
               <div class="info-label">Network Tier</div>
               <div class="info-value">Premium Industrial Tier</div>
             </div>
+            <div class="col-md-6">
+              <div class="info-label">GST Number</div>
+              <div class="info-value text-success">{{ miller[7] or 'N/A' }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="info-label">Mandi License Number</div>
+              <div class="info-value text-info">{{ miller[8] or 'N/A' }}</div>
+            </div>
             <div class="col-12">
               <div class="info-label">Geographic Domicile (Address)</div>
               <div class="info-value fw-600 text-muted">{{ miller[4] if miller[4] else 'Detailed address not
@@ -206,9 +214,26 @@
                 <div class="small text-muted fw-600" style="font-size: 0.65rem;">VERIFIED COMPLIANCE</div>
               </div>
             </div>
-            <a href="/static/uploads/docs/{{ miller[5] }}" target="_blank"
-              class="btn btn-black w-100 fw-800 py-2 rounded-3">Access Document</a>
+            <a href="{{ url_for('static', filename='uploads/miller_docs/' + miller[5]) }}" target="_blank"
+              class="btn btn-black w-100 fw-800 py-2 rounded-3">Access GST Cert</a>
           </div>
+
+          {% if miller[6] %}
+          <div class="doc-module mb-3 mt-3">
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="bg-primary-subtle text-primary rounded-3 d-flex align-items-center justify-content-center"
+                style="width: 45px; height: 45px;">
+                <i class="fa fa-file-shield fs-5"></i>
+              </div>
+              <div>
+                <div class="fw-800 text-dark small">Mandi License</div>
+                <div class="small text-muted fw-600" style="font-size: 0.65rem;">TRADE PERMIT</div>
+              </div>
+            </div>
+            <a href="{{ url_for('static', filename='uploads/miller_docs/' + miller[6]) }}" target="_blank"
+              class="btn btn-primary w-100 fw-800 py-2 rounded-3">Access Mandi License</a>
+          </div>
+          {% endif %}
           {% else %}
           <div class="text-center py-5 bg-light rounded-4 border-dashed">
             <i class="fa fa-file-circle-xmark text-muted opacity-25 fs-1 mb-3"></i>

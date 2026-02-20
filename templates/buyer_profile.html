@@ -164,6 +164,19 @@
                 placeholder="Complete mailing address" required>{{ profile.address if profile else '' }}</textarea>
             </div>
 
+            <div class="col-md-6 mb-4">
+              <label class="form-label fw-800 small text-uppercase">GST Number</label>
+              <input class="form-control enterprise-input" name="gst_number"
+                value="{{ profile.gst_number if profile and profile.gst_number else '' }}"
+                placeholder="Enter GST Number">
+            </div>
+            <div class="col-md-6 mb-4">
+              <label class="form-label fw-800 small text-uppercase">Mandi License Number</label>
+              <input class="form-control enterprise-input" name="mandi_number"
+                value="{{ profile.mandi_number if profile and profile.mandi_number else '' }}"
+                placeholder="Enter Mandi License Number">
+            </div>
+
             <div class="col-12">
               <h6 class="form-section-title">KYC & Compliance Documents</h6>
             </div>

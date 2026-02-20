@@ -1122,7 +1122,10 @@ def run_migrations():
             ("staff_phone", "TEXT"),
             ("gst_doc", "TEXT"),
             ("mandi_doc", "TEXT"),
-            ("other_doc", "TEXT")
+            ("other_doc", "TEXT"),
+            ("owner_name", "TEXT"),
+            ("gst_number", "TEXT"),
+            ("mandi_number", "TEXT")
         ]
         
         for col, col_type in miller_fields:
@@ -1141,6 +1144,8 @@ def run_migrations():
             ("city", "TEXT"),
             ("state", "TEXT"),
             ("country", "TEXT DEFAULT 'India'"),
+            ("gst_number", "TEXT"),
+            ("mandi_number", "TEXT")
         ]
 
         for table in tables:
@@ -1439,6 +1444,10 @@ def register():
         city = request.form.get("city", "").strip()
         state = request.form.get("state", "").strip()
         country = request.form.get("country", "India").strip()
+        
+        # Compliance fields
+        gst_number = request.form.get("gst_number", "").strip()
+        mandi_number = request.form.get("mandi_number", "").strip()
 
         # Construct legacy address string for backward compatibility
         # Format: House No, Area, Locality (if any), Landmark (if any), City, State - Pincode
@@ -1488,21 +1497,21 @@ def register():
             if role == "miller":
                 cur.execute("""
                     INSERT INTO miller_profiles
-                    (miller_id, mill_name, owner_phone, address, gst_doc, mandi_doc, other_doc,
-                     pincode, house_no, area, locality, landmark, city, state, country)
-                    VALUES (%s,%s,%s,%s,%s,%s,%s, %s,%s,%s,%s,%s,%s,%s,%s)
-                """, (user_id, firm_name, phone, full_address, gst_filename, mandi_filename, other_filename,
-                      pincode, house_no, area, locality, landmark, city, state, country))
+                    (miller_id, mill_name, owner_name, owner_phone, address, gst_doc, mandi_doc, other_doc,
+                     pincode, house_no, area, locality, landmark, city, state, country, gst_number, mandi_number)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s, %s,%s,%s,%s,%s,%s,%s,%s, %s, %s)
+                """, (user_id, firm_name, name, phone, full_address, gst_filename, mandi_filename, other_filename,
+                      pincode, house_no, area, locality, landmark, city, state, country, gst_number, mandi_number))
                 
             elif role == "buyer":
                 # For buyer, map firm_name -> shop_name, mandi_doc -> license_doc
                 cur.execute("""
                     INSERT INTO buyer_profiles
                     (buyer_id, shop_name, owner_name, phone, address, gst_doc, license_doc, other_doc,
-                     pincode, house_no, area, locality, landmark, city, state, country)
-                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s, %s,%s,%s,%s,%s,%s,%s,%s)
+                     pincode, house_no, area, locality, landmark, city, state, country, gst_number, mandi_number)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s, %s,%s,%s,%s,%s,%s,%s,%s, %s, %s)
                 """, (user_id, firm_name, name, phone, full_address, gst_filename, mandi_filename, other_filename,
-                      pincode, house_no, area, locality, landmark, city, state, country))
+                      pincode, house_no, area, locality, landmark, city, state, country, gst_number, mandi_number))
                 
             con.commit()
             con.close()
@@ -1531,6 +1540,24 @@ except Exception as e:
 def logout():
     session.clear()
     return redirect("/")
+
+@app.route("/profile")
+def profile():
+    if not session.get("user_id"):
+        return redirect("/")
+    
+    user_id = session.get("user_id")
+    con = get_db()
+    cur = con.cursor()
+    
+    cur.execute("SELECT name, email, role FROM users WHERE id=%s", (user_id,))
+    user = cur.fetchone()
+    con.close()
+    
+    if not user:
+        return redirect("/")
+        
+    return render_template("profile.html", user=user)
 
 @app.route("/switch_role/<target_role>")
 def switch_role(target_role):
@@ -1862,6 +1889,10 @@ def miller_profile_page():
         city = request.form.get("city")
         state = request.form.get("state")
         
+        # New compliance fields
+        gst_number = request.form.get("gst_number")
+        mandi_number = request.form.get("mandi_number")
+        
         # Handle file uploads
         gst_doc = request.files.get("gst_doc")
         mandi_doc = request.files.get("mandi_doc")
@@ -1891,9 +1922,10 @@ def miller_profile_page():
             # Update
             query = """
                 UPDATE miller_profiles 
-                SET owner_name=%s, mill_name=%s, owner_phone=%s, accountant_phone=%s, staff_phone=%s, address=%s, city=%s, state=%s
+                SET owner_name=%s, mill_name=%s, owner_phone=%s, accountant_phone=%s, staff_phone=%s, address=%s, city=%s, state=%s,
+                    gst_number=%s, mandi_number=%s
             """
-            params = [owner_name, mill_name, owner_phone, accountant_phone, staff_phone, address, city, state]
+            params = [owner_name, mill_name, owner_phone, accountant_phone, staff_phone, address, city, state, gst_number, mandi_number]
             
             if gst_filename:
                 query += ", gst_doc=%s"
@@ -1913,9 +1945,9 @@ def miller_profile_page():
             # Insert
             cur.execute("""
                 INSERT INTO miller_profiles 
-                (miller_id, owner_name, mill_name, owner_phone, accountant_phone, staff_phone, address, city, state, gst_doc, document, other_doc)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """, (miller_id, owner_name, mill_name, owner_phone, accountant_phone, staff_phone, address, city, state, gst_filename, mandi_filename, other_filename))
+                (miller_id, owner_name, mill_name, owner_phone, accountant_phone, staff_phone, address, city, state, gst_doc, document, other_doc, gst_number, mandi_number)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (miller_id, owner_name, mill_name, owner_phone, accountant_phone, staff_phone, address, city, state, gst_filename, mandi_filename, other_filename, gst_number, mandi_number))
             
         con.commit()
         flash("Profile updated successfully", "success")
@@ -1929,7 +1961,8 @@ def miller_profile_page():
     # 7:owner_phone, 8:accountant_phone, 9:staff_phone, 10:gst_doc, 11:mandi_doc (document), 12:other_doc
     cur.execute("""
         SELECT id, miller_id, mill_name, owner_name, address, city, state, 
-               owner_phone, accountant_phone, staff_phone, gst_doc, document, other_doc 
+               owner_phone, accountant_phone, staff_phone, gst_doc, document, other_doc,
+               gst_number, mandi_number
         FROM miller_profiles 
         WHERE miller_id=%s
     """, (miller_id,))
@@ -3114,6 +3147,10 @@ def buyer_profile():
         owner_name = request.form.get("owner_name")
         phone = request.form["phone"]
         address = request.form["address"]
+        
+        # New compliance fields
+        gst_number = request.form.get("gst_number", "").strip()
+        mandi_number = request.form.get("mandi_number", "").strip()
 
         # Existing file names
         gst_existing = profile.get("gst_doc") if profile else None
@@ -3143,21 +3180,24 @@ def buyer_profile():
         if profile:
             cur.execute("""
                 UPDATE buyer_profiles
-                SET shop_name=%s, owner_name=%s, phone=%s, address=%s, gst_doc=%s, license_doc=%s, other_doc=%s
+                SET shop_name=%s, owner_name=%s, phone=%s, address=%s, gst_doc=%s, license_doc=%s, other_doc=%s,
+                    gst_number=%s, mandi_number=%s
                 WHERE buyer_id=%s
             """, (
                 shop_name, owner_name, phone, address,
                 gst_filename, lic_filename, other_filename,
+                gst_number, mandi_number,
                 session["user_id"]
             ))
         else:
             cur.execute("""
                 INSERT INTO buyer_profiles
-                (buyer_id, shop_name, owner_name, phone, address, gst_doc, license_doc, other_doc)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+                (buyer_id, shop_name, owner_name, phone, address, gst_doc, license_doc, other_doc, gst_number, mandi_number)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """, (
                 session["user_id"], shop_name, owner_name, phone, address,
-                gst_filename, lic_filename, other_filename
+                gst_filename, lic_filename, other_filename,
+                gst_number, mandi_number
             ))
 
         con.commit()
@@ -5197,7 +5237,7 @@ def admin_view_miller(miller_id):
     cur = con.cursor()
 
     cur.execute("""
-        SELECT u.name, u.email, p.mill_name, p.owner_phone, p.address, p.gst_doc
+        SELECT u.name, u.email, p.mill_name, p.owner_phone, p.address, p.gst_doc, p.mandi_doc, p.gst_number, p.mandi_number
         FROM users u
         LEFT JOIN miller_profiles p ON u.id = p.miller_id
         WHERE u.id=%s

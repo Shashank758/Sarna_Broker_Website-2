@@ -193,6 +193,19 @@
                 required {{ 'disabled' if session.is_staff else '' }}>
             </div>
 
+            <div class="col-md-6 mb-4">
+              <label class="form-label fw-800 small text-uppercase">GST Number</label>
+              <input class="form-control enterprise-input" name="gst_number"
+                value="{{ profile[13] if profile and profile|length > 13 else '' }}" placeholder="Enter GST Number"
+                {{ 'disabled' if session.is_staff else '' }}>
+            </div>
+            <div class="col-md-6 mb-4">
+              <label class="form-label fw-800 small text-uppercase">Mandi License Number</label>
+              <input class="form-control enterprise-input" name="mandi_number"
+                value="{{ profile[14] if profile and profile|length > 14 else '' }}"
+                placeholder="Enter Mandi License Number" {{ 'disabled' if session.is_staff else '' }}>
+            </div>
+
             <div class="col-12">
               <h6 class="form-section-title">Compliance Documents</h6>
             </div>
@@ -218,7 +231,7 @@
                     session.is_staff else '' }}>
                   {% if profile and profile[10] %}
                   <a href="{{ url_for('static', filename='uploads/miller_docs/' + profile[10]) }}" target="_blank"
-                    class="btn btn-light border fw-800 small px-4">View</a>
+                    class="btn btn-light border fw-800 small px-4">View Image</a>
                   {% endif %}
                 </div>
               </div>
@@ -245,7 +258,7 @@
                     session.is_staff else '' }}>
                   {% if profile and profile[11] %}
                   <a href="{{ url_for('static', filename='uploads/miller_docs/' + profile[11]) }}" target="_blank"
-                    class="btn btn-light border fw-800 small px-4">View</a>
+                    class="btn btn-light border fw-800 small px-4">View Image</a>
                   {% endif %}
                 </div>
               </div>

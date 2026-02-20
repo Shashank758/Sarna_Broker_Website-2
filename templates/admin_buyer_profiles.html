@@ -187,16 +187,28 @@
               </td>
               <td>
                 <div class="fw-800 text-dark"><i class="fa fa-phone me-2 text-muted"></i>{{ b[3] }}</div>
+                <div class="mt-1">
+                  <span class="badge bg-light text-muted border fw-800 px-2 py-1" style="font-size: 0.6rem;">GST: {{
+                    b[7] or 'N/A' }}</span><br>
+                  <span class="badge bg-light text-muted border fw-800 px-2 py-1" style="font-size: 0.6rem;">Mandi: {{
+                    b[8] or 'N/A' }}</span>
+                </div>
               </td>
               <td>
                 <div class="small text-muted fw-600"><i class="fa fa-location-dot me-1"></i>{{ b[4] }}</div>
               </td>
               <td>
                 {% if b[5] %}
-                <a href="{{ url_for('static', filename='uploads/miller_docs/' + b[5]) }}" target="_blank"
+                <a href="{{ url_for('static', filename='uploads/miller_docs/' + b[9]) }}" target="_blank"
                   class="doc-btn btn-primary-subtle text-primary">
-                  <i class="fa fa-file-lines"></i> View ID
+                  <i class="fa fa-file-lines"></i> View GST
                 </a>
+                {% if b[10] %}
+                <a href="{{ url_for('static', filename='uploads/miller_docs/' + b[10]) }}" target="_blank"
+                  class="doc-btn btn-success-subtle text-success mt-1">
+                  <i class="fa fa-file-shield"></i> View MANDI
+                </a>
+                {% endif %}
                 {% else %}
                 <span class="small text-muted fw-600 italic">No docs</span>
                 {% endif %}

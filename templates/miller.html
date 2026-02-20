@@ -423,7 +423,7 @@
                 <div class="fw-800 text-primary fs-5">{{ inv.truck_number or 'Truck #' ~ loop.index }}</div>
                 <div class="text-muted small fw-700">Consignment: {{ inv.qty }} Qt</div>
               </div>
-              <a href="/static/uploads/bills/{{ inv.file }}" target="_blank"
+              <a href="{{ url_for('static', filename='uploads/bills/' + inv.file) }}" target="_blank"
                 class="btn btn-light btn-sm fw-800 border"><i class="fa fa-eye me-2"></i>View Bill</a>
             </div>
 
