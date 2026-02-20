@@ -172,14 +172,13 @@
         <div class="text-muted small fw-600 mt-1">Commodities Live</div>
       </div>
     </div>
-    {% set pending_count = bookings|selectattr(4, 'equalto', 'pending')|list|length %}
     <div class="col-md-3">
       <div class="stat-card-miller">
         <div class="d-flex justify-content-between mb-3">
           <div class="text-warning fw-800 small text-uppercase">New Requests</div>
           <i class="fa fa-clock text-warning opacity-25"></i>
         </div>
-        <div class="fs-2 fw-800">{{ pending_count }}</div>
+        <div class="fs-2 fw-800">{{ pending_list|length }}</div>
         <div class="text-muted small fw-600 mt-1">Action Required</div>
       </div>
     </div>
@@ -189,7 +188,7 @@
           <div class="text-info fw-800 small text-uppercase">In Transit</div>
           <i class="fa fa-truck text-info opacity-25"></i>
         </div>
-        <div class="fs-2 fw-800">{{ approved_loading|length if approved_loading is defined else 0 }}</div>
+        <div class="fs-2 fw-800">{{ approved_loading|length }}</div>
         <div class="text-muted small fw-600 mt-1">Active Loads</div>
       </div>
     </div>
@@ -199,7 +198,7 @@
           <div class="text-success fw-800 small text-uppercase">Total Settled</div>
           <i class="fa fa-circle-check text-success opacity-25"></i>
         </div>
-        <div class="fs-2 fw-800">{{ payment_completed|length if payment_completed is defined else 0 }}</div>
+        <div class="fs-2 fw-800">{{ payment_completed|length }}</div>
         <div class="text-muted small fw-600 mt-1">Completed Trades</div>
       </div>
     </div>
@@ -295,7 +294,6 @@
     <!-- REQUESTS TAB -->
     <div class="tab-pane fade" id="requests" role="tabpanel">
       <h4 class="fw-800 mb-4">Pending Booking Requests</h4>
-      {% set pending_list = bookings|selectattr(4, 'equalto', 'pending')|list %}
       {% if pending_list %}
       <div class="row g-4">
         {% for b in pending_list %}

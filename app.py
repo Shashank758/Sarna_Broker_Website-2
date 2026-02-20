@@ -1691,9 +1691,11 @@ ORDER BY mb.created_at DESC
 """, (miller_id,))
     bookings = cur.fetchall()
 
-    # ✅ FETCH DEDUCTION OPTIONS
-    cur.execute("SELECT id, text FROM miller_deduction_options WHERE miller_id=%s ORDER BY created_at DESC", (miller_id,))
-    deduction_options = cur.fetchall()
+    # ✅ PRE-FILTER BOOKINGS FOR TABS
+    pending_list = [b for b in bookings if b[4] == 'pending']
+    approved_loading = [b for b in bookings if b[4] == 'approved' and b[8] != 'closed']
+    final_invoice_uploaded = [b for b in bookings if b[17] and b[16] != 'paid'] # Using COALESCE(p.status) and p.invoice_file indices
+    payment_completed = [b for b in bookings if b[16] == 'paid']
 
     # 🔹 FETCH PER-TRUCK LOADING INVOICES WITH QC DATA AND FINAL INVOICE
     cur.execute("""
@@ -1728,8 +1730,6 @@ ORDER BY mb.created_at DESC
         "qc_freight": r[14]
     })
 
-    # Limit loading invoices fetch to only relevant bookings? No, getting all is fine for now but optimize later.
-    
     # 🔹 COUNT PENDING PAYMENTS (For Dashboard Stats)
     cur.execute("""
         SELECT COUNT(*)
@@ -1744,8 +1744,8 @@ ORDER BY mb.created_at DESC
 
     # 🔹 CALCULATE DASHBOARD COUNTS
     active_stocks_count = len(stocks)
-    pending_bookings_count = sum(1 for b in bookings if b[4] == 'pending')
-    approved_bookings_count = sum(1 for b in bookings if b[4] == 'approved')
+    pending_bookings_count = len(pending_list)
+    approved_bookings_count = len(approved_loading)
     # QC Status is at index 9 in the rows query results
     qc_pending_count = sum(1 for r in rows if (r[9] is None or r[9] == 'pending'))
 
@@ -1764,6 +1764,10 @@ ORDER BY mb.created_at DESC
     "miller.html",
     stocks=stocks,
     bookings=bookings,
+    pending_list=pending_list,
+    approved_loading=approved_loading,
+    final_invoice_uploaded=final_invoice_uploaded,
+    payment_completed=payment_completed,
     invoices_map=invoices_map,
     deduction_options=deduction_options,
     total_pending_payments=total_pending_payments,
