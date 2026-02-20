@@ -1166,11 +1166,16 @@ def login():
         con = get_db()
         try:
             cur = con.cursor()
+            print(f"DEBUG: Login attempt for email: {email}")
             cur.execute(
                 "SELECT id, name, email, password, role, status, is_staff, parent_miller_id FROM users WHERE lower(email)=%s",
                 (email.lower(),)
             )
             user = cur.fetchone()
+            if not user:
+                print(f"DEBUG: User not found: {email}")
+            else:
+                print(f"DEBUG: User found: {user[2]}, Role: {user[4]}, Status: {user[5]}")
         finally:
             con.close()
 
@@ -1188,12 +1193,14 @@ def login():
             pw_ok = (stored_pw == password)
 
         if not pw_ok:
+            print(f"DEBUG: Password mismatch for user: {email}")
             return render_template(
                 "login.html",
                 error="Invalid credentials"
             )
 
         if user[5] != "approved":
+            print(f"DEBUG: User {email} is not approved. Status: {user[5]}")
             return render_template(
                 "login.html",
                 error="⛔ Your account is not approved by admin yet"
@@ -1488,6 +1495,16 @@ def register():
             logger.error(f"Registration Error: {e}")
             return render_template("register.html", error="Registration failed. Email might be taken.")
     return render_template("register.html")
+
+# Run migrations at startup
+try:
+    from app import run_migrations
+    run_migrations()
+except ImportError:
+    # If this script is run as 'app', it will fail to import from itself
+    run_migrations()
+except Exception as e:
+    print(f"Startup migration alert: {e}")
 
 @app.route("/logout")
 def logout():
@@ -5474,21 +5491,6 @@ def debug_bookings():
     con.close()
     return render_template("debug_bookings.html", bookings=rows, stocks=stocks)
 
-def run_migrations():
-    """Run all schema upgrades."""
-    upgrade_db()
-    upgrade_miller_stock_status()
-    upgrade_staff_system()
-    upgrade_loading_invoices()
-    upgrade_loading_invoices_debit_note()
-    upgrade_loading_invoices_extended_qc()
-    upgrade_partial_loading()
-    upgrade_users_table()
-    upgrade_password_resets_table()
-    upgrade_miller_stock_auto_approve()
-    upgrade_miller_booking_truck_status()
-    upgrade_buyer_profile_table()
-    # Add any other upgrades here
 
 if __name__ == "__main__":
     init_db()
