@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Dashboard{% endblock %} | Sarna Broker</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/static/css/admin_premium.css">
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+    <div class="admin-layout">
+
+        <!-- Sidebar -->
+        <aside class="admin-sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="/admin" class="sidebar-logo">
+                    <img src="/static/image/Sarna broker.png" alt="Logo">
+                    <span>Sarna Broker</span>
+                </a>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-label">Main</div>
+                <a href="/admin" class="nav-link {% if request.path == '/admin' %}active{% endif %}">
+                    <i class="fa fa-gauge-high"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <div class="nav-label">Management</div>
+                <a href="/admin/users" class="nav-link {% if 'users' in request.path %}active{% endif %}">
+                    <i class="fa fa-users"></i>
+                    <span>Users</span>
+                </a>
+                <a href="/admin/bookings" class="nav-link {% if 'bookings' in request.path %}active{% endif %}">
+                    <i class="fa fa-shopping-cart"></i>
+                    <span>Bookings</span>
+                </a>
+                <a href="/admin/miller-profiles"
+                    class="nav-link {% if 'miller-profiles' in request.path %}active{% endif %}">
+                    <i class="fa fa-industry"></i>
+                    <span>Millers</span>
+                </a>
+                <a href="/admin/buyer-profiles"
+                    class="nav-link {% if 'buyer-profiles' in request.path %}active{% endif %}">
+                    <i class="fa fa-store"></i>
+                    <span>Traders</span>
+                </a>
+
+                <div class="nav-label">Stock & Rates</div>
+                <a href="/admin/stock" class="nav-link {% if '/admin/stock' == request.path %}active{% endif %}">
+                    <i class="fa fa-cubes"></i>
+                    <span>Latest Rate</span>
+                </a>
+                <a href="/admin/stock-history"
+                    class="nav-link {% if 'stock-history' in request.path %}active{% endif %}">
+                    <i class="fa fa-clock-rotate-left"></i>
+                    <span>Rate History</span>
+                </a>
+
+                <div class="nav-label">System</div>
+                <a href="/admin/logs" class="nav-link {% if 'logs' in request.path %}active{% endif %}">
+                    <i class="fa fa-clipboard-list"></i>
+                    <span>Audit Logs</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-snippet">
+                    <div class="user-avatar">A</div>
+                    <div class="user-info">
+                        <p class="user-name">Administrator</p>
+                        <p class="user-role">Super Admin</p>
+                    </div>
+                    <a href="/logout" class="btn-icon" title="Logout">
+                        <i class="fa fa-right-from-bracket"></i>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="top-bar">
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn-icon d-md-none" id="sidebarToggle">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                    <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+                </div>
+
+                <div class="top-actions">
+                    <button class="btn-icon">
+                        <i class="fa fa-bell"></i>
+                    </button>
+                    <button class="btn-icon">
+                        <i class="fa fa-gear"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}"
+                    style="margin-bottom: 24px; padding: 16px; border-radius: 8px; background: {% if category == 'success' %}#dcfce7{% else %}#fee2e2{% endif %}; color: {% if category == 'success' %}#16a34a{% else %}#dc2626{% endif %};">
+                    {{ message }}
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+
+    </div>
+
+    <script>
+        // Sidebar Toggle for Mobile
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.getElementById('sidebar');
+
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+            });
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target) && sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+    </script>
+
+    <!-- Charts.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

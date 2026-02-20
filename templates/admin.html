@@ -1,471 +1,267 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "admin_base.html" %}
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard | Saarna Canvessars</title>
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/style.css">
-
-  <style>
-    /* Admin specific enhancements */
-    .admin-hero {
-      background: linear-gradient(135deg, #0f9b5f 0%, #0d8a54 50%, #0a7548 100%);
-      color: #fff;
-      padding: 30px;
-      border-radius: 16px;
-      margin-bottom: 30px;
-      box-shadow: 0 10px 40px rgba(15, 155, 95, 0.3);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .admin-hero::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -30%;
-      width: 60%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-    }
-
-    .admin-hero h5 {
-      font-weight: 800;
-      font-size: 1.5rem;
-      margin: 0;
-      position: relative;
-      z-index: 1;
-    }
-
-    .admin-hero p {
-      opacity: 0.9;
-      margin: 5px 0 0;
-      position: relative;
-      z-index: 1;
-    }
-
-    .stat-card {
-      background: #fff;
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      border: 1px solid #e2e8f0;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .stat-card::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 4px;
-      height: 100%;
-      background: linear-gradient(135deg, #0f9b5f, #0d8a54);
-    }
-
-    .stat-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 32px rgba(15, 155, 95, 0.15);
-    }
-
-    .stat-card i {
-      width: 50px;
-      height: 50px;
-      background: #e8f5f0;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      color: #0f9b5f;
-      transition: all 0.3s ease;
-    }
-
-    .stat-card:hover i {
-      background: #0f9b5f;
-      color: #fff;
-      transform: scale(1.1);
-    }
-
-    .stat-card h6 {
-      font-size: 12px;
-      font-weight: 600;
-      color: #64748b;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin: 0;
-    }
-
-    .stat-card p {
-      font-size: 28px;
-      font-weight: 800;
-      color: #1e293b;
-      margin: 5px 0 0;
-    }
-
-    .table-card {
-      background: #fff;
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      border: 1px solid #e2e8f0;
-    }
-
-    .table-card h6 {
-      font-weight: 700;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .admin-sidebar {
-      background: linear-gradient(180deg, #0f9b5f 0%, #0a7548 100%);
-      min-height: calc(100vh - 80px);
-    }
-
-    .admin-sidebar h4 {
-      font-weight: 800;
-      font-size: 1.1rem;
-    }
-
-    .admin-sidebar ul li {
-      transition: all 0.2s ease;
-      border-radius: 10px;
-      margin-bottom: 6px;
-    }
-
-    .admin-sidebar ul li:hover,
-    .admin-sidebar ul li.active {
-      background: rgba(255, 255, 255, 0.15);
-      transform: translateX(5px);
-    }
-
-    .admin-sidebar ul li a {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 14px;
-    }
-
-    .admin-sidebar ul li i {
-      width: 20px;
-      text-align: center;
-    }
-
-    .admin-main {
-      background: #f4f7f6;
-      padding: 30px;
-    }
-
-    .admin-badge {
-      background: linear-gradient(135deg, #0f9b5f, #0d8a54);
-      color: #fff;
-      padding: 8px 20px;
-      border-radius: 30px;
-      font-size: 13px;
-      font-weight: 700;
-    }
-  </style>
-</head>
-
-<body>
-
-  <!-- ================= TOP NAVBAR ================= -->
-  {% include '_navbar.html' %}
-
-  <div class="admin-container">
-
-    <!-- SIDEBAR -->
-    <aside class="admin-sidebar">
-      <h4>Sarna Broker</h4>
-      <ul>
-        <li class="active"><a href="/admin"><i class="fa fa-gauge"></i> Dashboard</a></li>
-
-        <li><a href="/admin/users"><i class="fa fa-users"></i> Users</a></li>
-        <li><a href="/admin/stock"><i class="fa fa-box"></i> Latest rate</a></li>
-        <li><a href="/admin/stock-history"><i class="fa fa-history"></i> Rate update history</a></li>
-        <li><a href="/admin/bookings"><i class="fa fa-shopping-cart"></i> Bookings</a></li>
-        <li><a href="/admin/miller-profiles"><i class="fa fa-industry"></i> Miller Profiles</a></li>
-        <li><a href="/admin/buyer-profiles"><i class="fa fa-store"></i> Trader Profiles</a></li>
-        <li><a href="/admin/logs"><i class="fa fa-list"></i> Admin Logs</a></li>
-        <li>
-          <i class="fa fa-right-from-bracket"></i>
-          <a href="/logout">Logout</a>
-        </li>
-      </ul>
-    </aside>
-
-    <!-- MAIN -->
-    <main class="admin-main">
-
-      <div class="admin-top">
-        <h5>Admin Dashboard</h5>
-        <span class="admin-badge">Admin</span>
+{% block content %}
+<!-- Stats Row -->
+<div class="row g-4 mb-4">
+  <div class="col-md-3">
+    <div class="card-premium stat-card">
+      <div>
+        <div class="stat-icon green">
+          <i class="fa fa-user-tie"></i>
+        </div>
+        <h3 class="stat-value" start="0" end="{{ farmer_count }}">{{ farmer_count }}</h3>
+        <p class="stat-label">Farmers</p>
       </div>
-
-      <!-- ================= STATS ================= -->
-      <div class="row mt-3">
-        <div class="col-md-3">
-          <div class="stat-card">
-            <i class="fa fa-user"></i>
-            <div>
-              <h6>Farmers</h6>
-              <p>{{ farmer_count }}</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-3">
-          <div class="stat-card">
-            <i class="fa fa-cart-shopping"></i>
-            <div>
-              <h6>Traders</h6>
-              <p>{{ buyer_count }}</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-3">
-          <div class="stat-card">
-            <i class="fa fa-industry"></i>
-            <div>
-              <h6>Millers</h6>
-              <p>{{ miller_count }}</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-3">
-          <div class="stat-card">
-            <i class="fa fa-shopping-cart"></i>
-            <div>
-              <h6>Total Bookings</h6>
-              <p>{{ total_bookings }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ================= ADDITIONAL STATS ================= -->
-      <div class="row mt-3">
-        <div class="col-md-3">
-          <div class="stat-card">
-            <i class="fa fa-check-circle text-success"></i>
-            <div>
-              <h6>Approved Bookings</h6>
-              <p>{{ approved_bookings }}</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-3">
-          <div class="stat-card">
-            <i class="fa fa-clock text-warning"></i>
-            <div>
-              <h6>Pending Bookings</h6>
-              <p>{{ pending_bookings }}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- ================= CHARTS ================= -->
-        <!-- ================= CHARTS ================= -->
-        <div class="row mt-4">
-          <!-- Booking Status Chart -->
-          <div class="col-md-6 mb-4">
-            <div class="table-card">
-              <h6>📊 Booking Status Distribution</h6>
-              <canvas id="bookingStatusChart" style="max-height: 300px;"></canvas>
-            </div>
-          </div>
-
-          <!-- User Status Chart -->
-          <div class="col-md-6 mb-4">
-            <div class="table-card">
-              <h6>👥 User Status Distribution</h6>
-              <canvas id="userStatusChart" style="max-height: 300px;"></canvas>
-            </div>
-          </div>
-        </div>
-
-        <div class="row mt-4">
-          <!-- Stock by Crop Chart -->
-          <div class="col-md-6 mb-4">
-            <div class="table-card">
-              <h6>🌾 Stock Quantity by Crop</h6>
-              <canvas id="stockByCropChart" style="max-height: 300px;"></canvas>
-            </div>
-          </div>
-
-          <!-- Recent Bookings Trend -->
-          <div class="col-md-6 mb-4">
-            <div class="table-card">
-              <h6>📈 Recent Bookings (Last 7 Days)</h6>
-              <canvas id="recentBookingsChart" style="max-height: 300px;"></canvas>
-            </div>
-          </div>
-        </div>
-
-    </main>
+    </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script>
-    // Booking Status Chart
-    const bookingStatusCtx = document.getElementById('bookingStatusChart').getContext('2d');
-    new Chart(bookingStatusCtx, {
-      type: 'doughnut',
-      data: {
-        labels: ['Pending', 'Approved', 'Declined'],
-        datasets: [{
-          data: [{{ pending_bookings }}, {{ approved_bookings }}, {{ declined_bookings }}],
-      backgroundColor: ['#ffc107', '#28a745', '#dc3545'],
-      borderWidth: 2
+  <div class="col-md-3">
+    <div class="card-premium stat-card">
+      <div>
+        <div class="stat-icon blue">
+          <i class="fa fa-store"></i>
+        </div>
+        <h3 class="stat-value" start="0" end="{{ buyer_count }}">{{ buyer_count }}</h3>
+        <p class="stat-label">Traders</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card-premium stat-card">
+      <div>
+        <div class="stat-icon purple">
+          <i class="fa fa-industry"></i>
+        </div>
+        <h3 class="stat-value" start="0" end="{{ miller_count }}">{{ miller_count }}</h3>
+        <p class="stat-label">Millers</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card-premium stat-card">
+      <div>
+        <div class="stat-icon yellow">
+          <i class="fa fa-shopping-cart"></i>
+        </div>
+        <h3 class="stat-value" start="0" end="{{ total_bookings }}">{{ total_bookings }}</h3>
+        <p class="stat-label">Total Bookings</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Additional Stats Row -->
+<div class="row g-4 mb-4">
+  <div class="col-md-3">
+    <div class="card-premium">
+      <div class="d-flex align-items-center gap-3">
+        <div class="p-3 rounded-circle bg-success bg-opacity-10 text-success">
+          <i class="fa fa-check-circle fa-xl"></i>
+        </div>
+        <div>
+          <h4 class="mb-0 fw-bold">{{ approved_bookings }}</h4>
+          <span class="text-muted small">Approved Bookings</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card-premium">
+      <div class="d-flex align-items-center gap-3">
+        <div class="p-3 rounded-circle bg-warning bg-opacity-10 text-warning">
+          <i class="fa fa-clock fa-xl"></i>
+        </div>
+        <div>
+          <h4 class="mb-0 fw-bold">{{ pending_bookings }}</h4>
+          <span class="text-muted small">Pending Bookings</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts Row 1 -->
+<div class="row g-4 mb-4">
+  <!-- Booking Status Chart -->
+  <div class="col-md-6">
+    <div class="card-premium">
+      <h5 class="mb-4 fw-bold text-dark">Booking Status Distribution</h5>
+      <div class="chart-container">
+        <canvas id="bookingStatusChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Status Chart -->
+  <div class="col-md-6">
+    <div class="card-premium">
+      <h5 class="mb-4 fw-bold text-dark">User Status Distribution</h5>
+      <div class="chart-container">
+        <canvas id="userStatusChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts Row 2 -->
+<div class="row g-4">
+  <!-- Stock by Crop Chart -->
+  <div class="col-md-6">
+    <div class="card-premium">
+      <h5 class="mb-4 fw-bold text-dark">Stock Quantity by Crop</h5>
+      <div class="chart-container">
+        <canvas id="stockByCropChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Bookings Trend -->
+  <div class="col-md-6">
+    <div class="card-premium">
+      <h5 class="mb-4 fw-bold text-dark">Recent Bookings (Last 7 Days)</h5>
+      <div class="chart-container">
+        <canvas id="recentBookingsChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Common Chart Options for Premium Look
+  Chart.defaults.font.family = "'Inter', sans-serif";
+  Chart.defaults.color = '#64748b';
+
+  const commonOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          usePointStyle: true,
+          padding: 20
+        }
+      }
+    },
+    layout: {
+      padding: 10
+    }
+  };
+
+  // 1. Booking Status Chart
+  const bookingStatusCtx = document.getElementById('bookingStatusChart').getContext('2d');
+  new Chart(bookingStatusCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Pending', 'Approved', 'Declined'],
+      datasets: [{
+        data: [{{ pending_bookings }}, {{ approved_bookings }}, {{ declined_bookings }}],
+    backgroundColor: ['#fbbf24', '#10b981', '#ef4444'], // Amber, Emerald, Red
+    borderWidth: 0,
+    hoverOffset: 10
       }]
     },
-      options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: 'bottom'
+    options: {
+    ...commonOptions,
+    cutout: '70%'
+  }
+  });
+
+  // 2. User Status Chart
+  const userStatusCtx = document.getElementById('userStatusChart').getContext('2d');
+  new Chart(userStatusCtx, {
+    type: 'pie',
+    data: {
+      labels: ['Approved', 'Pending', 'Blocked'],
+      datasets: [{
+        data: [{{ approved_users }}, {{ pending_users }}, {{ blocked_users }}],
+    backgroundColor: ['#10b981', '#fbbf24', '#ef4444'],
+    borderWidth: 0,
+    hoverOffset: 10
+      }]
+    },
+    options: commonOptions
+  });
+
+  // 3. Stock by Crop Chart
+  const stockByCropCtx = document.getElementById('stockByCropChart').getContext('2d');
+  const cropLabels = [{% if crop_stats %}{% for crop, data in crop_stats.items() %} '{{ crop }}'{% if not loop.last %}, {% endif %} {% endfor %} {% endif %}];
+  const cropQuantities = [{% if crop_stats %}{% for crop, data in crop_stats.items() %} { { data.quantity } } {% if not loop.last %}, {% endif %} {% endfor %} {% endif %}];
+
+  new Chart(stockByCropCtx, {
+    type: 'bar',
+    data: {
+      labels: cropLabels.length ? cropLabels : ['No Data'],
+      datasets: [{
+        label: 'Quantity (Quintal)',
+        data: cropQuantities.length ? cropQuantities : [0],
+        backgroundColor: '#0f9b5f',
+        borderRadius: 6,
+        barThickness: 30
+      }]
+    },
+    options: {
+      ...commonOptions,
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: { color: '#f1f5f9' },
+          border: { display: false }
+        },
+        x: {
+          grid: { display: false },
+          border: { display: false }
         }
       }
     }
   });
 
-    // User Status Chart
-    const userStatusCtx = document.getElementById('userStatusChart').getContext('2d');
-    new Chart(userStatusCtx, {
-      type: 'pie',
-      data: {
-        labels: ['Approved', 'Pending', 'Blocked'],
-        datasets: [{
-          data: [{{ approved_users }}, {{ pending_users }}, {{ blocked_users }}],
-      backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
-      borderWidth: 2
+  // 4. Recent Bookings Trend
+  const recentBookingsCtx = document.getElementById('recentBookingsChart').getContext('2d');
+  const bookingDates = [{% if recent_bookings_dates %}{% for date in recent_bookings_dates %} '{{ date }}'{% if not loop.last %}, {% endif %} {% endfor %} {% endif %}];
+  const bookingCounts = [{% if recent_bookings_counts %}{% for count in recent_bookings_counts %} { { count } } {% if not loop.last %}, {% endif %} {% endfor %} {% endif %}];
+
+  new Chart(recentBookingsCtx, {
+    type: 'line',
+    data: {
+      labels: bookingDates.length ? bookingDates : ['No Data'],
+      datasets: [{
+        label: 'Bookings',
+        data: bookingCounts.length ? bookingCounts : [0],
+        borderColor: '#0f9b5f',
+        backgroundColor: 'rgba(15, 155, 95, 0.1)',
+        borderWidth: 3,
+        pointBackgroundColor: '#ffffff',
+        pointBorderColor: '#0f9b5f',
+        pointBorderWidth: 2,
+        pointRadius: 4,
+        fill: true,
+        tension: 0.4
       }]
     },
-      options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: 'bottom'
+    options: {
+      ...commonOptions,
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: { color: '#f1f5f9' },
+          border: { display: false },
+          ticks: { stepSize: 1 }
+        },
+        x: {
+          grid: { display: false },
+          border: { display: false }
         }
       }
     }
   });
-
-    // Stock by Crop Chart
-    const stockByCropCtx = document.getElementById('stockByCropChart').getContext('2d');
-    const cropLabels = [{% if crop_stats and crop_stats | length > 0 %}{% for crop, data in crop_stats.items() %} '{{ crop }}'{% if not loop.last %}, {% endif %} {% endfor %} {% endif %}];
-    const cropQuantities = [{% if crop_stats and crop_stats | length > 0 %}{% for crop, data in crop_stats.items() %} { { data.quantity } } {% if not loop.last %}, {% endif %} {% endfor %} {% endif %}];
-
-    {% if crop_stats and crop_stats | length > 0 %}
-    new Chart(stockByCropCtx, {
-      type: 'bar',
-      data: {
-        labels: cropLabels,
-        datasets: [{
-          label: 'Quantity (Quintal)',
-          data: cropQuantities,
-          backgroundColor: '#1e7e34',
-          borderColor: '#155d27',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              callback: function (value) {
-                return value + ' Qt';
-              }
-            }
-          }
-        },
-        plugins: {
-          legend: {
-            display: false
-          }
-        }
-      }
-    });
-    {% else %}
-    // No crop data available
-    new Chart(stockByCropCtx, {
-      type: 'bar',
-      data: {
-        labels: ['No Data'],
-        datasets: [{
-          data: [0],
-          backgroundColor: '#e0e0e0'
-        }]
-      }
-    });
-    {% endif %}
-
-    // Recent Bookings Trend
-    const recentBookingsCtx = document.getElementById('recentBookingsChart').getContext('2d');
-    const bookingDates = [{% if recent_bookings_dates and recent_bookings_dates | length > 0 %}{% for date in recent_bookings_dates %} '{{ date }}'{% if not loop.last %}, {% endif %} {% endfor %} {% endif %}];
-    const bookingCounts = [{% if recent_bookings_counts and recent_bookings_counts | length > 0 %}{% for count in recent_bookings_counts %} { { count } } {% if not loop.last %}, {% endif %} {% endfor %} {% endif %}];
-
-    {% if recent_bookings_dates and recent_bookings_dates | length > 0 %}
-    new Chart(recentBookingsCtx, {
-      type: 'line',
-      data: {
-        labels: bookingDates,
-        datasets: [{
-          label: 'Bookings',
-          data: bookingCounts,
-          borderColor: '#1e7e34',
-          backgroundColor: 'rgba(30, 126, 52, 0.1)',
-          borderWidth: 2,
-          fill: true,
-          tension: 0.4
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              stepSize: 1
-            }
-          }
-        },
-        plugins: {
-          legend: {
-            display: false
-          }
-        }
-      }
-    });
-    {% else %}
-    // No recent bookings data
-    new Chart(recentBookingsCtx, {
-      type: 'line',
-      data: {
-        labels: ['No Data'],
-        datasets: [{
-          data: [0],
-          borderColor: '#e0e0e0'
-        }]
-      }
-    });
-    {% endif %}
-  </script>
-
-</body>
-
-</html>
+</script>
+{% endblock %}
