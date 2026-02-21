@@ -7,7 +7,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .admin-header {
             display: flex;
@@ -166,48 +165,53 @@
         </div>
 
         <div class="row g-4 mb-4">
-            <div class="col-lg-8">
-                <div class="admin-table-card h-100 p-4">
-                    <h5 class="fw-800 text-dark mb-4">Market Velocity <span class="small text-muted fw-400 ms-2">7 Day
-                            Projection</span></h5>
-                    <canvas id="bookingsChart" height="280"></canvas>
-                </div>
-            </div>
-            <div class="col-lg-4">
+            <div class="col-lg-12">
                 <div class="admin-table-card h-100 p-4">
                     <h5 class="fw-800 text-dark mb-4">Network Distribution</h5>
 
-                    <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-4 mb-3">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center"
-                                style="width: 40px; height: 40px;"><i class="fa fa-check"></i></div>
-                            <span class="fw-800">Verified Entities</span>
-                        </div>
-                        <span class="fs-5 fw-800">{{ approved_users }}</span>
-                    </div>
+                    <div class="row">
+                        <div class="col-md-6 border-end">
+                            <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-4 mb-3">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center"
+                                        style="width: 40px; height: 40px;"><i class="fa fa-check"></i></div>
+                                    <span class="fw-800">Verified Entities</span>
+                                </div>
+                                <span class="fs-5 fw-800">{{ approved_users }}</span>
+                            </div>
 
-                    <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-4 mb-3">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center"
-                                style="width: 40px; height: 40px;"><i class="fa fa-hourglass-half"></i></div>
-                            <span class="fw-800">Pending Approvals</span>
+                            <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center"
+                                        style="width: 40px; height: 40px;"><i class="fa fa-hourglass-half"></i></div>
+                                    <span class="fw-800">Pending Approvals</span>
+                                </div>
+                                <span class="fs-5 fw-800">{{ pending_users }}</span>
+                            </div>
                         </div>
-                        <span class="fs-5 fw-800">{{ pending_users }}</span>
-                    </div>
 
-                    <div class="mt-4 pt-2">
-                        <h6 class="fw-800 text-muted small text-uppercase mb-3">Composition Breakdown</h6>
-                        <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
-                            <span class="fw-600">Industrial Millers</span>
-                            <span class="fw-800">{{ miller_count }}</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
-                            <span class="fw-600">Commodity Traders</span>
-                            <span class="fw-800">{{ buyer_count }}</span>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <span class="fw-600">Direct Farmers</span>
-                            <span class="fw-800">{{ farmer_count }}</span>
+                        <div class="col-md-6 ps-4">
+                            <h6 class="fw-800 text-muted small text-uppercase mb-3">Composition Breakdown</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="p-3 border rounded-4">
+                                        <div class="small fw-800 text-muted text-uppercase">Millers</div>
+                                        <div class="fs-4 fw-800 text-dark">{{ miller_count }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="p-3 border rounded-4">
+                                        <div class="small fw-800 text-muted text-uppercase">Traders</div>
+                                        <div class="fs-4 fw-800 text-dark">{{ buyer_count }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="p-3 border rounded-4">
+                                        <div class="small fw-800 text-muted text-uppercase">Farmers</div>
+                                        <div class="fs-4 fw-800 text-dark">{{ farmer_count }}</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -261,46 +265,7 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        const ctx = document.getElementById('bookingsChart').getContext('2d');
-        const bookingsChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: {{ recent_bookings_dates | tojson | safe }},
-        datasets: [{
-            label: 'Trade Volume',
-            data: {{ recent_bookings_counts | tojson | safe }},
-            borderColor: '#0a8a54',
-            backgroundColor: 'rgba(10, 138, 84, 0.05)',
-            fill: true,
-            tension: 0.4,
-            pointRadius: 6,
-            pointHoverRadius: 8,
-            pointBackgroundColor: '#fff',
-            pointBorderColor: '#0a8a54',
-            pointBorderWidth: 3
-                }]
-            },
-        options: {
-            responsive: true,
-                maintainAspectRatio: false,
-                    plugins: {
-                legend: { display: false }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                        grid: { display: true, color: '#f1f5f9' },
-                    ticks: { stepSize: 1, font: { weight: '600' } }
-                },
-                x: {
-                    grid: { display: false },
-                    ticks: { font: { weight: '600' } }
-                }
-            }
-        }
-        });
-    </script>
+</body>
 </body>
 
 </html>

@@ -4725,28 +4725,19 @@ def admin():
     con = get_db()
     cur = con.cursor()
 
-    cur.execute("SELECT * FROM users")
-    users = cur.fetchall()
+    # Optimized counters
+    cur.execute("SELECT role, status, COUNT(*) FROM users GROUP BY role, status")
+    roles_data = cur.fetchall()
+    
+    farmer_count = sum(r[2] for r in roles_data if r[0] == 'farmer')
+    buyer_count  = sum(r[2] for r in roles_data if r[0] == 'buyer')
+    miller_count = sum(r[2] for r in roles_data if r[0] == 'miller')
+    
+    approved_users = sum(r[2] for r in roles_data if r[1] == 'approved')
+    pending_users = sum(r[2] for r in roles_data if r[1] == 'pending')
+    blocked_users = sum(r[2] for r in roles_data if r[1] == 'blocked')
 
-    farmer_count = sum(1 for u in users if u[4]=="farmer")
-    buyer_count  = sum(1 for u in users if u[4]=="buyer")
-    miller_count = sum(1 for u in users if u[4]=="miller")
-
-    cur.execute("""
-    SELECT miller_stock.*, users.name
-    FROM miller_stock
-    JOIN users ON miller_stock.miller_id = users.id
-    """)
-    stocks = cur.fetchall()
-
-    cur.execute("""
-    SELECT h.*, u.name
-    FROM miller_stock_history h
-    JOIN users u ON h.miller_id = u.id
-    ORDER BY h.updated_at DESC
-    """)
-    history = cur.fetchall()
-
+    # Latest bookings (limited to 50 for overview stats)
     cur.execute("""
     SELECT
         mb.id,                 -- 0 Booking ID
@@ -4757,7 +4748,7 @@ def admin():
         COALESCE(mb.price, ms.price), -- 5 Price
         (mb.quantity * COALESCE(mb.price, ms.price)), -- 6 Total
         mb.status,             -- 7 Booking status
-        mb.truck_status,       -- 8 🚚 Loading status
+        mb.truck_status,       -- 8 Loading status
         mb.loaded_at,          -- 9 Loaded date
         mb.truck_remark,       -- 10 Remark
         mb.order_id            -- 11 Order ID
@@ -4766,121 +4757,35 @@ def admin():
     JOIN miller_stock ms ON mb.stock_id = ms.id
     JOIN users miller ON ms.miller_id = miller.id
     ORDER BY mb.created_at DESC
+    LIMIT 50
 """)
     bookings = cur.fetchall()
 
-    
-    # 🔹 BUYER PROFILES
+    # Total revenue from all-time approved bookings (using aggregate query)
     cur.execute("""
-        SELECT
-        bp.id,
-        u.name,
-        bp.shop_name,
-        bp.phone,
-        bp.address,
-        bp.document,
-        bp.created_at
-    FROM buyer_profiles bp
-    JOIN users u ON bp.buyer_id = u.id
-    ORDER BY bp.created_at DESC
+        SELECT SUM(mb.quantity * COALESCE(mb.price, ms.price))
+        FROM miller_bookings mb
+        JOIN miller_stock ms ON mb.stock_id = ms.id
+        WHERE mb.status = 'approved'
     """)
-    buyer_profiles = cur.fetchall()
+    total_revenue = cur.fetchone()[0] or 0
 
-    # 🔹 MILLER PROFILES
-    cur.execute("""
-        SELECT
-            mp.id,
-            u.name,
-            mp.mill_name,
-            mp.owner_phone,
-            mp.address,
-            mp.gst_doc,
-            mp.mandi_doc,
-            mp.other_doc,
-            mp.created_at
-        FROM miller_profiles mp
-        JOIN users u ON mp.miller_id = u.id
-        ORDER BY mp.created_at DESC
-    """)
-    miller_profiles = cur.fetchall()
-    cur.execute("""
-    SELECT
-        u.id,                     -- 0
-        u.name,                   -- 1
-        u.email,                  -- 2
-        u.role,                   -- 3
-        u.status,                 -- 4
-        u.is_staff,               -- 5
-        pm.name                   -- 6 Parent miller name
-    FROM users u
-    LEFT JOIN users pm
-        ON u.parent_miller_id = pm.id
-    WHERE u.role != 'admin'
-    ORDER BY u.id DESC
-""")
+    # Total stock qty (aggregate)
+    cur.execute("SELECT SUM(quantity) FROM miller_stock")
+    total_stock_qty = cur.fetchone()[0] or 0
 
-    all_users = cur.fetchall()
-
-    # Get all main millers (not staff) for comparison
-    cur.execute("""
-        SELECT u.id, u.name
-        FROM users u
-        WHERE u.role = 'miller' AND (u.is_staff = 0 OR u.is_staff IS NULL)
-        ORDER BY u.name
-    """)
-    millers = cur.fetchall()
-
-    # Calculate statistics for charts
-    # Booking status distribution
+    # Counts for status summary
     pending_bookings = sum(1 for b in bookings if b[7] == 'pending')
-    approved_bookings = sum(1 for b in bookings if b[7] == 'approved')
-    declined_bookings = sum(1 for b in bookings if b[7] == 'declined')
-    
-    # Total revenue (from approved bookings)
-    total_revenue = sum(b[6] for b in bookings if b[7] == 'approved')
-    
-    # Stock statistics by crop
-    crop_stats = {}
-    for stock in stocks:
-        crop = stock[2]
-        if crop not in crop_stats:
-            crop_stats[crop] = {'quantity': 0, 'count': 0}
-        crop_stats[crop]['quantity'] += stock[3] or 0
-        crop_stats[crop]['count'] += 1
-    
-    # Recent bookings (last 7 days)
-    cur.execute("""
-        SELECT DATE(created_at) as date, COUNT(*) as count
-        FROM miller_bookings
-        WHERE created_at >= NOW() - INTERVAL '7 days'
-        GROUP BY DATE(created_at)
-        ORDER BY date ASC
-    """)
-    recent_data = cur.fetchall()
-    recent_bookings_dates = [row[0] or '' for row in recent_data]
-    recent_bookings_counts = [row[1] or 0 for row in recent_data]
-    
-    # User status distribution
-    approved_users = sum(1 for u in users if u[5] == 'approved')
-    pending_users = sum(1 for u in users if u[5] == 'pending')
-    blocked_users = sum(1 for u in users if u[5] == 'blocked')
-    
-    # Total bookings count
-    total_bookings = len(bookings)
-    
-    # Total stock quantity
-    total_stock_qty = sum(s[3] or 0 for s in stocks)
+    total_bookings_all_time = 0 # We can fetch this if needed, but using len(bookings) for 'recent' context or a separate query
+    cur.execute("SELECT COUNT(*) FROM miller_bookings")
+    total_bookings = cur.fetchone()[0] or 0
 
     con.close()
 
     return render_template(
         "admin.html",
-        users=users,
-        stocks=stocks,
-        history=history,
         bookings=bookings,
         pending_bookings=pending_bookings,
-        approved_bookings=approved_bookings,
         total_revenue=total_revenue,
         total_bookings=total_bookings,
         total_stock_qty=total_stock_qty,
@@ -4889,9 +4794,7 @@ def admin():
         blocked_users=blocked_users,
         farmer_count=farmer_count,
         buyer_count=buyer_count,
-        miller_count=miller_count,
-        recent_bookings_dates=recent_bookings_dates,
-        recent_bookings_counts=recent_bookings_counts
+        miller_count=miller_count
     )
 
 @app.route("/admin/order/<int:booking_id>")
