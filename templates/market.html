@@ -304,7 +304,13 @@
     <div class="tab-content mt-4" id="marketTabsContent">
         <!-- LIVE RATES TAB -->
         <div class="tab-pane fade show active" id="live-rates" role="tabpanel">
-            <div class="row g-4">
+            <div class="mb-4">
+                <input type="text" id="marketSearch" class="form-control"
+                    style="max-width: 400px; border-radius: 12px; padding: 12px 20px; font-weight: 600; border: 1px solid var(--border);"
+                    placeholder="🔍 Search by crop, miller, city, address..."
+                    oninput="universalSearch('marketSearch', '#stockCardsContainer', '.col-md-6')">
+            </div>
+            <div class="row g-4" id="stockCardsContainer">
                 {% if miller_stocks %}
                 {% for stock in miller_stocks %}
                 <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
@@ -341,6 +347,27 @@
                                     <span class="meta-label">Condition</span>
                                     <span class="meta-value text-primary">{{ stock[5] }}</span>
                                 </div>
+                                {% if stock[16] %}
+                                <div class="meta-item">
+                                    <span class="meta-label"><i class="fa fa-balance-scale me-1 text-warning"></i>Wt.
+                                        Deduction</span>
+                                    <span class="meta-value">{{ stock[16] }}</span>
+                                </div>
+                                {% endif %}
+                                {% if stock[17] %}
+                                <div class="meta-item">
+                                    <span class="meta-label"><i class="fa fa-calendar-check me-1 text-info"></i>Payment
+                                        Duration</span>
+                                    <span class="meta-value">{{ stock[17] }}</span>
+                                </div>
+                                {% endif %}
+                                {% if stock[18] %}
+                                <div class="meta-item">
+                                    <span class="meta-label"><i
+                                            class="fa fa-file-contract me-1 text-secondary"></i>Extra Condition</span>
+                                    <span class="meta-value">{{ stock[18] }}</span>
+                                </div>
+                                {% endif %}
                             </div>
 
                             {% if session.role != 'admin' %}
@@ -392,6 +419,19 @@
                                             <small class="text-primary fw-600">Secure Rate</small>
                                         </div>
                                     </div>
+
+                                    {% if stock[16] or stock[17] or stock[18] %}
+                                    <div class="alert alert-warning border-0 rounded-4 p-3 mb-3">
+                                        <div class="fw-700 small mb-2"><i
+                                                class="fa fa-exclamation-triangle me-1"></i>Terms & Conditions</div>
+                                        {% if stock[16] %}<div class="small"><strong>Weight Deduction:</strong> {{
+                                            stock[16] }}</div>{% endif %}
+                                        {% if stock[17] %}<div class="small"><strong>Payment Duration:</strong> {{
+                                            stock[17] }}</div>{% endif %}
+                                        {% if stock[18] %}<div class="small"><strong>Extra Condition:</strong> {{
+                                            stock[18] }}</div>{% endif %}
+                                    </div>
+                                    {% endif %}
 
                                     <div class="alert alert-info border-0 rounded-4 p-3 d-flex align-items-center mb-0">
                                         <i class="fa fa-shield-halved me-3 fs-3 text-info"></i>

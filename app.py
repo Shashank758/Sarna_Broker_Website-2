@@ -972,6 +972,28 @@ def upgrade_miller_stock_note():
     con.commit()
     con.close()
 
+def upgrade_miller_stock_new_fields():
+    """Add weight_deduction, payment_duration, extra_condition columns to miller_stock."""
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name=%s", ("miller_stock",))
+    cols = [c[0] for c in cur.fetchall()]
+
+    new_cols = [
+        ("weight_deduction", "TEXT"),
+        ("payment_duration", "TEXT"),
+        ("extra_condition", "TEXT")
+    ]
+
+    for col_name, col_type in new_cols:
+        if col_name not in cols:
+            cur.execute(f"ALTER TABLE miller_stock ADD COLUMN {col_name} {col_type}")
+            print(f"✅ Added {col_name} to miller_stock")
+
+    con.commit()
+    con.close()
+
 
 
 def upgrade_miller_booking_price():
@@ -1088,6 +1110,7 @@ def run_migrations():
         upgrade_miller_stock_auto_approve()
         upgrade_miller_stock_reserved_qty()
         upgrade_miller_stock_note()
+        upgrade_miller_stock_new_fields()
         
         # Buyer Profile
         upgrade_buyer_profile_table()
@@ -1674,7 +1697,8 @@ def miller_dashboard():
     # ✅ LIVE STOCKS
     cur.execute("""
     SELECT 
-        id, miller_id, crop, quantity, price, condition, bag_type, deduction, created_at, status, note, reserved_qty, auto_approve_min_qty
+        id, miller_id, crop, quantity, price, condition, bag_type, deduction, created_at, status, note, reserved_qty, auto_approve_min_qty,
+        weight_deduction, payment_duration, extra_condition
     FROM miller_stock
     WHERE miller_id=%s
     ORDER BY created_at DESC
@@ -2425,11 +2449,16 @@ def miller_post_stock_page():
         except ValueError:
             duration = None
 
+        # New fields
+        weight_deduction = request.form.get("weight_deduction", "")
+        payment_duration = request.form.get("payment_duration", "")
+        extra_condition = request.form.get("extra_condition", "")
+
         # Create new stock entry
         cur.execute("""
-            INSERT INTO miller_stock (miller_id, crop, quantity, price, condition, bag_type, deduction, note, auto_approve_min_qty, duration)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """, (miller_id, crop, qty, price, condition, bag_type, deduction, note, auto_approve_min_qty, duration))
+            INSERT INTO miller_stock (miller_id, crop, quantity, price, condition, bag_type, deduction, note, auto_approve_min_qty, duration, weight_deduction, payment_duration, extra_condition)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (miller_id, crop, qty, price, condition, bag_type, deduction, note, auto_approve_min_qty, duration, weight_deduction, payment_duration, extra_condition))
         
         con.commit()
         con.close()
@@ -3481,6 +3510,9 @@ def update_miller_stock(id):
     new_price = request.form["price"]
     new_qty = request.form["quantity"]
     deduction = request.form["deduction"]
+    weight_deduction = request.form.get("weight_deduction", "")
+    payment_duration = request.form.get("payment_duration", "")
+    extra_condition = request.form.get("extra_condition", "")
 
     cur.execute("""
         UPDATE miller_stock_history
@@ -3501,12 +3533,18 @@ def update_miller_stock(id):
         SET deduction=%s,
             price=%s,
             quantity=%s,
+            weight_deduction=%s,
+            payment_duration=%s,
+            extra_condition=%s,
             status='open'
         WHERE id=%s AND miller_id=%s
     """, (
         deduction,
         new_price,
         new_qty,
+        weight_deduction,
+        payment_duration,
+        extra_condition,
         id,
         get_effective_user_id()
     ))
@@ -3596,7 +3634,10 @@ def market():
         mp.address,                -- 12 (miller location)
         mp.city,                   -- 13
         mp.state,                  -- 14
-        mp.pincode                 -- 15
+        mp.pincode,                -- 15
+        miller_stock.weight_deduction,  -- 16
+        miller_stock.payment_duration,  -- 17
+        miller_stock.extra_condition    -- 18
     FROM miller_stock
     JOIN users ON miller_stock.miller_id = users.id
     LEFT JOIN miller_profiles mp ON users.id = mp.miller_id
@@ -4930,7 +4971,8 @@ def admin_stock():
         miller_stock.id, miller_stock.miller_id, miller_stock.crop, miller_stock.quantity, miller_stock.price, 
         miller_stock.condition, miller_stock.bag_type, miller_stock.deduction, miller_stock.created_at, 
         miller_stock.status, miller_stock.note, miller_stock.reserved_qty, miller_stock.auto_approve_min_qty, 
-        users.name
+        users.name,
+        miller_stock.weight_deduction, miller_stock.payment_duration, miller_stock.extra_condition
     FROM miller_stock
     JOIN users ON miller_stock.miller_id = users.id
     ORDER BY miller_stock.created_at DESC

@@ -201,6 +201,20 @@
     }, observerOptions);
 
     document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+
+    // Universal Search/Filter function — used across all pages
+    function universalSearch(inputId, containerSelector, itemSelector) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      const term = input.value.toLowerCase().trim();
+      const container = document.querySelector(containerSelector);
+      if (!container) return;
+      const items = container.querySelectorAll(':scope > ' + itemSelector);
+      items.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(term) ? '' : 'none';
+      });
+    }
   </script>
 
   {% block extra_js %}{% endblock %}

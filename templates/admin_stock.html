@@ -40,6 +40,9 @@
               <th>Condition</th>
               <th>Packaging</th>
               <th>Note / Adj</th>
+              <th>Wt. Deduction</th>
+              <th>Payment Duration</th>
+              <th>Extra Condition</th>
             </tr>
           </thead>
           <tbody>
@@ -71,6 +74,9 @@
                   <button class="btn btn-black btn-sm fw-800 px-3 py-2 rounded-3">Commit</button>
                 </form>
               </td>
+              <td><span class="small fw-600 text-muted">{{ s[14] or '—' }}</span></td>
+              <td><span class="small fw-600 text-muted">{{ s[15] or '—' }}</span></td>
+              <td><span class="small fw-600 text-muted">{{ s[16] or '—' }}</span></td>
             </tr>
             {% endfor %}
           </tbody>
