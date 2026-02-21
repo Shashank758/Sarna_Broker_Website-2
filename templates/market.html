@@ -87,57 +87,121 @@
         box-shadow: 0 8px 20px rgba(10, 138, 84, 0.2);
     }
 
+    /* === HORIZONTAL ROW CARD LAYOUT === */
     .premium-stock-card {
         background: #fff;
-        border-radius: 24px;
+        border-radius: 16px;
         border: 1px solid var(--border);
         transition: var(--transition);
-        height: 100%;
         display: flex;
-        flex-direction: column;
-        overflow: hidden;
+        flex-direction: row;
+        align-items: center;
+        padding: 16px 20px;
+        gap: 20px;
     }
 
     .premium-stock-card:hover {
-        transform: translateY(-8px);
-        box-shadow: var(--shadow-2xl);
+        box-shadow: var(--shadow-lg);
         border-color: var(--primary-light);
+        transform: translateY(-2px);
     }
 
-    .stock-visual {
+    .stock-row-icon {
+        flex-shrink: 0;
+        width: 48px;
+        height: 48px;
         background: var(--primary-subtle);
-        padding: 24px;
+        border-radius: 14px;
         display: flex;
         align-items: center;
         justify-content: center;
-        position: relative;
     }
 
-    .stock-visual i {
-        font-size: 3rem;
+    .stock-row-icon i {
+        font-size: 1.3rem;
         color: var(--primary);
-        filter: drop-shadow(0 4px 10px rgba(10, 138, 84, 0.2));
+    }
+
+    .stock-row-main {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px 16px;
+    }
+
+    .stock-row-name {
+        font-weight: 800;
+        font-size: 1rem;
+        color: var(--text);
+        text-transform: capitalize;
+        white-space: nowrap;
+    }
+
+    .stock-row-seller {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        font-weight: 600;
+    }
+
+    .stock-row-price {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--primary);
+        white-space: nowrap;
+    }
+
+    .stock-row-price small {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .stock-row-details {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 12px;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .detail-chip {
+        background: var(--bg);
+        border-radius: 8px;
+        padding: 4px 10px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .detail-chip .chip-val {
+        color: var(--text);
+        font-weight: 800;
     }
 
     .live-indicator {
-        position: absolute;
-        top: 16px;
-        right: 16px;
         background: #fff;
-        padding: 4px 12px;
+        padding: 3px 10px;
         border-radius: 20px;
-        font-size: 0.7rem;
+        font-size: 0.65rem;
         font-weight: 800;
         color: var(--primary);
         box-shadow: var(--shadow-sm);
-        display: flex;
+        display: inline-flex;
         align-items: center;
-        gap: 6px;
+        gap: 5px;
+        white-space: nowrap;
+        border: 1px solid var(--primary-light);
     }
 
     .pulse-dot {
-        width: 6px;
-        height: 6px;
+        width: 5px;
+        height: 5px;
         background: var(--primary);
         border-radius: 50%;
         animation: pulse-dot 1.5s infinite;
@@ -160,74 +224,49 @@
         }
     }
 
-    .stock-info {
-        padding: 24px;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .stock-price {
-        font-size: 1.75rem;
-        font-weight: 800;
-        color: var(--text);
-        letter-spacing: -0.5px;
-        margin-bottom: 12px;
-    }
-
-    .stock-price small {
-        font-size: 0.9rem;
-        color: var(--text-muted);
-        font-weight: 500;
-    }
-
-    .stock-meta {
-        background: var(--bg);
-        border-radius: 12px;
-        padding: 16px;
-        margin-bottom: 20px;
-    }
-
-    .meta-item {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 8px;
-        font-size: 0.85rem;
-    }
-
-    .meta-item:last-child {
-        margin-bottom: 0;
-    }
-
-    .meta-label {
-        color: var(--text-muted);
-        font-weight: 500;
-    }
-
-    .meta-value {
-        color: var(--text);
-        font-weight: 700;
-    }
-
     .btn-premium-book {
         background: var(--primary-gradient);
         color: #fff;
         border: none;
-        padding: 14px;
-        border-radius: 12px;
+        padding: 10px 20px;
+        border-radius: 10px;
         font-weight: 700;
+        font-size: 0.85rem;
         transition: var(--transition);
-        display: flex;
+        display: inline-flex;
         align-items: center;
-        justify-content: center;
-        gap: 8px;
+        gap: 6px;
+        white-space: nowrap;
+        flex-shrink: 0;
     }
 
     .btn-premium-book:hover {
         background: var(--primary-gradient-hover);
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(10, 138, 84, 0.3);
+        box-shadow: 0 6px 16px rgba(10, 138, 84, 0.3);
         color: #fff;
+    }
+
+    /* Responsive: stack on mobile */
+    @media (max-width: 767px) {
+        .premium-stock-card {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+        }
+
+        .stock-row-icon {
+            align-self: flex-start;
+        }
+
+        .stock-row-details {
+            flex-direction: column;
+        }
+
+        .btn-premium-book {
+            width: 100%;
+            justify-content: center;
+        }
     }
 
     .order-summary-card {
@@ -308,75 +347,54 @@
                 <input type="text" id="marketSearch" class="form-control"
                     style="max-width: 400px; border-radius: 12px; padding: 12px 20px; font-weight: 600; border: 1px solid var(--border);"
                     placeholder="🔍 Search by crop, Buyer, city, address..."
-                    oninput="universalSearch('marketSearch', '#stockCardsContainer', '.col-md-6')">
+                    oninput="universalSearch('marketSearch', '#stockCardsContainer', '.col-12')">
             </div>
-            <div class="row g-4" id="stockCardsContainer">
+            <div class="d-flex flex-column gap-3" id="stockCardsContainer">
                 {% if miller_stocks %}
                 {% for stock in miller_stocks %}
-                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
+                <div class="col-12" data-aos="fade-up" data-aos-delay="{{ loop.index * 30 }}">
                     <div class="premium-stock-card">
-                        <div class="stock-visual">
+                        <!-- Icon -->
+                        <div class="stock-row-icon">
                             <i class="fa fa-seedling"></i>
-                            <div class="live-indicator">
-                                <div class="pulse-dot"></div> LIVE
+                        </div>
+
+                        <!-- Main content -->
+                        <div class="stock-row-main">
+                            <div class="d-flex align-items-center gap-2 me-3">
+                                <span class="stock-row-name">{{ stock[2] }}</span>
+                                <div class="live-indicator">
+                                    <div class="pulse-dot"></div>LIVE
+                                </div>
+                            </div>
+                            <div class="stock-row-seller"><i class="fa fa-industry me-1"></i>{{ stock[10] }}</div>
+                            <div class="stock-row-price">₹{{ stock[4] }}<small>/Qt</small></div>
+
+                            <!-- Detail chips -->
+                            <div class="stock-row-details">
+                                <span class="detail-chip">Qty: <span class="chip-val">{{ stock[3] }} Qt</span></span>
+                                <span class="detail-chip"><i class="fa fa-location-dot me-1"></i><span
+                                        class="chip-val">{{ stock[13] }}, {{ stock[14] }}</span></span>
+                                <span class="detail-chip">{{ stock[5] }}</span>
+                                {% if stock[16] %}<span class="detail-chip"><i
+                                        class="fa fa-balance-scale me-1 text-warning"></i>Wt: <span class="chip-val">{{
+                                        stock[16] }}</span></span>{% endif %}
+                                {% if stock[17] %}<span class="detail-chip"><i
+                                        class="fa fa-calendar-check me-1 text-info"></i><span class="chip-val">{{
+                                        stock[17] }}</span></span>{% endif %}
+                                {% if stock[18] %}<span class="detail-chip"><i
+                                        class="fa fa-file-contract me-1 text-secondary"></i><span class="chip-val">{{
+                                        stock[18] }}</span></span>{% endif %}
                             </div>
                         </div>
-                        <div class="stock-info">
-                            <div class="d-flex justify-content-between align-items-start mb-1">
-                                <h5 class="fw-800 text-capitalize mb-0">{{ stock[2] }}</h5>
-                                <span
-                                    class="badge bg-primary-subtle text-primary border-primary-subtle border">Available</span>
-                            </div>
-                            <small class="text-muted fw-600 mb-3"><i class="fa fa-industry me-1"></i>{{ stock[10]
-                                }}</small>
 
-                            <div class="stock-price">
-                                ₹{{ stock[4] }}<small>/Quintal</small>
-                            </div>
-
-                            <div class="stock-meta">
-                                <div class="meta-item">
-                                    <span class="meta-label">Quantity</span>
-                                    <span class="meta-value">{{ stock[3] }} Qt</span>
-                                </div>
-                                <div class="meta-item">
-                                    <span class="meta-label">Location</span>
-                                    <span class="meta-value">{{ stock[13] }}, {{ stock[14] }}</span>
-                                </div>
-                                <div class="meta-item">
-                                    <span class="meta-label">Condition</span>
-                                    <span class="meta-value text-primary">{{ stock[5] }}</span>
-                                </div>
-                                {% if stock[16] %}
-                                <div class="meta-item">
-                                    <span class="meta-label"><i class="fa fa-balance-scale me-1 text-warning"></i>Wt.
-                                        Deduction</span>
-                                    <span class="meta-value">{{ stock[16] }}</span>
-                                </div>
-                                {% endif %}
-                                {% if stock[17] %}
-                                <div class="meta-item">
-                                    <span class="meta-label"><i class="fa fa-calendar-check me-1 text-info"></i>Payment
-                                        Duration</span>
-                                    <span class="meta-value">{{ stock[17] }}</span>
-                                </div>
-                                {% endif %}
-                                {% if stock[18] %}
-                                <div class="meta-item">
-                                    <span class="meta-label"><i
-                                            class="fa fa-file-contract me-1 text-secondary"></i>Extra Condition</span>
-                                    <span class="meta-value">{{ stock[18] }}</span>
-                                </div>
-                                {% endif %}
-                            </div>
-
-                            {% if session.role != 'admin' %}
-                            <button class="btn btn-premium-book" data-bs-toggle="modal"
-                                data-bs-target="#bookModal{{ stock[0] }}">
-                                <i class="fa fa-file-signature me-2"></i>Book Stock
-                            </button>
-                            {% endif %}
-                        </div>
+                        <!-- Book button -->
+                        {% if session.role != 'admin' %}
+                        <button class="btn btn-premium-book" data-bs-toggle="modal"
+                            data-bs-target="#bookModal{{ stock[0] }}">
+                            <i class="fa fa-file-signature"></i>Book
+                        </button>
+                        {% endif %}
                     </div>
                 </div>
 
