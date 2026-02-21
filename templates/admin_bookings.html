@@ -88,7 +88,7 @@
           </thead>
           <tbody>
             {% for b in bookings %}
-            {% set invs = invoices_map.get(b[0]) if invoices_map else [] %}
+            {% set invs = invoices_map.get(b[0], []) if invoices_map else [] %}
             <tr class="booking-row"
               data-search="{{ (b[11]|string + ' ' + b[1]|string + ' ' + b[2]|string + ' ' + b[3]|string)|lower }}">
               <td>

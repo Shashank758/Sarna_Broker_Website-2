@@ -5167,6 +5167,47 @@ def admin_update_deduction(stock_id):
     log_activity("update_deduction", stock_id, f"Stock {stock_id} deduction updated to {deduction}")
     return redirect("/admin/stock")
     
+@app.route("/admin/update_truck/<int:inv_id>", methods=["POST"])
+def admin_update_truck(inv_id):
+    if session.get("role") != "admin":
+        return redirect("/")
+
+    truck_number = request.form.get("truck_number")
+    loaded_qty = request.form.get("loaded_qty")
+    qc_weight = request.form.get("qc_weight")
+    qc_moisture = request.form.get("qc_moisture")
+    qc_broken = request.form.get("qc_broken")
+    qc_claim = request.form.get("qc_claim")
+    qc_remarks = request.form.get("qc_remarks")
+
+    con = get_db()
+    cur = con.cursor()
+
+    try:
+        cur.execute("""
+            UPDATE loading_invoices
+            SET truck_number=%s,
+                loaded_qty=%s,
+                qc_weight=%s,
+                qc_moisture=%s,
+                qc_broken=%s,
+                qc_claim=%s,
+                qc_remarks=%s,
+                qc_status='verified',
+                qc_at=CURRENT_TIMESTAMP
+            WHERE id=%s
+        """, (truck_number, loaded_qty, qc_weight, qc_moisture, qc_broken, qc_claim, qc_remarks, inv_id))
+        con.commit()
+    except Exception as e:
+        con.rollback()
+        logger.error(f"Error updating truck {inv_id}: {e}")
+        flash(f"Error updating truck: {e}", "danger")
+    finally:
+        con.close()
+
+    log_activity("update_truck", inv_id, f"Truck {inv_id} ({truck_number}) data adjusted by admin")
+    return redirect("/admin/bookings")
+
 @app.route("/admin/approve_user/<int:id>")
 def approve_user(id):
     if session.get("role") != "admin":
