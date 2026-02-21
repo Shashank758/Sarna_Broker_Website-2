@@ -8,119 +8,103 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
 
+        .admin-header h2 {
+            font-weight: 800;
+            color: #1e293b;
+            margin: 0;
+            letter-spacing: -1px;
+        }
 
-    .admin-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 40px;
-    }
+        /* STAT CARDS */
+        .admin-stat-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 24px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
 
-    .admin-header h2 {
-    font-weight: 800;
-    color: #1e293b;
-    margin: 0;
-    letter-spacing: -1px;
-    }
+        .admin-stat-card:hover {
+            transform: translateY(-5px);
+        }
 
-    /* STAT CARDS */
-    .admin-stat-card {
-    background: #fff;
-    border-radius: 20px;
-    padding: 24px;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-    }
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
 
-    .admin-stat-card:hover {
-    transform: translateY(-5px);
-    }
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #1e293b;
+            line-height: 1;
+        }
 
-    .stat-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    margin-bottom: 16px;
-    }
+        .stat-label {
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
 
-    .stat-value {
-    font-size: 1.75rem;
-    font-weight: 800;
-    color: #1e293b;
-    line-height: 1;
-    }
+        /* TABLE */
+        .admin-table-card {
+            background: #fff;
+            border-radius: 24px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
 
-    .stat-label {
-    color: #64748b;
-    font-weight: 600;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
-    }
+        .admin-table thead th {
+            background: #f8fafc;
+            padding: 16px 24px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            border-bottom: 1px solid #e2e8f0;
+        }
 
-    /* TABLE */
-    .admin-table-card {
-    background: #fff;
-    border-radius: 24px;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    }
+        .admin-table tbody td {
+            padding: 20px 24px;
+            border-bottom: 1px solid #f1f5f9;
+            font-weight: 600;
+            color: #334155;
+        }
 
-    .admin-table thead th {
-    background: #f8fafc;
-    padding: 16px 24px;
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #64748b;
-    border-bottom: 1px solid #e2e8f0;
-    }
-
-    .admin-table tbody td {
-    padding: 20px 24px;
-    border-bottom: 1px solid #f1f5f9;
-    font-weight: 600;
-    color: #334155;
-    }
-
-    .badge-admin {
-    padding: 6px 12px;
-    border-radius: 50px;
-    font-weight: 800;
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    }
+        .badge-admin {
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
     </style>
 </head>
 
 <body>
 
-    <aside class="admin-sidebar">
-        <div class="sidebar-brand">
-            <h4>SAARNA <span>ADMIN</span></h4>
-        </div>
-        <ul class="admin-nav">
-            <li class="active"><a href="/admin"><i class="fa fa-chart-pie"></i> Overview</a></li>
-            <li><a href="/admin/users"><i class="fa fa-users"></i> Account Access</a></li>
-            <li><a href="/admin/stock"><i class="fa fa-tags"></i> Market Pricing</a></li>
-            <li><a href="/admin/stock-history"><i class="fa fa-history"></i> Rate History</a></li>
-            <li><a href="/admin/bookings"><i class="fa fa-shopping-cart"></i> Global Orders</a></li>
-            <li><a href="/admin/miller-profiles"><i class="fa fa-industry"></i> Industry Network</a></li>
-            <li><a href="/admin/buyer-profiles"><i class="fa fa-store"></i> Trader Network</a></li>
-            <li><a href="/admin/logs"><i class="fa fa-clipboard-list"></i> Audit Logs</a></li>
-            <li class="mt-5"><a href="/logout" class="text-danger"><i class="fa fa-sign-out-alt"></i> Terminate
-                    Session</a></li>
-        </ul>
-    </aside>
+    {% set active_page = 'overview' %}
+    {% include '_admin_sidebar.html' %}
 
     <main class="admin-content">
         <header class="admin-header">

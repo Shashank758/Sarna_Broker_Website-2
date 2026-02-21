@@ -42,7 +42,7 @@
           </thead>
           <tbody>
             {% for h in history %}
-            <tr class="history-row" data-search="{{ (h[8] + ' ' + h[7])|lower }}">
+            <tr class="history-row" data-search="{{ (h[8]|string + ' ' + h[7]|string)|lower }}">
               <td>
                 <div class="fw-800 text-dark">{{ h[8] }}</div>
               </td>

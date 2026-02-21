@@ -5082,7 +5082,8 @@ def admin_bookings():
         mb.order_id,           -- 11 Order ID
         mb.loading_status,     -- 12 Loading status
         mb.bill_document,      -- 13 Bill document
-        mb.loaded_qty          -- 14 Loaded quantity
+        mb.loaded_qty,         -- 14 Loaded quantity
+        mb.created_at          -- 15 Created at
     FROM miller_bookings mb
     JOIN users buyer ON mb.buyer_id = buyer.id
     JOIN miller_stock ms ON mb.stock_id = ms.id
