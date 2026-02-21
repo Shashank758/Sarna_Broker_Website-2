@@ -9,174 +9,96 @@
     <link rel="stylesheet" href="/static/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <style>
-        :root {
-            --admin-sidebar-width: 280px;
-            --admin-bg: #f1f5f9;
-            --admin-sidebar-bg: #0f172a;
-        }
 
-        body {
-            background: var(--admin-bg);
-            font-family: Inter, Segoe UI, sans-serif;
-            overflow-x: hidden;
-        }
+    .admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    }
 
-        /* SIDEBAR */
-        .admin-sidebar {
-            width: var(--admin-sidebar-width);
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            background: var(--admin-sidebar-bg);
-            color: white;
-            padding: 30px 20px;
-            z-index: 1000;
-        }
+    .admin-header h2 {
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0;
+    letter-spacing: -1px;
+    }
 
-        .sidebar-brand {
-            padding: 0 10px 30px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 30px;
-        }
+    /* STAT CARDS */
+    .admin-stat-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 24px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    }
 
-        .sidebar-brand h4 {
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            color: #fff;
-            margin: 0;
-        }
+    .admin-stat-card:hover {
+    transform: translateY(-5px);
+    }
 
-        .admin-nav {
-            list-style: none;
-            padding: 0;
-        }
+    .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+    }
 
-        .admin-nav li {
-            margin-bottom: 8px;
-        }
+    .stat-value {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #1e293b;
+    line-height: 1;
+    }
 
-        .admin-nav a {
-            color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-            padding: 12px 18px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
+    .stat-label {
+    color: #64748b;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+    }
 
-        .admin-nav a:hover,
-        .admin-nav li.active a {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-        }
+    /* TABLE */
+    .admin-table-card {
+    background: #fff;
+    border-radius: 24px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    }
 
-        .admin-nav i {
-            width: 20px;
-            text-align: center;
-            font-size: 1.1rem;
-        }
+    .admin-table thead th {
+    background: #f8fafc;
+    padding: 16px 24px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #64748b;
+    border-bottom: 1px solid #e2e8f0;
+    }
 
-        /* MAIN CONTENT */
-        .admin-content {
-            margin-left: var(--admin-sidebar-width);
-            padding: 40px;
-            min-height: 100vh;
-        }
+    .admin-table tbody td {
+    padding: 20px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    font-weight: 600;
+    color: #334155;
+    }
 
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-        }
-
-        .admin-header h2 {
-            font-weight: 800;
-            color: #1e293b;
-            margin: 0;
-            letter-spacing: -1px;
-        }
-
-        /* STAT CARDS */
-        .admin-stat-card {
-            background: #fff;
-            border-radius: 20px;
-            padding: 24px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .admin-stat-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin-bottom: 16px;
-        }
-
-        .stat-value {
-            font-size: 1.75rem;
-            font-weight: 800;
-            color: #1e293b;
-            line-height: 1;
-        }
-
-        .stat-label {
-            color: #64748b;
-            font-weight: 600;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
-        }
-
-        /* TABLE */
-        .admin-table-card {
-            background: #fff;
-            border-radius: 24px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        .admin-table thead th {
-            background: #f8fafc;
-            padding: 16px 24px;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #64748b;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .admin-table tbody td {
-            padding: 20px 24px;
-            border-bottom: 1px solid #f1f5f9;
-            font-weight: 600;
-            color: #334155;
-        }
-
-        .badge-admin {
-            padding: 6px 12px;
-            border-radius: 50px;
-            font-weight: 800;
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+    .badge-admin {
+    padding: 6px 12px;
+    border-radius: 50px;
+    font-weight: 800;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    }
     </style>
 </head>
 
@@ -331,7 +253,8 @@
                     <tbody>
                         {% for b in bookings[:8] %}
                         <tr>
-                            <td><span class="fw-800 text-primary">{{ b[11] if b[11] else 'N/A' }}</span></td>
+                            <td><a href="/admin/order/{{ b[0] }}" class="fw-800 text-primary">{{ b[11] if b[11] else
+                                    'SEC-' ~ b[0] }}</a></td>
                             <td>{{ b[2] }}</td>
                             <td>{{ b[1] }}</td>
                             <td><span class="text-capitalize">{{ b[3] }}</span></td>
@@ -359,10 +282,10 @@
         const bookingsChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: {{ recent_bookings_dates| tojson }},
+                labels: {{ recent_bookings_dates | tojson | safe }},
         datasets: [{
             label: 'Trade Volume',
-            data: {{ recent_bookings_counts| tojson }},
+            data: {{ recent_bookings_counts | tojson | safe }},
             borderColor: '#0a8a54',
             backgroundColor: 'rgba(10, 138, 84, 0.05)',
             fill: true,

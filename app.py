@@ -52,15 +52,15 @@ def send_sms(to_phone, message_text):
     """Send SMS using Twilio. Returns True if successful, False otherwise."""
     # Check if credentials are configured
     if not TWILIO_ACCOUNT_SID or not TWILIO_AUTH_TOKEN or not TWILIO_PHONE_NUMBER:
-        print(f"⚠️ SMS not configured. Missing credentials.")
-        print(f"   Account SID: {'Set' if TWILIO_ACCOUNT_SID else 'Missing'}")
-        print(f"   Auth Token: {'Set' if TWILIO_AUTH_TOKEN else 'Missing'}")
-        print(f"   Phone Number: {'Set' if TWILIO_PHONE_NUMBER else 'Missing'}")
-        print(f"   Would send to {to_phone}: {message_text}")
+        logger.warning(f"SMS not configured. Missing credentials.")
+        logger.warning(f"   Account SID: {'Set' if TWILIO_ACCOUNT_SID else 'Missing'}")
+        logger.warning(f"   Auth Token: {'Set' if TWILIO_AUTH_TOKEN else 'Missing'}")
+        logger.warning(f"   Phone Number: {'Set' if TWILIO_PHONE_NUMBER else 'Missing'}")
+        logger.info(f"   Would send to {to_phone}: {message_text}")
         return False
     
     if not to_phone:
-        print("⚠️ No phone number provided for SMS")
+        logger.warning("No phone number provided for SMS")
         return False
     
     try:
@@ -72,9 +72,9 @@ def send_sms(to_phone, message_text):
             else:
                 to_phone = '+91' + to_phone.lstrip('0')
         
-        print(f"📱 Attempting to send SMS to {to_phone} (original: {original_phone})")
-        print(f"   From: {TWILIO_PHONE_NUMBER}")
-        print(f"   Message: {message_text[:50]}...")
+        logger.info(f"Attempting to send SMS to {to_phone} (original: {original_phone})")
+        logger.info(f"   From: {TWILIO_PHONE_NUMBER}")
+        logger.info(f"   Message: {message_text[:50]}...")
         
         client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
         message = client.messages.create(
@@ -82,19 +82,19 @@ def send_sms(to_phone, message_text):
             from_=TWILIO_PHONE_NUMBER,
             to=to_phone
         )
-        print(f"✅ SMS sent successfully to {to_phone}")
-        print(f"   Message SID: {message.sid}")
-        print(f"   Status: {message.status}")
+        logger.info(f"SMS sent successfully to {to_phone}")
+        logger.info(f"   Message SID: {message.sid}")
+        logger.info(f"   Status: {message.status}")
         return True
     except Exception as e:
-        print(f"❌ Failed to send SMS to {to_phone}")
+        logger.error(f"Failed to send SMS to {to_phone}")
         logger.error(f"   Error Type: {type(e).__name__}")
         logger.error(f"   Error Message: {str(e)}")
         # Print more details for common errors
         if "Invalid" in str(e) or "not found" in str(e).lower():
-            print(f"   ⚠️ Check your Twilio credentials (Account SID, Auth Token)")
+            logger.warning(f"   Check your Twilio credentials (Account SID, Auth Token)")
         if "phone number" in str(e).lower() or "number" in str(e).lower():
-            print(f"   ⚠️ Check the phone number format: {to_phone}")
+            logger.warning(f"   Check the phone number format: {to_phone}")
         return False
 
 def clean_phone_number(phone):
@@ -4861,9 +4861,9 @@ def admin():
     recent_bookings_counts = [row[1] or 0 for row in recent_data]
     
     # User status distribution
-    approved_users = sum(1 for u in users if u[4] == 'approved')
-    pending_users = sum(1 for u in users if u[4] == 'pending')
-    blocked_users = sum(1 for u in users if u[4] == 'blocked')
+    approved_users = sum(1 for u in users if u[5] == 'approved')
+    pending_users = sum(1 for u in users if u[5] == 'pending')
+    blocked_users = sum(1 for u in users if u[5] == 'blocked')
     
     # Total bookings count
     total_bookings = len(bookings)
@@ -4875,34 +4875,114 @@ def admin():
 
     return render_template(
         "admin.html",
-       users=users,
-    stocks=stocks,
-    history=history,
-    bills=[],
-    bookings=bookings,
-    miller_profiles=miller_profiles,
-    farmer_count=farmer_count,
-    buyer_profiles=buyer_profiles,
-    buyer_count=buyer_count,
-    miller_count=miller_count,
-    all_users=all_users,
-    millers=millers,
-    # Chart data
-    pending_bookings=pending_bookings,
-    approved_bookings=approved_bookings,
-    declined_bookings=declined_bookings,
-    total_revenue=total_revenue,
-    crop_stats=crop_stats,
-    recent_bookings_dates=recent_bookings_dates,
-    recent_bookings_counts=recent_bookings_counts,
-    approved_users=approved_users,
-    pending_users=pending_users,
-    blocked_users=blocked_users,
-    total_bookings=total_bookings,
-    total_stock_qty=total_stock_qty,
+        users=users,
+        stocks=stocks,
+        history=history,
+        bookings=bookings,
+        pending_bookings=pending_bookings,
+        approved_bookings=approved_bookings,
+        total_revenue=total_revenue,
+        total_bookings=total_bookings,
+        total_stock_qty=total_stock_qty,
+        approved_users=approved_users,
+        pending_users=pending_users,
+        blocked_users=blocked_users,
+        farmer_count=farmer_count,
+        buyer_count=buyer_count,
+        miller_count=miller_count,
+        recent_bookings_dates=recent_bookings_dates,
+        recent_bookings_counts=recent_bookings_counts
     )
-    
 
+@app.route("/admin/order/<int:booking_id>")
+def admin_order_detail(booking_id):
+    """Detailed view for a single order."""
+    if session.get("role") != "admin":
+        return redirect("/")
+    
+    con = get_db()
+    cur = con.cursor()
+    
+    # Fetch core booking data
+    cur.execute("""
+        SELECT
+            mb.id,                 -- 0 Booking ID
+            buyer.name,            -- 1 Buyer
+            miller.name,           -- 2 Miller
+            ms.crop,               -- 3 Crop
+            mb.quantity,           -- 4 Qty
+            COALESCE(mb.price, ms.price), -- 5 Price
+            (mb.quantity * COALESCE(mb.price, ms.price)), -- 6 Total
+            mb.status,             -- 7 Booking status
+            mb.truck_status,       -- 8 Truck status
+            mb.loaded_at,          -- 9 Loaded date
+            mb.order_id,           -- 10 Order ID
+            mb.created_at,         -- 11 Created at
+            mb.loading_status,     -- 12 Loading status
+            mb.bill_document,      -- 13 Bill doc
+            mb.truck_remark,       -- 14 Remark
+            buyer.email,           -- 15 Buyer email
+            miller.email,          -- 16 Miller email
+            mb.buyer_id,           -- 17 Buyer ID
+            ms.miller_id,          -- 18 Miller ID
+            mb.stock_id            -- 19 Stock ID
+        FROM miller_bookings mb
+        JOIN users buyer ON mb.buyer_id = buyer.id
+        JOIN miller_stock ms ON mb.stock_id = ms.id
+        JOIN users miller ON ms.miller_id = miller.id
+        WHERE mb.id = %s
+    """, (booking_id,))
+    booking = cur.fetchone()
+    
+    if not booking:
+        con.close()
+        flash("Order not found.", "danger")
+        return redirect("/admin/bookings")
+    
+    # Fetch loading invoices (trucks)
+    cur.execute("""
+        SELECT id, loaded_qty, invoice_file, truck_number, created_at,
+               qc_weight, qc_moisture, qc_remarks, qc_status, qc_at,
+               final_invoice_file, payment_status, payment_at, qc_freight, debit_note,
+               qc_broken, qc_karda, qc_oil, qc_mitti, qc_ssa, qc_claim
+        FROM loading_invoices
+        WHERE booking_id = %s
+        ORDER BY created_at ASC
+    """, (booking_id,))
+    invoices = cur.fetchall()
+    
+    # Fetch payment record if exists
+    cur.execute("SELECT * FROM payments WHERE booking_id = %s", (booking_id,))
+    payment = cur.fetchone()
+    
+    con.close()
+    
+    return render_template("admin_order_detail.html", booking=booking, invoices=invoices, payment=payment)
+
+@app.route("/admin/buyer/<int:buyer_id>")
+def admin_buyer_profile(buyer_id):
+    """Detailed view for a buyer profile."""
+    if session.get("role") != "admin":
+        return redirect("/")
+    
+    con = get_db()
+    cur = con.cursor()
+    
+    cur.execute("""
+        SELECT u.name, u.email, p.shop_name, p.phone, p.address, p.gst_doc, p.license_doc, p.gst_number, p.mandi_number, p.document, u.id, p.created_at
+        FROM users u
+        LEFT JOIN buyer_profiles p ON u.id = p.buyer_id
+        WHERE u.id = %s
+    """, (buyer_id,))
+    buyer = cur.fetchone()
+    
+    con.close()
+    
+    if not buyer:
+        flash("Buyer profile not found.", "danger")
+        return redirect("/admin/buyer-profiles")
+        
+    return render_template("admin_profile_view.html", profile=buyer, member_type="buyer")
 
 @app.route("/admin/users")
 def admin_users():
@@ -5066,7 +5146,7 @@ def admin_miller_profiles():
     
     cur.execute("""
         SELECT
-            mp.id,
+            mp.miller_id,
             u.name,
             mp.mill_name,
             mp.owner_phone,
@@ -5074,7 +5154,9 @@ def admin_miller_profiles():
             mp.gst_doc,
             mp.mandi_doc,
             mp.other_doc,
-            mp.created_at
+            mp.created_at,
+            mp.gst_number,
+            mp.mandi_number
         FROM miller_profiles mp
         JOIN users u ON mp.miller_id = u.id
         ORDER BY mp.created_at DESC
@@ -5082,7 +5164,7 @@ def admin_miller_profiles():
     miller_profiles = cur.fetchall()
     con.close()
     
-    return render_template("admin_miller_profiles.html", miller_profiles=miller_profiles)
+    return render_template("admin_network.html", profiles=miller_profiles, network_type="miller")
 
 @app.route("/admin/buyer-profiles")
 def admin_buyer_profiles():
@@ -5095,13 +5177,17 @@ def admin_buyer_profiles():
     
     cur.execute("""
         SELECT
-        bp.id,
+        bp.buyer_id,
         u.name,
         bp.shop_name,
         bp.phone,
         bp.address,
         bp.document,
-        bp.created_at
+        bp.created_at,
+        bp.gst_number,
+        bp.mandi_number,
+        bp.gst_doc,
+        bp.license_doc
     FROM buyer_profiles bp
     JOIN users u ON bp.buyer_id = u.id
     ORDER BY bp.created_at DESC
@@ -5109,7 +5195,7 @@ def admin_buyer_profiles():
     buyer_profiles = cur.fetchall()
     con.close()
     
-    return render_template("admin_buyer_profiles.html", buyer_profiles=buyer_profiles)
+    return render_template("admin_network.html", profiles=buyer_profiles, network_type="buyer")
 
 
 @app.route("/admin/logs")
@@ -5237,7 +5323,7 @@ def admin_view_miller(miller_id):
     cur = con.cursor()
 
     cur.execute("""
-        SELECT u.name, u.email, p.mill_name, p.owner_phone, p.address, p.gst_doc, p.mandi_doc, p.gst_number, p.mandi_number
+        SELECT u.name, u.email, p.mill_name, p.owner_phone, p.address, p.gst_doc, p.mandi_doc, p.gst_number, p.mandi_number, p.other_doc, u.id, p.created_at
         FROM users u
         LEFT JOIN miller_profiles p ON u.id = p.miller_id
         WHERE u.id=%s
@@ -5245,7 +5331,7 @@ def admin_view_miller(miller_id):
     miller = cur.fetchone()
 
     con.close()
-    return render_template("admin_miller_profile.html", miller=miller)
+    return render_template("admin_profile_view.html", profile=miller, member_type="miller")
     
 @app.route("/admin/approve_booking/<int:id>")
 def admin_approve_booking(id):
@@ -5355,187 +5441,9 @@ def admin_update_truck(invoice_id):
     flash("Truck details updated.", "success")
     return redirect(request.referrer or "/admin/bookings")
 
-# ---------------- SMS TEST ROUTE ----------------
-@app.route("/test_sms", methods=["GET", "POST"])
-def test_sms():
-    """Test SMS functionality - for debugging only"""
-    result = {"success": False, "message": "", "details": {}}
-    
-    if request.method == "POST":
-        test_phone = request.form.get("phone", "")
-        test_message = request.form.get("message", "Test SMS from Sarna Broker")
-        
-        result["details"]["phone"] = test_phone
-        result["details"]["message"] = test_message
-        result["details"]["twilio_account_sid"] = "Set" if TWILIO_ACCOUNT_SID else "Missing"
-        result["details"]["twilio_auth_token"] = "Set" if TWILIO_AUTH_TOKEN else "Missing"
-        result["details"]["twilio_phone_number"] = TWILIO_PHONE_NUMBER if TWILIO_PHONE_NUMBER else "Missing"
-        
-        if test_phone:
-            success = send_sms(test_phone, test_message)
-            result["success"] = success
-            result["message"] = "SMS sent successfully!" if success else "Failed to send SMS. Check console for details."
-        else:
-            result["message"] = "Please provide a phone number"
-    
-    return f"""
-    <html>
-    <head><title>SMS Test</title></head>
-    <body style="font-family: Arial; padding: 20px;">
-        <h2>SMS Test Page</h2>
-        <form method="POST">
-            <p>
-                <label>Phone Number (with country code):</label><br>
-                <input type="text" name="phone" placeholder="+919876543210" style="width: 300px; padding: 5px;" required>
-            </p>
-            <p>
-                <label>Test Message:</label><br>
-                <textarea name="message" style="width: 300px; padding: 5px; height: 60px;">Test SMS from Sarna Broker</textarea>
-            </p>
-            <p>
-                <button type="submit" style="padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer;">Send Test SMS</button>
-            </p>
-        </form>
-        {f'''
-        <div style="margin-top: 20px; padding: 15px; background: {'#d4edda' if result['success'] else '#f8d7da'}; border: 1px solid {'#c3e6cb' if result['success'] else '#f5c6cb'};">
-            <h3>{'✅ Success' if result['success'] else '❌ Failed'}</h3>
-            <p><strong>Message:</strong> {result['message']}</p>
-            <p><strong>Details:</strong></p>
-            <ul>
-                <li>Phone: {result['details'].get('phone', 'N/A')}</li>
-                <li>Account SID: {result['details'].get('twilio_account_sid', 'N/A')}</li>
-                <li>Auth Token: {result['details'].get('twilio_auth_token', 'N/A')}</li>
-                <li>Twilio Phone: {result['details'].get('twilio_phone_number', 'N/A')}</li>
-            </ul>
-        </div>
-        ''' if request.method == "POST" else ""}
-        <hr>
-        <p><strong>Current Configuration:</strong></p>
-        <ul>
-            <li>Account SID: {'✅ Set' if TWILIO_ACCOUNT_SID else '❌ Missing'}</li>
-            <li>Auth Token: {'✅ Set' if TWILIO_AUTH_TOKEN else '❌ Missing'}</li>
-            <li>Phone Number: {TWILIO_PHONE_NUMBER if TWILIO_PHONE_NUMBER else '❌ Missing'}</li>
-        </ul>
-    </body>
-    </html>
-    """
-    
 
 
 
-
-@app.route("/patch-miller-profile")
-def patch_miller_profile():
-    if session.get("role") != "admin":
-         # Allow dev usage or protect it? For now let's just allow anyone who knows the URL or require admin
-         # But usually init-db is protected or temporary.
-         # Let's just make it open for now as a quick fix, or check for specific secret if needed.
-         # The user is likely not logged in as admin locally if they just restarted.
-         # Let's rely on obscurity or basic auth if needed.
-         pass
-
-    con = get_db()
-    cur = con.cursor()
-    try:
-        # Get current columns
-        cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name = 'miller_profiles'")
-        columns = [row[0] for row in cur.fetchall()]
-        
-        msgs = []
-        
-        # Add city if missing
-        if 'city' not in columns:
-            cur.execute("ALTER TABLE miller_profiles ADD COLUMN city VARCHAR(100)")
-            msgs.append("Added city column")
-        else:
-            msgs.append("City column exists")
-            
-        # Add state if missing
-        if 'state' not in columns:
-            cur.execute("ALTER TABLE miller_profiles ADD COLUMN state VARCHAR(100)")
-            msgs.append("Added state column")
-        else:
-            msgs.append("State column exists")
-            
-        con.commit()
-        return "<br>".join(msgs)
-    except Exception as e:
-        con.rollback()
-        return f"Error: {e}"
-    finally:
-        con.close()
-
-
-
-@app.route("/patch-db-schema")
-def patch_db_schema():
-    con = get_db()
-    cur = con.cursor()
-    try:
-        # Get current columns
-        cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name = 'miller_bookings'")
-        columns = [row[0] for row in cur.fetchall()]
-        
-        msgs = []
-        
-        # Define missing columns and their types
-        new_cols = {
-            "order_id": "VARCHAR(20)",
-            "price": "DECIMAL(10,2)",
-            "loading_status": "VARCHAR(20) DEFAULT 'pending'",
-            "loaded_qty": "DECIMAL(10,2) DEFAULT 0",
-            "reason": "TEXT",
-            "decision_at": "TIMESTAMP",
-            "close_reason": "TEXT",
-            "closed_by": "VARCHAR(20)",
-            "qc_weight": "DECIMAL(10,2)",
-            "qc_moisture": "DECIMAL(5,2)",
-            "qc_remarks": "TEXT",
-            "qc_status": "VARCHAR(20) DEFAULT 'pending'",
-            "qc_at": "TIMESTAMP",
-            "bill_document": "VARCHAR(255)",
-            "truck_status": "VARCHAR(50)",
-            "deadline_at": "TIMESTAMP",
-            "loaded_at": "TIMESTAMP"
-        }
-
-        for col, col_type in new_cols.items():
-            if col not in columns:
-                cur.execute(f"ALTER TABLE miller_bookings ADD COLUMN {col} {col_type}")
-                msgs.append(f"Added column: {col}")
-            else:
-                msgs.append(f"Column exists: {col}")
-        
-        # Also patch miller_stock for duration
-        cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name = 'miller_stock'")
-        stock_cols = [row[0] for row in cur.fetchall()]
-        if 'duration' not in stock_cols:
-            cur.execute("ALTER TABLE miller_stock ADD COLUMN duration INTEGER")
-            msgs.append("Added duration to miller_stock")
-        else:
-            msgs.append("Duration exists in miller_stock")
-
-        con.commit()
-        return "<br>".join(msgs)
-    except Exception as e:
-        con.rollback()
-        return f"Error: {e}"
-    finally:
-        con.close()
-
-@app.route("/debug-bookings")
-def debug_bookings():
-    con = get_db()
-    cur = con.cursor()
-    cur.execute("SELECT id, order_id, stock_id, buyer_id, quantity, status, loading_status, created_at FROM miller_bookings ORDER BY created_at DESC LIMIT 10")
-    rows = cur.fetchall()
-    
-    # Also check miller_stock
-    cur.execute("SELECT id, miller_id, status FROM miller_stock ORDER BY created_at DESC LIMIT 5")
-    stocks = cur.fetchall()
-    
-    con.close()
-    return render_template("debug_bookings.html", bookings=rows, stocks=stocks)
 
 
 if __name__ == "__main__":
@@ -5543,5 +5451,5 @@ if __name__ == "__main__":
     try:
         run_migrations()
     except Exception as e:
-        print(f"Migration warning: {e}")
+        logger.warning(f"Migration warning: {e}")
     app.run(debug=os.environ.get("FLASK_DEBUG", "0") == "1")

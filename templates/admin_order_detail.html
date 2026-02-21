@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Order Intelligence Detailing | Saarna Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <style>
+        :root {
+            --admin-sidebar-width: 280px;
+            --admin-bg: #f1f5f9;
+            --admin-sidebar-bg: #0f172a;
+        }
+
+        body {
+            background: var(--admin-bg);
+            font-family: Inter, Segoe UI, sans-serif;
+        }
+
+        .order-card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 32px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .info-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: #64748b;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 1rem;
+        }
+
+        .truck-row {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+        }
+
+        .truck-row:hover {
+            background: #fff;
+            border-color: #0d6efd;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-pill {
+            background: #f1f5f9;
+            border-radius: 50px;
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #475569;
+        }
+
+        .qa-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #cbd5e1;
+        }
+
+        .qa-item {
+            text-align: center;
+        }
+
+        .qa-label {
+            font-size: 0.6rem;
+            color: #94a3b8;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .qa-value {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #334155;
+        }
+
+        .badge-status {
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 0.7rem;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <aside class="admin-sidebar">
+        <div class="sidebar-brand p-3 border-bottom border-secondary mb-4">
+            <h4 class="fw-800 text-white m-0">SAARNA <span>ADMIN</span></h4>
+        </div>
+        {% set active_page = 'bookings' %}
+        {% include '_admin_sidebar.html' %}
+    </aside>
+
+    <main class="admin-content">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <a href="/admin/bookings" class="btn btn-white border rounded-pill px-4 fw-800 shadow-sm mb-3">
+                    <i class="fa fa-arrow-left me-2"></i>Back to Orders
+                </a>
+                <h2 class="fw-800 text-dark mb-1">Order intelligence Detailing</h2>
+                <p class="text-muted fw-600 mb-0">Complete lifecycle audit of Shipment #{{ booking[10] or booking[0] }}
+                </p>
+            </div>
+            <div>
+                {% if booking[7] == 'pending' %}
+                <span class="badge-status bg-warning-subtle text-warning-emphasis">AWAITING REVIEW</span>
+                {% elif booking[7] == 'approved' %}
+                <span class="badge-status bg-success-subtle text-success">TRADE VERIFIED</span>
+                {% else %}
+                <span class="badge-status bg-danger-subtle text-danger">CANCELLED/DECLINED</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <!-- ORDER SUMMARY -->
+                <div class="order-card">
+                    <h5 class="fw-800 text-dark mb-4 border-bottom pb-3">Shipment Intelligence</h5>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="info-label">Commodity Asset</div>
+                            <div class="info-value text-primary text-capitalize">{{ booking[3] }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-label">Reserved Volume</div>
+                            <div class="info-value">{{ booking[4] }} Qt</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-label">Negotiated Rate</div>
+                            <div class="info-value">₹{{ booking[5]|format_currency }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-label">Gross Valuation</div>
+                            <div class="info-value">₹{{ booking[6]|format_currency }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-label">Execution Date</div>
+                            <div class="info-value">{{ booking[11].strftime('%d %b %Y') }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-label">Loading Paradigm</div>
+                            <div class="info-value">
+                                <span class="badge bg-light text-dark fw-800 border">{{ booking[12]|upper }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LOGISTICS BREAKDOWN -->
+                <div class="order-card">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="fw-800 text-dark mb-0">Logistics Attribution</h5>
+                        <span class="badge bg-primary rounded-pill px-3">{{ invoices|length }} Trucks</span>
+                    </div>
+
+                    {% if invoices %}
+                    {% for inv in invoices %}
+                    <div class="truck-row">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <div class="fw-800 text-dark mb-1"><i class="fa fa-truck me-2 text-muted"></i>{{ inv[3]
+                                    or 'UNIDENTIFIED' }}</div>
+                                <div class="small text-muted fw-600">Dispatched: {{ inv[4].strftime('%d %b %Y') if
+                                    inv[4] else 'N/A' }}</div>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-800 text-dark">{{ inv[1] }} Qt</div>
+                                {% if inv[8] == 'verified' %}
+                                <span class="badge bg-success-subtle text-success fw-800" style="font-size: 0.6rem;">QA
+                                    VERIFIED</span>
+                                {% else %}
+                                <span class="badge bg-warning-subtle text-warning-emphasis fw-800"
+                                    style="font-size: 0.6rem;">QA PENDING</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="qa-metrics">
+                            <div class="qa-item">
+                                <div class="qa-label">Weight</div>
+                                <div class="qa-value">{{ inv[5] or '-' }}</div>
+                            </div>
+                            <div class="qa-item">
+                                <div class="qa-label">Moisture</div>
+                                <div class="qa-value">{{ inv[6] or '-' }}%</div>
+                            </div>
+                            <div class="qa-item">
+                                <div class="qa-label">Broken</div>
+                                <div class="qa-value">{{ inv[15] or '-' }}%</div>
+                            </div>
+                            <div class="qa-item">
+                                <div class="qa-label">Freight</div>
+                                <div class="qa-value text-danger">₹{{ inv[13] or 0 }}</div>
+                            </div>
+                            <div class="qa-item">
+                                <div class="qa-label">Claim</div>
+                                <div class="qa-value text-danger">₹{{ inv[20] or 0 }}</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 d-flex gap-2">
+                            <a href="/static/uploads/bills/{{ inv[2] }}" target="_blank"
+                                class="btn btn-white border btn-xs fw-800 py-1">Load Slip</a>
+                            {% if inv[11] %}
+                            <a href="/static/uploads/bills/{{ inv[11] }}" target="_blank"
+                                class="btn btn-primary btn-xs fw-800 py-1">Final Invoice</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fa fa-truck-ramp-box text-muted opacity-25 fs-1 mb-3"></i>
+                        <p class="text-muted fw-800 mb-0">No Logistics Registered</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <!-- PARTIES -->
+                <div class="order-card">
+                    <h5 class="fw-800 text-dark mb-4 border-bottom pb-3">Counterparty Intelligence</h5>
+
+                    <div class="mb-4">
+                        <div class="info-label">Fulfillment Partner (Miller)</div>
+                        <div class="d-flex align-items-center gap-3 mt-2">
+                            <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center"
+                                style="width: 40px; height: 40px; font-weight: 800;">
+                                {{ booking[2][0] }}
+                            </div>
+                            <div>
+                                <div class="fw-800 text-dark">{{ booking[2] }}</div>
+                                <div class="small text-muted fw-600">{{ booking[16] }}</div>
+                            </div>
+                        </div>
+                        <a href="/admin/miller/{{ booking[18] }}" class="btn btn-link btn-sm fw-800 p-0 mt-2">View
+                            Compliance Dossier</a>
+                    </div>
+
+                    <div>
+                        <div class="info-label">Market Destination (Buyer)</div>
+                        <div class="d-flex align-items-center gap-3 mt-2">
+                            <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center"
+                                style="width: 40px; height: 40px; font-weight: 800;">
+                                {{ booking[1][0] }}
+                            </div>
+                            <div>
+                                <div class="fw-800 text-dark">{{ booking[1] }}</div>
+                                <div class="small text-muted fw-600">{{ booking[15] }}</div>
+                            </div>
+                        </div>
+                        <a href="/admin/buyer/{{ booking[17] }}" class="btn btn-link btn-sm fw-800 p-0 mt-2">View
+                            Compliance Dossier</a>
+                    </div>
+                </div>
+
+                <!-- FINANCIALS -->
+                <div class="order-card bg-dark text-white">
+                    <h5 class="fw-800 text-white mb-4 border-bottom border-secondary pb-3">Settlement Summary</h5>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-white-50 fw-600">Contract Value</span>
+                        <span class="fw-800">₹{{ booking[6]|format_currency }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-white-50 fw-600">Logistics Claims</span>
+                        {% set total_claim = invoices|sum(attribute=20) %}
+                        <span class="fw-800 text-danger">- ₹{{ total_claim|format_currency }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-4 pb-4 border-bottom border-secondary">
+                        <span class="text-white-50 fw-600">Freight Adjustment</span>
+                        {% set total_freight = invoices|sum(attribute=13) %}
+                        <span class="fw-800 text-danger">- ₹{{ total_freight|format_currency }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fs-5 fw-800">Net Settlement</span>
+                        <span class="fs-4 fw-800 text-success">₹{{ (booking[6] - total_claim -
+                            total_freight)|format_currency }}</span>
+                    </div>
+
+                    {% if payment %}
+                    <div
+                        class="mt-4 pt-4 border-top border-secondary d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="info-label text-white-50">Payment Status</div>
+                            <div class="fw-800 text-capitalize">{{ payment[5] }}</div>
+                        </div>
+                        {% if payment[7] %}
+                        <a href="/static/uploads/bills/{{ payment[7] }}" target="_blank"
+                            class="btn btn-primary btn-sm fw-800 rounded-pill px-4">View Hisab</a>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div class="mt-4 pt-4 border-top border-secondary text-center text-white-50 small fw-600">
+                        Pending final invoice upload from Miller.
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- AUDIT ACTIONS -->
+                <div class="order-card border-warning" style="border-left: 5px solid #ffc107;">
+                    <h6 class="fw-800 text-dark mb-3"><i
+                            class="fa fa-shield-halved me-2 text-warning"></i>Administrative Control</h6>
+                    <div class="d-grid gap-2">
+                        {% if booking[7] == 'pending' %}
+                        <a href="/admin/approve_booking/{{ booking[0] }}" class="btn btn-success fw-800">Approve
+                            Booking</a>
+                        <a href="/admin/decline_booking/{{ booking[0] }}" class="btn btn-danger fw-800">Decline
+                            Booking</a>
+                        {% endif %}
+                        <button class="btn btn-white border fw-800" onclick="window.print()"><i
+                                class="fa fa-print me-2"></i>Print Ledger</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

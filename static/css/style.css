@@ -2364,3 +2364,148 @@ a {
         background: #fff;
     }
 }
+
+/* =========================
+   ADMIN PANEL STYLES
+========================= */
+:root {
+    --admin-sidebar-width: 280px;
+    --admin-bg: #f1f5f9;
+    --admin-sidebar-bg: #0f172a;
+}
+
+.admin-sidebar {
+    width: var(--admin-sidebar-width);
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    background: var(--admin-sidebar-bg);
+    color: white;
+    padding: 30px 20px;
+    z-index: 1000;
+}
+
+.sidebar-brand {
+    padding: 0 10px 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 30px;
+}
+
+.sidebar-brand h4 {
+    font-weight: 800;
+    color: #fff;
+    margin: 0;
+}
+
+.admin-nav {
+    list-style: none;
+    padding: 0;
+}
+
+.admin-nav li {
+    margin-bottom: 8px;
+}
+
+.admin-nav a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    padding: 12px 18px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.admin-nav a:hover,
+.admin-nav li.active a {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.admin-content {
+    margin-left: var(--admin-sidebar-width);
+    padding: 40px;
+    min-height: 100vh;
+}
+
+/* Common Admin Components */
+.admin-card,
+.profiles-card,
+.pricing-card,
+.history-card,
+.logs-card,
+.users-card {
+    background: #fff;
+    border-radius: 30px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.table-enterprise thead th {
+    background: #f8fafc;
+    padding: 20px 24px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #64748b;
+    font-weight: 800;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.table-enterprise tbody td {
+    padding: 18px 24px;
+    vertical-align: middle;
+    font-weight: 600;
+    color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.search-control {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-weight: 600;
+}
+
+.search-control:focus {
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(10, 138, 84, 0.1);
+    border-color: #0a8a54;
+}
+
+.doc-btn {
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.price-tag {
+    background: #f0fdf4;
+    color: #166534;
+    font-weight: 800;
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+}
+
+@media (max-width: 991px) {
+    .admin-sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+
+    .admin-content {
+        margin-left: 0;
+        padding: 20px;
+    }
+}

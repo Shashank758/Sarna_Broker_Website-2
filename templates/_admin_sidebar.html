@@ -1,0 +1,31 @@
+<aside class="admin-sidebar">
+    <div class="sidebar-brand">
+        <h4>SAARNA <span>ADMIN</span></h4>
+    </div>
+    <ul class="admin-nav">
+        <li class="{% if active_page == 'overview' %}active{% endif %}">
+            <a href="/admin"><i class="fa fa-chart-pie"></i> Overview</a>
+        </li>
+        <li class="{% if active_page == 'users' %}active{% endif %}">
+            <a href="/admin/users"><i class="fa fa-users"></i> Account Access</a>
+        </li>
+        <li class="{% if active_page == 'stock' %}active{% endif %}">
+            <a href="/admin/stock"><i class="fa fa-tags"></i> Market Pricing</a>
+        </li>
+        <li class="{% if active_page == 'history' %}active{% endif %}">
+            <a href="/admin/stock-history"><i class="fa fa-history"></i> Rate History</a>
+        </li>
+        <li class="{% if active_page == 'bookings' %}active{% endif %}">
+            <a href="/admin/bookings"><i class="fa fa-shopping-cart"></i> Global Orders</a>
+        </li>
+        <li class="{% if active_page == 'miller_profiles' %}active{% endif %}">
+            <a href="/admin/miller-profiles"><i class="fa fa-industry"></i> Industry Network</a>
+        </li>
+        <li class="{% if active_page == 'buyer_profiles' %}active{% endif %}">
+            <a href="/admin/buyer-profiles"><i class="fa fa-store"></i> Trader Network</a>
+        </li>
+        <li class="{% if active_page == 'logs' %}active{% endif %}">
+            <a href="/admin/logs"><i class="fa fa-clipboard-list"></i> Audit Logs</a>
+        </li>
+    </ul>
+</aside>
