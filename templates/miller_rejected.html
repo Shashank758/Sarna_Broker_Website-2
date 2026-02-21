@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}Rejected Orders | Saarna Canvessars{% endblock %}
 
@@ -68,7 +68,7 @@
 
     <div class="d-flex justify-content-center" data-aos="fade-up" data-aos-delay="200">
       <input type="text" id="rejectedSearch" class="search-enterprise"
-        placeholder="Search Order, Trader, or Commodity..." style="max-width: 450px;">
+        placeholder="Search Order, Seller, or Commodity..." style="max-width: 450px;">
     </div>
   </div>
 </section>
@@ -87,7 +87,7 @@
         <thead>
           <tr>
             <th>Shipment ID</th>
-            <th>Trader</th>
+            <th>Seller</th>
             <th>Commodity</th>
             <th>Requested Qty</th>
             <th>Rejection Rationale</th>
@@ -99,7 +99,7 @@
             <td><span class="fw-800 text-dark">{{ b[10] if b[10] else 'N/A' }}</span></td>
             <td>
               <div class="fw-800 mb-0">{{ b[1] }}</div>
-              <div class="small text-muted fw-600">Enterprise Buyer</div>
+              <div class="small text-muted fw-600">Enterprise Seller</div>
             </td>
             <td>
               <div class="badge bg-light text-muted fw-800 border px-3 rounded-pill text-capitalize">{{ b[2] }}</div>

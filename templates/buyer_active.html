@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}Active Orders | Saarna Canvessars{% endblock %}
 
@@ -131,7 +131,7 @@
       <p class="text-muted mb-0 fw-500">Monitor loading progress and verify quality checks for ongoing trades.</p>
     </div>
     <div class="position-relative">
-      <input type="text" id="activeSearch" class="search-minimal" placeholder="Search orders, millers...">
+      <input type="text" id="activeSearch" class="search-minimal" placeholder="Search orders, Buyers...">
       <i class="fa fa-search position-absolute text-muted"
         style="right: 16px; top: 50%; transform: translateY(-50%);"></i>
     </div>
@@ -152,7 +152,7 @@
             <div class="order-title">{{ o.crop|capitalize }} · {{ o.booked }} Qt</div>
             <div class="order-meta">
               <span class="badge bg-light text-muted fw-800 me-2">#{{ o.order_id }}</span>
-              <span>Miller: <strong>{{ o.miller_name }}</strong></span>
+              <span>Buyer: <strong>{{ o.miller_name }}</strong></span>
               <span class="mx-2">|</span>
               <span><i class="fa fa-map-marker-alt me-1"></i>{{ o.miller_city }}, {{ o.miller_state }}</span>
             </div>
@@ -236,7 +236,7 @@
               </div>
               {% else %}
               <div class="py-3 text-center bg-light rounded-3 my-2 small text-muted italic">
-                Awaiting miller quality verification...
+                Awaiting buyer quality verification...
               </div>
               {% endif %}
 

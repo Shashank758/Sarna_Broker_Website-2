@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <title>{{ "Industry" if network_type == "miller" else "Trader" }} Network | Saarna Admin</title>
+    <title>{{ "Industry" if network_type == "miller" else "Seller" }} Network | Saarna Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
@@ -18,7 +18,7 @@
     <main class="admin-content">
         <div class="d-flex justify-content-between align-items-center mb-5">
             <div>
-                <h2 class="fw-800 text-dark mb-1">{{ "Industrial" if network_type == "miller" else "Trader" }} Network
+                <h2 class="fw-800 text-dark mb-1">{{ "Industrial" if network_type == "miller" else "Seller" }} Network
                 </h2>
                 <p class="text-muted fw-600 mb-0">
                     {% if network_type == "miller" %}
@@ -43,7 +43,7 @@
                 <table class="table table-enterprise m-0" id="networkTable">
                     <thead>
                         <tr>
-                            <th>{{ "Miller Profile" if network_type == "miller" else "Trader Identity" }}</th>
+                            <th>{{ "Buyer Profile" if network_type == "miller" else "Seller Identity" }}</th>
                             <th>{{ "Industrial Unit" if network_type == "miller" else "Commercial Outlet" }}</th>
                             <th>Operational Contact</th>
                             {% if network_type == "buyer" %}
@@ -149,7 +149,7 @@
             <div class="text-center py-5">
                 <i
                     class="fa {{ 'fa-industry' if network_type == 'miller' else 'fa-store' }} text-muted opacity-25 fs-1 mb-3"></i>
-                <h5 class="fw-800 text-muted">No {{ "Industrial" if network_type == "miller" else "Trader" }} Profiles
+                <h5 class="fw-800 text-muted">No {{ "Industrial" if network_type == "miller" else "Seller" }} Profiles
                     Found</h5>
                 <p class="text-muted fw-600">Onboarded partners will be listed here.</p>
             </div>

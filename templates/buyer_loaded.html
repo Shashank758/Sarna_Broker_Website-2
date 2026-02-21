@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}Loaded Orders | Saarna Canvessars{% endblock %}
 
@@ -114,7 +114,7 @@
       <p class="text-muted mb-0 fw-500">Archived view of your fully loaded and settled trades.</p>
     </div>
     <div class="position-relative">
-      <input type="text" id="loadedSearch" class="search-minimal" placeholder="Filter by ID, Miller or Crop...">
+      <input type="text" id="loadedSearch" class="search-minimal" placeholder="Filter by ID, Buyer or Crop...">
       <i class="fa fa-search position-absolute text-muted"
         style="right: 16px; top: 50%; transform: translateY(-50%);"></i>
     </div>
@@ -135,7 +135,7 @@
             <div class="order-title">{{ o.crop|capitalize }} · {{ o.loaded }} Qt</div>
             <div class="order-meta">
               <span class="badge bg-light text-muted fw-800 me-2">#{{ o.order_id }}</span>
-              <span>Miller: <strong>{{ o.miller_name }}</strong></span>
+              <span>Buyer: <strong>{{ o.miller_name }}</strong></span>
             </div>
 
             <div class="settlement-panel mt-4">

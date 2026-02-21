@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}Approved Orders | Saarna Canvessars{% endblock %}
 
@@ -141,7 +141,7 @@
         <thead>
           <tr>
             <th>Shipment ID</th>
-            <th>Trader Info</th>
+            <th>Seller Info</th>
             <th>Commodity</th>
             <th>Contract Weight</th>
             <th>Logistics Status</th>
@@ -170,7 +170,7 @@
             <td><span class="fw-800 text-dark">{{ b[10] }}</span></td>
             <td>
               <div class="fw-800 mb-0">{{ b[1] }}</div>
-              <div class="small text-muted fw-600">Enterprise Buyer</div>
+              <div class="small text-muted fw-600">Enterprise Seller</div>
             </td>
             <td>
               <div class="badge bg-light text-dark fw-800 border px-3 rounded-pill text-capitalize">{{ b[2] }}</div>

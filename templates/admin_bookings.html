@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -67,7 +67,7 @@
       </div>
       <div class="d-flex gap-3">
         <input type="text" id="bookingSearch" class="form-control search-control" style="width: 350px;"
-          placeholder="Filter by ID, Trader, or Status...">
+          placeholder="Filter by ID, Seller, or Status...">
         <button class="btn btn-white border fw-800" onclick="printTable()"><i class="fa fa-print me-2"></i>Export
           PDF</button>
       </div>
@@ -98,8 +98,8 @@
               </td>
               <td>
                 <div class="d-flex flex-column gap-1">
-                  <span class="small fw-800 text-dark">T: {{ b[1] }}</span>
-                  <span class="small fw-800 text-muted">M: {{ b[2] }}</span>
+                  <span class="small fw-800 text-dark">S: {{ b[1] }}</span>
+                  <span class="small fw-800 text-muted">B: {{ b[2] }}</span>
                 </div>
               </td>
               <td>
