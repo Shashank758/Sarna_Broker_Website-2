@@ -89,11 +89,12 @@
           <tbody>
             {% for b in bookings %}
             {% set invs = invoices_map.get(b[0]) if invoices_map else [] %}
-            <tr class="booking-row" data-search="{{ (b[11]|string + ' ' + b[1] + ' ' + b[2] + ' ' + b[3])|lower }}">
+            <tr class="booking-row"
+              data-search="{{ (b[11]|string + ' ' + b[1]|string + ' ' + b[2]|string + ' ' + b[3]|string)|lower }}">
               <td>
                 <div class="fw-800 text-primary mb-1">{{ b[11] if b[11] else 'N/A' }}</div>
-                <div class="small text-muted fw-600">{{ b[9].strftime('%d %b %Y') if b[9] else (b[15].strftime('%d %b
-                  %Y') if b[15] else 'N/A') }}</div>
+                <div class="small text-muted fw-600">{{ b[9].strftime('%d %b %Y') if b[9] and b[9].strftime else
+                  (b[15].strftime('%d %b %Y') if b[15] and b[15].strftime else 'N/A') }}</div>
               </td>
               <td>
                 <div class="d-flex flex-column gap-1">
