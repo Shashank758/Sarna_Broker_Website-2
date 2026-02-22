@@ -27,6 +27,80 @@
             </div>
         </div>
 
+        <!-- ═══ Filter Bar ═══ -->
+        <div class="logs-card mb-4"
+            style="background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%); border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px;">
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <i class="fa fa-filter text-primary"></i>
+                <h6 class="fw-800 text-dark mb-0">Filter &amp; Search Logs</h6>
+                <span class="badge bg-primary-subtle text-primary fw-800 ms-auto" id="matchCount"></span>
+            </div>
+
+            <!-- Global Search -->
+            <div class="position-relative mb-3">
+                <i class="fa fa-search position-absolute text-muted"
+                    style="left: 14px; top: 50%; transform: translateY(-50%); font-size: 0.85rem;"></i>
+                <input type="text" id="globalSearch" class="form-control fw-600"
+                    placeholder="Search by ID, name, role, action, reference, details…"
+                    style="padding-left: 40px; border-radius: 12px; border: 1.5px solid #d0d7e3; height: 46px; font-size: 0.9rem; background: #fff; transition: border-color .2s, box-shadow .2s;"
+                    onfocus="this.style.borderColor='#6366f1'; this.style.boxShadow='0 0 0 3px rgba(99,102,241,.12)'"
+                    onblur="this.style.borderColor='#d0d7e3'; this.style.boxShadow='none'">
+            </div>
+
+            <!-- Row of column filters -->
+            <div class="row g-2 align-items-end">
+                <!-- Identity Filter -->
+                <div class="col-md-3 col-sm-6">
+                    <label class="form-label small fw-800 text-muted mb-1"><i
+                            class="fa fa-user me-1"></i>Identity</label>
+                    <select id="filterIdentity" class="form-select fw-600"
+                        style="border-radius: 10px; border: 1.5px solid #d0d7e3; height: 42px; font-size: 0.85rem; background: #fff;">
+                        <option value="">All Users</option>
+                    </select>
+                </div>
+                <!-- Role Filter -->
+                <div class="col-md-2 col-sm-6">
+                    <label class="form-label small fw-800 text-muted mb-1"><i
+                            class="fa fa-id-badge me-1"></i>Role</label>
+                    <select id="filterRole" class="form-select fw-600"
+                        style="border-radius: 10px; border: 1.5px solid #d0d7e3; height: 42px; font-size: 0.85rem; background: #fff;">
+                        <option value="">All Roles</option>
+                    </select>
+                </div>
+                <!-- Action Filter -->
+                <div class="col-md-2 col-sm-6">
+                    <label class="form-label small fw-800 text-muted mb-1"><i class="fa fa-bolt me-1"></i>Action</label>
+                    <select id="filterAction" class="form-select fw-600"
+                        style="border-radius: 10px; border: 1.5px solid #d0d7e3; height: 42px; font-size: 0.85rem; background: #fff;">
+                        <option value="">All Actions</option>
+                    </select>
+                </div>
+                <!-- Date From -->
+                <div class="col-md-2 col-sm-6">
+                    <label class="form-label small fw-800 text-muted mb-1"><i
+                            class="fa fa-calendar me-1"></i>From</label>
+                    <input type="date" id="filterDateFrom" class="form-control fw-600"
+                        style="border-radius: 10px; border: 1.5px solid #d0d7e3; height: 42px; font-size: 0.85rem; background: #fff;">
+                </div>
+                <!-- Date To -->
+                <div class="col-md-2 col-sm-6">
+                    <label class="form-label small fw-800 text-muted mb-1"><i
+                            class="fa fa-calendar-check me-1"></i>To</label>
+                    <input type="date" id="filterDateTo" class="form-control fw-600"
+                        style="border-radius: 10px; border: 1.5px solid #d0d7e3; height: 42px; font-size: 0.85rem; background: #fff;">
+                </div>
+                <!-- Clear Button -->
+                <div class="col-md-1 col-sm-6 d-grid">
+                    <label class="form-label small fw-800 text-muted mb-1">&nbsp;</label>
+                    <button class="btn btn-outline-danger fw-800" id="clearFilters"
+                        style="border-radius: 10px; height: 42px; font-size: 0.8rem;" title="Clear all filters">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ Logs Table ═══ -->
         <div class="logs-card">
             <div class="table-responsive">
                 <table class="table table-enterprise m-0" id="logsTable">
@@ -42,7 +116,8 @@
                     </thead>
                     <tbody>
                         {% for log in logs %}
-                        <tr>
+                        <tr data-identity="{{ log[1] }}" data-role="{{ log[2]|upper }}" data-action="{{ log[3] }}"
+                            data-date="{{ log[6].strftime('%Y-%m-%d') }}">
                             <td><span class="text-muted small fw-800">#{{ log[0] }}</span></td>
                             <td>
                                 <div class="fw-800 text-dark">{{ log[1] }}</div>
@@ -61,7 +136,7 @@
                             </td>
                         </tr>
                         {% else %}
-                        <tr>
+                        <tr id="emptyRow">
                             <td colspan="6" class="text-center py-5">
                                 <i class="fa fa-shield-halved text-muted opacity-25 fs-1 mb-3"></i>
                                 <h5 class="fw-800 text-muted">No Integrity Violations</h5>
@@ -71,6 +146,12 @@
                         {% endfor %}
                     </tbody>
                 </table>
+            </div>
+            <!-- No results row (hidden by default) -->
+            <div id="noResults" class="text-center py-5" style="display:none;">
+                <i class="fa fa-search text-muted opacity-25 fs-1 mb-3"></i>
+                <h5 class="fw-800 text-muted">No Matching Logs</h5>
+                <p class="text-muted fw-600">Try adjusting your filters or search query.</p>
             </div>
         </div>
     </main>
@@ -82,6 +163,104 @@
             let wb = XLSX.utils.table_to_book(table, { sheet: "Audit Logs" });
             XLSX.writeFile(wb, filename);
         }
+
+        // ─── Filter Logic ───
+        (function () {
+            const rows = document.querySelectorAll('#logsTable tbody tr[data-identity]');
+            const globalSearch = document.getElementById('globalSearch');
+            const filterIdentity = document.getElementById('filterIdentity');
+            const filterRole = document.getElementById('filterRole');
+            const filterAction = document.getElementById('filterAction');
+            const filterDateFrom = document.getElementById('filterDateFrom');
+            const filterDateTo = document.getElementById('filterDateTo');
+            const clearBtn = document.getElementById('clearFilters');
+            const matchCount = document.getElementById('matchCount');
+            const noResults = document.getElementById('noResults');
+
+            // Populate dropdown options from table data
+            const identities = new Set();
+            const roles = new Set();
+            const actions = new Set();
+            rows.forEach(r => {
+                identities.add(r.dataset.identity);
+                roles.add(r.dataset.role);
+                actions.add(r.dataset.action);
+            });
+            [...identities].sort().forEach(v => {
+                filterIdentity.innerHTML += `<option value="${v}">${v}</option>`;
+            });
+            [...roles].sort().forEach(v => {
+                filterRole.innerHTML += `<option value="${v}">${v}</option>`;
+            });
+            [...actions].sort().forEach(v => {
+                filterAction.innerHTML += `<option value="${v}">${v}</option>`;
+            });
+
+            function applyFilters() {
+                const query = globalSearch.value.toLowerCase().trim();
+                const selIdentity = filterIdentity.value;
+                const selRole = filterRole.value;
+                const selAction = filterAction.value;
+                const dateFrom = filterDateFrom.value;
+                const dateTo = filterDateTo.value;
+                let visible = 0;
+
+                rows.forEach(row => {
+                    let show = true;
+
+                    // Global text search across all cells
+                    if (query) {
+                        const text = row.textContent.toLowerCase();
+                        if (!text.includes(query)) show = false;
+                    }
+
+                    // Column filters
+                    if (selIdentity && row.dataset.identity !== selIdentity) show = false;
+                    if (selRole && row.dataset.role !== selRole) show = false;
+                    if (selAction && row.dataset.action !== selAction) show = false;
+
+                    // Date range
+                    if (dateFrom && row.dataset.date < dateFrom) show = false;
+                    if (dateTo && row.dataset.date > dateTo) show = false;
+
+                    row.style.display = show ? '' : 'none';
+                    if (show) visible++;
+                });
+
+                // Update count badge
+                if (query || selIdentity || selRole || selAction || dateFrom || dateTo) {
+                    matchCount.textContent = visible + ' of ' + rows.length + ' logs';
+                    matchCount.style.display = '';
+                } else {
+                    matchCount.textContent = rows.length + ' total logs';
+                    matchCount.style.display = '';
+                }
+
+                // Show/hide no-results message
+                noResults.style.display = (visible === 0 && rows.length > 0) ? '' : 'none';
+            }
+
+            // Attach events
+            globalSearch.addEventListener('input', applyFilters);
+            filterIdentity.addEventListener('change', applyFilters);
+            filterRole.addEventListener('change', applyFilters);
+            filterAction.addEventListener('change', applyFilters);
+            filterDateFrom.addEventListener('change', applyFilters);
+            filterDateTo.addEventListener('change', applyFilters);
+
+            clearBtn.addEventListener('click', function () {
+                globalSearch.value = '';
+                filterIdentity.value = '';
+                filterRole.value = '';
+                filterAction.value = '';
+                filterDateFrom.value = '';
+                filterDateTo.value = '';
+                applyFilters();
+            });
+
+            // Initial count
+            applyFilters();
+        })();
     </script>
 </body>
 
