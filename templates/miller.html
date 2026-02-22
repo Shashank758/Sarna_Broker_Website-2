@@ -143,9 +143,9 @@
     <div class="d-flex justify-content-center mb-4" data-aos="zoom-in">
       <div class="nav-pills-premium nav nav-pills" id="millerTabs" role="tablist">
         <button class="nav-link active" id="stock-tab" data-bs-toggle="pill" data-bs-target="#stock" type="button"
-          role="tab">Live Stock</button>
+          role="tab">Live Rate</button>
         <button class="nav-link" id="requests-tab" data-bs-toggle="pill" data-bs-target="#requests" type="button"
-          role="tab">New Orders</button>
+          role="tab">Order Request</button>
         <button class="nav-link" id="loading-tab" data-bs-toggle="pill" data-bs-target="#loading" type="button"
           role="tab">Active Loads</button>
         <button class="nav-link" id="qc-tab" data-bs-toggle="pill" data-bs-target="#qc" type="button" role="tab">Quality
@@ -195,7 +195,7 @@
     <div class="col-md-3">
       <div class="stat-card-miller">
         <div class="d-flex justify-content-between mb-3">
-          <div class="text-success fw-800 small text-uppercase">Total Settled</div>
+          <div class="text-success fw-800 small text-uppercase">Complete Order</div>
           <i class="fa fa-circle-check text-success opacity-25"></i>
         </div>
         <div class="fs-2 fw-800">{{ payment_completed|length }}</div>
@@ -225,7 +225,7 @@
           <thead>
             <tr>
               <th>Commodity</th>
-              <th>Current Inventory</th>
+              <th>Booking Quantity</th>
               <th>Live Price</th>
               <th>Remark</th>
               <th>Wt. Deduction</th>
