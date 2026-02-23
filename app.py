@@ -3866,7 +3866,8 @@ ORDER BY mb.created_at DESC
     # Fetch Buyer Details for Header
     user_id = session.get("user_id")
     cur.execute("""
-        SELECT u.name, bp.address, bp.city, bp.state 
+        SELECT COALESCE(bp.shop_name, u.name) AS display_name,
+               bp.address, bp.city, bp.state 
         FROM users u 
         LEFT JOIN buyer_profiles bp ON u.id = bp.buyer_id 
         WHERE u.id = %s
