@@ -83,8 +83,14 @@
 <section class="hisab-hero">
   <div class="container text-center">
     <h2 class="fw-800 text-white mb-2" data-aos="fade-up">Trade Settlement</h2>
+    <h5 class="text-white fw-700 mb-1" data-aos="fade-up" data-aos-delay="50">{{ miller_name }}</h5>
+    {% if miller_address %}
+    <p class="text-white opacity-75 fw-600 mb-5" data-aos="fade-up" data-aos-delay="100"><i
+        class="fa fa-map-marker-alt me-2"></i>{{ miller_address }}</p>
+    {% else %}
     <p class="text-white opacity-75 fw-600 mb-5" data-aos="fade-up" data-aos-delay="100">Finalize trade hisab and
       reconcile payments for industrial shipments.</p>
+    {% endif %}
 
     <div class="d-flex justify-content-center" data-aos="fade-up" data-aos-delay="200">
       <input type="text" id="hisabSearch" class="search-enterprise" placeholder="Search Order, Buyer, or Truck..."

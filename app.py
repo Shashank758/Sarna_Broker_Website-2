@@ -642,6 +642,28 @@ def inject_pending_counts():
         counts['buyer_active_orders'] = b_active
         counts['buyer_total_pending'] = b_req + b_active
 
+        # --- MILLER PROFILE (name + address for hero sections) ---
+        if session.get("role") == "miller":
+            cur.execute("SELECT mill_name, address FROM miller_profiles WHERE miller_id=%s", (miller_id,))
+            mp = cur.fetchone()
+            if mp:
+                counts['miller_name'] = mp[0] or session.get("name", "Miller Login")
+                counts['miller_address'] = mp[1]
+            else:
+                counts['miller_name'] = session.get("name", "Miller Login")
+                counts['miller_address'] = None
+
+        # --- BUYER PROFILE (name + address for hero sections) ---
+        if session.get("role") == "buyer":
+            cur.execute("SELECT shop_name, address FROM buyer_profiles WHERE buyer_id=%s", (buyer_id,))
+            bp = cur.fetchone()
+            if bp:
+                counts['buyer_name'] = bp[0] or session.get("name", "Buyer")
+                counts['buyer_address'] = bp[1]
+            else:
+                counts['buyer_name'] = session.get("name", "Buyer")
+                counts['buyer_address'] = None
+
         con.close()
     except Exception as e:
         logger.error(f"Error in context processor: {e}")
