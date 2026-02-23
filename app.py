@@ -1614,7 +1614,55 @@ def switch_role(target_role):
     # Security: Only allow switching between miller and buyer
     if current_role in ["miller", "buyer"] and target_role in ["miller", "buyer"]:
         session["role"] = target_role
-        
+
+        # Auto-create target profile if missing, copying from existing profile
+        user_id = session.get("user_id")
+        try:
+            con = get_db()
+            cur = con.cursor()
+
+            if target_role == "buyer":
+                cur.execute("SELECT id FROM buyer_profiles WHERE buyer_id=%s", (user_id,))
+                if not cur.fetchone():
+                    # Copy from miller profile if available
+                    cur.execute("SELECT mill_name, owner_name, owner_phone, address, city, state FROM miller_profiles WHERE miller_id=%s", (user_id,))
+                    mp = cur.fetchone()
+                    if mp:
+                        cur.execute("""INSERT INTO buyer_profiles (buyer_id, shop_name, owner_name, phone, address, city, state)
+                                      VALUES (%s,%s,%s,%s,%s,%s,%s)""",
+                                   (user_id, mp[0], mp[1], mp[2], mp[3], mp[4], mp[5]))
+                    else:
+                        cur.execute("SELECT name FROM users WHERE id=%s", (user_id,))
+                        u = cur.fetchone()
+                        uname = u[0] if u else ''
+                        cur.execute("""INSERT INTO buyer_profiles (buyer_id, shop_name, owner_name)
+                                      VALUES (%s,%s,%s)""",
+                                   (user_id, uname, uname))
+                    con.commit()
+
+            elif target_role == "miller":
+                cur.execute("SELECT id FROM miller_profiles WHERE miller_id=%s", (user_id,))
+                if not cur.fetchone():
+                    # Copy from buyer profile if available
+                    cur.execute("SELECT shop_name, owner_name, phone, address, city, state FROM buyer_profiles WHERE buyer_id=%s", (user_id,))
+                    bp = cur.fetchone()
+                    if bp:
+                        cur.execute("""INSERT INTO miller_profiles (miller_id, mill_name, owner_name, owner_phone, address, city, state)
+                                      VALUES (%s,%s,%s,%s,%s,%s,%s)""",
+                                   (user_id, bp[0], bp[1], bp[2], bp[3], bp[4], bp[5]))
+                    else:
+                        cur.execute("SELECT name FROM users WHERE id=%s", (user_id,))
+                        u = cur.fetchone()
+                        uname = u[0] if u else ''
+                        cur.execute("""INSERT INTO miller_profiles (miller_id, mill_name, owner_name)
+                                      VALUES (%s,%s,%s)""",
+                                   (user_id, uname, uname))
+                    con.commit()
+
+            con.close()
+        except Exception as e:
+            logger.error(f"Error auto-creating profile on role switch: {e}")
+
         if target_role == "buyer":
             return redirect("/market")
         elif target_role == "miller":
@@ -1995,6 +2043,8 @@ def miller_profile_page():
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, (miller_id, owner_name, mill_name, owner_phone, accountant_phone, staff_phone, address, city, state, gst_filename, mandi_filename, other_filename, gst_number, mandi_number))
             
+        # Sync name to users table so it reflects everywhere
+        cur.execute("UPDATE users SET name=%s WHERE id=%s", (mill_name, miller_id))
         con.commit()
         flash("Profile updated successfully", "success")
         log_activity("Profile Updated", miller_id, "Miller Profile Updated")
@@ -3251,6 +3301,8 @@ def buyer_profile():
                 gst_number, mandi_number
             ))
 
+        # Sync name to users table so it reflects everywhere
+        cur.execute("UPDATE users SET name=%s WHERE id=%s", (shop_name, session["user_id"]))
         con.commit()
         log_activity("Profile Updated", session["user_id"], "Buyer Profile Updated", user_id=session["user_id"], role="buyer")
         con.close()
