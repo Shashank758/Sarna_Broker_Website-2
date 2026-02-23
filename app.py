@@ -1779,7 +1779,7 @@ def miller_dashboard():
     cur.execute("""
 SELECT
     mb.id,              -- 0 booking_id
-    u.name,             -- 1 buyer_name
+    COALESCE(bp.shop_name, u.name),  -- 1 buyer_name (from profile)
     ms.crop,            -- 2 crop
     mb.quantity,        -- 3 booked
     mb.status,          -- 4 booking_status
@@ -2080,7 +2080,7 @@ def miller_approved_page():
     cur.execute("""
         SELECT
             mb.id,              -- 0 booking_id
-            u.name,             -- 1 buyer
+            COALESCE(bp.shop_name, u.name), -- 1 buyer (from profile)
             ms.crop,            -- 2 crop
             mb.quantity,        -- 3 booked
             mb.status,          -- 4
@@ -2104,6 +2104,7 @@ def miller_approved_page():
         JOIN users u ON mb.buyer_id = u.id
         JOIN miller_stock ms ON mb.stock_id = ms.id
         LEFT JOIN payments p ON p.booking_id = mb.id
+        LEFT JOIN buyer_profiles bp ON u.id = bp.buyer_id
         WHERE
             ms.miller_id = %s
             AND mb.status = 'approved'
@@ -2264,7 +2265,7 @@ def miller_final_hisab_page():
     cur.execute("""
         SELECT
             mb.id,              -- 0 booking_id
-            u.name,             -- 1 buyer_name
+            COALESCE(bp.shop_name, u.name), -- 1 buyer_name (from profile)
             ms.crop,            -- 2 crop
             mb.quantity,        -- 3 booked
             mb.status,          -- 4 booking_status
@@ -2290,6 +2291,7 @@ def miller_final_hisab_page():
         JOIN users u ON mb.buyer_id = u.id
         JOIN miller_stock ms ON mb.stock_id = ms.id
         LEFT JOIN payments p ON p.booking_id = mb.id
+        LEFT JOIN buyer_profiles bp ON u.id = bp.buyer_id
         WHERE
             ms.miller_id = %s
         ORDER BY mb.created_at DESC
@@ -2560,7 +2562,7 @@ def miller_rejected_page():
     cur.execute("""
         SELECT
             mb.id,              -- 0 booking_id
-            u.name,             -- 1 buyer
+            COALESCE(bp.shop_name, u.name), -- 1 buyer (from profile)
             ms.crop,            -- 2 crop
             mb.quantity,        -- 3 qty
             mb.status,          -- 4
@@ -2573,6 +2575,7 @@ def miller_rejected_page():
         FROM miller_bookings mb
         JOIN users u ON mb.buyer_id = u.id
         JOIN miller_stock ms ON mb.stock_id = ms.id
+        LEFT JOIN buyer_profiles bp ON u.id = bp.buyer_id
         WHERE
             ms.miller_id = %s
             AND mb.status = 'declined'
@@ -2596,7 +2599,7 @@ def miller_payment_completed_page():
     cur.execute("""
         SELECT DISTINCT
             mb.id,              -- 0 booking_id
-            u.name,             -- 1 buyer
+            COALESCE(bp.shop_name, u.name), -- 1 buyer (from profile)
             ms.crop,            -- 2 crop
             mb.quantity,        -- 3 booked
             mb.status,          -- 4
@@ -2623,11 +2626,12 @@ def miller_payment_completed_page():
         JOIN miller_stock ms ON mb.stock_id = ms.id
         JOIN users u ON mb.buyer_id = u.id
         JOIN loading_invoices li ON li.booking_id = mb.id
+        LEFT JOIN buyer_profiles bp ON u.id = bp.buyer_id
         WHERE
             mb.stock_id IN (SELECT id FROM miller_stock WHERE miller_id=%s)
             AND li.payment_status='paid'
         GROUP BY
-            mb.id, u.name, ms.crop, mb.quantity, mb.status, mb.reason,
+            mb.id, u.name, bp.shop_name, ms.crop, mb.quantity, mb.status, mb.reason,
             mb.decision_at, mb.loaded_qty, mb.loading_status, mb.close_reason,
             mb.order_id, mb.qc_weight, mb.qc_moisture, mb.qc_remarks,
             mb.qc_status, mb.qc_at, COALESCE(mb.price, ms.price)
@@ -3703,7 +3707,7 @@ def market():
         miller_stock.deduction,    -- 7
         miller_stock.created_at,   -- 8
         miller_stock.status,       -- 9
-        users.name,                -- 10 (miller name)
+        COALESCE(mp.mill_name, users.name),  -- 10 (miller name from profile)
         miller_stock.note,         -- 11
         mp.address,                -- 12 (miller location)
         mp.city,                   -- 13
@@ -3742,12 +3746,13 @@ SELECT
     COALESCE(p.status,'pending') AS payment_status,  -- 17
     p.invoice_file              AS final_invoice,   -- 18
     p.paid_at                   AS payment_at,      -- 19
-    u.name                      AS miller_name,     -- 20
+    COALESCE(mp.mill_name, u.name)   AS miller_name,     -- 20 (from profile)
     mb.deadline_at                                  -- 21 (NEW)
 FROM miller_bookings mb
 JOIN miller_stock ms ON mb.stock_id = ms.id
 JOIN users u ON ms.miller_id = u.id
 LEFT JOIN payments p ON p.booking_id = mb.id
+LEFT JOIN miller_profiles mp ON u.id = mp.miller_id
 WHERE mb.buyer_id=%s
 ORDER BY mb.created_at DESC
 """, (session["user_id"],))
@@ -4029,7 +4034,7 @@ def get_miller_orders_by_type(filter_type):
         SELECT
             mb.id,                -- 0
             mb.order_id,          -- 1
-            u.name,               -- 2 buyer
+            COALESCE(bp.shop_name, u.name), -- 2 buyer (from profile)
             ms.crop,              -- 3
             mb.quantity,          -- 4 booked
             COALESCE(mb.loaded_qty,0), -- 5 loaded
@@ -4046,6 +4051,7 @@ def get_miller_orders_by_type(filter_type):
         JOIN miller_stock ms ON mb.stock_id = ms.id
         JOIN users u ON mb.buyer_id = u.id
         LEFT JOIN payments p ON p.booking_id = mb.id
+        LEFT JOIN buyer_profiles bp ON u.id = bp.buyer_id
         WHERE ms.miller_id=%s
         {where}
         ORDER BY mb.created_at DESC
@@ -4256,7 +4262,7 @@ def buyer_payments():
         (li.loaded_qty * COALESCE(mb.price, ms.price)) AS total_amount,
         li.final_invoice_file,
         li.payment_at,
-        u.name AS miller_name,
+        COALESCE(mp.mill_name, u.name) AS miller_name,
         li.truck_number,
         mp.city,
         mp.state
