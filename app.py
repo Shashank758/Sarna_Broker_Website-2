@@ -2544,9 +2544,9 @@ def miller_post_stock_page():
 
         # Create new stock entry
         cur.execute("""
-            INSERT INTO miller_stock (miller_id, crop, quantity, price, condition, bag_type, deduction, note, auto_approve_min_qty, duration, weight_deduction, payment_duration, extra_condition, moisture)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """, (miller_id, crop, qty, price, condition, bag_type, deduction, note, auto_approve_min_qty, duration, weight_deduction, payment_duration, extra_condition, moisture))
+            INSERT INTO miller_stock (miller_id, crop, quantity, price, condition, bag_type, deduction, note, auto_approve_min_qty, weight_deduction, payment_duration, extra_condition, moisture)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (miller_id, crop, qty, price, condition, bag_type, deduction, note, auto_approve_min_qty, weight_deduction, payment_duration, extra_condition, moisture))
         
         con.commit()
         con.close()
