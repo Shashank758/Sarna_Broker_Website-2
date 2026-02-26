@@ -232,7 +232,7 @@
               <th>Commodity</th>
               <th>Booking Quantity</th>
               <th>Price</th>
-              <th>Remark</th>
+              <th>Moisture</th>
               <th>Wt. Deduction</th>
               <th>Payment Duration</th>
               <th>Extra Condition</th>
@@ -265,8 +265,8 @@
                   </div>
                 </td>
                 <td>
-                  <input type="text" name="deduction" value="{{ s[7] }}" class="form-control enterprise-input-sm"
-                    style="max-width: 160px;" placeholder="Condition notes">
+                  <input type="text" name="moisture" value="{{ s[16] or '' }}" class="form-control enterprise-input-sm"
+                    style="max-width: 160px;" placeholder="Moisture %">
                 </td>
                 <td>
                   <input type="text" name="weight_deduction" value="{{ s[13] or '' }}"

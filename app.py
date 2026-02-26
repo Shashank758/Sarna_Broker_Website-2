@@ -1016,6 +1016,18 @@ def upgrade_miller_stock_new_fields():
     con.commit()
     con.close()
 
+def upgrade_miller_stock_moisture():
+    """Add moisture column to miller_stock."""
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name=%s", ("miller_stock",))
+    cols = [c[0] for c in cur.fetchall()]
+    if "moisture" not in cols:
+        cur.execute("ALTER TABLE miller_stock ADD COLUMN moisture TEXT")
+        print("✅ Added moisture to miller_stock")
+    con.commit()
+    con.close()
+
 
 
 def upgrade_miller_booking_price():
@@ -1133,6 +1145,7 @@ def run_migrations():
         upgrade_miller_stock_reserved_qty()
         upgrade_miller_stock_note()
         upgrade_miller_stock_new_fields()
+        upgrade_miller_stock_moisture()
         
         # Buyer Profile
         upgrade_buyer_profile_table()
@@ -1768,7 +1781,7 @@ def miller_dashboard():
     cur.execute("""
     SELECT 
         id, miller_id, crop, quantity, price, condition, bag_type, deduction, created_at, status, note, reserved_qty, auto_approve_min_qty,
-        weight_deduction, payment_duration, extra_condition
+        weight_deduction, payment_duration, extra_condition, moisture
     FROM miller_stock
     WHERE miller_id=%s
     ORDER BY created_at DESC
@@ -2513,7 +2526,8 @@ def miller_post_stock_page():
         
         # Defaults for removed fields
         bag_type = "Standard" 
-        deduction = request.form.get("deduction", "")
+        deduction = ""  # Condition Note removed
+        moisture = request.form.get("moisture", "")
         note = ""
         auto_approve_min_qty = 0
         
@@ -2530,21 +2544,17 @@ def miller_post_stock_page():
 
         # Create new stock entry
         cur.execute("""
-            INSERT INTO miller_stock (miller_id, crop, quantity, price, condition, bag_type, deduction, note, auto_approve_min_qty, duration, weight_deduction, payment_duration, extra_condition)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """, (miller_id, crop, qty, price, condition, bag_type, deduction, note, auto_approve_min_qty, duration, weight_deduction, payment_duration, extra_condition))
+            INSERT INTO miller_stock (miller_id, crop, quantity, price, condition, bag_type, deduction, note, auto_approve_min_qty, duration, weight_deduction, payment_duration, extra_condition, moisture)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (miller_id, crop, qty, price, condition, bag_type, deduction, note, auto_approve_min_qty, duration, weight_deduction, payment_duration, extra_condition, moisture))
         
         con.commit()
         con.close()
         flash("Stock posted successfully!", "success")
         return redirect("/miller")
 
-    # Fetch deduction options for the form
-    cur.execute("SELECT * FROM miller_deduction_options WHERE miller_id=%s ORDER BY created_at DESC", (miller_id,))
-    deduction_options = cur.fetchall()
-    
     con.close()
-    return render_template("post_stock.html", deduction_options=deduction_options)
+    return render_template("post_stock.html")
 
 
 
@@ -3587,7 +3597,8 @@ def update_miller_stock(id):
 
     new_price = request.form["price"]
     new_qty = request.form["quantity"]
-    deduction = request.form["deduction"]
+    deduction = request.form.get("deduction", "")
+    moisture = request.form.get("moisture", "")
     weight_deduction = request.form.get("weight_deduction", "")
     payment_duration = request.form.get("payment_duration", "")
     extra_condition = request.form.get("extra_condition", "")
@@ -3614,6 +3625,7 @@ def update_miller_stock(id):
             weight_deduction=%s,
             payment_duration=%s,
             extra_condition=%s,
+            moisture=%s,
             status='open'
         WHERE id=%s AND miller_id=%s
     """, (
@@ -3623,6 +3635,7 @@ def update_miller_stock(id):
         weight_deduction,
         payment_duration,
         extra_condition,
+        moisture,
         id,
         get_effective_user_id()
     ))
@@ -3715,7 +3728,8 @@ def market():
         mp.pincode,                -- 15
         miller_stock.weight_deduction,  -- 16
         miller_stock.payment_duration,  -- 17
-        miller_stock.extra_condition    -- 18
+        miller_stock.extra_condition,   -- 18
+        miller_stock.moisture           -- 19
     FROM miller_stock
     JOIN users ON miller_stock.miller_id = users.id
     LEFT JOIN miller_profiles mp ON users.id = mp.miller_id
@@ -5053,7 +5067,8 @@ def admin_stock():
         miller_stock.condition, miller_stock.bag_type, miller_stock.deduction, miller_stock.created_at, 
         miller_stock.status, miller_stock.note, miller_stock.reserved_qty, miller_stock.auto_approve_min_qty, 
         users.name,
-        miller_stock.weight_deduction, miller_stock.payment_duration, miller_stock.extra_condition
+        miller_stock.weight_deduction, miller_stock.payment_duration, miller_stock.extra_condition,
+        miller_stock.moisture
     FROM miller_stock
     JOIN users ON miller_stock.miller_id = users.id
     ORDER BY miller_stock.created_at DESC
@@ -5268,26 +5283,26 @@ def admin_migrate_db():
         return f"Migration failed: {e}"
 
 
-@app.route("/admin/update_deduction/<int:stock_id>", methods=["POST"])
-def admin_update_deduction(stock_id):
+@app.route("/admin/update_moisture/<int:stock_id>", methods=["POST"])
+def admin_update_moisture(stock_id):
     if session.get("role") != "admin":
         return redirect("/")
 
-    deduction = request.form.get("deduction", 0)
+    moisture = request.form.get("moisture", "")
 
     con = get_db()
     cur = con.cursor()
 
     cur.execute("""
         UPDATE miller_stock
-        SET deduction=%s
+        SET moisture=%s
         WHERE id=%s
-    """, (deduction, stock_id))
+    """, (moisture, stock_id))
 
     con.commit()
     con.close()
 
-    log_activity("update_deduction", stock_id, f"Stock {stock_id} deduction updated to {deduction}")
+    log_activity("update_moisture", stock_id, f"Stock {stock_id} moisture updated to {moisture}")
     return redirect("/admin/stock")
     
 @app.route("/admin/approve_user/<int:id>")

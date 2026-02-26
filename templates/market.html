@@ -375,7 +375,9 @@
                                 <span class="detail-chip">Qty: <span class="chip-val">{{ stock[3] }} Qt</span></span>
                                 <span class="detail-chip"><i class="fa fa-location-dot me-1"></i><span
                                         class="chip-val">{{ stock[13] }}, {{ stock[14] }}</span></span>
-                                <span class="detail-chip">{{ stock[5] }}</span>
+                                {% if stock[19] %}<span class="detail-chip"><i
+                                        class="fa fa-tint me-1 text-info"></i>Mst: <span class="chip-val">{{
+                                        stock[19] }}</span></span>{% endif %}
                                 {% if stock[16] %}<span class="detail-chip"><i
                                         class="fa fa-balance-scale me-1 text-warning"></i>Wt: <span class="chip-val">{{
                                         stock[16] }}</span></span>{% endif %}
