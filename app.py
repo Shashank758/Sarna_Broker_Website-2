@@ -1028,6 +1028,17 @@ def upgrade_miller_stock_moisture():
     con.commit()
     con.close()
 
+def upgrade_miller_stock_duration():
+    """Add duration column to miller_stock."""
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name=%s", ("miller_stock",))
+    cols = [c[0] for c in cur.fetchall()]
+    if "duration" not in cols:
+        cur.execute("ALTER TABLE miller_stock ADD COLUMN duration INTEGER")
+        print("✅ Added duration to miller_stock")
+    con.commit()
+    con.close()
 
 
 def upgrade_miller_booking_price():
@@ -1146,6 +1157,7 @@ def run_migrations():
         upgrade_miller_stock_note()
         upgrade_miller_stock_new_fields()
         upgrade_miller_stock_moisture()
+        upgrade_miller_stock_duration()
         
         # Buyer Profile
         upgrade_buyer_profile_table()
@@ -1781,7 +1793,7 @@ def miller_dashboard():
     cur.execute("""
     SELECT 
         id, miller_id, crop, quantity, price, condition, bag_type, deduction, created_at, status, note, reserved_qty, auto_approve_min_qty,
-        weight_deduction, payment_duration, extra_condition, moisture
+        weight_deduction, payment_duration, extra_condition, moisture, duration
     FROM miller_stock
     WHERE miller_id=%s
     ORDER BY created_at DESC
@@ -2544,9 +2556,9 @@ def miller_post_stock_page():
 
         # Create new stock entry
         cur.execute("""
-            INSERT INTO miller_stock (miller_id, crop, quantity, price, condition, bag_type, deduction, note, auto_approve_min_qty, weight_deduction, payment_duration, extra_condition, moisture)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """, (miller_id, crop, qty, price, condition, bag_type, deduction, note, auto_approve_min_qty, weight_deduction, payment_duration, extra_condition, moisture))
+            INSERT INTO miller_stock (miller_id, crop, quantity, price, condition, bag_type, deduction, note, auto_approve_min_qty, weight_deduction, payment_duration, extra_condition, moisture, duration)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (miller_id, crop, qty, price, condition, bag_type, deduction, note, auto_approve_min_qty, weight_deduction, payment_duration, extra_condition, moisture, duration))
         
         con.commit()
         con.close()
@@ -3626,6 +3638,7 @@ def update_miller_stock(id):
             payment_duration=%s,
             extra_condition=%s,
             moisture=%s,
+            duration=%s,
             status='open'
         WHERE id=%s AND miller_id=%s
     """, (
@@ -3636,6 +3649,7 @@ def update_miller_stock(id):
         payment_duration,
         extra_condition,
         moisture,
+        request.form.get("duration", type=int),
         id,
         get_effective_user_id()
     ))

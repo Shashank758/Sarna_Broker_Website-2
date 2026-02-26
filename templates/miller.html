@@ -234,6 +234,7 @@
               <th>Price</th>
               <th>Moisture</th>
               <th>Wt. Deduction</th>
+              <th>Delivery Duration</th>
               <th>Payment Duration</th>
               <th>Extra Condition</th>
               <th class="text-end">Actions</th>
@@ -271,6 +272,10 @@
                 <td>
                   <input type="text" name="weight_deduction" value="{{ s[13] or '' }}"
                     class="form-control enterprise-input-sm" style="max-width: 140px;" placeholder="Wt. deduction">
+                </td>
+                <td>
+                  <input type="number" name="duration" value="{{ s[17] or '' }}"
+                    class="form-control enterprise-input-sm" style="max-width: 130px;" placeholder="Delivery days">
                 </td>
                 <td>
                   <input type="text" name="payment_duration" value="{{ s[14] or '' }}"
