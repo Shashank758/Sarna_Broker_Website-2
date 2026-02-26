@@ -2526,7 +2526,7 @@ def miller_post_stock_page():
         
         # Defaults for removed fields
         bag_type = "Standard" 
-        deduction = ""  # Condition Note removed
+        deduction = 0  # Condition Note removed, must be integer
         moisture = request.form.get("moisture", "")
         note = ""
         auto_approve_min_qty = 0
