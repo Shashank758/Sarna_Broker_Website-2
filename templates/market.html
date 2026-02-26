@@ -343,12 +343,36 @@
     <div class="tab-content mt-4" id="marketTabsContent">
         <!-- LIVE RATES TAB -->
         <div class="tab-pane fade show active" id="live-rates" role="tabpanel">
-            <div class="mb-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
                 <input type="text" id="marketSearch" class="form-control"
                     style="max-width: 400px; border-radius: 12px; padding: 12px 20px; font-weight: 600; border: 1px solid var(--border);"
                     placeholder="🔍 Search by crop, Buyer, city, address..."
                     oninput="universalSearch('marketSearch', '#stockCardsContainer', '.col-12')">
+
+                <!-- Location Filter -->
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary fw-700 px-4 py-2 bg-white" type="button"
+                        data-bs-toggle="dropdown" aria-expanded="false"
+                        style="border-radius: 12px; border: 2px solid var(--primary-light);">
+                        <i class="fa fa-location-dot me-2"></i>
+                        {% if location_filter == 'my' and buyer_city %}
+                        Showing: {{ buyer_city }}
+                        {% else %}
+                        Showing: All Locations
+                        {% endif %}
+                        <i class="fa fa-chevron-down ms-2 small"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2" style="border-radius: 12px;">
+                        {% if buyer_city %}
+                        <li><a class="dropdown-item py-2 fw-600 {% if location_filter == 'my' %}active text-white bg-primary{% endif %}"
+                                href="?location=my">My Location ({{ buyer_city }})</a></li>
+                        {% endif %}
+                        <li><a class="dropdown-item py-2 fw-600 {% if location_filter == 'all' %}active text-white bg-primary{% endif %}"
+                                href="?location=all">All Locations</a></li>
+                    </ul>
+                </div>
             </div>
+
             <div class="d-flex flex-column gap-3" id="stockCardsContainer">
                 {% if miller_stocks %}
                 {% for stock in miller_stocks %}
@@ -474,9 +498,15 @@
                     <div class="empty-state-visual mb-4">
                         <i class="fa fa-store-slash text-muted fs-1 opacity-25"></i>
                     </div>
+                    {% if location_filter == 'my' and buyer_city %}
+                    <h3 class="fw-800 text-muted">No Live Stocks in {{ buyer_city }}</h3>
+                    <p class="text-muted mb-4">Currently, there are no live stocks listed by millers in your area.</p>
+                    <a href="?location=all" class="btn btn-primary rounded-pill px-4 fw-700">View All Locations</a>
+                    {% else %}
                     <h3 class="fw-800 text-muted">No Live Market Rates</h3>
-                    <p class="text-muted">Currently, there are no live stocks listed by buyers. Please check back
+                    <p class="text-muted">Currently, there are no live stocks listed by millers. Please check back
                         later.</p>
+                    {% endif %}
                 </div>
                 {% endif %}
             </div>

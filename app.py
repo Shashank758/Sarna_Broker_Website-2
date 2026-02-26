@@ -3708,7 +3708,29 @@ def market():
     con = get_db()
     cur = con.cursor()
 
+    # Fetch Buyer Details for Header and Filtering
+    user_id = session.get("user_id")
     cur.execute("""
+        SELECT COALESCE(bp.shop_name, u.name) AS display_name,
+               bp.address, bp.city, bp.state 
+        FROM users u 
+        LEFT JOIN buyer_profiles bp ON u.id = bp.buyer_id 
+        WHERE u.id = %s
+    """, (user_id,))
+    buyer_info = cur.fetchone()
+    buyer_name = buyer_info[0] if buyer_info else "Trader"
+    buyer_address = f"{buyer_info[1]}, {buyer_info[2]}" if buyer_info and buyer_info[1] else "Address not set"
+    buyer_city = buyer_info[2] if buyer_info else None
+
+    # Handle Location Filter
+    location_filter = request.args.get('location', 'my')
+    
+    # If filter is 'my' but buyer has no city set, default to 'all'
+    if location_filter == 'my' and not buyer_city:
+        location_filter = 'all'
+
+    # Build the miller_stock query dynamically based on filter
+    miller_stock_query = """
     SELECT 
         miller_stock.id,           -- 0
         miller_stock.miller_id,    -- 1
@@ -3734,8 +3756,16 @@ def market():
     JOIN users ON miller_stock.miller_id = users.id
     LEFT JOIN miller_profiles mp ON users.id = mp.miller_id
     WHERE miller_stock.status = 'open' AND miller_stock.quantity > 0
-    ORDER BY miller_stock.created_at DESC
-    """)
+    """
+    
+    query_params = []
+    if location_filter == 'my' and buyer_city:
+        miller_stock_query += " AND LOWER(mp.city) = LOWER(%s)"
+        query_params.append(buyer_city)
+        
+    miller_stock_query += " ORDER BY miller_stock.created_at DESC"
+    
+    cur.execute(miller_stock_query, tuple(query_params))
     miller_stocks = cur.fetchall()
 
     cur.execute("""
@@ -3872,28 +3902,20 @@ ORDER BY mb.created_at DESC
     total_loaded = sum(b[3] or 0 for b in active_bookings)
     total_remaining = sum(b[4] or 0 for b in active_bookings)
 
-    # Fetch all crops for market
-    cur.execute("""
+    # Fetch all crops for market (farmer listings) -> Can also filter this if needed, but skipping for now or apply same?
+    crops_query = """
     SELECT crops.*, users.name
     FROM crops
     JOIN users ON crops.farmer_id = users.id
     WHERE crops.sold = 0
-    ORDER BY crops.id DESC
-    """)
+    """
+    # If we want to filter crops too (since farmer location is usually just text "location" not structured, it's harder, but we can try)
+    if location_filter == 'my' and buyer_city:
+        crops_query += " AND LOWER(crops.location) LIKE LOWER(%s)"
+        cur.execute(crops_query + " ORDER BY crops.id DESC", (f"%{buyer_city}%",))
+    else:
+        cur.execute(crops_query + " ORDER BY crops.id DESC")
     crops = cur.fetchall()
-
-    # Fetch Buyer Details for Header
-    user_id = session.get("user_id")
-    cur.execute("""
-        SELECT COALESCE(bp.shop_name, u.name) AS display_name,
-               bp.address, bp.city, bp.state 
-        FROM users u 
-        LEFT JOIN buyer_profiles bp ON u.id = bp.buyer_id 
-        WHERE u.id = %s
-    """, (user_id,))
-    buyer_info = cur.fetchone()
-    buyer_name = buyer_info[0] if buyer_info else "Trader"
-    buyer_address = f"{buyer_info[1]}, {buyer_info[2]}" if buyer_info and buyer_info[1] else "Address not set"
 
     con.close()
     
@@ -3913,7 +3935,9 @@ ORDER BY mb.created_at DESC
         debit_note_invoices=debit_notes_list,
         paid_invoices=payments_list,
         buyer_name=buyer_name,
-        buyer_address=buyer_address
+        buyer_address=buyer_address,
+        buyer_city=buyer_city,
+        location_filter=location_filter
     )
 # ================= BUYER ORDER PAGES =================
 
