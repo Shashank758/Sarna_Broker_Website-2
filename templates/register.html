@@ -516,6 +516,16 @@
               </div>
             </div>
 
+            <!-- Locality Dropdown (Dynamic) -->
+            <div id="localityWrapper" class="row mb-2" style="display: none;">
+              <div class="col-12">
+                <label class="form-label ms-1">Select Locality / Post Office</label>
+                <select id="localitySelect" class="form-select form-select-sm">
+                  <option value="">-- Select Locality --</option>
+                </select>
+              </div>
+            </div>
+
             <!-- Auto-filled Fields -->
             <div class="row mb-2">
               <div class="col-4">
@@ -542,7 +552,8 @@
 
             <div class="row mb-2">
               <div class="col-6">
-                <input name="locality" class="form-control form-control-sm" placeholder="Locality (Optional)">
+                <input name="locality" id="locality" class="form-control form-control-sm"
+                  placeholder="Locality (Optional)">
               </div>
               <div class="col-6">
                 <input name="landmark" class="form-control form-control-sm" placeholder="Landmark (Optional)">
@@ -554,21 +565,56 @@
             document.getElementById('pincode').addEventListener('input', function () {
               const pincode = this.value;
               const errorMsg = document.getElementById('pinError');
+              const localityWrapper = document.getElementById('localityWrapper');
+              const localitySelect = document.getElementById('localitySelect');
+              const cityInput = document.getElementById('city');
+              const stateInput = document.getElementById('state');
 
               if (pincode.length === 6) {
+                // Reset fields
+                localitySelect.innerHTML = '<option value="">-- Select Locality --</option>';
+                localityWrapper.style.display = 'none';
+
                 // Fetch details
                 fetch(`https://api.postalpincode.in/pincode/${pincode}`)
                   .then(response => response.json())
                   .then(data => {
                     if (data && data[0].Status === "Success") {
-                      const details = data[0].PostOffice[0];
-                      document.getElementById('city').value = details.District;
-                      document.getElementById('state').value = details.State;
-                      document.getElementById('country').value = details.Country;
+                      const postOffices = data[0].PostOffice;
+
+                      if (postOffices && postOffices.length > 0) {
+                        localityWrapper.style.display = 'block';
+
+                        postOffices.forEach(po => {
+                          const option = document.createElement('option');
+                          option.value = po.Name;
+                          option.textContent = `${po.Name} (${po.District})`;
+                          // Store details in data attributes
+                          option.dataset.name = po.Name;
+                          option.dataset.district = po.District;
+                          option.dataset.state = po.State;
+                          localitySelect.appendChild(option);
+                        });
+
+                        // Set initial state from first PO
+                        stateInput.value = postOffices[0].State;
+                        document.getElementById('country').value = postOffices[0].Country;
+
+                        // If only one, auto-select it
+                        if (postOffices.length === 1) {
+                          localitySelect.selectedIndex = 1;
+                          cityInput.value = postOffices[0].Name;
+                          document.getElementById('locality').value = postOffices[0].Name;
+                        } else {
+                          // If multiple, wait for user selection
+                          cityInput.value = '';
+                        }
+                      }
                       errorMsg.style.display = 'none';
                     } else {
-                      document.getElementById('city').value = '';
-                      document.getElementById('state').value = '';
+                      cityInput.value = '';
+                      stateInput.value = '';
+                      localityWrapper.style.display = 'none';
                       errorMsg.style.display = 'block';
                       errorMsg.textContent = "Invalid PIN Code";
                     }
@@ -578,6 +624,20 @@
                     errorMsg.style.display = 'block';
                     errorMsg.textContent = "Error fetching PIN details";
                   });
+              } else {
+                localityWrapper.style.display = 'none';
+              }
+            });
+
+            // Handle selection change
+            document.getElementById('localitySelect').addEventListener('change', function () {
+              const selectedPO = this.value;
+              if (selectedPO) {
+                document.getElementById('city').value = selectedPO;
+                document.getElementById('locality').value = selectedPO;
+              } else {
+                document.getElementById('city').value = '';
+                document.getElementById('locality').value = '';
               }
             });
           </script>
