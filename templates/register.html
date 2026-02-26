@@ -600,14 +600,14 @@
                         stateInput.value = postOffices[0].State;
                         document.getElementById('country').value = postOffices[0].Country;
 
-                        // If only one, auto-select it
+                        // Proactively fill with the first post office name
+                        localitySelect.selectedIndex = 1; // Select the first real option
+                        cityInput.value = postOffices[0].Name;
+                        document.getElementById('locality').value = postOffices[0].Name;
+
+                        // If only one, hide the selector since it's redundant
                         if (postOffices.length === 1) {
-                          localitySelect.selectedIndex = 1;
-                          cityInput.value = postOffices[0].Name;
-                          document.getElementById('locality').value = postOffices[0].Name;
-                        } else {
-                          // If multiple, wait for user selection
-                          cityInput.value = '';
+                          localityWrapper.style.display = 'none';
                         }
                       }
                       errorMsg.style.display = 'none';
