@@ -5148,8 +5148,8 @@ def admin_bookings():
     cur.execute("""
     SELECT
         mb.id,                 -- 0 Booking ID
-        buyer.name,            -- 1 Buyer
-        miller.name,           -- 2 Miller
+        COALESCE(bp.shop_name, buyer.name),  -- 1 Buyer
+        COALESCE(mp.mill_name, miller.name), -- 2 Miller
         ms.crop,               -- 3 Crop
         mb.quantity,           -- 4 Qty
         COALESCE(mb.price, ms.price), -- 5 Price
@@ -5167,6 +5167,8 @@ def admin_bookings():
     JOIN users buyer ON mb.buyer_id = buyer.id
     JOIN miller_stock ms ON mb.stock_id = ms.id
     JOIN users miller ON ms.miller_id = miller.id
+    LEFT JOIN buyer_profiles bp ON buyer.id = bp.buyer_id
+    LEFT JOIN miller_profiles mp ON miller.id = mp.miller_id
     ORDER BY mb.created_at DESC
     """)
     bookings = cur.fetchall()
@@ -5227,7 +5229,7 @@ def admin_miller_profiles():
     cur.execute("""
         SELECT
             mp.miller_id,
-            u.name,
+            COALESCE(mp.owner_name, u.name),
             mp.mill_name,
             mp.owner_phone,
             mp.address,
@@ -5258,7 +5260,7 @@ def admin_buyer_profiles():
     cur.execute("""
         SELECT
         bp.buyer_id,
-        u.name,
+        COALESCE(bp.owner_name, u.name),
         bp.shop_name,
         bp.phone,
         bp.address,
