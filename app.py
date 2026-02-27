@@ -2197,7 +2197,7 @@ def miller_qc_page():
     # 1️⃣ Fetch bookings (same as miller dashboard)
     cur.execute("""
     SELECT
-        mb.id, u.name, ms.crop, mb.quantity,
+        mb.id, COALESCE(bp.shop_name, u.name), ms.crop, mb.quantity,
         mb.status, mb.reason, mb.decision_at,
         mb.loaded_qty, mb.loading_status,
         mb.close_reason, mb.order_id,
@@ -2212,6 +2212,7 @@ def miller_qc_page():
     JOIN users u ON mb.buyer_id = u.id
     JOIN miller_stock ms ON mb.stock_id = ms.id
     LEFT JOIN payments p ON p.booking_id = mb.id
+    LEFT JOIN buyer_profiles bp ON u.id = bp.buyer_id
     WHERE ms.miller_id=%s
     ORDER BY mb.created_at DESC
     """, (miller_id,))
@@ -2460,7 +2461,7 @@ def miller_pending_payments_page():
     # Fetch all bookings
     cur.execute("""
         SELECT
-            mb.id, u.name, ms.crop, mb.quantity, mb.status, mb.reason, mb.decision_at,
+            mb.id, COALESCE(bp.shop_name, u.name), ms.crop, mb.quantity, mb.status, mb.reason, mb.decision_at,
             mb.loaded_qty, mb.loading_status, mb.close_reason, mb.order_id,
             mb.qc_weight, mb.qc_moisture, mb.qc_remarks, mb.qc_status, mb.qc_at,
             COALESCE(p.status,'pending'), p.invoice_file, p.paid_at, ms.price
@@ -2468,6 +2469,7 @@ def miller_pending_payments_page():
         JOIN users u ON mb.buyer_id = u.id
         JOIN miller_stock ms ON mb.stock_id = ms.id
         LEFT JOIN payments p ON p.booking_id = mb.id
+        LEFT JOIN buyer_profiles bp ON u.id = bp.buyer_id
         WHERE ms.miller_id = %s
         ORDER BY mb.created_at DESC
     """, (miller_id,))
@@ -3991,7 +3993,7 @@ def get_buyer_orders(filter_type):
             p.invoice_file,
             p.paid_at,
 
-            u.name AS miller_name,
+            COALESCE(mp.mill_name, u.name) AS miller_name,
             mb.close_reason,
             mp.city,
             mp.state
@@ -4200,13 +4202,14 @@ def buyer_debit_note(invoice_id):
     # Fetch invoice details with order info, including booking_id and buyer_id for security
     cur.execute("""
         SELECT li.id, li.truck_number, li.loaded_qty, li.final_invoice_file, li.payment_status,
-               mb.order_id, ms.crop, COALESCE(mb.price, ms.price), u.name, mb.id,
+               mb.order_id, ms.crop, COALESCE(mb.price, ms.price), COALESCE(mp.mill_name, u.name), mb.id,
                li.qc_weight, li.qc_moisture, li.qc_remarks, li.qc_freight,
                li.qc_broken, li.qc_karda, li.qc_oil, li.qc_mitti, li.qc_ssa, li.qc_claim
         FROM loading_invoices li
         JOIN miller_bookings mb ON li.booking_id = mb.id
         JOIN miller_stock ms ON mb.stock_id = ms.id
         JOIN users u ON ms.miller_id = u.id
+        LEFT JOIN miller_profiles mp ON u.id = mp.miller_id
         WHERE li.id = %s AND mb.buyer_id = %s
     """, (invoice_id, session["user_id"]))
     
@@ -4254,11 +4257,12 @@ def buyer_debit_notes_list():
     # Fetch all invoices that have a final invoice file (debit note)
     cur.execute("""
         SELECT li.id, li.truck_number, li.loaded_qty, li.final_invoice_file, li.payment_status,
-               mb.order_id, ms.crop, COALESCE(mb.price, ms.price), u.name, mb.id, li.created_at
+               mb.order_id, ms.crop, COALESCE(mb.price, ms.price), COALESCE(mp.mill_name, u.name), mb.id, li.created_at
         FROM loading_invoices li
         JOIN miller_bookings mb ON li.booking_id = mb.id
         JOIN miller_stock ms ON mb.stock_id = ms.id
         JOIN users u ON ms.miller_id = u.id
+        LEFT JOIN miller_profiles mp ON u.id = mp.miller_id
         WHERE mb.buyer_id = %s AND li.final_invoice_file IS NOT NULL
         ORDER BY li.created_at DESC
     """, (session["user_id"],))
@@ -4682,8 +4686,8 @@ def invoice(booking_id):
     cur.execute("""
     SELECT
         mb.id,
-        buyer.name,
-        miller.name,
+        COALESCE(bp.shop_name, buyer.name),
+        COALESCE(mp.mill_name, miller.name),
         ms.crop,
         mb.loaded_qty,
         ms.price,
@@ -4692,6 +4696,8 @@ def invoice(booking_id):
     JOIN miller_stock ms ON mb.stock_id = ms.id
     JOIN users buyer ON mb.buyer_id = buyer.id
     JOIN users miller ON ms.miller_id = miller.id
+    LEFT JOIN buyer_profiles bp ON buyer.id = bp.buyer_id
+    LEFT JOIN miller_profiles mp ON miller.id = mp.miller_id
     JOIN payments p ON p.booking_id = mb.id
     WHERE mb.id=%s AND mb.buyer_id=%s AND p.status='paid'
 """, (booking_id, get_effective_user_id()))
@@ -4821,12 +4827,13 @@ def miller_pending_payments():
             li.truck_number,
             li.final_invoice_file,
             DATE(li.created_at) as date,
-            u.name as buyer_name,
+            COALESCE(bp.shop_name, u.name) as buyer_name,
             COALESCE(mb.price, ms.price)
         FROM loading_invoices li
         JOIN miller_bookings mb ON li.booking_id = mb.id
         JOIN miller_stock ms ON mb.stock_id = ms.id
         JOIN users u ON mb.buyer_id = u.id
+        LEFT JOIN buyer_profiles bp ON u.id = bp.buyer_id
         WHERE ms.miller_id = %s
           AND li.final_invoice_file IS NOT NULL
           AND (li.payment_status IS NULL OR li.payment_status != 'paid')
@@ -4915,8 +4922,8 @@ def admin():
     cur.execute("""
     SELECT
         mb.id,                 -- 0 Booking ID
-        buyer.name,            -- 1 Buyer
-        miller.name,           -- 2 Miller
+        COALESCE(bp.shop_name, buyer.name),  -- 1 Buyer
+        COALESCE(mp.mill_name, miller.name), -- 2 Miller
         ms.crop,               -- 3 Crop
         mb.quantity,           -- 4 Qty
         COALESCE(mb.price, ms.price), -- 5 Price
@@ -4930,6 +4937,8 @@ def admin():
     JOIN users buyer ON mb.buyer_id = buyer.id
     JOIN miller_stock ms ON mb.stock_id = ms.id
     JOIN users miller ON ms.miller_id = miller.id
+    LEFT JOIN buyer_profiles bp ON buyer.id = bp.buyer_id
+    LEFT JOIN miller_profiles mp ON miller.id = mp.miller_id
     ORDER BY mb.created_at DESC
     LIMIT 50
 """)
@@ -4984,8 +4993,8 @@ def admin_order_detail(booking_id):
     cur.execute("""
         SELECT
             mb.id,                 -- 0 Booking ID
-            buyer.name,            -- 1 Buyer
-            miller.name,           -- 2 Miller
+            COALESCE(bp.shop_name, buyer.name),  -- 1 Buyer
+            COALESCE(mp.mill_name, miller.name), -- 2 Miller
             ms.crop,               -- 3 Crop
             mb.quantity,           -- 4 Qty
             COALESCE(mb.price, ms.price), -- 5 Price
@@ -5007,6 +5016,8 @@ def admin_order_detail(booking_id):
         JOIN users buyer ON mb.buyer_id = buyer.id
         JOIN miller_stock ms ON mb.stock_id = ms.id
         JOIN users miller ON ms.miller_id = miller.id
+        LEFT JOIN buyer_profiles bp ON buyer.id = bp.buyer_id
+        LEFT JOIN miller_profiles mp ON miller.id = mp.miller_id
         WHERE mb.id = %s
     """, (booking_id,))
     booking = cur.fetchone()
@@ -5046,7 +5057,7 @@ def admin_buyer_profile(buyer_id):
     cur = con.cursor()
     
     cur.execute("""
-        SELECT u.name, u.email, p.shop_name, p.phone, p.address, p.gst_doc, p.license_doc, p.gst_number, p.mandi_number, p.document, u.id, p.created_at
+        SELECT COALESCE(p.shop_name, u.name), u.email, p.shop_name, p.phone, p.address, p.gst_doc, p.license_doc, p.gst_number, p.mandi_number, p.document, u.id, p.created_at
         FROM users u
         LEFT JOIN buyer_profiles p ON u.id = p.buyer_id
         WHERE u.id = %s
@@ -5229,8 +5240,8 @@ def admin_miller_profiles():
     cur.execute("""
         SELECT
             mp.miller_id,
-            COALESCE(mp.owner_name, u.name),
-            mp.mill_name,
+            COALESCE(mp.mill_name, u.name),
+            mp.owner_name,
             mp.owner_phone,
             mp.address,
             mp.gst_doc,
@@ -5260,8 +5271,8 @@ def admin_buyer_profiles():
     cur.execute("""
         SELECT
         bp.buyer_id,
-        COALESCE(bp.owner_name, u.name),
-        bp.shop_name,
+        COALESCE(bp.shop_name, u.name),
+        bp.owner_name,
         bp.phone,
         bp.address,
         bp.document,
@@ -5405,7 +5416,7 @@ def admin_view_miller(miller_id):
     cur = con.cursor()
 
     cur.execute("""
-        SELECT u.name, u.email, p.mill_name, p.owner_phone, p.address, p.gst_doc, p.mandi_doc, p.gst_number, p.mandi_number, p.other_doc, u.id, p.created_at
+        SELECT COALESCE(p.mill_name, u.name), u.email, p.mill_name, p.owner_phone, p.address, p.gst_doc, p.mandi_doc, p.gst_number, p.mandi_number, p.other_doc, u.id, p.created_at
         FROM users u
         LEFT JOIN miller_profiles p ON u.id = p.miller_id
         WHERE u.id=%s

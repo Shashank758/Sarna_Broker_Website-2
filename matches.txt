@@ -1,0 +1,32 @@
+1807: COALESCE(bp.shop_name, u.name),  -- 1 buyer_name (from profile)
+2108: COALESCE(bp.shop_name, u.name), -- 1 buyer (from profile)
+2200: mb.id, u.name, ms.crop, mb.quantity,
+2293: COALESCE(bp.shop_name, u.name), -- 1 buyer_name (from profile)
+2463: mb.id, u.name, ms.crop, mb.quantity, mb.status, mb.reason, mb.decision_at,
+2587: COALESCE(bp.shop_name, u.name), -- 1 buyer (from profile)
+2624: COALESCE(bp.shop_name, u.name), -- 1 buyer (from profile)
+2656: mb.id, u.name, bp.shop_name, ms.crop, mb.quantity, mb.status, mb.reason,
+3728: SELECT COALESCE(bp.shop_name, u.name) AS display_name,
+3807: COALESCE(mp.mill_name, u.name)   AS miller_name,     -- 20 (from profile)
+3890: # Query: SELECT mb.id (0), ms.crop (1), ... mb.order_id (9), ... u.name (20)
+3994: u.name AS miller_name,
+4089: COALESCE(bp.shop_name, u.name), -- 2 buyer (from profile)
+4203: mb.order_id, ms.crop, COALESCE(mb.price, ms.price), u.name, mb.id,
+4257: mb.order_id, ms.crop, COALESCE(mb.price, ms.price), u.name, mb.id, li.created_at
+4317: COALESCE(mp.mill_name, u.name) AS miller_name,
+4685: buyer.name,
+4686: miller.name,
+4824: u.name as buyer_name,
+4918: COALESCE(bp.shop_name, buyer.name),  -- 1 Buyer
+4919: COALESCE(mp.mill_name, miller.name), -- 2 Miller
+4989: buyer.name,            -- 1 Buyer
+4990: miller.name,           -- 2 Miller
+5051: SELECT u.name, u.email, p.shop_name, p.phone, p.address, p.gst_doc, p.license_doc, p.gst_number, p.mandi_number, p.document, u.id, p.created_at
+5078: u.name,                   -- 1
+5131: SELECT h.*, u.name
+5153: COALESCE(bp.shop_name, buyer.name),  -- 1 Buyer
+5154: COALESCE(mp.mill_name, miller.name), -- 2 Miller
+5234: COALESCE(mp.mill_name, u.name),
+5265: COALESCE(bp.shop_name, u.name),
+5294: SELECT l.id, COALESCE(u.name, 'Unknown User'), l.role, l.action, l.target_id, l.details, l.created_at, l.admin_id
+5410: SELECT u.name, u.email, p.mill_name, p.owner_phone, p.address, p.gst_doc, p.mandi_doc, p.gst_number, p.mandi_number, p.other_doc, u.id, p.created_at
