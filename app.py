@@ -3967,7 +3967,8 @@ def user_directory():
     cur.execute("""
         SELECT u.id, u.role, 
                COALESCE(mp.mill_name, u.name) as firm_name, 
-               mp.owner_name, mp.owner_phone, mp.city, mp.state, 
+               mp.owner_name, COALESCE(mp.owner_phone, mp.phone) as contact_phone, 
+               mp.city, mp.state, 
                mp.gst_number, mp.mandi_number
         FROM users u
         INNER JOIN miller_profiles mp ON u.id = mp.miller_id
@@ -3977,7 +3978,8 @@ def user_directory():
         
         SELECT u.id, u.role, 
                COALESCE(bp.shop_name, u.name) as firm_name, 
-               bp.owner_name, bp.owner_phone, bp.city, bp.state, 
+               bp.owner_name, bp.phone as contact_phone, 
+               bp.city, bp.state, 
                bp.gst_number, bp.mandi_number
         FROM users u
         INNER JOIN buyer_profiles bp ON u.id = bp.buyer_id
