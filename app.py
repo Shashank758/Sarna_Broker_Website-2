@@ -1665,16 +1665,6 @@ def register():
             return render_template("register.html", error="Registration failed. Email might be taken.")
     return render_template("register.html")
 
-# Run migrations at startup
-try:
-    from app import run_migrations
-    run_migrations()
-except ImportError:
-    # If this script is run as 'app', it will fail to import from itself
-    run_migrations()
-except Exception as e:
-    print(f"Startup migration alert: {e}")
-
 @app.route("/logout")
 def logout():
     session.clear()
