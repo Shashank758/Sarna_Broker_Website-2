@@ -3953,6 +3953,44 @@ ORDER BY mb.created_at DESC
         buyer_city=buyer_city,
         location_filter=location_filter
     )
+
+@app.route("/directory")
+def user_directory():
+    if not session.get("user_id"):
+        return redirect("/")
+        
+    con = get_db()
+    cur = con.cursor()
+    
+    # Fetch all users with their profiles (both millers and buyers)
+    # Using a UNION ALL to combine the sets for easy processing
+    cur.execute("""
+        SELECT u.id, u.role, 
+               COALESCE(mp.mill_name, u.name) as firm_name, 
+               mp.owner_name, mp.owner_phone, mp.city, mp.state, 
+               mp.gst_number, mp.mandi_number
+        FROM users u
+        INNER JOIN miller_profiles mp ON u.id = mp.miller_id
+        WHERE u.status != 'rejected'
+        
+        UNION ALL
+        
+        SELECT u.id, u.role, 
+               COALESCE(bp.shop_name, u.name) as firm_name, 
+               bp.owner_name, bp.owner_phone, bp.city, bp.state, 
+               bp.gst_number, bp.mandi_number
+        FROM users u
+        INNER JOIN buyer_profiles bp ON u.id = bp.buyer_id
+        WHERE u.status != 'rejected'
+        
+        ORDER BY firm_name ASC
+    """)
+    users_data = cur.fetchall()
+    con.close()
+    
+    return render_template("directory.html", directory_users=users_data)
+
+
 # ================= BUYER ORDER PAGES =================
 
 def get_buyer_orders(filter_type):

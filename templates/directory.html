@@ -1,0 +1,142 @@
+{% set title = "User Directory - Modern Sarna Brokers" %}
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5 mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <h2 class="fw-800 mb-1 text-dark"><i class="fa fa-address-book text-primary me-2"></i>User Directory</h2>
+            <p class="text-muted mb-0">Discover and verify trading partners across the network.</p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-box position-relative" style="width: 100%; max-width: 400px;">
+            <i class="fa fa-search position-absolute text-muted"
+                style="top: 50%; left: 15px; transform: translateY(-50%);"></i>
+            <input type="text" id="directorySearch"
+                class="form-control form-control-lg rounded-pill ps-5 border-0 shadow-sm"
+                placeholder="Search by Firm, City, Name or GST..." onkeyup="filterDirectory()">
+        </div>
+    </div>
+
+    <!-- Directory Grid -->
+    <div class="row g-4 mt-2" id="directoryGrid">
+        {% for u in directory_users %}
+        <!-- u: [0]id, [1]role, [2]firm_name, [3]owner_name, [4]phone, [5]city, [6]state, [7]gst, [8]mandi -->
+        <div class="col-md-6 col-lg-4 directory-card-item">
+            <div class="card h-100 border-0 shadow-sm rounded-4 hover-lift overflow-hidden position-relative">
+
+                <!-- Top Decoration Bar -->
+                <div class="position-absolute top-0 start-0 w-100 {{ 'bg-primary' if u[1] == 'buyer' else 'bg-secondary' }}"
+                    style="height: 4px;"></div>
+
+                <div class="card-body p-4 pt-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5 class="fw-800 text-dark mb-0 text-capitalize directory-name">{{ u[2] or 'No Firm Name' }}
+                        </h5>
+                        <span
+                            class="badge {{ 'bg-primary-subtle text-primary' if u[1] == 'buyer' else 'bg-secondary-subtle text-secondary' }} rounded-pill px-3 fw-800 text-uppercase"
+                            style="font-size: 0.65rem;">
+                            {{ u[1] }}
+                        </span>
+                    </div>
+
+                    <div class="d-flex gap-2 mb-4 directory-location text-muted fw-600 small">
+                        <i class="fa fa-location-dot mt-1 opacity-75"></i>
+                        <span>
+                            {% if u[5] or u[6] %}
+                            {{ u[5] or 'City' }}, {{ u[6] or 'State' }}
+                            {% else %}
+                            Location not set
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="bg-light rounded-3 p-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="bg-white rounded-circle d-flex align-items-center justify-content-center me-2 shadow-sm"
+                                        style="width: 28px; height: 28px;">
+                                        <i class="fa fa-user text-muted" style="font-size: 0.75rem;"></i>
+                                    </div>
+                                    <span class="fw-700 text-dark small directory-owner">{{ u[3] or 'Owner Unknown'
+                                        }}</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-white rounded-circle d-flex align-items-center justify-content-center me-2 shadow-sm"
+                                        style="width: 28px; height: 28px;">
+                                        <i class="fa fa-phone text-muted" style="font-size: 0.75rem;"></i>
+                                    </div>
+                                    <span class="fw-700 text-dark small directory-phone">{{ u[4] or 'No Phone' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="d-flex flex-column gap-2 opacity-75">
+                                <div class="d-flex justify-content-between align-items-center small">
+                                    <span class="fw-600 text-muted">GST No.</span>
+                                    <span class="fw-800 text-dark font-monospace directory-gst">{{ u[7] or 'N/A'
+                                        }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center small">
+                                    <span class="fw-600 text-muted">Mandi License</span>
+                                    <span class="fw-800 text-dark font-monospace">{{ u[8] or 'N/A' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Empty State -->
+    <div id="noResults" class="text-center py-5 d-none">
+        <div class="mb-4">
+            <i class="fa fa-search text-muted fs-1 opacity-25"></i>
+        </div>
+        <h3 class="fw-800 text-dark mb-2">No users found</h3>
+        <p class="text-muted mb-0">Try changing your search keywords.</p>
+    </div>
+</div>
+
+<style>
+    .hover-lift {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+    }
+</style>
+
+<script>
+    function filterDirectory() {
+        let input = document.getElementById('directorySearch').value.toLowerCase();
+        let cards = document.getElementsByClassName('directory-card-item');
+        let hasResults = false;
+
+        for (let i = 0; i < cards.length; i++) {
+            let name = cards[i].querySelector('.directory-name').innerText.toLowerCase();
+            let owner = cards[i].querySelector('.directory-owner').innerText.toLowerCase();
+            let phone = cards[i].querySelector('.directory-phone').innerText.toLowerCase();
+            let loc = cards[i].querySelector('.directory-location').innerText.toLowerCase();
+            let gst = cards[i].querySelector('.directory-gst').innerText.toLowerCase();
+
+            if (name.includes(input) || owner.includes(input) || phone.includes(input) || loc.includes(input) || gst.includes(input)) {
+                cards[i].style.display = "";
+                hasResults = true;
+            } else {
+                cards[i].style.display = "none";
+            }
+        }
+
+        // Toggle Empty State
+        document.getElementById('noResults').classList.toggle('d-none', hasResults || cards.length === 0);
+    }
+</script>
+{% endblock %}
