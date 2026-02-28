@@ -1712,7 +1712,12 @@ def switch_role(target_role):
         # 🔄 Rather than copying manually here, let's just trigger our unified sync function
         # from the perspective of the profile they are LEAVING, to ensure the new profile is updated
         sync_user_profiles(session.get("user_id"), current_role)
-        return redirect(request.referrer or "/")
+        
+        # Explicitly route to new dashboard to avoid restrictive referrer bounces
+        if target_role == "buyer":
+            return redirect("/market")
+        elif target_role == "miller":
+            return redirect("/miller")
             
     return redirect("/")
 
