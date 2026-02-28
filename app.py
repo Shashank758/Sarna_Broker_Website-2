@@ -1227,6 +1227,11 @@ def run_migrations():
                 if col_name not in existing_cols:
                     cur.execute(f"ALTER TABLE {table} ADD COLUMN {col_name} {col_type}")
                     print(f"✅ Added {col_name} to {table}")
+                    
+        # 3. Rename Commodities
+        cur.execute("UPDATE miller_stock SET crop = 'rice' WHERE LOWER(crop) = 'chawal'")
+        cur.execute("UPDATE miller_stock SET crop = 'mustard' WHERE LOWER(crop) = 'sarso'")
+        print("✅ Migrated legacy commodities.")
 
         con.commit()
         con.close()
