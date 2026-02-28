@@ -204,6 +204,70 @@ def get_phone_for_password_reset(user_id, role=None, is_staff=0, parent_miller_i
 
     return None
 
+def sync_user_profiles(user_id, source_role):
+    """Synchronize profile data between Miller and Buyer profiles to prevent dual data entry."""
+    con = get_db()
+    cur = con.cursor()
+    try:
+        if source_role == "miller":
+            # Fetch from Miller Profile
+            cur.execute("""
+                SELECT mill_name, owner_name, owner_phone, address, city, state, 
+                       gst_number, mandi_number, gst_doc, document, other_doc
+                FROM miller_profiles WHERE miller_id=%s
+            """, (user_id,))
+            mp = cur.fetchone()
+            if mp:
+                # Upsert into Buyer Profile
+                cur.execute("SELECT id FROM buyer_profiles WHERE buyer_id=%s", (user_id,))
+                if cur.fetchone():
+                    cur.execute("""
+                        UPDATE buyer_profiles 
+                        SET shop_name=%s, owner_name=%s, phone=%s, address=%s, city=%s, state=%s,
+                            gst_number=%s, mandi_number=%s, gst_doc=%s, license_doc=%s, other_doc=%s
+                        WHERE buyer_id=%s
+                    """, (mp[0], mp[1], mp[2], mp[3], mp[4], mp[5], mp[6], mp[7], mp[8], mp[9], mp[10], user_id))
+                else:
+                    cur.execute("""
+                        INSERT INTO buyer_profiles 
+                        (buyer_id, shop_name, owner_name, phone, address, city, state, 
+                         gst_number, mandi_number, gst_doc, license_doc, other_doc)
+                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                    """, (user_id, mp[0], mp[1], mp[2], mp[3], mp[4], mp[5], mp[6], mp[7], mp[8], mp[9], mp[10]))
+                    
+        elif source_role == "buyer":
+            # Fetch from Buyer Profile
+            cur.execute("""
+                SELECT shop_name, owner_name, phone, address, city, state, 
+                       gst_number, mandi_number, gst_doc, license_doc, other_doc
+                FROM buyer_profiles WHERE buyer_id=%s
+            """, (user_id,))
+            bp = cur.fetchone()
+            if bp:
+                # Upsert into Miller Profile
+                cur.execute("SELECT id FROM miller_profiles WHERE miller_id=%s", (user_id,))
+                if cur.fetchone():
+                    cur.execute("""
+                        UPDATE miller_profiles 
+                        SET mill_name=%s, owner_name=%s, owner_phone=%s, address=%s, city=%s, state=%s,
+                            gst_number=%s, mandi_number=%s, gst_doc=%s, document=%s, other_doc=%s
+                        WHERE miller_id=%s
+                    """, (bp[0], bp[1], bp[2], bp[3], bp[4], bp[5], bp[6], bp[7], bp[8], bp[9], bp[10], user_id))
+                else:
+                    cur.execute("""
+                        INSERT INTO miller_profiles 
+                        (miller_id, mill_name, owner_name, owner_phone, address, city, state, 
+                         gst_number, mandi_number, gst_doc, document, other_doc)
+                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                    """, (user_id, bp[0], bp[1], bp[2], bp[3], bp[4], bp[5], bp[6], bp[7], bp[8], bp[9], bp[10]))
+                    
+        con.commit()
+    except Exception as e:
+        con.rollback()
+        logger.error(f"Failed to sync user profiles for {user_id}: {str(e)}")
+    finally:
+        con.close()
+
 def get_all_buyer_phones():
     """Get all buyer phone numbers."""
     con = get_db()
@@ -1645,58 +1709,10 @@ def switch_role(target_role):
     if current_role in ["miller", "buyer"] and target_role in ["miller", "buyer"]:
         session["role"] = target_role
 
-        # Auto-create target profile if missing, copying from existing profile
-        user_id = session.get("user_id")
-        try:
-            con = get_db()
-            cur = con.cursor()
-
-            if target_role == "buyer":
-                cur.execute("SELECT id FROM buyer_profiles WHERE buyer_id=%s", (user_id,))
-                if not cur.fetchone():
-                    # Copy from miller profile if available
-                    cur.execute("SELECT mill_name, owner_name, owner_phone, address, city, state FROM miller_profiles WHERE miller_id=%s", (user_id,))
-                    mp = cur.fetchone()
-                    if mp:
-                        cur.execute("""INSERT INTO buyer_profiles (buyer_id, shop_name, owner_name, phone, address, city, state)
-                                      VALUES (%s,%s,%s,%s,%s,%s,%s)""",
-                                   (user_id, mp[0], mp[1], mp[2], mp[3], mp[4], mp[5]))
-                    else:
-                        cur.execute("SELECT name FROM users WHERE id=%s", (user_id,))
-                        u = cur.fetchone()
-                        uname = u[0] if u else ''
-                        cur.execute("""INSERT INTO buyer_profiles (buyer_id, shop_name, owner_name)
-                                      VALUES (%s,%s,%s)""",
-                                   (user_id, uname, uname))
-                    con.commit()
-
-            elif target_role == "miller":
-                cur.execute("SELECT id FROM miller_profiles WHERE miller_id=%s", (user_id,))
-                if not cur.fetchone():
-                    # Copy from buyer profile if available
-                    cur.execute("SELECT shop_name, owner_name, phone, address, city, state FROM buyer_profiles WHERE buyer_id=%s", (user_id,))
-                    bp = cur.fetchone()
-                    if bp:
-                        cur.execute("""INSERT INTO miller_profiles (miller_id, mill_name, owner_name, owner_phone, address, city, state)
-                                      VALUES (%s,%s,%s,%s,%s,%s,%s)""",
-                                   (user_id, bp[0], bp[1], bp[2], bp[3], bp[4], bp[5]))
-                    else:
-                        cur.execute("SELECT name FROM users WHERE id=%s", (user_id,))
-                        u = cur.fetchone()
-                        uname = u[0] if u else ''
-                        cur.execute("""INSERT INTO miller_profiles (miller_id, mill_name, owner_name)
-                                      VALUES (%s,%s,%s)""",
-                                   (user_id, uname, uname))
-                    con.commit()
-
-            con.close()
-        except Exception as e:
-            logger.error(f"Error auto-creating profile on role switch: {e}")
-
-        if target_role == "buyer":
-            return redirect("/market")
-        elif target_role == "miller":
-            return redirect("/miller")
+        # 🔄 Rather than copying manually here, let's just trigger our unified sync function
+        # from the perspective of the profile they are LEAVING, to ensure the new profile is updated
+        sync_user_profiles(session.get("user_id"), current_role)
+        return redirect(request.referrer or "/")
             
     return redirect("/")
 
@@ -2076,6 +2092,10 @@ def miller_profile_page():
         # Sync name to users table so it reflects everywhere
         cur.execute("UPDATE users SET name=%s WHERE id=%s", (mill_name, miller_id))
         con.commit()
+        
+        # 🔄 Auto-sync attributes to buyer profile
+        sync_user_profiles(miller_id, "miller")
+        
         flash("Profile updated successfully", "success")
         log_activity("Profile Updated", miller_id, "Miller Profile Updated")
         con.close()
@@ -2392,67 +2412,37 @@ def miller_final_hisab_page():
     final_bookings = []
     
     for b in all_bookings:
-        booking_id = b[0]
-        trucks = invoices_map.get(booking_id, [])
+        # Redoing the logic to be cleaner:
+        # 1. Create filtered map 'on_final_hisab_map'
+        # 2. Only include bookings that have entries in this map.
         
-        # Check if any truck needs an invoice (QC Verified but No Final Invoice)
-        # OR if we want to show all trucks for a booking if at least one needs attention.
-        # User said: "remove mark payment done button if the final invoice is uploaded... not more show in final hisab"
+        on_final_hisab_map = {}
+        filtered_bookings = []
         
-        # So we should only pass trucks that need invoice.
-        # But our template iterates bookings then trucks.
-        # We'll filter the trucks list for each booking first.
-        
-        pending_invoice_trucks = [
-            t for t in trucks 
-            if t['qc_status'] == 'verified' and not t['final_invoice_file']
-        ]
-        
-        # Also include trucks that might be pending QC? Conventionally Final Hisab waits for QC.
-        # But if the user says "Final Hisab", it usually implies QC is done.
-        # Let's show bookings that have pending_invoice_trucks.
-        
-        if pending_invoice_trucks:
-            # We clone the booking simple object? 
-            # No, 'invoices_map' is separate. We can just check if we have relevant trucks.
-            # But we should probably ONLY show the relevant trucks in the template?
-            # Or show the whole booking but mark trucks? 
-            # The prompt says "remove ... not more show in final hisab".
-            # So I should Filter the trucks inside the invoices_map for this view?
-            # Creating a new map for this view might be safer.
-            pass
+        for b in all_bookings:
+            booking_id = b[0]
+            orig_trucks = invoices_map.get(booking_id, [])
             
-    # Redoing the logic to be cleaner:
-    # 1. Create filtered map 'on_final_hisab_map'
-    # 2. Only include bookings that have entries in this map.
-    
-    on_final_hisab_map = {}
-    filtered_bookings = []
-    
-    for b in all_bookings:
-        booking_id = b[0]
-        orig_trucks = invoices_map.get(booking_id, [])
-        
-        # Trucks that should appear in Final Hisab:
-        # QC Verified AND No Final Invoice
-        # (If QC not verified, it's in QC page. If Invoice Uploaded, it's in Pending Payment page)
-        
-        relevant_trucks = [
-            t for t in orig_trucks 
-            if t['qc_status'] == 'verified' and not t['final_invoice_file']
-        ]
-        
-        if relevant_trucks:
-            on_final_hisab_map[booking_id] = relevant_trucks
-            filtered_bookings.append(b)
+            # Trucks that should appear in Final Hisab:
+            # QC Verified AND No Final Invoice
+            # (If QC not verified, it's in QC page. If Invoice Uploaded, it's in Pending Payment page)
             
-    con.close()
+            relevant_trucks = [
+                t for t in orig_trucks 
+                if t['qc_status'] == 'verified' and not t['final_invoice_file']
+            ]
+            
+            if relevant_trucks:
+                on_final_hisab_map[booking_id] = relevant_trucks
+                filtered_bookings.append(b)
+                
+        con.close()
 
-    return render_template(
-        "miller_final_hisab.html",
-        all_bookings=filtered_bookings,
-        invoices_map=on_final_hisab_map
-    )
+        return render_template(
+            "miller_final_hisab.html",
+            all_bookings=filtered_bookings,
+            invoices_map=on_final_hisab_map
+        )
 
 @app.route("/miller/pending-payments")
 def miller_pending_payments_page():
@@ -3281,6 +3271,8 @@ def buyer_profile():
         owner_name = request.form.get("owner_name")
         phone = request.form["phone"]
         address = request.form["address"]
+        city = request.form.get("city")
+        state = request.form.get("state")
         
         # New compliance fields
         gst_number = request.form.get("gst_number", "").strip()
@@ -3314,11 +3306,11 @@ def buyer_profile():
         if profile:
             cur.execute("""
                 UPDATE buyer_profiles
-                SET shop_name=%s, owner_name=%s, phone=%s, address=%s, gst_doc=%s, license_doc=%s, other_doc=%s,
+                SET shop_name=%s, owner_name=%s, phone=%s, address=%s, city=%s, state=%s, gst_doc=%s, license_doc=%s, other_doc=%s,
                     gst_number=%s, mandi_number=%s
                 WHERE buyer_id=%s
             """, (
-                shop_name, owner_name, phone, address,
+                shop_name, owner_name, phone, address, city, state,
                 gst_filename, lic_filename, other_filename,
                 gst_number, mandi_number,
                 session["user_id"]
@@ -3326,10 +3318,10 @@ def buyer_profile():
         else:
             cur.execute("""
                 INSERT INTO buyer_profiles
-                (buyer_id, shop_name, owner_name, phone, address, gst_doc, license_doc, other_doc, gst_number, mandi_number)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                (buyer_id, shop_name, owner_name, phone, address, city, state, gst_doc, license_doc, other_doc, gst_number, mandi_number)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """, (
-                session["user_id"], shop_name, owner_name, phone, address,
+                session["user_id"], shop_name, owner_name, phone, address, city, state,
                 gst_filename, lic_filename, other_filename,
                 gst_number, mandi_number
             ))
@@ -3337,6 +3329,11 @@ def buyer_profile():
         # Sync name to users table so it reflects everywhere
         cur.execute("UPDATE users SET name=%s WHERE id=%s", (shop_name, session["user_id"]))
         con.commit()
+        
+        # 🔄 Auto-sync attributes to miller profile
+        sync_user_profiles(session["user_id"], "buyer")
+        
+        flash("Profile updated successfully", "success")
         log_activity("Profile Updated", session["user_id"], "Buyer Profile Updated", user_id=session["user_id"], role="buyer")
         con.close()
         return redirect("/buyer/profile")
