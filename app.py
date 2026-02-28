@@ -3764,7 +3764,8 @@ def market():
         miller_stock.weight_deduction,  -- 16
         miller_stock.payment_duration,  -- 17
         miller_stock.extra_condition,   -- 18
-        miller_stock.moisture           -- 19
+        miller_stock.moisture,          -- 19
+        miller_stock.duration           -- 20
     FROM miller_stock
     JOIN users ON miller_stock.miller_id = users.id
     LEFT JOIN miller_profiles mp ON users.id = mp.miller_id

@@ -332,7 +332,7 @@
                 {% endif %}
             </button>
         </li>
-       
+
     </ul>
 
     <div class="tab-content mt-4" id="marketTabsContent">
@@ -459,12 +459,16 @@
                                         </div>
                                     </div>
 
-                                    {% if stock[16] or stock[17] or stock[18] %}
+                                    {% if stock[16] or stock[17] or stock[18] or stock[19] or stock[20] %}
                                     <div class="alert alert-warning border-0 rounded-4 p-3 mb-3">
                                         <div class="fw-700 small mb-2"><i
                                                 class="fa fa-exclamation-triangle me-1"></i>Terms & Conditions</div>
+                                        {% if stock[19] %}<div class="small"><strong>Moisture:</strong> {{
+                                            stock[19] }}%</div>{% endif %}
                                         {% if stock[16] %}<div class="small"><strong>Weight Deduction:</strong> {{
                                             stock[16] }}</div>{% endif %}
+                                        {% if stock[20] %}<div class="small"><strong>Delivery Duration:</strong> {{
+                                            stock[20] }} Days</div>{% endif %}
                                         {% if stock[17] %}<div class="small"><strong>Payment Duration:</strong> {{
                                             stock[17] }}</div>{% endif %}
                                         {% if stock[18] %}<div class="small"><strong>Extra Condition:</strong> {{
