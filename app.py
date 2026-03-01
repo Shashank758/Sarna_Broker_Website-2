@@ -1213,6 +1213,30 @@ def upgrade_admin_logs_extended():
     con.close()
 
 
+def upgrade_notifications_system():
+    """Create notifications table and add firebase_token to users."""
+    con = get_db()
+    cur = con.cursor()
+    try:
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS notifications (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER REFERENCES users(id),
+                title TEXT,
+                message TEXT,
+                is_read BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS firebase_token TEXT")
+        con.commit()
+        print("✅ Notifications system migration complete")
+    except Exception as e:
+        print(f"⚠️ Notifications migration: {e}")
+        con.rollback()
+    finally:
+        con.close()
+
 def run_migrations():
     """Run all database migrations in a single connection to speed up startup."""
     try:
@@ -1255,6 +1279,9 @@ def run_migrations():
         
         # Payments
         upgrade_payments_table()
+
+        # Notifications & Firebase
+        upgrade_notifications_system()
         
         # Miller Profile & Address Schema (Custom Logic)
         con = get_db()
