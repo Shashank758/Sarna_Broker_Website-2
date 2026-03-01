@@ -3608,10 +3608,10 @@ def update_miller_stock(id):
 
     new_price = request.form["price"]
     new_qty = request.form["quantity"]
-    deduction = request.form.get("deduction", "")
-    moisture = request.form.get("moisture", "")
-    weight_deduction = request.form.get("weight_deduction", "")
-    payment_duration = request.form.get("payment_duration", "")
+    deduction = request.form.get("deduction", "").strip() or None
+    moisture = request.form.get("moisture", "").strip() or None
+    weight_deduction = request.form.get("weight_deduction", "").strip() or None
+    payment_duration = request.form.get("payment_duration", "").strip() or None
     extra_condition = request.form.get("extra_condition", "")
 
     cur.execute("""
