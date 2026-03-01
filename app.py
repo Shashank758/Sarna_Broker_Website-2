@@ -2206,6 +2206,73 @@ def miller_approved_page():
     )
 
 
+@app.route("/miller/order/<int:booking_id>")
+def miller_order_detail(booking_id):
+    """Detailed view for a single completed order (miller-side)."""
+    if session.get("role") != "miller":
+        return redirect("/")
+
+    miller_id = get_effective_user_id()
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT
+            mb.id,                 -- 0 Booking ID
+            COALESCE(bp.shop_name, buyer.name),  -- 1 Buyer
+            COALESCE(mp.mill_name, miller.name), -- 2 Miller
+            ms.crop,               -- 3 Crop
+            mb.quantity,           -- 4 Qty
+            COALESCE(mb.price, ms.price), -- 5 Price
+            (mb.quantity * COALESCE(mb.price, ms.price)), -- 6 Total
+            mb.status,             -- 7 Booking status
+            mb.truck_status,       -- 8 Truck status
+            mb.loaded_at,          -- 9 Loaded date
+            mb.order_id,           -- 10 Order ID
+            mb.created_at,         -- 11 Created at
+            mb.loading_status,     -- 12 Loading status
+            mb.bill_document,      -- 13 Bill doc
+            mb.truck_remark,       -- 14 Remark
+            buyer.email,           -- 15 Buyer email
+            miller.email,          -- 16 Miller email
+            mb.buyer_id,           -- 17 Buyer ID
+            ms.miller_id,          -- 18 Miller ID
+            mb.stock_id,           -- 19 Stock ID
+            mb.loaded_qty          -- 20 Loaded qty
+        FROM miller_bookings mb
+        JOIN users buyer ON mb.buyer_id = buyer.id
+        JOIN miller_stock ms ON mb.stock_id = ms.id
+        JOIN users miller ON ms.miller_id = miller.id
+        LEFT JOIN buyer_profiles bp ON buyer.id = bp.buyer_id
+        LEFT JOIN miller_profiles mp ON miller.id = mp.miller_id
+        WHERE mb.id = %s AND ms.miller_id = %s
+    """, (booking_id, miller_id))
+    booking = cur.fetchone()
+
+    if not booking:
+        con.close()
+        flash("Order not found.", "danger")
+        return redirect("/miller")
+
+    cur.execute("""
+        SELECT id, loaded_qty, invoice_file, truck_number, created_at,
+               qc_weight, qc_moisture, qc_remarks, qc_status, qc_at,
+               final_invoice_file, payment_status, payment_at, qc_freight, debit_note,
+               qc_broken, qc_karda, qc_oil, qc_mitti, qc_ssa, qc_claim
+        FROM loading_invoices
+        WHERE booking_id = %s
+        ORDER BY created_at ASC
+    """, (booking_id,))
+    invoices = cur.fetchall()
+
+    cur.execute("SELECT * FROM payments WHERE booking_id = %s", (booking_id,))
+    payment = cur.fetchone()
+
+    con.close()
+
+    return render_template("miller_order_detail.html", booking=booking, invoices=invoices, payment=payment)
+
+
 @app.route("/miller/qc")
 def miller_qc_page():
 

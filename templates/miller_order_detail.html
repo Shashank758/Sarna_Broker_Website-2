@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+
+{% block title %}Order {{ booking[10] }} | Saarna Canvessars{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 960px;">
+
+    <!-- Back Button -->
+    <a href="/miller" class="btn btn-light border fw-800 rounded-pill px-4 py-2 mb-4">
+        <i class="fa fa-arrow-left me-2"></i>Back to Dashboard
+    </a>
+
+    <!-- ORDER HEADER -->
+    <div class="p-4 rounded-4 mb-4"
+        style="background: linear-gradient(135deg, var(--primary-dark), var(--primary)); color: white;">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <div class="small fw-700 opacity-75 text-uppercase mb-1">Order</div>
+                <h3 class="fw-800 mb-0">{{ booking[10] }}</h3>
+            </div>
+            <div class="text-end">
+                {% if booking[12] == 'loaded' %}
+                <span class="badge bg-white text-success fw-800 px-3 py-2 rounded-pill fs-6">✅ COMPLETED</span>
+                {% elif booking[12] == 'partial' %}
+                <span class="badge bg-warning text-dark fw-800 px-3 py-2 rounded-pill fs-6">🔄 IN PROGRESS</span>
+                {% else %}
+                <span class="badge bg-light text-muted fw-800 px-3 py-2 rounded-pill fs-6">{{ booking[12]|upper
+                    }}</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- ORDER INFO CARDS -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="bg-white rounded-4 border p-4 h-100">
+                <h6 class="fw-800 text-muted small text-uppercase mb-3"><i class="fa fa-user me-2"></i>Buyer Details
+                </h6>
+                <div class="fw-800 fs-5 mb-1">{{ booking[1] }}</div>
+                <div class="text-muted fw-600 small">{{ booking[15] }}</div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="bg-white rounded-4 border p-4 h-100">
+                <h6 class="fw-800 text-muted small text-uppercase mb-3"><i class="fa fa-industry me-2"></i>Seller
+                    Details</h6>
+                <div class="fw-800 fs-5 mb-1">{{ booking[2] }}</div>
+                <div class="text-muted fw-600 small">{{ booking[16] }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TRADE DETAILS -->
+    <div class="bg-white rounded-4 border p-4 mb-4">
+        <h6 class="fw-800 text-muted small text-uppercase mb-3"><i class="fa fa-receipt me-2"></i>Trade Summary</h6>
+        <div class="row g-3">
+            <div class="col-6 col-md-3">
+                <div class="p-3 bg-light rounded-4 text-center">
+                    <div class="text-muted small fw-700 mb-1">Crop</div>
+                    <div class="fw-800 fs-5 text-capitalize">{{ booking[3] }}</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="p-3 bg-light rounded-4 text-center">
+                    <div class="text-muted small fw-700 mb-1">Quantity</div>
+                    <div class="fw-800 fs-5">{{ booking[4] }} Qt</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="p-3 bg-light rounded-4 text-center">
+                    <div class="text-muted small fw-700 mb-1">Price/Qt</div>
+                    <div class="fw-800 fs-5">₹{{ booking[5] }}</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="p-3 bg-light rounded-4 text-center">
+                    <div class="text-muted small fw-700 mb-1">Total Value</div>
+                    <div class="fw-800 fs-5 text-success">₹{{ booking[6]|int }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOADING PROGRESS -->
+    <div class="bg-white rounded-4 border p-4 mb-4">
+        <h6 class="fw-800 text-muted small text-uppercase mb-3"><i class="fa fa-truck me-2"></i>Loading Progress</h6>
+        {% set loaded = booking[20] or 0 %}
+        {% set total = booking[4] or 1 %}
+        {% set percent = (loaded / total * 100)|round|int %}
+        <div class="d-flex justify-content-between fw-800 mb-2">
+            <span>{{ loaded }} / {{ total }} Qt loaded</span>
+            <span>{{ percent }}%</span>
+        </div>
+        <div class="progress mb-3" style="height: 14px; border-radius: 10px;">
+            <div class="progress-bar bg-success" style="width: {{ percent }}%"></div>
+        </div>
+        <div class="small text-muted fw-600">
+            {% if booking[9] %}Loaded at: {{ booking[9] }}{% endif %}
+        </div>
+    </div>
+
+    <!-- TRUCK DETAILS -->
+    {% if invoices %}
+    <div class="bg-white rounded-4 border p-4 mb-4">
+        <h6 class="fw-800 text-muted small text-uppercase mb-3">
+            <i class="fa fa-truck-ramp-box me-2"></i>Truck Details ({{ invoices|length }} Trucks)
+        </h6>
+        {% for inv in invoices %}
+        <div class="p-3 bg-light rounded-4 mb-3">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-2">
+                <div class="fw-800">
+                    <i class="fa fa-truck text-primary me-2"></i>{{ inv[3] or 'Consignment #' ~ loop.index }}
+                </div>
+                <span class="small text-muted fw-600">{{ inv[4] }}</span>
+            </div>
+            <div class="row g-2">
+                <div class="col-6 col-md-3">
+                    <div class="small text-muted fw-600">Loaded Qty</div>
+                    <div class="fw-800">{{ inv[1] }} Qt</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="small text-muted fw-600">QC Status</div>
+                    <div class="fw-800">
+                        {% if inv[8] == 'verified' %}
+                        <span class="text-success">✅ Verified</span>
+                        {% else %}
+                        <span class="text-warning">⏳ Pending</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if inv[5] %}
+                <div class="col-6 col-md-3">
+                    <div class="small text-muted fw-600">QC Weight</div>
+                    <div class="fw-800">{{ inv[5] }} Qt</div>
+                </div>
+                {% endif %}
+                {% if inv[6] %}
+                <div class="col-6 col-md-3">
+                    <div class="small text-muted fw-600">QC Moisture</div>
+                    <div class="fw-800">{{ inv[6] }}%</div>
+                </div>
+                {% endif %}
+                {% if inv[13] %}
+                <div class="col-6 col-md-3">
+                    <div class="small text-muted fw-600">Freight</div>
+                    <div class="fw-800">₹{{ inv[13] }}</div>
+                </div>
+                {% endif %}
+                {% if inv[7] %}
+                <div class="col-12">
+                    <div class="small text-muted fw-600">QC Remarks</div>
+                    <div class="fw-700 small">{{ inv[7] }}</div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- QC Breakdown -->
+            {% if inv[15] or inv[16] or inv[17] or inv[18] or inv[19] or inv[20] %}
+            <hr class="my-2 opacity-10">
+            <div class="row g-2">
+                {% if inv[15] %}<div class="col-4 col-md-2">
+                    <div class="small text-muted">Broken</div>
+                    <div class="fw-700 small">{{ inv[15] }}%</div>
+                </div>{% endif %}
+                {% if inv[16] %}<div class="col-4 col-md-2">
+                    <div class="small text-muted">Karda</div>
+                    <div class="fw-700 small">{{ inv[16] }}%</div>
+                </div>{% endif %}
+                {% if inv[17] %}<div class="col-4 col-md-2">
+                    <div class="small text-muted">Oil</div>
+                    <div class="fw-700 small">{{ inv[17] }}%</div>
+                </div>{% endif %}
+                {% if inv[18] %}<div class="col-4 col-md-2">
+                    <div class="small text-muted">Mitti</div>
+                    <div class="fw-700 small">{{ inv[18] }}%</div>
+                </div>{% endif %}
+                {% if inv[19] %}<div class="col-4 col-md-2">
+                    <div class="small text-muted">SSA</div>
+                    <div class="fw-700 small">{{ inv[19] }}%</div>
+                </div>{% endif %}
+                {% if inv[20] %}<div class="col-4 col-md-2">
+                    <div class="small text-muted">Claim</div>
+                    <div class="fw-700 small">₹{{ inv[20] }}</div>
+                </div>{% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Invoice & Payment -->
+            <hr class="my-2 opacity-10">
+            <div class="d-flex flex-wrap gap-3">
+                {% if inv[2] %}
+                <a href="/static/bills/{{ inv[2] }}" target="_blank"
+                    class="btn btn-sm btn-outline-primary fw-700 rounded-pill px-3">
+                    <i class="fa fa-file-invoice me-1"></i>Loading Bill
+                </a>
+                {% endif %}
+                {% if inv[10] %}
+                <a href="/static/bills/{{ inv[10] }}" target="_blank"
+                    class="btn btn-sm btn-outline-success fw-700 rounded-pill px-3">
+                    <i class="fa fa-file-circle-check me-1"></i>Final Hisab
+                </a>
+                {% endif %}
+                {% if inv[14] %}
+                <a href="/static/bills/{{ inv[14] }}" target="_blank"
+                    class="btn btn-sm btn-outline-danger fw-700 rounded-pill px-3">
+                    <i class="fa fa-file-circle-minus me-1"></i>Debit Note
+                </a>
+                {% endif %}
+            </div>
+            {% if inv[11] %}
+            <div class="mt-2">
+                <span
+                    class="badge bg-{{ 'success' if inv[11] == 'paid' else 'warning' }}-subtle text-{{ 'success' if inv[11] == 'paid' else 'warning' }} fw-800 px-3 py-2 rounded-pill">
+                    Payment: {{ inv[11]|upper }}
+                    {% if inv[12] %} — {{ inv[12] }}{% endif %}
+                </span>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- ORDER TIMELINE -->
+    <div class="bg-white rounded-4 border p-4 mb-4">
+        <h6 class="fw-800 text-muted small text-uppercase mb-3"><i class="fa fa-timeline me-2"></i>Order Timeline</h6>
+        <div class="d-flex flex-column gap-2">
+            {% if booking[11] %}
+            <div class="p-2 bg-light rounded-3 d-flex align-items-center gap-2">
+                <i class="fa fa-plus-circle text-primary"></i>
+                <span class="fw-700 small">Order Created — {{ booking[11] }}</span>
+            </div>
+            {% endif %}
+            {% if booking[9] %}
+            <div class="p-2 bg-light rounded-3 d-flex align-items-center gap-2">
+                <i class="fa fa-truck text-info"></i>
+                <span class="fw-700 small">Loading Completed — {{ booking[9] }}</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

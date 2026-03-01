@@ -530,7 +530,7 @@
           </thead>
           <tbody>
             {% for b in completed_orders %}
-            <tr>
+            <tr style="cursor: pointer;" onclick="window.location='/miller/order/{{ b[0] }}'">
               <td><span class="badge bg-success-subtle text-success fw-800 font-monospace">{{ b[10] }}</span></td>
               <td>
                 <div class="fw-800">{{ b[1] }}</div>
@@ -543,7 +543,10 @@
                   <i class="fa fa-truck me-1"></i>{{ (invoices_map[b[0]]|length) if b[0] in invoices_map else 0 }}
                 </span>
               </td>
-              <td><span class="badge bg-success-subtle text-success fw-800 px-3 py-2 rounded-pill">✅ COMPLETED</span>
+              <td>
+                <a href="/miller/order/{{ b[0] }}" class="btn btn-sm btn-outline-success fw-800 rounded-pill px-3">
+                  View <i class="fa fa-arrow-right ms-1"></i>
+                </a>
               </td>
             </tr>
             {% endfor %}
