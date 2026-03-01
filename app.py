@@ -3954,6 +3954,11 @@ ORDER BY mb.created_at DESC
         location_filter=location_filter
     )
 
+@app.route("/privacy-policy")
+def privacy_policy():
+    return render_template("privacy_policy.html")
+
+
 @app.route("/directory")
 def user_directory():
     if not session.get("user_id"):
