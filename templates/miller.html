@@ -151,7 +151,7 @@
         <button class="nav-link" id="qc-tab" data-bs-toggle="pill" data-bs-target="#qc" type="button" role="tab">Quality
           Check</button>
         <button class="nav-link" id="payments-tab" data-bs-toggle="pill" data-bs-target="#payments" type="button"
-          role="tab">Settlements</button>
+          role="tab">Completed Orders</button>
       </div>
     </div>
     <h1 class="fw-800 text-white mb-2" data-aos="fade-up">{{ miller_name }}</h1>
@@ -203,7 +203,7 @@
           <div class="text-success fw-800 small text-uppercase">Complete Order</div>
           <i class="fa fa-circle-check text-success opacity-25"></i>
         </div>
-        <div class="fs-2 fw-800">{{ payment_completed|length }}</div>
+        <div class="fs-2 fw-800">{{ completed_orders|length }}</div>
         <div class="text-muted small fw-600 mt-1">Completed Trades</div>
       </div>
     </div>
@@ -511,46 +511,50 @@
       {% endif %}
     </div>
 
-    <!-- SETTLEMENTS TAB -->
+    <!-- COMPLETED ORDERS TAB -->
     <div class="tab-pane fade" id="payments" role="tabpanel">
-      <h4 class="fw-800 mb-4">Financial Settlements</h4>
-      {% if final_invoice_uploaded %}
-      <div class="row g-4">
-        {% for b in final_invoice_uploaded %}
-        <div class="col-md-6">
-          <div class="stat-card-miller border-warning-subtle" style="border-left: 5px solid #f59e0b;">
-            <div class="d-flex justify-content-between mb-4">
-              <div>
-                <h6 class="fw-800 text-dark mb-1">{{ b[1] }}</h6>
-                <span class="badge bg-primary-subtle text-primary fw-800 font-monospace">{{ b[10] }}</span>
-              </div>
-              <div class="text-end">
-                <span class="badge bg-warning-subtle text-warning-emphasis px-3 py-2 rounded-pill fw-800">AWAITING
-                  PAYMENT</span>
-              </div>
-            </div>
-
-            <div class="mb-4">
-              {% for inv in invoices_map[b[0]] %}
-              <div class="p-3 bg-light rounded-4 mb-2 d-flex justify-content-between align-items-center">
-                <div>
-                  <div class="fw-800 small">{{ inv.truck_number or 'Consignment' }}</div>
-                  <div class="small text-muted fw-600">{{ inv.qty }} Qt</div>
-                </div>
-                <form method="POST" action="/miller/mark_truck_payment_done/{{ inv.id }}">
-                  <button class="btn btn-success btn-sm fw-800 rounded-pill px-3">Mark Paid</button>
-                </form>
-              </div>
-              {% endfor %}
-            </div>
-          </div>
-        </div>
-        {% endfor %}
+      <h4 class="fw-800 mb-4">Completed Orders</h4>
+      {% if completed_orders %}
+      <div class="table-responsive">
+        <table class="table stock-table-modern">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Buyer</th>
+              <th>Crop</th>
+              <th>Quantity</th>
+              <th>Loaded</th>
+              <th>Trucks</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for b in completed_orders %}
+            <tr>
+              <td><span class="badge bg-success-subtle text-success fw-800 font-monospace">{{ b[10] }}</span></td>
+              <td>
+                <div class="fw-800">{{ b[1] }}</div>
+              </td>
+              <td><span class="text-capitalize fw-700">{{ b[2] }}</span></td>
+              <td>{{ b[3] }} Qt</td>
+              <td>{{ b[7] }} Qt</td>
+              <td>
+                <span class="badge bg-light text-muted fw-800 border px-3 py-2 rounded-pill">
+                  <i class="fa fa-truck me-1"></i>{{ (invoices_map[b[0]]|length) if b[0] in invoices_map else 0 }}
+                </span>
+              </td>
+              <td><span class="badge bg-success-subtle text-success fw-800 px-3 py-2 rounded-pill">✅ COMPLETED</span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
       {% else %}
       <div class="text-center py-5">
-        <i class="fa fa-file-invoice-dollar text-muted fs-1 opacity-25 mb-3"></i>
-        <h5 class="fw-800 text-muted">No pending settlements</h5>
+        <i class="fa fa-circle-check text-muted fs-1 opacity-25 mb-3"></i>
+        <h5 class="fw-800 text-muted">No completed orders yet</h5>
+        <p class="text-muted fw-600">Orders will appear here when 100% loading is complete</p>
       </div>
       {% endif %}
     </div>

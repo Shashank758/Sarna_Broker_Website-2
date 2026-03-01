@@ -1857,6 +1857,7 @@ ORDER BY mb.created_at DESC
     # ✅ PRE-FILTER BOOKINGS FOR TABS
     pending_list = [b for b in bookings if b[4] == 'pending']
     approved_loading = [b for b in bookings if b[4] in ('approved', 'completed') and b[8] not in ('closed', 'loaded')]
+    completed_orders = [b for b in bookings if b[8] == 'loaded' or (b[4] == 'completed' and b[8] == 'loaded')]
     final_invoice_uploaded = [b for b in bookings if b[17] and b[16] != 'paid'] # Using COALESCE(p.status) and p.invoice_file indices
     payment_completed = [b for b in bookings if b[16] == 'paid']
 
@@ -1933,6 +1934,7 @@ ORDER BY mb.created_at DESC
     bookings=bookings,
     pending_list=pending_list,
     approved_loading=approved_loading,
+    completed_orders=completed_orders,
     final_invoice_uploaded=final_invoice_uploaded,
     payment_completed=payment_completed,
     invoices_map=invoices_map,
