@@ -1232,6 +1232,22 @@ def upgrade_notifications_system():
     finally:
         con.close()
 
+def upgrade_miller_booking_deadline():
+    """Add deadline_at column to miller_bookings."""
+    con = get_db()
+    cur = con.cursor()
+    try:
+        cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name='miller_bookings'")
+        cols = [c[0] for c in cur.fetchall()]
+        if "deadline_at" not in cols:
+            cur.execute("ALTER TABLE miller_bookings ADD COLUMN deadline_at TIMESTAMP")
+        con.commit()
+    except Exception as e:
+        print(f"⚠️ deadline_at migration: {e}")
+        con.rollback()
+    finally:
+        con.close()
+
 def run_migrations():
     """Run all database migrations in a single connection to speed up startup."""
     try:
@@ -1277,6 +1293,9 @@ def run_migrations():
 
         # Notifications
         upgrade_notifications_system()
+
+        # Booking deadline
+        upgrade_miller_booking_deadline()
         
         # Miller Profile & Address Schema (Custom Logic)
         con = get_db()
