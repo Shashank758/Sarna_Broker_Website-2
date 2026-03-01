@@ -446,43 +446,120 @@
     <div class="tab-pane fade" id="payments" role="tabpanel">
       <h4 class="fw-800 mb-4">Completed Orders</h4>
       {% if completed_orders %}
-      <div class="table-responsive">
-        <table class="table stock-table-modern">
-          <thead>
-            <tr>
-              <th>Order ID</th>
-              <th>Buyer</th>
-              <th>Crop</th>
-              <th>Quantity</th>
-              <th>Loaded</th>
-              <th>Trucks</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for b in completed_orders %}
-            <tr style="cursor: pointer;" onclick="window.location='/miller/order/{{ b[0] }}'">
-              <td><span class="badge bg-success-subtle text-success fw-800 font-monospace">{{ b[10] }}</span></td>
-              <td>
-                <div class="fw-800">{{ b[1] }}</div>
-              </td>
-              <td><span class="text-capitalize fw-700">{{ b[2] }}</span></td>
-              <td>{{ b[3] }} Qt</td>
-              <td>{{ b[7] }} Qt</td>
-              <td>
-                <span class="badge bg-light text-muted fw-800 border px-3 py-2 rounded-pill">
-                  <i class="fa fa-truck me-1"></i>{{ (invoices_map[b[0]]|length) if b[0] in invoices_map else 0 }}
+      <div class="row g-4">
+        {% for b in completed_orders %}
+        <div class="col-12">
+          <div class="bg-white rounded-4 border p-4"
+            style="cursor:pointer; transition: all 0.2s; border-left: 5px solid {{ '#10b981' if b[16] == 'paid' else '#f59e0b' }};"
+            onclick="window.location='/miller/order/{{ b[0] }}'">
+
+            <!-- HEADER: Order ID + Payment Status -->
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+              <div class="d-flex align-items-center gap-3">
+                <span class="badge bg-primary-subtle text-primary fw-800 font-monospace px-3 py-2 rounded-pill">{{ b[10]
+                  }}</span>
+                <div>
+                  <div class="fw-800 fs-5">{{ b[1] }}</div>
+                  <div class="text-muted small fw-600">Buyer</div>
+                </div>
+              </div>
+              <div>
+                {% if b[16] == 'paid' %}
+                <span class="badge bg-success-subtle text-success fw-800 px-3 py-2 rounded-pill fs-6">
+                  <i class="fa fa-circle-check me-1"></i>Payment Done
                 </span>
-              </td>
-              <td>
-                <a href="/miller/order/{{ b[0] }}" class="btn btn-sm btn-outline-success fw-800 rounded-pill px-3">
-                  View <i class="fa fa-arrow-right ms-1"></i>
-                </a>
-              </td>
-            </tr>
+                {% else %}
+                <span class="badge bg-warning-subtle text-warning-emphasis fw-800 px-3 py-2 rounded-pill fs-6">
+                  <i class="fa fa-clock me-1"></i>Payment Pending
+                </span>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- TRADE INFO ROW -->
+            <div class="row g-2 mb-3">
+              <div class="col-6 col-md-3">
+                <div class="p-2 bg-light rounded-3 text-center">
+                  <div class="text-muted small fw-600" style="font-size:0.7rem;">CROP</div>
+                  <div class="fw-800 text-capitalize">{{ b[2] }}</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="p-2 bg-light rounded-3 text-center">
+                  <div class="text-muted small fw-600" style="font-size:0.7rem;">BOOKED</div>
+                  <div class="fw-800">{{ b[3] }} Qt</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="p-2 bg-light rounded-3 text-center">
+                  <div class="text-muted small fw-600" style="font-size:0.7rem;">LOADED</div>
+                  <div class="fw-800 text-success">{{ b[7] }} Qt</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="p-2 bg-light rounded-3 text-center">
+                  <div class="text-muted small fw-600" style="font-size:0.7rem;">TRUCKS</div>
+                  <div class="fw-800"><i class="fa fa-truck me-1 text-muted"></i>{{ (invoices_map[b[0]]|length) if b[0]
+                    in invoices_map else 0 }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- LOADING PROGRESS BAR -->
+            {% set percent = ((b[7] or 0) / (b[3] or 1) * 100)|round|int %}
+            <div class="d-flex justify-content-between small fw-800 mb-1">
+              <span>Loading Progress</span>
+              <span>{{ percent }}%</span>
+            </div>
+            <div class="progress mb-3" style="height: 8px; border-radius: 8px;">
+              <div class="progress-bar bg-success" style="width: {{ percent }}%"></div>
+            </div>
+
+            <!-- PER-TRUCK QC DETAILS -->
+            {% if b[0] in invoices_map %}
+            <div class="small fw-800 text-muted text-uppercase mb-2" style="font-size:0.65rem;">Truck-wise Details</div>
+            {% for inv in invoices_map[b[0]] %}
+            <div class="p-3 bg-light rounded-3 mb-2">
+              <div class="d-flex flex-wrap justify-content-between align-items-center mb-1">
+                <div class="fw-800">
+                  <i class="fa fa-truck-fast text-primary me-1"></i>{{ inv.truck_number or 'Truck #' ~ loop.index }}
+                </div>
+                <div class="d-flex gap-2 align-items-center">
+                  <span
+                    class="badge bg-{{ 'success' if inv.qc_status == 'verified' else 'secondary' }}-subtle text-{{ 'success' if inv.qc_status == 'verified' else 'secondary' }} fw-800 rounded-pill px-2 py-1"
+                    style="font-size:0.65rem;">
+                    {{ 'QC ✓' if inv.qc_status == 'verified' else 'QC Pending' }}
+                  </span>
+                  {% if inv.payment_status == 'paid' %}
+                  <span class="badge bg-success-subtle text-success fw-800 rounded-pill px-2 py-1"
+                    style="font-size:0.65rem;">Paid ✓</span>
+                  {% else %}
+                  <span class="badge bg-warning-subtle text-warning fw-800 rounded-pill px-2 py-1"
+                    style="font-size:0.65rem;">Unpaid</span>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="d-flex flex-wrap gap-3 small text-muted fw-600 mt-1">
+                <span><strong>Qty:</strong> {{ inv.qty }} Qt</span>
+                {% if inv.qc_weight %}<span><strong>Wt:</strong> {{ inv.qc_weight }} Qt</span>{% endif %}
+                {% if inv.qc_moisture %}<span><strong>Moisture:</strong> {{ inv.qc_moisture }}%</span>{% endif %}
+                {% if inv.qc_freight %}<span><strong>Freight:</strong> ₹{{ inv.qc_freight }}</span>{% endif %}
+                {% if inv.qc_remarks %}<span><strong>Remarks:</strong> {{ inv.qc_remarks }}</span>{% endif %}
+              </div>
+            </div>
             {% endfor %}
-          </tbody>
-        </table>
+            {% endif %}
+
+            <!-- VIEW DETAIL LINK -->
+            <div class="text-end mt-2">
+              <a href="/miller/order/{{ b[0] }}" class="btn btn-sm btn-outline-primary fw-800 rounded-pill px-4"
+                onclick="event.stopPropagation();">
+                Full Details <i class="fa fa-arrow-right ms-1"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
       </div>
       {% else %}
       <div class="text-center py-5">
