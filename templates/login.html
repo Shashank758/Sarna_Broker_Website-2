@@ -209,23 +209,9 @@
             body,
             html {
                 overflow: auto;
-                background: linear-gradient(135deg, #065f3a 0%, #0a8a54 40%, #0d9e62 70%, #087a4a 100%);
-                background-size: 400% 400%;
-                animation: mobileGradient 10s ease infinite;
-            }
-
-            @keyframes mobileGradient {
-                0% {
-                    background-position: 0% 50%;
-                }
-
-                50% {
-                    background-position: 100% 50%;
-                }
-
-                100% {
-                    background-position: 0% 50%;
-                }
+                background:
+                    linear-gradient(135deg, rgba(6, 95, 58, 0.75), rgba(10, 138, 84, 0.7)),
+                    url('/static/image/login_bg.png') center center / cover no-repeat fixed;
             }
 
             /* Digital mandi dot pattern overlay */
