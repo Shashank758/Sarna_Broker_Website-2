@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, url_for, flash
+from flask import Flask, render_template, request, redirect, session, url_for, flash, jsonify, send_from_directory
 import psycopg2
 import psycopg2.extras
 import os
@@ -10,6 +10,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from twilio.rest import Client
 from dotenv import load_dotenv
+from firebase_config import send_push_notification, save_notification
 
 load_dotenv()
 
@@ -466,6 +467,24 @@ CREATE TABLE IF NOT EXISTS miller_profiles (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
 """)
+
+    # NOTIFICATIONS TABLE
+    cur.execute("""
+CREATE TABLE IF NOT EXISTS notifications (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    title TEXT,
+    message TEXT,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+""")
+
+    # Add firebase_token column to users if not exists
+    try:
+        cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS firebase_token TEXT")
+    except Exception:
+        pass
 
     # DEFAULT ADMIN
     # DEFAULT ADMIN (SAFE)
@@ -4546,7 +4565,34 @@ def book_miller_stock(stock_id):
                     else:
                         message = f"🆕 New booking received! Order {order_id}: {crop} - Qty: {qty}. Please review and approve."
                     send_sms(miller_phone, message)
-            
+
+            # 🔔 Push Notification to Miller
+            try:
+                if stock_info:
+                    miller_id_for_notif = stock_info[0]
+                    crop_name = stock_info[1]
+                    # Get buyer name
+                    cur.execute("SELECT name FROM users WHERE id=%s", (session['user_id'],))
+                    buyer_row = cur.fetchone()
+                    buyer_name = buyer_row[0] if buyer_row else 'A buyer'
+
+                    notif_title = "New Stock Booking"
+                    notif_body = f"Buyer {buyer_name} booked {int(qty)} Qt of {crop_name}. Order: {order_id}"
+
+                    # Save in-app notification
+                    cur.execute("""
+                        INSERT INTO notifications (user_id, title, message)
+                        VALUES (%s, %s, %s)
+                    """, (miller_id_for_notif, notif_title, notif_body))
+
+                    # Send FCM push if token exists
+                    cur.execute("SELECT firebase_token FROM users WHERE id=%s", (miller_id_for_notif,))
+                    token_row = cur.fetchone()
+                    if token_row and token_row[0]:
+                        send_push_notification(token_row[0], notif_title, notif_body)
+            except Exception as notif_err:
+                logger.error(f"Notification error (non-fatal): {notif_err}")
+
             con.commit()
             log_activity("Stock Booked", booking_id, f"Order {order_id} placed. Qty: {qty}")
             if is_auto_approved:
@@ -5653,6 +5699,90 @@ def admin_update_truck(invoice_id):
 
 
 
+
+
+# ─────────────────── NOTIFICATION API ROUTES ───────────────────
+
+@app.route("/save_token", methods=["POST"])
+def save_firebase_token():
+    """Save FCM token for the logged-in user."""
+    if "user_id" not in session:
+        return jsonify({"error": "Not logged in"}), 401
+
+    data = request.get_json()
+    token = data.get("token") if data else None
+    if not token:
+        return jsonify({"error": "No token provided"}), 400
+
+    try:
+        con = get_db()
+        cur = con.cursor()
+        cur.execute("UPDATE users SET firebase_token=%s WHERE id=%s", (token, session["user_id"]))
+        con.commit()
+        con.close()
+        return jsonify({"success": True})
+    except Exception as e:
+        logger.error(f"Error saving FCM token: {e}")
+        return jsonify({"error": "Failed to save token"}), 500
+
+
+@app.route("/notifications")
+def get_notifications():
+    """Return unread notifications for the logged-in user."""
+    if "user_id" not in session:
+        return jsonify([]), 401
+
+    try:
+        con = get_db()
+        cur = con.cursor()
+        cur.execute("""
+            SELECT id, title, message, is_read, created_at
+            FROM notifications
+            WHERE user_id=%s
+            ORDER BY created_at DESC
+            LIMIT 20
+        """, (session["user_id"],))
+        rows = cur.fetchall()
+        con.close()
+
+        notifs = []
+        for r in rows:
+            notifs.append({
+                "id": r[0],
+                "title": r[1],
+                "message": r[2],
+                "is_read": r[3],
+                "created_at": str(r[4]) if r[4] else None
+            })
+        return jsonify(notifs)
+    except Exception as e:
+        logger.error(f"Error fetching notifications: {e}")
+        return jsonify([]), 500
+
+
+@app.route("/notifications/mark_read", methods=["POST"])
+def mark_notifications_read():
+    """Mark all notifications as read for the logged-in user."""
+    if "user_id" not in session:
+        return jsonify({"error": "Not logged in"}), 401
+
+    try:
+        con = get_db()
+        cur = con.cursor()
+        cur.execute("UPDATE notifications SET is_read=TRUE WHERE user_id=%s AND is_read=FALSE", (session["user_id"],))
+        con.commit()
+        con.close()
+        return jsonify({"success": True})
+    except Exception as e:
+        logger.error(f"Error marking notifications: {e}")
+        return jsonify({"error": "Failed"}), 500
+
+
+@app.route("/firebase-messaging-sw.js")
+def firebase_sw():
+    """Serve Firebase service worker from root path."""
+    return send_from_directory("static", "firebase-messaging-sw.js",
+                              mimetype="application/javascript")
 
 
 if __name__ == "__main__":
