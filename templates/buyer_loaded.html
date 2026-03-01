@@ -123,11 +123,21 @@
   {% if orders %}
   {% for o in orders %}
   <div class="order-card-premium-wrapper" data-aos="fade-up" data-aos-delay="{{ loop.index * 30 }}">
-    <div class="order-card-premium">
+    <div class="order-card-premium"
+      style="border-left: 5px solid {{ '#10b981' if o.payment_status == 'paid' else '#f59e0b' }};">
+
+      <!-- STATUS STRIP: Dynamic based on payment -->
+      {% if o.payment_status == 'paid' %}
       <div class="order-status-strip status-loaded">
-        <span><i class="fa fa-check-double me-2"></i> FULLY LOADED & SETTLED</span>
+        <span><i class="fa fa-check-double me-2"></i>FULLY LOADED & PAID</span>
         <span>COMPLETED ON {{ o.loaded_at or 'N/A' }}</span>
       </div>
+      {% else %}
+      <div class="order-status-strip" style="background:#fefce8; color:#854d0e;">
+        <span><i class="fa fa-clock me-2"></i>LOADED — PAYMENT PENDING</span>
+        <span>LOADED ON {{ o.loaded_at or 'N/A' }}</span>
+      </div>
+      {% endif %}
 
       <div class="order-main">
         <div class="row align-items-start">
@@ -135,78 +145,151 @@
             <div class="order-title">{{ o.crop|capitalize }} · {{ o.loaded }} Qt</div>
             <div class="order-meta">
               <span class="badge bg-light text-muted fw-800 me-2">#{{ o.order_id }}</span>
-              <span>Buyer: <strong>{{ o.miller_name }}</strong></span>
+              <span>Seller: <strong>{{ o.miller_name }}</strong></span>
+              {% if o.miller_city %}<span class="ms-2 text-muted small"><i class="fa fa-map-marker-alt me-1"></i>{{
+                o.miller_city }}</span>{% endif %}
             </div>
 
-            <div class="settlement-panel mt-4">
-              <div class="row g-4">
-                <div class="col-md-6 border-end">
-                  <h6 class="fw-800 text-uppercase small text-muted mb-3">Load Finality</h6>
-                  <div class="d-flex justify-content-between mb-2">
-                    <span class="text-muted fw-600 small">Total Booked:</span>
-                    <span class="fw-800">{{ o.booked }} Qt</span>
-                  </div>
-                  <div class="d-flex justify-content-between">
-                    <span class="text-muted fw-600 small">Actual Loaded:</span>
-                    <span class="fw-800 text-success">{{ o.loaded }} Qt</span>
-                  </div>
+            <!-- TRADE SUMMARY -->
+            <div class="row g-2 mb-3">
+              <div class="col-6 col-md-3">
+                <div class="p-2 bg-light rounded-3 text-center">
+                  <div class="text-muted small fw-600" style="font-size:0.7rem;">BOOKED</div>
+                  <div class="fw-800">{{ o.booked }} Qt</div>
                 </div>
-                <div class="col-md-6">
-                  <h6 class="fw-800 text-uppercase small text-muted mb-3">Settlement Document</h6>
-                  {% if o.final_invoice %}
-                  <a href="{{ url_for('static', filename='uploads/bills/' + o.final_invoice) }}" target="_blank"
-                    class="btn btn-outline-primary w-100 rounded-pill fw-800 py-2">
-                    <i class="fa fa-file-invoice me-2"></i> View Final Bill
-                  </a>
-                  {% else %}
-                  <div class="small text-muted italic">Final invoice not yet attached.</div>
-                  {% endif %}
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="p-2 bg-light rounded-3 text-center">
+                  <div class="text-muted small fw-600" style="font-size:0.7rem;">LOADED</div>
+                  <div class="fw-800 text-success">{{ o.loaded }} Qt</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="p-2 bg-light rounded-3 text-center">
+                  <div class="text-muted small fw-600" style="font-size:0.7rem;">TRUCKS</div>
+                  <div class="fw-800"><i class="fa fa-truck me-1 text-muted"></i>{{ o.invoices|length }}</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="p-2 bg-light rounded-3 text-center">
+                  <div class="text-muted small fw-600" style="font-size:0.7rem;">PAYMENT</div>
+                  <div class="fw-800 text-{{ 'success' if o.payment_status == 'paid' else 'warning' }}">
+                    {{ 'Paid ✓' if o.payment_status == 'paid' else 'Pending' }}
+                  </div>
                 </div>
               </div>
             </div>
+
+            <!-- LOADING PROGRESS -->
+            {% set percent = ((o.loaded or 0) / (o.booked or 1) * 100)|round|int %}
+            <div class="d-flex justify-content-between small fw-800 mb-1">
+              <span>Loading Progress</span>
+              <span>{{ percent }}%</span>
+            </div>
+            <div class="progress mb-3" style="height: 8px; border-radius: 8px;">
+              <div class="progress-bar bg-success" style="width: {{ percent }}%"></div>
+            </div>
+
+            <!-- SETTLEMENT DOCUMENT -->
+            <div class="settlement-panel mt-3">
+              <h6 class="fw-800 text-uppercase small text-muted mb-3">Settlement Document</h6>
+              {% if o.final_invoice %}
+              <a href="{{ url_for('static', filename='uploads/bills/' + o.final_invoice) }}" target="_blank"
+                class="btn btn-outline-primary rounded-pill fw-800 py-2 px-4">
+                <i class="fa fa-file-invoice me-2"></i>View Final Bill
+              </a>
+              {% else %}
+              <div class="small text-muted fw-600">Final invoice not yet attached.</div>
+              {% endif %}
+            </div>
           </div>
 
-          <div class="col-lg-4 text-center text-lg-end">
+          <!-- PAYMENT STATUS CARD -->
+          <div class="col-lg-4 text-center text-lg-end mt-3 mt-lg-0">
+            {% if o.payment_status == 'paid' %}
             <div
               class="p-4 bg-success-subtle rounded-4 h-100 d-flex flex-column justify-content-center border-success-subtle border">
               <div class="fs-1 text-success mb-2"><i class="fa fa-circle-check"></i></div>
               <h5 class="fw-800 text-success-emphasis mb-1">Payment Done</h5>
               <p class="small text-success-emphasis mb-0 opacity-75">Trade successfully finalized on the platform.</p>
+              {% if o.payment_at %}
+              <div class="mt-2 small text-success fw-700">Paid: {{ o.payment_at }}</div>
+              {% endif %}
             </div>
+            {% else %}
+            <div
+              class="p-4 bg-warning-subtle rounded-4 h-100 d-flex flex-column justify-content-center border-warning-subtle border">
+              <div class="fs-1 text-warning mb-2"><i class="fa fa-clock"></i></div>
+              <h5 class="fw-800 text-warning-emphasis mb-1">Payment Pending</h5>
+              <p class="small text-warning-emphasis mb-0 opacity-75">Loading complete. Awaiting payment from seller.</p>
+            </div>
+            {% endif %}
           </div>
         </div>
 
-        <div class="mt-5">
-          <h6 class="fw-800 text-uppercase small text-muted mb-4 pb-2 border-bottom">Consignment Breakdown</h6>
+        <!-- PER-TRUCK BREAKDOWN WITH QC DETAILS -->
+        <div class="mt-4">
+          <h6 class="fw-800 text-uppercase small text-muted mb-3 pb-2 border-bottom">
+            Consignment Breakdown ({{ o.invoices|length }} Trucks)
+          </h6>
           {% if o.invoices %}
           <div class="truck-grid">
             {% for inv in o.invoices %}
-            <div class="truck-card">
+            <div class="truck-card"
+              style="border-left: 4px solid {{ '#10b981' if inv.qc_status == 'verified' else '#94a3b8' }};">
               <div class="d-flex justify-content-between align-items-start mb-3">
                 <div>
                   <div class="fw-800 text-primary fs-5">{{ inv.truck_number or 'Truck #' ~ loop.index }}</div>
                   <small class="text-muted fw-700">QTY: {{ inv.qty }} Qt</small>
                 </div>
-                <span class="qc-badge qc-verified">VERIFIED</span>
+                <div class="d-flex flex-column gap-1 align-items-end">
+                  {% if inv.qc_status == 'verified' %}
+                  <span class="qc-badge qc-verified">QC ✓</span>
+                  {% else %}
+                  <span class="qc-badge" style="background:#f1f5f9; color:#64748b;">QC PENDING</span>
+                  {% endif %}
+                  {% if inv.payment_status == 'paid' %}
+                  <span class="qc-badge" style="background:#dcfce7; color:#166534;">PAID ✓</span>
+                  {% else %}
+                  <span class="qc-badge" style="background:#fef9c3; color:#854d0e;">UNPAID</span>
+                  {% endif %}
+                </div>
               </div>
 
-              <div class="mt-3 py-2 border-top border-bottom border-light">
+              <!-- QC DATA -->
+              <div class="mt-2 py-2 border-top border-bottom border-light">
                 <div class="d-flex justify-content-between small mb-1">
                   <span class="text-muted fw-600">QC Weight:</span>
                   <span class="fw-800">{{ inv.qc_weight or inv.qty }} Qt</span>
                 </div>
-                <div class="d-flex justify-content-between small">
+                <div class="d-flex justify-content-between small mb-1">
                   <span class="text-muted fw-600">Moisture:</span>
-                  <span class="fw-800">{{ inv.qc_moisture or 'N/A' }}%</span>
+                  <span class="fw-800">{{ inv.qc_moisture or 'N/A' }}{% if inv.qc_moisture %}%{% endif %}</span>
                 </div>
+                {% if inv.qc_freight %}
+                <div class="d-flex justify-content-between small mb-1">
+                  <span class="text-muted fw-600">Freight:</span>
+                  <span class="fw-800">₹{{ inv.qc_freight }}</span>
+                </div>
+                {% endif %}
+                {% if inv.qc_remarks %}
+                <div class="mt-1">
+                  <span class="text-muted fw-600 small">Remarks:</span>
+                  <span class="fw-700 small"> {{ inv.qc_remarks }}</span>
+                </div>
+                {% endif %}
               </div>
 
-              <div class="mt-3 d-flex gap-2">
+              <!-- DOCUMENTS -->
+              <div class="mt-3 d-flex flex-wrap gap-2">
                 <a href="{{ url_for('static', filename='uploads/bills/' + inv.file) }}" target="_blank"
-                  class="btn btn-light border flex-grow-1 fw-700 small py-2"><i class="fa fa-eye me-1"></i> View
+                  class="btn btn-light border flex-grow-1 fw-700 small py-2"><i class="fa fa-eye me-1"></i>View
                   Bill</a>
                 {% if inv.final_invoice_file %}
-                <a href="/buyer/debit_note/{{ inv.id }}" class="btn btn-primary-subtle fw-800 py-2 small px-3">Debit
+                <a href="{{ url_for('static', filename='uploads/bills/' + inv.final_invoice_file) }}" target="_blank"
+                  class="btn btn-outline-success fw-700 small py-2 px-3"><i
+                    class="fa fa-file-circle-check me-1"></i>Hisab</a>
+                <a href="/buyer/debit_note/{{ inv.id }}" class="btn btn-outline-danger fw-700 small py-2 px-3">Debit
                   Note</a>
                 {% endif %}
               </div>
