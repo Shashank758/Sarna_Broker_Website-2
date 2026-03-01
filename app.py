@@ -10,7 +10,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from twilio.rest import Client
 from dotenv import load_dotenv
-from firebase_config import send_push_notification, save_notification
+
 
 load_dotenv()
 
@@ -480,11 +480,7 @@ CREATE TABLE IF NOT EXISTS notifications (
 )
 """)
 
-    # Add firebase_token column to users if not exists
-    try:
-        cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS firebase_token TEXT")
-    except Exception:
-        pass
+
 
     # DEFAULT ADMIN
     # DEFAULT ADMIN (SAFE)
@@ -1214,7 +1210,7 @@ def upgrade_admin_logs_extended():
 
 
 def upgrade_notifications_system():
-    """Create notifications table and add firebase_token to users."""
+    """Create notifications table."""
     con = get_db()
     cur = con.cursor()
     try:
@@ -1228,7 +1224,6 @@ def upgrade_notifications_system():
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
-        cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS firebase_token TEXT")
         con.commit()
         print("✅ Notifications system migration complete")
     except Exception as e:
@@ -1280,7 +1275,7 @@ def run_migrations():
         # Payments
         upgrade_payments_table()
 
-        # Notifications & Firebase
+        # Notifications
         upgrade_notifications_system()
         
         # Miller Profile & Address Schema (Custom Logic)
@@ -4612,11 +4607,7 @@ def book_miller_stock(stock_id):
                         VALUES (%s, %s, %s)
                     """, (miller_id_for_notif, notif_title, notif_body))
 
-                    # Send FCM push if token exists
-                    cur.execute("SELECT firebase_token FROM users WHERE id=%s", (miller_id_for_notif,))
-                    token_row = cur.fetchone()
-                    if token_row and token_row[0]:
-                        send_push_notification(token_row[0], notif_title, notif_body)
+
             except Exception as notif_err:
                 logger.error(f"Notification error (non-fatal): {notif_err}")
 
@@ -5730,28 +5721,6 @@ def admin_update_truck(invoice_id):
 
 # ─────────────────── NOTIFICATION API ROUTES ───────────────────
 
-@app.route("/save_token", methods=["POST"])
-def save_firebase_token():
-    """Save FCM token for the logged-in user."""
-    if "user_id" not in session:
-        return jsonify({"error": "Not logged in"}), 401
-
-    data = request.get_json()
-    token = data.get("token") if data else None
-    if not token:
-        return jsonify({"error": "No token provided"}), 400
-
-    try:
-        con = get_db()
-        cur = con.cursor()
-        cur.execute("UPDATE users SET firebase_token=%s WHERE id=%s", (token, session["user_id"]))
-        con.commit()
-        con.close()
-        return jsonify({"success": True})
-    except Exception as e:
-        logger.error(f"Error saving FCM token: {e}")
-        return jsonify({"error": "Failed to save token"}), 500
-
 
 @app.route("/notifications")
 def get_notifications():
@@ -5805,11 +5774,7 @@ def mark_notifications_read():
         return jsonify({"error": "Failed"}), 500
 
 
-@app.route("/firebase-messaging-sw.js")
-def firebase_sw():
-    """Serve Firebase service worker from root path."""
-    return send_from_directory("static", "firebase-messaging-sw.js",
-                              mimetype="application/javascript")
+
 
 
 if __name__ == "__main__":

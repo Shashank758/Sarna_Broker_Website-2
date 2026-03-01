@@ -311,96 +311,9 @@
 
   {% block extra_js %}{% endblock %}
 
-  <!-- Firebase SDK (only for logged-in users) -->
+  <!-- Notification badge & dropdown refresh (for logged-in users) -->
   {% if session.user_id %}
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js"></script>
-
-  <!-- FCM Notification Toast -->
-  <div id="fcmToast" class="position-fixed top-0 end-0 p-3" style="z-index: 99999;">
-    <div class="toast align-items-center border-0 shadow-lg" role="alert"
-      style="min-width:320px; border-radius:16px; overflow:hidden;">
-      <div style="background:linear-gradient(135deg,#0f9b5f,#0F5132); padding:10px 16px;">
-        <strong class="text-white"><i class="fa fa-bell me-2"></i><span id="fcmToastTitle">Notification</span></strong>
-      </div>
-      <div class="toast-body fw-600 p-3" id="fcmToastBody" style="font-size:0.9rem;">
-        New notification received.
-      </div>
-    </div>
-  </div>
-
   <script>
-    // ─── Firebase Configuration (REPLACE with your project values) ───
-   const firebaseConfig = {
-  apiKey: "AIzaSyD2xT-2-KVgu1-Iyv1Wn6mXXfP8aXM3w8g",
-  authDomain: "sarna-broker.firebaseapp.com",
-  projectId: "sarna-broker",
-  storageBucket: "sarna-broker.firebasestorage.app",
-  messagingSenderId: "165530468734",
-  appId: "1:165530468734:web:d7ce59ece97662fbc8332f"
-};
-
-const VAPID_KEY = "BMzTVpNHMbh9KcNFOtEb7jJso-Elj-bpaqPK0zsKBI3V8ffwDuYJ6nBj3JXxJLwrp9LSUKFMDsT6tLep7zs83CI";
-
-    // ─── Initialize Firebase ───
-    firebase.initializeApp(firebaseConfig);
-    const messaging = firebase.messaging();
-
-    // Register service worker & request permission
-    if ('serviceWorker' in navigator && 'Notification' in window) {
-      navigator.serviceWorker.register('/firebase-messaging-sw.js')
-        .then(function (registration) {
-          console.log('[FCM] Service worker registered');
-
-          // Request notification permission
-          Notification.requestPermission().then(function (permission) {
-            if (permission === 'granted') {
-              console.log('[FCM] Permission granted');
-              // Get FCM token
-              messaging.getToken({
-                vapidKey: VAPID_KEY,
-                serviceWorkerRegistration: registration
-              }).then(function (token) {
-                if (token) {
-                  console.log('[FCM] Token obtained');
-                  // Save token to backend
-                  fetch('/save_token', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token: token })
-                  }).then(function (res) {
-                    if (res.ok) console.log('[FCM] Token saved to server');
-                  }).catch(function (err) {
-                    console.warn('[FCM] Token save failed:', err);
-                  });
-                }
-              }).catch(function (err) {
-                console.warn('[FCM] Token error:', err);
-              });
-            }
-          });
-        }).catch(function (err) {
-          console.warn('[FCM] SW registration failed:', err);
-        });
-
-      // ─── Foreground message handler ───
-      messaging.onMessage(function (payload) {
-        console.log('[FCM] Foreground message:', payload);
-        const title = payload.notification?.title || 'Saarna Canvessars';
-        const body = payload.notification?.body || 'New notification';
-
-        document.getElementById('fcmToastTitle').textContent = title;
-        document.getElementById('fcmToastBody').textContent = body;
-
-        const toastEl = document.querySelector('#fcmToast .toast');
-        const toast = new bootstrap.Toast(toastEl, { delay: 6000 });
-        toast.show();
-
-        // Update bell badge
-        refreshNotificationBadge();
-      });
-    }
-
     // ─── Notification badge refresh ───
     function refreshNotificationBadge() {
       fetch('/notifications')
