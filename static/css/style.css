@@ -2498,7 +2498,27 @@ a {
     font-size: 1.1rem;
 }
 
-@media (max-width: 991px) {
+/* ==========================================================
+   COMPREHENSIVE RESPONSIVE SYSTEM
+   Covers: 992px (tablet), 768px (phone landscape), 576px (phone)
+   ========================================================== */
+
+/* --- Global Overflow Protection --- */
+html,
+body {
+    overflow-x: hidden;
+}
+
+/* --- Responsive Images --- */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* ======= BREAKPOINT: TABLETS & BELOW (≤992px) ======= */
+@media (max-width: 992px) {
+
+    /* Admin: Sidebar collapses */
     .admin-sidebar {
         width: 100%;
         height: auto;
@@ -2507,6 +2527,547 @@ a {
 
     .admin-content {
         margin-left: 0;
-        padding: 20px;
+        padding: 20px 16px;
+    }
+
+    .admin-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: center;
+        padding-bottom: 10px;
+    }
+
+    .admin-nav li {
+        margin-bottom: 0;
+    }
+
+    .admin-nav a {
+        padding: 8px 14px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+
+    .sidebar-brand {
+        padding-bottom: 16px;
+        margin-bottom: 16px;
+        text-align: center;
+    }
+
+    /* Miller hero: tighter */
+    .miller-hero {
+        padding: 40px 0 80px;
+        border-radius: 0 0 30px 30px;
+    }
+
+    .miller-hero h1 {
+        font-size: 1.5rem;
+    }
+
+    /* Tab content */
+    .miller-tab-content {
+        padding: 24px 16px;
+        border-radius: 20px;
+    }
+
+    /* Nav pills: scrollable */
+    .nav-pills-premium {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        max-width: 100%;
+        border-radius: 16px;
+    }
+
+    .nav-pills-premium::-webkit-scrollbar {
+        display: none;
+    }
+
+    .nav-pills-premium .nav-link {
+        white-space: nowrap;
+        font-size: 0.78rem;
+        padding: 8px 16px;
+    }
+
+    /* Footer: stack columns */
+    .sarna-footer .row>div {
+        margin-bottom: 24px;
+    }
+
+    /* Page headers */
+    .page-header {
+        padding: 24px 20px;
+        border-radius: var(--radius);
+    }
+
+    /* Enterprise card spacing */
+    .enterprise-card-body {
+        padding: 18px;
+    }
+
+    /* Profile */
+    .profile-avatar {
+        width: 70px;
+        height: 70px;
+        font-size: 28px;
+    }
+
+    /* Farmer crop card: stack */
+    .farmer-crop-card,
+    .crop-modern-card {
+        flex-direction: column;
+    }
+
+    .farmer-crop-image,
+    .crop-img {
+        width: 100%;
+        height: 160px;
+    }
+
+    .crop-data,
+    .crop-meta,
+    .crop-metrics {
+        gap: 16px;
+    }
+}
+
+/* ======= BREAKPOINT: PHONE LANDSCAPE (≤768px) ======= */
+@media (max-width: 768px) {
+
+    /* Body text */
+    body {
+        font-size: 0.9rem;
+    }
+
+    /* Headings shrink */
+    h1,
+    .fs-1 {
+        font-size: 1.4rem !important;
+    }
+
+    h2,
+    .fs-2 {
+        font-size: 1.2rem !important;
+    }
+
+    h3,
+    .fs-3 {
+        font-size: 1.1rem !important;
+    }
+
+    h4,
+    .fs-4 {
+        font-size: 1rem !important;
+    }
+
+    /* Containers: edge-to-edge feel */
+    .container {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    /* Dashboard stat cards: 2-col on phone */
+    .dashboard-container .row.g-4>.col-md-3 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+
+    .stat-card-miller {
+        padding: 18px 14px;
+        border-radius: 16px;
+    }
+
+    .stat-card-miller .fs-2 {
+        font-size: 1.5rem !important;
+    }
+
+    /* Stat cards (admin) */
+    .stat-card,
+    .stat-box,
+    .stat-card-enterprise {
+        padding: 14px;
+    }
+
+    .stat-card-enterprise .stat-value {
+        font-size: 22px;
+    }
+
+    /* Tables: scrollable + smaller */
+    .table-responsive {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+        font-size: 0.8rem;
+    }
+
+    .enterprise-table thead th,
+    .enterprise-table tbody td,
+    .table-enterprise thead th,
+    .table-enterprise tbody td,
+    .stock-table-modern thead th,
+    .stock-table-modern tbody td {
+        padding: 10px 12px;
+        font-size: 0.78rem;
+    }
+
+    /* Cards: tighter */
+    .card,
+    .section-card,
+    .enterprise-card,
+    .booking-request-card,
+    .truck-qc-panel,
+    .admin-card,
+    .profiles-card,
+    .users-card {
+        border-radius: 16px;
+    }
+
+    .booking-request-card {
+        padding: 18px;
+    }
+
+    /* Buttons: touch-friendly */
+    .btn {
+        min-height: 42px;
+        font-size: 0.85rem;
+    }
+
+    .btn-enterprise {
+        padding: 10px 18px;
+    }
+
+    .btn-sm {
+        min-height: 36px;
+        font-size: 0.78rem;
+    }
+
+    /* Forms: touch-friendly */
+    .form-control,
+    .form-select,
+    .enterprise-input,
+    .enterprise-input-sm {
+        font-size: 16px;
+        /* prevents iOS zoom */
+        padding: 10px 14px;
+        border-radius: 10px;
+    }
+
+    .input-group-text {
+        font-size: 0.8rem;
+        padding: 8px 10px;
+    }
+
+    /* Search bars: full width */
+    .search-control,
+    #stockSearch {
+        width: 100% !important;
+    }
+
+    /* Live rate header: stack */
+    #stock .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    #stock .d-flex.justify-content-between .d-flex.gap-2 {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    #stock .d-flex.justify-content-between .d-flex.gap-2 .btn {
+        width: 100%;
+    }
+
+    /* Modals: full width on mobile */
+    .modal-dialog {
+        margin: 10px;
+    }
+
+    .modal-content {
+        border-radius: 20px !important;
+    }
+
+    /* Back to top */
+    .back-to-top {
+        bottom: 16px;
+        right: 16px;
+        width: 40px;
+        height: 40px;
+    }
+
+    /* Hero: tighter */
+    .hero-section {
+        padding: 20px 14px;
+        border-radius: var(--radius);
+    }
+
+    /* Progress steps */
+    .progress-steps {
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .progress-steps::before {
+        display: none;
+    }
+
+    /* Flash messages */
+    .flash-container .alert {
+        font-size: 0.85rem;
+    }
+
+    /* Crop cards */
+    .crop-card img {
+        height: 160px;
+    }
+
+    /* Sold box */
+    .sold-box {
+        font-size: 13px;
+        padding: 8px 10px;
+    }
+
+    /* Footer */
+    .sarna-footer {
+        padding: 30px 0 20px;
+    }
+
+    .footer-bottom {
+        font-size: 0.78rem;
+    }
+
+    /* Market card */
+    .market-img {
+        height: 100px;
+        font-size: 36px;
+    }
+
+    /* Dashboard container */
+    .dashboard-container {
+        padding-bottom: 40px;
+    }
+
+    /* Navbar mobile tweaks */
+    .sarna-navbar .navbar-brand {
+        font-size: 1.1rem;
+    }
+
+    .sarna-navbar .navbar-brand .brand-badge {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+    }
+
+    .sarna-navbar .navbar-brand .brand-badge i {
+        font-size: 1rem;
+    }
+
+    .sarna-navbar .nav-link {
+        padding: 10px 14px !important;
+        font-size: 0.85rem;
+    }
+
+    /* Dropdown on mobile */
+    .sarna-navbar .dropdown-menu {
+        border-radius: 12px;
+        margin-top: 4px;
+    }
+
+    /* Admin cards */
+    .admin-card,
+    .profiles-card,
+    .pricing-card,
+    .history-card,
+    .logs-card,
+    .users-card {
+        border-radius: 20px;
+    }
+
+    /* Empty states */
+    .empty-state {
+        padding: 40px 16px;
+    }
+
+    .empty-state-icon {
+        width: 72px;
+        height: 72px;
+        font-size: 28px;
+    }
+}
+
+/* ======= BREAKPOINT: SMALL PHONES (≤576px) ======= */
+@media (max-width: 576px) {
+
+    /* Even tighter containers */
+    .container {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    /* Stat cards: force 2-col */
+    .dashboard-container .row.g-4>.col-md-3 {
+        flex: 0 0 50%;
+        max-width: 50%;
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+
+    .stat-card-miller {
+        padding: 14px 10px;
+        border-radius: 14px;
+    }
+
+    .stat-card-miller .fs-2 {
+        font-size: 1.3rem !important;
+    }
+
+    .stat-card-miller .small {
+        font-size: 0.65rem;
+    }
+
+    /* Stock cards: full width */
+    #stock-grid .col-md-6,
+    #stock-grid .col-lg-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    #stock-grid .card {
+        border-radius: 16px !important;
+    }
+
+    /* Miller hero */
+    .miller-hero {
+        padding: 30px 0 70px;
+        border-radius: 0 0 20px 20px;
+    }
+
+    .miller-hero h1 {
+        font-size: 1.25rem;
+    }
+
+    .miller-hero p {
+        font-size: 0.8rem;
+    }
+
+    /* Tab content */
+    .miller-tab-content {
+        padding: 16px 12px;
+        border-radius: 16px;
+        margin-top: 20px;
+    }
+
+    .miller-tab-content h4 {
+        font-size: 1rem !important;
+    }
+
+    /* Login page */
+    .login-container {
+        padding: 16px;
+    }
+
+    .login-card {
+        padding: 20px 16px;
+        border-radius: 14px;
+    }
+
+    /* Actions compact */
+    .actions,
+    .market-actions,
+    .crop-actions,
+    .crop-action-bar {
+        flex-direction: column;
+    }
+
+    .actions>*,
+    .market-actions>*,
+    .crop-actions>* {
+        width: 100%;
+    }
+
+    /* Post crop form */
+    .post-crop-card {
+        padding: 14px;
+        border-radius: 14px;
+    }
+
+    /* File upload */
+    .file-upload {
+        padding: 14px;
+    }
+
+    /* Price display */
+    .price-big {
+        font-size: 18px;
+    }
+
+    /* Bottom nav (if visible) */
+    .bottom-nav,
+    .dashboard-footer {
+        padding: 8px 0;
+    }
+
+    .bottom-nav .nav-item,
+    .dashboard-footer a {
+        font-size: 10px;
+    }
+
+    /* QC form */
+    .qc-form-mini {
+        padding: 12px;
+    }
+
+    /* Crop modern card text */
+    .crop-meta small,
+    .crop-data small {
+        font-size: 0.7rem;
+    }
+
+    /* Farmer crop info */
+    .farmer-crop-info {
+        padding: 12px;
+    }
+
+    /* Admin */
+    .admin-content {
+        padding: 14px 10px;
+    }
+
+    /* Admin nav: scroll horizontally */
+    .admin-nav {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        justify-content: flex-start;
+    }
+
+    .admin-nav a {
+        font-size: 0.72rem;
+        padding: 6px 10px;
+    }
+
+    /* Badges */
+    .badge,
+    .status-badge {
+        font-size: 0.65rem;
+        padding: 4px 10px;
+    }
+
+    /* Modal */
+    .modal-dialog {
+        margin: 6px;
+    }
+}
+
+/* ======= LANDSCAPE ORIENTATION FIX ======= */
+@media (max-height: 500px) and (orientation: landscape) {
+    .miller-hero {
+        padding: 20px 0 60px;
+    }
+
+    .sarna-navbar {
+        padding: 6px 0;
     }
 }
