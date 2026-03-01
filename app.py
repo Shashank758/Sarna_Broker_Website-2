@@ -1856,7 +1856,7 @@ ORDER BY mb.created_at DESC
 
     # ✅ PRE-FILTER BOOKINGS FOR TABS
     pending_list = [b for b in bookings if b[4] == 'pending']
-    approved_loading = [b for b in bookings if b[4] == 'approved' and b[8] != 'closed']
+    approved_loading = [b for b in bookings if b[4] in ('approved', 'completed') and b[8] not in ('closed', 'loaded')]
     final_invoice_uploaded = [b for b in bookings if b[17] and b[16] != 'paid'] # Using COALESCE(p.status) and p.invoice_file indices
     payment_completed = [b for b in bookings if b[16] == 'paid']
 
@@ -2152,7 +2152,7 @@ def miller_approved_page():
         LEFT JOIN buyer_profiles bp ON u.id = bp.buyer_id
         WHERE
             ms.miller_id = %s
-            AND mb.status = 'approved'
+            AND mb.status IN ('approved', 'completed')
         ORDER BY mb.created_at DESC
     """, (miller_id,))
 
@@ -3352,7 +3352,7 @@ def buyer_close_remaining(booking_id):
     cur.execute("""
         SELECT stock_id, quantity, loaded_qty, status
         FROM miller_bookings
-        WHERE id=%s AND buyer_id=%s AND status='approved'
+        WHERE id=%s AND buyer_id=%s AND status IN ('approved', 'completed')
     """, (booking_id, session["user_id"]))
 
     row = cur.fetchone()
@@ -4578,7 +4578,7 @@ def buyer_update_loading(id):
     cur.execute("""
         SELECT quantity, loaded_qty, stock_id
         FROM miller_bookings
-        WHERE id=%s AND buyer_id=%s AND status='approved'
+        WHERE id=%s AND buyer_id=%s AND status IN ('approved', 'completed')
     """, (id, session["user_id"]))
 
     row = cur.fetchone()
@@ -4613,15 +4613,19 @@ def buyer_update_loading(id):
     loading_status = "loaded" if new_loaded >= (total_qty - EPS) else "partial"
     truck_status = loading_status
 
+    # If 100% loaded, auto-complete the order
+    new_status = "completed" if loading_status == "loaded" else "approved"
+
     # 🔹 Update booking
     cur.execute("""
         UPDATE miller_bookings
         SET loaded_qty=%s,
             loading_status=%s,
             truck_status=%s,
+            status=%s,
             loaded_at=CURRENT_TIMESTAMP
         WHERE id=%s AND buyer_id=%s
-    """, (new_loaded, loading_status, truck_status, id, session["user_id"]))
+    """, (new_loaded, loading_status, truck_status, new_status, id, session["user_id"]))
 
     # 🔹 Save per-truck invoice
     truck_number_val = truck_number if truck_number else None
@@ -4992,7 +4996,7 @@ def admin():
         SELECT SUM(mb.quantity * COALESCE(mb.price, ms.price))
         FROM miller_bookings mb
         JOIN miller_stock ms ON mb.stock_id = ms.id
-        WHERE mb.status = 'approved'
+        WHERE mb.status IN ('approved', 'completed')
     """)
     total_revenue = cur.fetchone()[0] or 0
 
