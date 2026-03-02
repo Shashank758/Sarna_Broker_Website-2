@@ -4172,13 +4172,16 @@ def get_buyer_orders(filter_type):
             COALESCE(mp.mill_name, u.name) AS miller_name,
             mb.close_reason,
             mp.city,
-            mp.state
+            mp.state,
+
+            COALESCE(mb.price, ms.price) AS price,
+            mb.created_at
 
         FROM miller_bookings mb
-JOIN miller_stock ms ON mb.stock_id = ms.id
-JOIN users u ON ms.miller_id = u.id
-LEFT JOIN miller_profiles mp ON u.id = mp.miller_id
-LEFT JOIN payments p ON p.booking_id = mb.id
+        JOIN miller_stock ms ON mb.stock_id = ms.id
+        JOIN users u ON ms.miller_id = u.id
+        LEFT JOIN miller_profiles mp ON u.id = mp.miller_id
+        LEFT JOIN payments p ON p.booking_id = mb.id
 
         WHERE mb.buyer_id=%s
         {where}
@@ -4240,6 +4243,9 @@ LEFT JOIN payments p ON p.booking_id = mb.id
             "close_reason": r[16],
             "miller_city": r[17],
             "miller_state": r[18],
+
+            "price": r[19],
+            "created_at": r[20],
 
             "invoices": invoices_map.get(r[0], [])
         })

@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Request Orders | Saarna Canvessars{% endblock %}
 
@@ -135,11 +135,11 @@
                 </div>
                 <h3 class="fw-800 mb-0">Requested Orders</h3>
             </div>
-            <p class="text-muted mb-0 fw-500">Track and manage your bookings waiting for buyer approval.</p>
+            <p class="text-muted mb-0 fw-500">Track and manage your bookings waiting for miller approval.</p>
         </div>
         <div class="position-relative">
             <input type="text" id="requestedSearch" class="search-minimal"
-                placeholder="Filter by Buyer, Crop or ID...">
+                placeholder="Filter by Miller, Crop or ID...">
             <i class="fa fa-search position-absolute text-muted"
                 style="right: 16px; top: 50%; transform: translateY(-50%);"></i>
         </div>
@@ -151,8 +151,8 @@
         <div class="col-12 order-card-premium-wrapper" data-aos="fade-up" data-aos-delay="{{ loop.index * 30 }}">
             <div class="order-card-premium">
                 <div class="order-status-strip status-pending">
-                    <span><i class="fa fa-clock me-2"></i> PENDING buyer approval</span>
-                    <span>ORDERED ON {{ o.created_at or 'N/A' }}</span>
+                    <span><i class="fa fa-clock me-2"></i> PENDING miller approval</span>
+                    <span>ORDERED ON {{ o.created_at.strftime('%d %b %Y, %I:%M %p') if o.created_at else 'N/A' }}</span>
                 </div>
                 <div class="order-main">
                     <div class="d-flex justify-content-between align-items-start mb-3">
@@ -160,7 +160,7 @@
                             <div class="order-title">{{ o.crop|capitalize }} Booking Request</div>
                             <div class="order-meta">
                                 <span class="badge bg-light text-muted fw-800 me-2">#{{ o.order_id }}</span>
-                                <span>Buyer: <strong>{{ o.miller_name }}</strong></span>
+                                <span>Miller: <strong>{{ o.miller_name }}</strong></span>
                             </div>
                         </div>
                         <div class="text-end">
@@ -178,8 +178,7 @@
                         </div>
                         <div class="detail-item">
                             <span class="detail-label">Est. Value</span>
-                            <span class="detail-value text-primary">₹{{ (o.price * o.booked)|format_currency if (o.price
-                                and o.booked) else '0.00' }}</span>
+                            <span class="detail-value text-primary">₹{{ ((o.price or 0) * (o.booked or 0))|format_currency }}</span>
                         </div>
                         <div class="detail-item">
                             <span class="detail-label">Location</span>
