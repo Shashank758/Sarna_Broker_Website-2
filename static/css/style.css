@@ -62,6 +62,11 @@
     box-sizing: border-box;
 }
 
+html {
+    margin: 0;
+    padding: 0;
+}
+
 body {
     font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     background: var(--bg);
@@ -192,9 +197,24 @@ body {
     animation-delay: 0.5s;
 }
 
+/* Remove any gap above navbar */
+.app-shell {
+    margin: 0;
+    padding: 0;
+}
+
+.page-loader {
+    margin: 0;
+    padding: 0;
+}
+
 /* =========================
    UNIFIED NAVBAR
 ========================= */
+.navbar {
+    margin-bottom: 0;
+}
+
 .sarna-navbar {
     background: linear-gradient(135deg, var(--primary), var(--primary-dark)) !important;
     padding: 12px 0;
@@ -202,6 +222,8 @@ body {
     position: sticky;
     top: 0;
     z-index: 1000;
+    margin: 0;
+    border-top: none;
 }
 
 .sarna-navbar .navbar-brand {
