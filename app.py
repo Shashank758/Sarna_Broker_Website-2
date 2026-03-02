@@ -4183,7 +4183,7 @@ LEFT JOIN payments p ON p.booking_id = mb.id
         WHERE mb.buyer_id=%s
         {where}
         ORDER BY mb.created_at DESC
-    """, (session["user_id"],))
+    """, (get_effective_user_id(),))
 
     rows = cur.fetchall()
 
@@ -4575,12 +4575,13 @@ def book_miller_stock(stock_id):
             logger.debug(f"DEBUG: Generated order_id: {order_id}")
             
             # Create booking
+            buyer_id = get_effective_user_id()
             cur.execute("""
                 INSERT INTO miller_bookings
                 (stock_id, buyer_id, quantity, status, order_id, price)
                 VALUES (%s, %s, %s, %s, %s, %s)
             RETURNING id
-    """, (stock_id, session["user_id"], qty, initial_status, order_id, current_price))
+            """, (stock_id, buyer_id, qty, initial_status, order_id, current_price))
             
             booking_id = cur.fetchone()[0]  # was lastrowid
             logger.debug(f"DEBUG: Created booking_id: {booking_id}")
@@ -4603,47 +4604,50 @@ def book_miller_stock(stock_id):
                 WHERE id=%s AND quantity <= 0
             """, (stock_id,))
             
-            # 📱 Send SMS to miller about new booking
-            cur.execute("""
-                SELECT ms.miller_id, ms.crop
-                FROM miller_stock ms
-                WHERE ms.id = %s
-            """, (stock_id,))
-            stock_info = cur.fetchone()
-            if stock_info:
-                miller_id, crop = stock_info
-                miller_phone = get_miller_phone(miller_id)
-                if miller_phone:
-                    if is_auto_approved:
-                        message = f"✅ New Auto-Approved Order! {order_id}: {crop} - Qty: {qty}. Status: Approved."
-                    else:
-                        message = f"🆕 New booking received! Order {order_id}: {crop} - Qty: {qty}. Please review and approve."
-                    send_sms(miller_phone, message)
-
-            # 🔔 Push Notification to Miller
+            # ✅ COMMIT IMMEDIATELY - persist booking before any external operations
+            # This ensures the booking shows in miller/buyer panels even if SMS/notification fails
+            con.commit()
+            logger.info(f"Booking {booking_id} (Order {order_id}) committed successfully")
+            
+            # 📱 Send SMS to miller (non-critical - don't let failures affect booking)
             try:
+                cur.execute("""
+                    SELECT ms.miller_id, ms.crop
+                    FROM miller_stock ms
+                    WHERE ms.id = %s
+                """, (stock_id,))
+                stock_info = cur.fetchone()
                 if stock_info:
-                    miller_id_for_notif = stock_info[0]
-                    crop_name = stock_info[1]
-                    # Get buyer name
-                    cur.execute("SELECT name FROM users WHERE id=%s", (session['user_id'],))
+                    miller_id, crop = stock_info
+                    miller_phone = get_miller_phone(miller_id)
+                    if miller_phone:
+                        if is_auto_approved:
+                            message = f"✅ New Auto-Approved Order! {order_id}: {crop} - Qty: {qty}. Status: Approved."
+                        else:
+                            message = f"🆕 New booking received! Order {order_id}: {crop} - Qty: {qty}. Please review and approve."
+                        send_sms(miller_phone, message)
+            except Exception as sms_err:
+                logger.warning(f"SMS/stock_info error (booking persisted): {sms_err}")
+
+            # 🔔 Push Notification to Miller (non-critical)
+            try:
+                cur.execute("SELECT miller_id, crop FROM miller_stock WHERE id=%s", (stock_id,))
+                stock_info = cur.fetchone()
+                if stock_info:
+                    miller_id_for_notif, crop_name = stock_info
+                    cur.execute("SELECT name FROM users WHERE id=%s", (session["user_id"],))
                     buyer_row = cur.fetchone()
                     buyer_name = buyer_row[0] if buyer_row else 'A buyer'
-
                     notif_title = "New Stock Booking"
                     notif_body = f"Buyer {buyer_name} booked {int(qty)} Qt of {crop_name}. Order: {order_id}"
-
-                    # Save in-app notification
                     cur.execute("""
                         INSERT INTO notifications (user_id, title, message)
                         VALUES (%s, %s, %s)
                     """, (miller_id_for_notif, notif_title, notif_body))
-
-
+                    con.commit()
             except Exception as notif_err:
-                logger.error(f"Notification error (non-fatal): {notif_err}")
+                logger.warning(f"Notification error (non-fatal, booking persisted): {notif_err}")
 
-            con.commit()
             log_activity("Stock Booked", booking_id, f"Order {order_id} placed. Qty: {qty}")
             if is_auto_approved:
                 flash(f"Order {order_id} placed successfully and Auto-Approved!", "success")
