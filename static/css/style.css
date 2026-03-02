@@ -68,6 +68,8 @@ body {
     color: var(--text);
     line-height: 1.6;
     min-height: 100vh;
+    margin: 0;
+    padding: 0;
 }
 
 /* =========================
@@ -3229,7 +3231,7 @@ img {
     }
 
     /* Location filter button */
-    .market-hero + .container .dropdown .btn {
+    .market-hero+.container .dropdown .btn {
         font-size: 0.78rem;
         padding: 8px 14px;
     }
@@ -3352,7 +3354,7 @@ img {
         border-radius: 14px;
     }
 
-    .action-panel .row.g-3 > div {
+    .action-panel .row.g-3>div {
         flex: 0 0 100%;
         max-width: 100%;
     }
@@ -3376,8 +3378,11 @@ img {
 
 /* ── Forms Mobile ── */
 @media (max-width: 768px) {
+
     /* Prevent iOS zoom on input focus */
-    input, select, textarea {
+    input,
+    select,
+    textarea {
         font-size: 16px !important;
     }
 
@@ -3396,7 +3401,7 @@ img {
     }
 
     /* Card form fields: stack */
-    .card-body .row.g-3 > [class*="col-6"] {
+    .card-body .row.g-3>[class*="col-6"] {
         flex: 0 0 100%;
         max-width: 100%;
     }
@@ -3490,6 +3495,7 @@ img {
 
 /* ── Smooth touch scrolling for horizontal elements ── */
 @media (max-width: 768px) {
+
     .filters,
     .nav-pills-premium,
     .admin-nav {
@@ -3507,6 +3513,7 @@ img {
 
 /* ── Touch feedback for interactive elements ── */
 @media (max-width: 768px) {
+
     .premium-stock-card:active,
     .order-card-premium:active,
     .stat-card-miller:active,
@@ -3516,7 +3523,10 @@ img {
     }
 
     /* Better tap targets */
-    a, button, .btn, .nav-link {
+    a,
+    button,
+    .btn,
+    .nav-link {
         -webkit-tap-highlight-color: transparent;
     }
 
@@ -3532,6 +3542,7 @@ img {
 
 /* ── Print: hide bottom nav ── */
 @media print {
+
     .mobile-float-nav,
     .ptr-indicator {
         display: none !important;
