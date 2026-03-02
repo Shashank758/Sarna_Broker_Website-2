@@ -1,94 +1,342 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block title %}Privacy Policy | Saarna Canvessars{% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Privacy Policy - Saarna Canvessars">
+    <meta name="theme-color" content="#0f9b5f">
+    <title>Privacy Policy | Saarna Canvessars</title>
 
-{% block content %}
-<section
-    style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; padding: 50px 0; border-radius: 0 0 40px 40px;">
-    <div class="container text-center">
-        <h1 class="fw-800 mb-2">Privacy Policy</h1>
-        <p class="opacity-75 fw-600 mb-0">Effective Date: 01 March 2026</p>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #0a8a54;
+            --primary-dark: #065f3a;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+            margin: 0;
+        }
+
+        /* Simple top bar with back button */
+        .pp-topbar {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(10, 138, 84, 0.25);
+        }
+
+        .pp-topbar .back-btn {
+            width: 38px;
+            height: 38px;
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .pp-topbar .back-btn:active {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0.92);
+        }
+
+        .pp-topbar .brand {
+            color: #fff;
+            font-weight: 800;
+            font-size: 1.05rem;
+            text-decoration: none;
+        }
+
+        .pp-topbar .brand span {
+            font-weight: 300;
+        }
+
+        /* Hero */
+        .pp-hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .pp-hero h1 {
+            font-weight: 800;
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+        }
+
+        .pp-hero p {
+            opacity: 0.75;
+            font-weight: 600;
+            margin: 0;
+            font-size: 0.85rem;
+        }
+
+        /* Content */
+        .pp-content {
+            max-width: 860px;
+            margin: -20px auto 40px;
+            padding: 0 16px;
+        }
+
+        .pp-card {
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e2e8f0;
+            padding: 24px;
+        }
+
+        .pp-card h2 {
+            font-weight: 800;
+            font-size: 1.05rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .pp-card p,
+        .pp-card li {
+            color: #475569;
+            font-weight: 600;
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        .pp-card ul {
+            padding-left: 20px;
+        }
+
+        .pp-card ul li {
+            margin-bottom: 4px;
+        }
+
+        .pp-card hr {
+            opacity: 0.1;
+            margin: 20px 0;
+        }
+
+        .contact-box {
+            background: #f1f5f9;
+            border-radius: 14px;
+            padding: 16px;
+        }
+
+        .contact-box p {
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+        }
+
+        .contact-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .contact-box a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        /* Bottom sticky back bar for mobile */
+        .pp-bottom-bar {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .pp-hero {
+                padding: 28px 16px;
+            }
+
+            .pp-hero h1 {
+                font-size: 1.25rem;
+            }
+
+            .pp-card {
+                padding: 18px;
+                border-radius: 16px;
+            }
+
+            .pp-card h2 {
+                font-size: 0.95rem;
+            }
+
+            .pp-bottom-bar {
+                display: flex;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 9999;
+                background: rgba(255, 255, 255, 0.97);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border-top: 1px solid rgba(0, 0, 0, 0.06);
+                box-shadow: 0 -2px 24px rgba(0, 0, 0, 0.1);
+                padding: 8px 16px;
+                padding-bottom: max(8px, env(safe-area-inset-bottom));
+                justify-content: center;
+                gap: 12px;
+            }
+
+            .pp-bottom-bar a,
+            .pp-bottom-bar button {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                padding: 12px;
+                border-radius: 12px;
+                font-weight: 700;
+                font-size: 0.85rem;
+                border: none;
+                cursor: pointer;
+                text-decoration: none;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .pp-bottom-bar .btn-back {
+                background: var(--primary);
+                color: #fff;
+            }
+
+            .pp-bottom-bar .btn-back:active {
+                background: var(--primary-dark);
+            }
+
+            .pp-bottom-bar .btn-login {
+                background: #f1f5f9;
+                color: #334155;
+            }
+
+            .pp-content {
+                padding-bottom: 80px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Simple top bar with back button -->
+    <div class="pp-topbar">
+        <button class="back-btn" onclick="history.back()" aria-label="Go back">
+            <i class="fa fa-arrow-left"></i>
+        </button>
+        <a href="/login" class="brand">Saarna <span>Canvessars</span></a>
     </div>
-</section>
 
-<div class="container" style="max-width: 860px; padding-top: 40px; padding-bottom: 80px;">
-    <div class="bg-white rounded-4 shadow-sm p-4 p-md-5 border">
+    <!-- Hero -->
+    <section class="pp-hero">
+        <h1>Privacy Policy</h1>
+        <p>Effective Date: 01 March 2026</p>
+    </section>
 
-        <p class="text-muted fw-600 mb-4">Saarna Broker respects user privacy. This Privacy Policy explains how we
-            collect, use, and protect information when users access our website and mobile application.</p>
+    <!-- Content -->
+    <div class="pp-content">
+        <div class="pp-card">
 
-        <hr class="my-4 opacity-10">
+            <p>Saarna Broker respects user privacy. This Privacy Policy explains how we
+                collect, use, and protect information when users access our website and mobile application.</p>
 
-        <!-- 1 -->
-        <h2 class="fw-800 fs-5 mb-3" style="color: var(--primary);">1. Information We Collect</h2>
-        <ul class="text-muted fw-600 mb-4">
-            <li>Name</li>
-            <li>Mobile number</li>
-            <li>Email address</li>
-            <li>Business / Firm details</li>
-            <li>Location information</li>
-            <li>Booking and transaction data</li>
-            <li>Device / browser information</li>
-        </ul>
+            <hr>
 
-        <!-- 2 -->
-        <h2 class="fw-800 fs-5 mb-3" style="color: var(--primary);">2. How We Use Information</h2>
-        <ul class="text-muted fw-600 mb-4">
-            <li>Provide mandi trading services</li>
-            <li>Process bookings and transactions</li>
-            <li>Send confirmations and notifications</li>
-            <li>Improve platform performance</li>
-            <li>Prevent fraud and misuse</li>
-            <li>Comply with legal requirements</li>
-        </ul>
+            <h2>1. Information We Collect</h2>
+            <ul>
+                <li>Name</li>
+                <li>Mobile number</li>
+                <li>Email address</li>
+                <li>Business / Firm details</li>
+                <li>Location information</li>
+                <li>Booking and transaction data</li>
+                <li>Device / browser information</li>
+            </ul>
 
-        <!-- 3 -->
-        <h2 class="fw-800 fs-5 mb-3" style="color: var(--primary);">3. Push Notifications</h2>
-        <p class="text-muted fw-600">If enabled, users may receive:</p>
-        <ul class="text-muted fw-600 mb-3">
-            <li>Mandi price alerts</li>
-            <li>Booking confirmations</li>
-            <li>Payment confirmations</li>
-            <li>Important updates</li>
-        </ul>
-        <p class="text-muted fw-600 mb-4">Users can disable notifications anytime via device settings.</p>
+            <h2>2. How We Use Information</h2>
+            <ul>
+                <li>Provide mandi trading services</li>
+                <li>Process bookings and transactions</li>
+                <li>Send confirmations and notifications</li>
+                <li>Improve platform performance</li>
+                <li>Prevent fraud and misuse</li>
+                <li>Comply with legal requirements</li>
+            </ul>
 
-        <!-- 4 -->
-        <h2 class="fw-800 fs-5 mb-3" style="color: var(--primary);">4. Data Security</h2>
-        <p class="text-muted fw-600 mb-4">We implement reasonable security measures to protect data. However, no system
-            is 100% secure.</p>
+            <h2>3. Push Notifications</h2>
+            <p>If enabled, users may receive:</p>
+            <ul>
+                <li>Mandi price alerts</li>
+                <li>Booking confirmations</li>
+                <li>Payment confirmations</li>
+                <li>Important updates</li>
+            </ul>
+            <p>Users can disable notifications anytime via device settings.</p>
 
-        <!-- 5 -->
-        <h2 class="fw-800 fs-5 mb-3" style="color: var(--primary);">5. Data Sharing</h2>
-        <p class="text-muted fw-600">We do not sell personal information. Data may be shared only:</p>
-        <ul class="text-muted fw-600 mb-4">
-            <li>With trusted service providers</li>
-            <li>When legally required</li>
-            <li>To prevent fraud or security issues</li>
-        </ul>
+            <h2>4. Data Security</h2>
+            <p>We implement reasonable security measures to protect data. However, no system
+                is 100% secure.</p>
 
-        <!-- 6 -->
-        <h2 class="fw-800 fs-5 mb-3" style="color: var(--primary);">6. Cookies</h2>
-        <p class="text-muted fw-600 mb-4">We may use cookies for session management and analytics.</p>
+            <h2>5. Data Sharing</h2>
+            <p>We do not sell personal information. Data may be shared only:</p>
+            <ul>
+                <li>With trusted service providers</li>
+                <li>When legally required</li>
+                <li>To prevent fraud or security issues</li>
+            </ul>
 
-        <!-- 7 -->
-        <h2 class="fw-800 fs-5 mb-3" style="color: var(--primary);">7. Children's Privacy</h2>
-        <p class="text-muted fw-600 mb-4">This platform is not intended for children under 13.</p>
+            <h2>6. Cookies</h2>
+            <p>We may use cookies for session management and analytics.</p>
 
-        <!-- 8 -->
-        <h2 class="fw-800 fs-5 mb-3" style="color: var(--primary);">8. User Rights</h2>
-        <p class="text-muted fw-600 mb-4">Users may request data access, correction, or deletion by contacting us.</p>
+            <h2>7. Children's Privacy</h2>
+            <p>This platform is not intended for children under 13.</p>
 
-        <!-- 9 -->
-        <h2 class="fw-800 fs-5 mb-3" style="color: var(--primary);">9. Contact Information</h2>
-        <div class="bg-light rounded-4 p-3 p-md-4">
-            <p class="fw-600 mb-2"><i class="fa fa-envelope me-2" style="color: var(--primary);"></i>
-                <strong>Email:</strong> support@sarnabroker.com</p>
-            <p class="fw-600 mb-0"><i class="fa fa-globe me-2" style="color: var(--primary);"></i>
-                <strong>Website:</strong> <a href="https://sarna-broker-website-2-3.onrender.com"
-                    class="text-primary">https://sarna-broker-website-2-3.onrender.com</a></p>
+            <h2>8. User Rights</h2>
+            <p>Users may request data access, correction, or deletion by contacting us.</p>
+
+            <h2>9. Contact Information</h2>
+            <div class="contact-box">
+                <p><i class="fa fa-envelope me-2" style="color: var(--primary);"></i>
+                    <strong>Email:</strong> support@sarnabroker.com
+                </p>
+                <p><i class="fa fa-globe me-2" style="color: var(--primary);"></i>
+                    <strong>Website:</strong> <a
+                        href="https://sarna-broker-website-2-3.onrender.com">sarna-broker-website-2-3.onrender.com</a>
+                </p>
+            </div>
         </div>
-
     </div>
-</div>
-{% endblock %}
+
+    <!-- Mobile bottom bar with Back + Login -->
+    <div class="pp-bottom-bar">
+        <button class="btn-back" onclick="history.back()">
+            <i class="fa fa-arrow-left"></i> Go Back
+        </button>
+        <a href="/login" class="btn-login">
+            <i class="fa fa-sign-in-alt"></i> Login
+        </a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
