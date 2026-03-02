@@ -123,6 +123,47 @@
         color: #fff;
         border-color: var(--danger);
     }
+
+    /* Mobile styles for requested orders */
+    @media (max-width: 767px) {
+        .tracking-header {
+            padding: 18px;
+            border-radius: 16px;
+        }
+
+        .order-main {
+            padding: 16px;
+        }
+
+        .order-status-strip {
+            padding: 10px 14px;
+            font-size: 0.65rem;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .order-details-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .detail-label {
+            font-size: 0.6rem;
+        }
+
+        .detail-value {
+            font-size: 0.85rem;
+        }
+
+        .search-minimal {
+            max-width: 100%;
+        }
+
+        .btn-cancel-soft {
+            font-size: 0.72rem;
+            padding: 6px 12px;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -178,7 +219,8 @@
                         </div>
                         <div class="detail-item">
                             <span class="detail-label">Est. Value</span>
-                            <span class="detail-value text-primary">₹{{ ((o.price or 0) * (o.booked or 0))|format_currency }}</span>
+                            <span class="detail-value text-primary">₹{{ ((o.price or 0) * (o.booked or
+                                0))|format_currency }}</span>
                         </div>
                         <div class="detail-item">
                             <span class="detail-label">Location</span>

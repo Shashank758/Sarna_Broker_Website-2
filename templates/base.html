@@ -77,27 +77,91 @@
 
   </div>
 
-  <!-- Mobile Floating Navigation Bar (Back, Home, Refresh, Top) -->
+  <!-- Pull-to-Refresh Indicator -->
+  <div class="ptr-indicator" id="ptrIndicator">
+    <div class="ptr-spinner">
+      <i class="fa fa-rotate-right"></i>
+    </div>
+  </div>
+
+  <!-- Mobile Floating Navigation Bar (Role-Aware) -->
   <nav class="mobile-float-nav" id="mobileFloatNav">
-    <button onclick="history.back()" aria-label="Go back">
+    <button onclick="history.back()" aria-label="Go back" class="mnav-btn">
       <i class="fa fa-arrow-left"></i>
       <span>Back</span>
     </button>
-    <a href="/market" aria-label="Home">
+
+    {% if session.role == 'buyer' %}
+    <a href="/market" aria-label="Market" class="mnav-btn {% if request.path == '/market' %}mnav-active{% endif %}">
+      <i class="fa fa-store"></i>
+      <span>Market</span>
+    </a>
+    <a href="/buyer/requested" aria-label="Bookings"
+      class="mnav-btn {% if '/buyer/' in request.path %}mnav-active{% endif %}">
+      <i class="fa fa-shopping-bag"></i>
+      <span>Orders</span>
+    </a>
+    {% elif session.role == 'miller' %}
+    <a href="/miller" aria-label="Dashboard" class="mnav-btn {% if request.path == '/miller' %}mnav-active{% endif %}">
+      <i class="fa fa-gauge-high"></i>
+      <span>Dashboard</span>
+    </a>
+    <a href="/miller/approved" aria-label="Orders"
+      class="mnav-btn {% if '/miller/' in request.path %}mnav-active{% endif %}">
+      <i class="fa fa-clipboard-list"></i>
+      <span>Orders</span>
+    </a>
+    {% else %}
+    <a href="/market" aria-label="Home" class="mnav-btn">
       <i class="fa fa-home"></i>
       <span>Home</span>
     </a>
-    <button onclick="location.reload()" aria-label="Refresh">
+    {% endif %}
+
+    <button onclick="location.reload()" aria-label="Refresh" class="mnav-btn">
       <i class="fa fa-rotate-right"></i>
       <span>Refresh</span>
     </button>
-    <button onclick="window.scrollTo({top:0, behavior:'smooth'})" aria-label="Scroll to top">
+    <button onclick="window.scrollTo({top:0, behavior:'smooth'})" aria-label="Scroll to top" class="mnav-btn">
       <i class="fa fa-chevron-up"></i>
       <span>Top</span>
     </button>
   </nav>
 
   <style>
+    /* ===== PULL-TO-REFRESH ===== */
+    .ptr-indicator {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10000;
+      text-align: center;
+      padding: 14px 0;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.85rem;
+      transform: translateY(-100%);
+      transition: transform 0.3s ease;
+    }
+
+    .ptr-indicator.active {
+      transform: translateY(0);
+    }
+
+    .ptr-spinner i {
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes ptr-spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ===== MOBILE BOTTOM NAV ===== */
     .mobile-float-nav {
       display: none;
     }
@@ -110,60 +174,86 @@
         left: 0;
         right: 0;
         z-index: 9999;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
+        background: rgba(255, 255, 255, 0.97);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
         border-top: 1px solid rgba(0, 0, 0, 0.06);
-        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
-        padding: 6px 0;
-        padding-bottom: max(6px, env(safe-area-inset-bottom));
+        box-shadow: 0 -2px 24px rgba(0, 0, 0, 0.1);
+        padding: 4px 0;
+        padding-bottom: max(4px, env(safe-area-inset-bottom));
         justify-content: space-around;
         align-items: center;
-        transition: transform 0.3s ease;
+        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       .mobile-float-nav.nav-hidden {
         transform: translateY(100%);
       }
 
-      .mobile-float-nav button,
-      .mobile-float-nav a {
+      .mnav-btn {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 2px;
+        gap: 1px;
         background: none;
         border: none;
-        color: #64748b;
-        font-size: 0.65rem;
+        color: #94a3b8;
+        font-size: 0.6rem;
         font-weight: 700;
-        padding: 6px 12px;
-        border-radius: 10px;
+        padding: 6px 10px;
+        border-radius: 12px;
         cursor: pointer;
         transition: all 0.2s ease;
         text-decoration: none;
         -webkit-tap-highlight-color: transparent;
+        position: relative;
+        letter-spacing: 0.2px;
       }
 
-      .mobile-float-nav button i,
-      .mobile-float-nav a i {
-        font-size: 1.1rem;
+      .mnav-btn i {
+        font-size: 1.15rem;
+        margin-bottom: 1px;
       }
 
-      .mobile-float-nav button:active,
-      .mobile-float-nav a:active {
+      .mnav-btn.mnav-active {
+        color: #0a8a54;
+      }
+
+      .mnav-btn.mnav-active::before {
+        content: '';
+        position: absolute;
+        top: -4px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 20px;
+        height: 3px;
+        background: #0a8a54;
+        border-radius: 0 0 4px 4px;
+      }
+
+      .mnav-btn:active {
         color: #0a8a54;
         background: rgba(10, 138, 84, 0.08);
-        transform: scale(0.92);
+        transform: scale(0.9);
       }
 
-      /* Push content above the nav bar */
+      /* Push main content above bottom nav */
       .main-content {
-        padding-bottom: 70px;
+        padding-bottom: 72px;
       }
 
-      /* Hide the old back-to-top on mobile since we have Top in the bar */
+      /* Hide footer on mobile — bottom nav replaces it */
+      .sarna-footer {
+        display: none;
+      }
+
+      /* Hide desktop back-to-top */
       .back-to-top {
+        display: none !important;
+      }
+
+      /* Hide footer back-to-top button */
+      #backToTop {
         display: none !important;
       }
     }
@@ -307,6 +397,63 @@
         item.style.display = text.includes(term) ? '' : 'none';
       });
     }
+
+    // ─── Mobile: Auto-hide bottom nav on scroll down, show on scroll up ───
+    (function () {
+      const nav = document.getElementById('mobileFloatNav');
+      if (!nav) return;
+      let lastY = 0;
+      let ticking = false;
+
+      window.addEventListener('scroll', function () {
+        if (!ticking) {
+          window.requestAnimationFrame(function () {
+            const currentY = window.scrollY;
+            if (currentY > lastY && currentY > 100) {
+              nav.classList.add('nav-hidden');
+            } else {
+              nav.classList.remove('nav-hidden');
+            }
+            lastY = currentY;
+            ticking = false;
+          });
+          ticking = true;
+        }
+      }, { passive: true });
+    })();
+
+    // ─── Mobile: Pull-to-Refresh ───
+    (function () {
+      if (window.innerWidth > 768) return;
+      const indicator = document.getElementById('ptrIndicator');
+      if (!indicator) return;
+      let startY = 0;
+      let pulling = false;
+
+      document.addEventListener('touchstart', function (e) {
+        if (window.scrollY === 0) {
+          startY = e.touches[0].clientY;
+          pulling = true;
+        }
+      }, { passive: true });
+
+      document.addEventListener('touchmove', function (e) {
+        if (!pulling) return;
+        const diff = e.touches[0].clientY - startY;
+        if (diff > 80) {
+          indicator.style.display = 'block';
+          requestAnimationFrame(() => indicator.classList.add('active'));
+        }
+      }, { passive: true });
+
+      document.addEventListener('touchend', function () {
+        if (!pulling) return;
+        pulling = false;
+        if (indicator.classList.contains('active')) {
+          setTimeout(() => location.reload(), 400);
+        }
+      });
+    })();
   </script>
 
   {% block extra_js %}{% endblock %}

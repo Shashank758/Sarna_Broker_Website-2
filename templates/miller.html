@@ -134,6 +134,51 @@
     font-size: 0.85rem;
     font-weight: 600;
   }
+
+  /* Miller mobile adjustments */
+  @media (max-width: 767px) {
+    .miller-hero {
+      padding: 28px 0 72px;
+    }
+
+    .miller-hero h1 {
+      font-size: 1.2rem !important;
+    }
+
+    .miller-tab-content {
+      padding: 16px 12px;
+      border-radius: 18px;
+    }
+
+    .stat-card-miller {
+      padding: 14px 10px;
+    }
+
+    .stat-card-miller .fs-2 {
+      font-size: 1.3rem !important;
+    }
+
+    /* Stock card forms: full-width on mobile */
+    .stock-item .card-body .col-6 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+
+    /* Full-width buttons on mobile */
+    .stock-item .d-flex.justify-content-between.align-items-center {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .stock-item .d-flex.justify-content-between.align-items-center .d-flex.gap-2 {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .stock-item .btn-enterprise {
+      width: 100%;
+    }
+  }
 </style>
 {% endblock %}
 

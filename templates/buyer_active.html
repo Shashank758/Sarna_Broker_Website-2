@@ -117,6 +117,59 @@
     width: 100%;
     max-width: 320px;
   }
+
+  /* Mobile styles for active orders */
+  @media (max-width: 767px) {
+    .order-main {
+      padding: 16px;
+    }
+
+    .order-title {
+      font-size: 1rem;
+    }
+
+    .order-meta {
+      font-size: 0.8rem;
+      margin-bottom: 14px;
+    }
+
+    .order-meta .mx-2 {
+      display: none;
+    }
+
+    .order-meta span:last-child {
+      display: block;
+      margin-top: 4px;
+    }
+
+    .progress-tracking {
+      padding: 14px;
+      border-radius: 12px;
+    }
+
+    .truck-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .truck-card {
+      padding: 14px;
+    }
+
+    .action-panel {
+      padding: 16px;
+      border-radius: 14px;
+    }
+
+    .action-panel .row.g-3>div[class*="col-md"] {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+
+    .search-minimal {
+      max-width: 100%;
+    }
+  }
 </style>
 {% endblock %}
 

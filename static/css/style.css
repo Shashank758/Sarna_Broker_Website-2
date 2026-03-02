@@ -3071,3 +3071,469 @@ img {
         padding: 6px 0;
     }
 }
+
+/* ===========================================================
+   INDUSTRY-LEVEL MOBILE ENHANCEMENTS
+   Premium mobile-first experience — native app feel
+   =========================================================== */
+
+/* ── Navbar Mobile Drawer ── */
+@media (max-width: 991px) {
+    .sarna-navbar .navbar-collapse {
+        background: linear-gradient(180deg, rgba(6, 95, 58, 0.98), rgba(4, 67, 41, 0.98));
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        margin: 12px -12px 0;
+        padding: 8px 16px 16px;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sarna-navbar .navbar-nav {
+        gap: 2px;
+    }
+
+    .sarna-navbar .navbar-nav .nav-link {
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        padding: 12px 18px !important;
+        border-radius: 14px;
+        font-size: 0.92rem;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.85) !important;
+        transition: all 0.2s ease;
+    }
+
+    .sarna-navbar .navbar-nav .nav-link:active {
+        background: rgba(255, 255, 255, 0.2) !important;
+        transform: scale(0.98);
+    }
+
+    .sarna-navbar .navbar-nav .nav-link.active {
+        background: rgba(255, 255, 255, 0.15) !important;
+        color: #fff !important;
+    }
+
+    /* Mobile nav divider between sections */
+    .sarna-navbar .navbar-nav .nav-item:last-child .btn-outline-light {
+        margin-top: 8px;
+        width: 100%;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Dropdown menus in mobile nav */
+    .sarna-navbar .dropdown-menu {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-radius: 14px !important;
+        backdrop-filter: blur(16px);
+        box-shadow: none !important;
+        margin-top: 4px;
+    }
+
+    .sarna-navbar .dropdown-menu .dropdown-item {
+        color: rgba(255, 255, 255, 0.85) !important;
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-weight: 600;
+    }
+
+    .sarna-navbar .dropdown-menu .dropdown-item:hover,
+    .sarna-navbar .dropdown-menu .dropdown-item:active {
+        background: rgba(255, 255, 255, 0.15) !important;
+        color: #fff !important;
+    }
+
+    .sarna-navbar .dropdown-menu .dropdown-divider {
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* ── Notification Dropdown Mobile ── */
+@media (max-width: 768px) {
+    #notifDropdown {
+        position: fixed !important;
+        left: 8px !important;
+        right: 8px !important;
+        top: 60px !important;
+        width: auto !important;
+        max-height: 60vh !important;
+        border-radius: 20px !important;
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25) !important;
+    }
+}
+
+/* ── Market Hero Mobile ── */
+@media (max-width: 768px) {
+    .market-hero {
+        padding: 28px 0 32px;
+        margin-bottom: 20px;
+        border-radius: 0 0 24px 24px;
+    }
+
+    .market-hero .display-5 {
+        font-size: 1.35rem !important;
+    }
+
+    .market-hero .fs-5 {
+        font-size: 0.85rem !important;
+    }
+
+    .market-hero .badge {
+        font-size: 0.65rem;
+        padding: 6px 12px !important;
+    }
+
+    /* Hide stat cards in hero on mobile */
+    .stat-card-premium {
+        padding: 14px 12px;
+        min-width: 100px;
+        border-radius: 14px;
+    }
+
+    .stat-card-premium .stat-label {
+        font-size: 0.65rem;
+        letter-spacing: 0.5px;
+    }
+
+    .stat-card-premium .stat-value {
+        font-size: 1.2rem;
+    }
+
+    /* Tab pills: horizontal scroll */
+    .nav-pills-premium {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        gap: 6px;
+        margin-bottom: 20px;
+        padding-bottom: 4px;
+        justify-content: flex-start !important;
+    }
+
+    .nav-pills-premium::-webkit-scrollbar {
+        display: none;
+    }
+
+    .nav-pills-premium .nav-link {
+        white-space: nowrap;
+        font-size: 0.8rem;
+        padding: 10px 16px;
+        border-radius: 10px;
+        flex-shrink: 0;
+    }
+
+    /* Location filter button */
+    .market-hero + .container .dropdown .btn {
+        font-size: 0.78rem;
+        padding: 8px 14px;
+    }
+
+    /* Search bar full width */
+    #marketSearch {
+        max-width: 100% !important;
+    }
+}
+
+/* ── Miller Dashboard Mobile ── */
+@media (max-width: 768px) {
+    .miller-hero {
+        padding: 28px 0 70px;
+        border-radius: 0 0 24px 24px;
+    }
+
+    /* Tab pills scroll with fade overlay hint */
+    .miller-hero .nav-pills-premium {
+        max-width: calc(100vw - 32px);
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        padding: 6px;
+    }
+
+    .miller-hero .nav-pills-premium::-webkit-scrollbar {
+        display: none;
+    }
+
+    .miller-hero .nav-pills-premium .nav-link {
+        white-space: nowrap;
+        padding: 8px 14px;
+        font-size: 0.75rem;
+        border-radius: 25px;
+    }
+
+    /* Stock grid: full-width cards */
+    .miller-tab-content {
+        padding: 16px 12px;
+        border-radius: 18px;
+        margin-top: 16px;
+    }
+
+    .miller-tab-content .d-flex.justify-content-between.align-items-center {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch !important;
+    }
+
+    .miller-tab-content .d-flex.gap-2.align-items-center {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .miller-tab-content .enterprise-input-sm {
+        width: 100% !important;
+    }
+
+    .miller-tab-content .btn-enterprise {
+        width: 100%;
+    }
+
+    .dashboard-container {
+        margin-top: -50px;
+    }
+}
+
+/* ── Cards & Order Pages Mobile ── */
+@media (max-width: 768px) {
+    .order-card-premium .order-main {
+        padding: 16px;
+    }
+
+    .order-card-premium .order-status-strip {
+        padding: 10px 16px;
+        font-size: 0.68rem;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .order-card-premium .order-title {
+        font-size: 1rem;
+    }
+
+    .order-card-premium .order-meta {
+        font-size: 0.8rem;
+    }
+
+    .order-details-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .tracking-header {
+        padding: 18px;
+        border-radius: 16px;
+        margin-bottom: 16px;
+    }
+
+    .tracking-header h3 {
+        font-size: 1.1rem !important;
+    }
+
+    /* Truck grid: single column on mobile */
+    .truck-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .truck-card {
+        padding: 16px;
+    }
+
+    /* Action panel form: stack vertically */
+    .action-panel {
+        padding: 16px;
+        border-radius: 14px;
+    }
+
+    .action-panel .row.g-3 > div {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    /* Progress tracking */
+    .progress-tracking {
+        padding: 14px;
+        border-radius: 12px;
+    }
+
+    /* Booking request cards */
+    .booking-request-card {
+        padding: 16px;
+        border-radius: 16px;
+    }
+
+    .booking-request-card .d-grid {
+        gap: 8px;
+    }
+}
+
+/* ── Forms Mobile ── */
+@media (max-width: 768px) {
+    /* Prevent iOS zoom on input focus */
+    input, select, textarea {
+        font-size: 16px !important;
+    }
+
+    .form-control,
+    .form-select,
+    .enterprise-input,
+    .enterprise-input-sm {
+        font-size: 16px !important;
+        padding: 12px 14px;
+        border-radius: 12px;
+    }
+
+    .input-group .form-control,
+    .input-group .enterprise-input-sm {
+        padding: 10px 12px;
+    }
+
+    /* Card form fields: stack */
+    .card-body .row.g-3 > [class*="col-6"] {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+/* ── Modals Mobile ── */
+@media (max-width: 576px) {
+    .modal-dialog {
+        margin: 0 !important;
+        max-width: 100%;
+        min-height: 100vh;
+    }
+
+    .modal-content {
+        border-radius: 0 !important;
+        min-height: 100vh;
+    }
+
+    .modal-gradient-header {
+        padding: 24px 20px;
+    }
+
+    .modal-body {
+        padding: 20px 16px;
+    }
+
+    .modal-footer {
+        padding: 16px;
+    }
+
+    .btn-premium-book {
+        width: 100%;
+        justify-content: center;
+        padding: 14px;
+    }
+}
+
+/* ── Profile Pages Mobile ── */
+@media (max-width: 768px) {
+    .profile-avatar {
+        width: 64px;
+        height: 64px;
+        font-size: 24px;
+    }
+
+    .page-header {
+        padding: 20px 16px;
+        border-radius: 14px;
+        margin-bottom: 16px;
+    }
+
+    .page-header h4 {
+        font-size: 1.1rem !important;
+    }
+}
+
+/* ── Order Summary Card Mobile ── */
+@media (max-width: 768px) {
+    .order-summary-card {
+        padding: 18px;
+        border-radius: 16px;
+    }
+
+    /* Market stock cards */
+    .premium-stock-card {
+        padding: 14px;
+        gap: 10px;
+        border-radius: 14px;
+    }
+
+    .stock-row-name {
+        font-size: 0.9rem;
+    }
+
+    .stock-row-price {
+        font-size: 1.1rem;
+    }
+
+    .detail-chip {
+        font-size: 0.68rem;
+        padding: 3px 8px;
+    }
+}
+
+/* ── Directory Page Mobile ── */
+@media (max-width: 768px) {
+    .directory-card {
+        border-radius: 14px;
+    }
+}
+
+/* ── Smooth touch scrolling for horizontal elements ── */
+@media (max-width: 768px) {
+    .filters,
+    .nav-pills-premium,
+    .admin-nav {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+        scrollbar-width: none;
+    }
+
+    .filters::-webkit-scrollbar,
+    .nav-pills-premium::-webkit-scrollbar,
+    .admin-nav::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+/* ── Touch feedback for interactive elements ── */
+@media (max-width: 768px) {
+    .premium-stock-card:active,
+    .order-card-premium:active,
+    .stat-card-miller:active,
+    .booking-request-card:active {
+        transform: scale(0.985);
+        transition: transform 0.1s ease;
+    }
+
+    /* Better tap targets */
+    a, button, .btn, .nav-link {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Disable hover effects on touch */
+    .enterprise-card:hover,
+    .premium-stock-card:hover,
+    .crop-card:hover,
+    .stat-card-miller:hover,
+    .order-card-premium:hover {
+        transform: none;
+    }
+}
+
+/* ── Print: hide bottom nav ── */
+@media print {
+    .mobile-float-nav,
+    .ptr-indicator {
+        display: none !important;
+    }
+}
