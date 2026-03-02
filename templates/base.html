@@ -32,7 +32,7 @@
 </head>
 
 <body>
-  <!-- Page Loading Overlay -->
+  <!-- Page Loading Overlay (absolutely positioned, no layout space) -->
   <div class="page-loader" id="pageLoader">
     <div class="loader-content">
       <i class="fa fa-seedling loader-icon"></i>
@@ -40,11 +40,11 @@
     </div>
   </div>
 
+  <!-- Navigation bar (outside app-shell to avoid flex gap) -->
+  {% include '_navbar.html' %}
+
   <!-- Main App Shell -->
   <div class="app-shell">
-
-    <!-- Navigation bar with higher z-index -->
-    {% include '_navbar.html' %}
 
     <!-- Flash messages with premium styling -->
     <div class="flash-container">
