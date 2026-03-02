@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Marketplace | Saarna Canvessars{% endblock %}
 
@@ -409,8 +409,8 @@
                             </div>
                         </div>
 
-                        <!-- Book button -->
-                        {% if session.role != 'admin' %}
+                        <!-- Book button (buyers only) -->
+                        {% if session.role == 'buyer' %}
                         <button class="btn btn-premium-book" data-bs-toggle="modal"
                             data-bs-target="#bookModal{{ stock[0] }}">
                             <i class="fa fa-file-signature"></i>Book

@@ -1148,32 +1148,31 @@ def upgrade_miller_booking_price():
 
 def generate_next_order_id():
     """Generate next order ID in format S10001, S10002, etc."""
-    con = get_db()
-    cur = con.cursor()
-    
-    # Get the highest order number
-    cur.execute("""
-        SELECT order_id FROM miller_bookings 
-        WHERE order_id IS NOT NULL AND order_id LIKE 'S%'
-        ORDER BY CAST(SUBSTRING(order_id, 2) AS INTEGER) DESC
-        LIMIT 1
-    """)
-    result = cur.fetchone()
-    
-    con.close()
-    
-    if result and result[0]:
-        # Extract number from existing order_id (e.g., "S10001" -> 10001)
-        try:
-            last_number = int(result[0][1:])
-            next_number = last_number + 1
-        except ValueError:
+    try:
+        con = get_db()
+        cur = con.cursor()
+        cur.execute("""
+            SELECT order_id FROM miller_bookings 
+            WHERE order_id IS NOT NULL AND order_id ~ '^S[0-9]+$'
+            ORDER BY CAST(SUBSTRING(order_id FROM 2) AS INTEGER) DESC
+            LIMIT 1
+        """)
+        result = cur.fetchone()
+        con.close()
+
+        if result and result[0]:
+            try:
+                last_number = int(result[0][1:])
+                next_number = last_number + 1
+            except ValueError:
+                next_number = 10001
+        else:
             next_number = 10001
-    else:
-        # Start from S10001
-        next_number = 10001
-    
-    return f"S{next_number}"
+        return f"S{next_number}"
+    except Exception as e:
+        logger.error(f"generate_next_order_id failed: {e}")
+        import time
+        return f"S{10001 + int(time.time() % 100000)}"
 
 
 def upgrade_admin_logs_table():
@@ -3911,7 +3910,10 @@ def market():
     cur.execute(miller_stock_query, tuple(query_params))
     miller_stocks = cur.fetchall()
 
-    cur.execute("""
+    # Fetch buyer's bookings (skip if not logged in)
+    user_id = session.get("user_id")
+    if user_id:
+        cur.execute("""
 SELECT
     mb.id,                 -- 0
     ms.crop,               -- 1
@@ -3942,9 +3944,10 @@ LEFT JOIN payments p ON p.booking_id = mb.id
 LEFT JOIN miller_profiles mp ON u.id = mp.miller_id
 WHERE mb.buyer_id=%s
 ORDER BY mb.created_at DESC
-""", (session["user_id"],))
-
-    my_bookings = cur.fetchall()
+        """, (user_id,))
+        my_bookings = cur.fetchall()
+    else:
+        my_bookings = []
 
     active_bookings = [
         b for b in my_bookings
@@ -4512,11 +4515,20 @@ def buyer_payments():
 @app.route("/book_miller_stock/<int:stock_id>", methods=["POST"])
 def book_miller_stock(stock_id):
     if session.get("role") != "buyer":
-        flash("Unauthorized access.", "error")
+        flash("Unauthorized access. Please log in as a buyer to book stock.", "error")
+        return redirect("/market")
+
+    if not session.get("user_id"):
+        flash("Please log in to place an order.", "error")
+        return redirect("/market")
+
+    qty_raw = request.form.get("quantity")
+    if qty_raw is None or qty_raw == "":
+        flash("Please enter a quantity.", "error")
         return redirect("/market")
 
     try:
-        qty = float(request.form["quantity"])
+        qty = float(qty_raw)
     except (TypeError, ValueError):
         flash("Invalid quantity entered.", "error")
         return redirect("/market")
@@ -4639,10 +4651,9 @@ def book_miller_stock(stock_id):
                 flash(f"Order {order_id} placed successfully! Waiting for miller approval.", "success")
         except Exception as e:
             con.rollback()
-            logger.error(f"Error booking stock: {e}")
+            logger.error(f"Error booking stock: {e}", exc_info=True)
             flash("An error occurred while placing the order.", "error")
-            flash(str(e), "error") # DEBUG: Show actual error
-            logger.error(f"Error booking stock: {e}")
+            flash(str(e), "error")
 
     con.close()
     return redirect("/market")
