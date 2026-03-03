@@ -4220,6 +4220,16 @@ def get_buyer_orders(filter_type):
 
     orders = []
     for r in rows:
+        booking_invoices = invoices_map.get(r[0], [])
+
+        # Derive order-level payment status from truck-level data:
+        # If all trucks are paid, the order is paid (even if payments table is stale)
+        db_payment_status = r[12]
+        if booking_invoices and all(inv["payment_status"] == "paid" for inv in booking_invoices):
+            effective_payment_status = "paid"
+        else:
+            effective_payment_status = db_payment_status
+
         orders.append({
             "id": r[0],
             "order_id": r[1],
@@ -4235,7 +4245,7 @@ def get_buyer_orders(filter_type):
             "qc_status": r[10],
             "qc_at": r[11],
 
-            "payment_status": r[12],
+            "payment_status": effective_payment_status,
             "final_invoice": r[13],
             "payment_at": r[14],
 
@@ -4247,7 +4257,7 @@ def get_buyer_orders(filter_type):
             "price": r[19],
             "created_at": r[20],
 
-            "invoices": invoices_map.get(r[0], [])
+            "invoices": booking_invoices
         })
 
     con.close()

@@ -493,9 +493,20 @@
       {% if completed_orders %}
       <div class="row g-4">
         {% for b in completed_orders %}
+        {% set ns = namespace(all_paid=true) %}
+        {% if b[0] in invoices_map and invoices_map[b[0]]|length > 0 %}
+        {% for inv in invoices_map[b[0]] %}
+        {% if inv.payment_status != 'paid' %}
+        {% set ns.all_paid = false %}
+        {% endif %}
+        {% endfor %}
+        {% else %}
+        {% set ns.all_paid = (b[16] == 'paid') %}
+        {% endif %}
+        {% set order_paid = ns.all_paid or b[16] == 'paid' %}
         <div class="col-12">
           <div class="bg-white rounded-4 border p-4"
-            style="cursor:pointer; transition: all 0.2s; border-left: 5px solid {{ '#10b981' if b[16] == 'paid' else '#f59e0b' }};"
+            style="cursor:pointer; transition: all 0.2s; border-left: 5px solid {{ '#10b981' if order_paid else '#f59e0b' }};"
             onclick="window.location='/miller/order/{{ b[0] }}'">
 
             <!-- HEADER: Order ID + Payment Status -->
@@ -509,7 +520,7 @@
                 </div>
               </div>
               <div>
-                {% if b[16] == 'paid' %}
+                {% if order_paid %}
                 <span class="badge bg-success-subtle text-success fw-800 px-3 py-2 rounded-pill fs-6">
                   <i class="fa fa-circle-check me-1"></i>Payment Done
                 </span>
