@@ -66,6 +66,9 @@ html,
 body {
     margin: 0 !important;
     padding: 0 !important;
+}
+
+body {
     overflow-x: hidden;
 }
 
@@ -3583,7 +3586,6 @@ img {
     body {
         text-rendering: optimizeLegibility;
         -webkit-font-smoothing: antialiased;
-        overscroll-behavior-y: none;
     }
 
     /* Safer spacing on notched devices */
@@ -3689,6 +3691,7 @@ img {
 
 @supports (height: 100dvh) {
     @media (max-width: 768px) {
+
         /* Helps mobile browser bars + keyboard resizing */
         .app-shell {
             min-height: 100dvh;
