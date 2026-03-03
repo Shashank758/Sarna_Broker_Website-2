@@ -62,9 +62,28 @@
     box-sizing: border-box;
 }
 
+/* Force navbar to top - remove any white space */
+html, body {
+    overflow-x: hidden;
+}
+
+body {
+    position: relative;
+}
+
+/* Ensure first navbar element has no top margin */
+body > nav:first-child,
+body > .navbar:first-child,
+body > nav.navbar:first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    top: 0 !important;
+}
+
 html {
     margin: 0;
     padding: 0;
+    background: transparent;
 }
 
 body {
@@ -73,8 +92,16 @@ body {
     color: var(--text);
     line-height: 1.6;
     min-height: 100vh;
-    margin: 0;
-    padding: 0;
+    margin: 0 !important;
+    padding: 0 !important;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+/* Remove any white space/background at the very top */
+body::before {
+    display: none !important;
+    content: none !important;
 }
 
 /* =========================
@@ -201,6 +228,8 @@ body {
 .app-shell {
     margin: 0;
     padding: 0;
+    margin-top: 0;
+    padding-top: 0;
 }
 
 .page-loader {
@@ -213,6 +242,30 @@ body {
 ========================= */
 .navbar {
     margin-bottom: 0;
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+}
+
+/* Ensure no white space above navbar */
+body > .navbar,
+body > nav.navbar,
+.navbar.sarna-navbar {
+    margin-top: 0 !important;
+    padding-top: 12px !important;
+    margin-bottom: 0 !important;
+    border-top: none !important;
+    position: relative;
+}
+
+/* Override Bootstrap navbar defaults */
+.navbar.navbar-expand-lg {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+.navbar.navbar-expand-lg.sarna-navbar {
+    padding-top: 12px !important;
 }
 
 .sarna-navbar {
@@ -223,7 +276,10 @@ body {
     top: 0;
     z-index: 1000;
     margin: 0;
+    margin-top: 0;
+    padding-top: 12px;
     border-top: none;
+    border-bottom: none;
 }
 
 .sarna-navbar .navbar-brand {
@@ -1616,6 +1672,8 @@ a {
     flex-direction: column;
     background: var(--bg);
     background-image: var(--bg-pattern);
+    margin-top: 0;
+    padding-top: 0;
 }
 
 .main-content {
