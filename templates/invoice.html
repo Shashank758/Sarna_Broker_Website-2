@@ -67,6 +67,42 @@
 
   </div>
 
+  <!-- Mobile Floating Back Button -->
+  <a href="javascript:history.back()" class="mobile-back-btn" aria-label="Go back">
+    ← Back
+  </a>
+  <style>
+    .mobile-back-btn {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-back-btn {
+        display: flex;
+        position: fixed;
+        bottom: 20px;
+        left: 16px;
+        z-index: 9999;
+        background: linear-gradient(135deg, #0f9b5f, #065f3a);
+        color: #fff;
+        border: none;
+        border-radius: 50px;
+        padding: 12px 24px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 6px 20px rgba(15, 155, 95, 0.4);
+        text-decoration: none;
+        transition: transform 0.2s ease;
+      }
+
+      .mobile-back-btn:active {
+        transform: scale(0.93);
+      }
+    }
+  </style>
+
 </body>
 
 </html>
