@@ -3568,6 +3568,134 @@ img {
     }
 }
 
+/* =========================
+   INDUSTRY MOBILE POLISH
+   (CSS-only, no logic changes)
+========================= */
+@media (max-width: 768px) {
+    :root {
+        --mobile-gutter: 14px;
+        --mobile-radius: 18px;
+        --mobile-radius-lg: 22px;
+        --mobile-card-pad: 16px;
+    }
+
+    body {
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        overscroll-behavior-y: none;
+    }
+
+    /* Safer spacing on notched devices */
+    .sarna-navbar {
+        padding-top: calc(12px + env(safe-area-inset-top)) !important;
+    }
+
+    /* Content above the bottom nav + safe area */
+    main.main-content {
+        padding-bottom: max(84px, calc(72px + env(safe-area-inset-bottom))) !important;
+    }
+
+    /* More consistent gutters everywhere */
+    .container {
+        padding-left: var(--mobile-gutter) !important;
+        padding-right: var(--mobile-gutter) !important;
+    }
+
+    /* Premium horizontal tabs: scroll snap + better hit area */
+    .nav-pills-premium {
+        scroll-snap-type: x mandatory;
+        scroll-padding-left: var(--mobile-gutter);
+        gap: 8px !important;
+    }
+
+    .nav-pills-premium .nav-link {
+        scroll-snap-align: start;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        touch-action: manipulation;
+    }
+
+    /* Cards: consistent radius + padding for mobile */
+    .miller-tab-content,
+    .premium-table-card,
+    .enterprise-card,
+    .booking-request-card,
+    .truck-qc-panel,
+    .action-panel,
+    .order-summary-card,
+    .order-card-premium {
+        border-radius: var(--mobile-radius-lg) !important;
+    }
+
+    .miller-tab-content,
+    .premium-table-card,
+    .enterprise-card,
+    .booking-request-card,
+    .truck-qc-panel,
+    .action-panel,
+    .order-summary-card {
+        padding: var(--mobile-card-pad) !important;
+    }
+
+    /* Market stock row: better density + wrap */
+    .premium-stock-card {
+        border-radius: var(--mobile-radius) !important;
+        padding: 14px !important;
+        gap: 12px !important;
+        align-items: flex-start;
+    }
+
+    .stock-row-icon {
+        width: 42px !important;
+        height: 42px !important;
+        border-radius: 14px !important;
+    }
+
+    .stock-row-name {
+        line-height: 1.2;
+    }
+
+    /* Tables: smoother horizontal scroll */
+    .table-responsive {
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .table-responsive::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Form controls: consistent height + iOS zoom prevention */
+    .form-control,
+    .form-select,
+    .enterprise-input,
+    .enterprise-input-sm,
+    input,
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+
+    .btn,
+    .btn-enterprise,
+    .btn-agri {
+        min-height: 44px;
+        touch-action: manipulation;
+    }
+}
+
+@supports (height: 100dvh) {
+    @media (max-width: 768px) {
+        /* Helps mobile browser bars + keyboard resizing */
+        .app-shell {
+            min-height: 100dvh;
+        }
+    }
+}
+
 /* ── Print: hide bottom nav ── */
 @media print {
 

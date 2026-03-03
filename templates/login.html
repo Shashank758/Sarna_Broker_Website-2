@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Login | Saarna Canvessars</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -209,9 +209,10 @@
             body,
             html {
                 overflow: auto;
+                /* Avoid iOS "fixed background" jank on mobile */
                 background:
-                    linear-gradient(135deg, rgba(6, 95, 58, 0.75), rgba(10, 138, 84, 0.7)),
-                    url('/static/image/login_bg.png') center center / cover no-repeat fixed;
+                    linear-gradient(135deg, rgba(6, 95, 58, 0.78), rgba(10, 138, 84, 0.72)),
+                    url('/static/image/login_bg.png') center center / cover no-repeat;
             }
 
             /* Digital mandi dot pattern overlay */
@@ -259,7 +260,9 @@
                 height: auto;
                 align-items: center;
                 justify-content: center;
-                padding: 24px 16px;
+                padding: 22px 14px;
+                padding-top: max(22px, env(safe-area-inset-top));
+                padding-bottom: max(22px, env(safe-area-inset-bottom));
             }
 
             .form-panel {
@@ -270,7 +273,7 @@
                 backdrop-filter: blur(20px);
                 -webkit-backdrop-filter: blur(20px);
                 border-radius: 28px;
-                padding: 32px 24px;
+                padding: 28px 20px;
                 box-shadow:
                     0 20px 60px rgba(0, 0, 0, 0.15),
                     0 4px 16px rgba(0, 0, 0, 0.08);
@@ -294,6 +297,54 @@
 
             .form-footer {
                 margin-top: 24px;
+            }
+
+            /* Prevent iOS zoom on focus + improve tap targets */
+            .form-control-custom {
+                font-size: 16px;
+                min-height: 52px;
+            }
+
+            .btn-prime {
+                min-height: 54px;
+            }
+        }
+
+        /* Modern mobile viewport: keyboard-safe height */
+        @supports (height: 100dvh) {
+            @media (max-width: 991px) {
+                .login-container {
+                    min-height: 100dvh;
+                }
+            }
+        }
+
+        /* Small phones */
+        @media (max-width: 420px) {
+            .form-panel {
+                border-radius: 22px;
+                padding: 22px 16px;
+            }
+
+            .brand-header {
+                margin-bottom: 20px;
+            }
+
+            .brand-header h2 {
+                font-size: 1.45rem;
+            }
+
+            .input-group-custom {
+                margin-bottom: 18px;
+            }
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+                scroll-behavior: auto !important;
             }
         }
 
