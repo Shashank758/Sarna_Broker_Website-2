@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Buyer Dashboard | Saarna Canvessars{% endblock %}
 
@@ -158,21 +158,72 @@
       font-size: 1.3rem !important;
     }
 
-    /* Stock card forms: full-width on mobile */
-    .stock-item .card-body .col-6 {
+    /* Live Rate header: stack search + button */
+    #stock .d-flex.justify-content-between.align-items-center {
+      flex-direction: column;
+      align-items: stretch !important;
+      gap: 10px;
+    }
+
+    #stock .d-flex.justify-content-between.align-items-center h4 {
+      text-align: left;
+    }
+
+    #stock .d-flex.justify-content-between.align-items-center .d-flex.gap-2 {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    #stockSearch {
+      width: 100% !important;
+    }
+
+    #stock .btn-enterprise {
+      width: 100%;
+      justify-content: center;
+    }
+
+    /* Stock card forms: single column and comfy on mobile */
+    .stock-item .card {
+      border-radius: 18px;
+    }
+
+    .stock-item .card-header {
+      padding-top: 16px;
+      padding-bottom: 10px;
+    }
+
+    .stock-item .card-body {
+      padding: 16px 14px 18px;
+    }
+
+    .stock-item .card-body .row.g-3 .col-6 {
       flex: 0 0 100%;
       max-width: 100%;
     }
 
-    /* Full-width buttons on mobile */
+    .stock-item label.form-label {
+      font-size: 0.75rem;
+    }
+
+    .stock-item .enterprise-input-sm,
+    .stock-item .form-control {
+      font-size: 0.9rem;
+    }
+
+    /* Action buttons: stack and full width for tap targets */
     .stock-item .d-flex.justify-content-between.align-items-center {
       flex-direction: column;
+      align-items: stretch;
       gap: 10px;
     }
 
     .stock-item .d-flex.justify-content-between.align-items-center .d-flex.gap-2 {
-      width: 100%;
       justify-content: space-between;
+    }
+
+    .stock-item .d-flex.justify-content-between.align-items-center .d-flex.gap-2 .btn {
+      flex: 1;
     }
 
     .stock-item .btn-enterprise {
