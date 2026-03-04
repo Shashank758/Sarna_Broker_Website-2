@@ -472,19 +472,20 @@ a {
    ENTERPRISE BUTTONS
 ========================= */
 .btn-enterprise {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    background: linear-gradient(135deg, #0f9b5f 0%, #065f3a 100%);
     color: #fff;
-    border: none;
-    font-weight: 600;
-    padding: 12px 24px;
-    border-radius: var(--radius-sm);
-    transition: var(--transition);
-    box-shadow: 0 4px 15px rgba(15, 155, 95, 0.3);
+    border: 1px solid rgba(15, 155, 95, 0.4);
+    font-weight: 700;
+    padding: 14px 28px;
+    border-radius: 999px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 14px rgba(15, 155, 95, 0.2);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    font-size: 0.85rem;
 }
 
 .btn-enterprise:hover {
-    background: linear-gradient(135deg, var(--primary-light), var(--primary));
-    color: #fff;
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(15, 155, 95, 0.4);
 }
@@ -554,36 +555,44 @@ a {
 .status-badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    border-radius: 20px;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: 999px;
     font-size: 0.75rem;
-    font-weight: 700;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border: 1px solid transparent;
 }
 
 .status-badge-success {
-    background: #d1f2eb;
-    color: #0f9b5f;
+    background: rgba(46, 204, 113, 0.1);
+    color: #166534;
+    border-color: rgba(46, 204, 113, 0.3);
 }
 
 .status-badge-warning {
-    background: #fff3cd;
-    color: #856404;
+    background: rgba(241, 196, 15, 0.1);
+    color: #854d0e;
+    border-color: rgba(241, 196, 15, 0.3);
 }
 
 .status-badge-danger {
-    background: #f8d7da;
-    color: #842029;
+    background: rgba(231, 76, 60, 0.1);
+    color: #991b1b;
+    border-color: rgba(231, 76, 60, 0.3);
 }
 
 .status-badge-info {
-    background: #cff4fc;
-    color: #055160;
+    background: rgba(52, 152, 219, 0.1);
+    color: #1e40af;
+    border-color: rgba(52, 152, 219, 0.3);
 }
 
 .status-badge-pending {
-    background: #e2e3e5;
-    color: #383d41;
+    background: rgba(149, 165, 166, 0.1);
+    color: #475569;
+    border-color: rgba(149, 165, 166, 0.3);
 }
 
 /* =========================
