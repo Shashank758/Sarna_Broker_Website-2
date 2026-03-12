@@ -5877,6 +5877,8 @@ def get_notifications():
         return jsonify([]), 401
 
     try:
+        upgrade_notifications_system() # Ensure table exists
+        
         con = get_db()
         cur = con.cursor()
         cur.execute("""
@@ -5885,7 +5887,7 @@ def get_notifications():
             WHERE user_id=%s
             ORDER BY created_at DESC
             LIMIT 20
-        """, (session["user_id"],))
+        """, (get_effective_user_id(),))
         rows = cur.fetchall()
         con.close()
 
@@ -5913,7 +5915,7 @@ def mark_notifications_read():
     try:
         con = get_db()
         cur = con.cursor()
-        cur.execute("UPDATE notifications SET is_read=TRUE WHERE user_id=%s AND is_read=FALSE", (session["user_id"],))
+        cur.execute("UPDATE notifications SET is_read=TRUE WHERE user_id=%s AND is_read=FALSE", (get_effective_user_id(),))
         con.commit()
         con.close()
         return jsonify({"success": True})
