@@ -112,6 +112,7 @@
             <li>
               <hr class="dropdown-divider">
             </li>
+            <li><a class="dropdown-item rounded" href="/directory">Directory</a></li>
             <li><a class="dropdown-item rounded" href="/switch_role/miller">Switch to Buyer</a></li>
           </ul>
         </li>
@@ -157,6 +158,7 @@
             <li>
               <hr class="dropdown-divider">
             </li>
+            <li><a class="dropdown-item rounded" href="/directory">Directory</a></li>
             <li><a class="dropdown-item rounded" href="/switch_role/buyer">Switch to Seller</a></li>
           </ul>
         </li>
@@ -203,20 +205,12 @@
             <li><a class="dropdown-item rounded" href="/admin/miller-profiles">Buyer Profiles</a></li>
             <li><a class="dropdown-item rounded" href="/admin/buyer-profiles">Seller Profiles</a></li>
             <li><a class="dropdown-item rounded" href="/admin/logs">Admin Logs</a></li>
+            <li><a class="dropdown-item rounded" href="/directory">Directory</a></li>
           </ul>
         </li>
         {% endif %}
 
         <!-- ===== UNIVERSAL ELEMENTS ===== -->
-        {% if session.user_id %}
-        <!-- Directory Link (Matches Miller Links Styling) -->
-        <li class="nav-item">
-          <a class="nav-link {% if request.path == '/directory' %}active{% endif %}" href="/directory"
-            style="font-weight: 700;">
-            Directory
-          </a>
-        </li>
-        {% endif %}
 
       </ul>
 

@@ -18,6 +18,10 @@
         min-height: 350px;
     }
 
+    body {
+        background-color: #fefce8 !important;
+    }
+
     .market-hero::before {
         content: '';
         position: absolute;
@@ -368,7 +372,7 @@
                 <span class="mx-3 dashboard-title-small">TRADER MARKETPLACE</span>
                 <hr style="width: 40px; border-color: #4338ca; opacity: 1;" class="my-0">
             </div>
-            <h1>SAARNA MARKET</h1>
+            <h1>{{ (buyer_name or 'SAARNA')|upper }}'S MARKET</h1>
             <p>
                 <i class="fa fa-map-marker-alt text-primary"></i> {{ buyer_address }}
             </p>
