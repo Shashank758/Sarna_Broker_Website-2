@@ -34,7 +34,26 @@
     z-index: 0;
   }
 
-  /* Hero ::after kept empty — no decoration */
+  /* Network / mandi-node dot decoration (right side) */
+  .miller-hero::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    right: -30px;
+    width: 340px;
+    height: 340px;
+    background:
+      radial-gradient(circle 3px at 30% 25%, rgba(255, 255, 255, 0.3) 100%, transparent 100%),
+      radial-gradient(circle 3px at 70% 20%, rgba(255, 255, 255, 0.25) 100%, transparent 100%),
+      radial-gradient(circle 4px at 55% 50%, rgba(255, 255, 255, 0.35) 100%, transparent 100%),
+      radial-gradient(circle 3px at 25% 65%, rgba(255, 255, 255, 0.2) 100%, transparent 100%),
+      radial-gradient(circle 3px at 80% 70%, rgba(255, 255, 255, 0.25) 100%, transparent 100%),
+      radial-gradient(circle 3px at 45% 80%, rgba(255, 255, 255, 0.2) 100%, transparent 100%),
+      radial-gradient(circle 5px at 50% 45%, rgba(52, 211, 153, 0.45) 100%, transparent 100%);
+    opacity: 0.7;
+    pointer-events: none;
+    z-index: 0;
+  }
 
   .miller-hero>* {
     position: relative;
@@ -61,31 +80,6 @@
     position: relative;
     z-index: 10;
     padding-bottom: 80px;
-  }
-
-  /* Live Market Map background area */
-  .market-map-area {
-    background: url('/static/image/mandi_bg.png') center center / cover no-repeat;
-    border-radius: 24px;
-    padding: 30px 28px 24px;
-    position: relative;
-    border: 1px solid rgba(226, 232, 240, 0.5);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-    overflow: hidden;
-  }
-
-  .market-map-area::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(255, 255, 255, 0.82);
-    border-radius: 24px;
-    z-index: 0;
-  }
-
-  .market-map-area>* {
-    position: relative;
-    z-index: 1;
   }
 
   /* ── SECTION HEADING ── */
@@ -686,48 +680,46 @@
 </section>
 
 <div class="container dashboard-container">
-  <div class="market-map-area mb-5">
-    <h4 class="market-map-heading" data-aos="fade-up" data-aos-delay="150">Live Market Map</h4>
-    <div class="row g-4" data-aos="fade-up" data-aos-delay="200">
-      <div class="col-6 col-md-3">
-        <div class="stat-card-miller">
-          <div class="d-flex justify-content-between mb-3">
-            <div class="text-primary fw-800 small text-uppercase">Active Stock</div>
-            <i class="fa fa-warehouse text-primary opacity-25"></i>
-          </div>
-          <div class="fs-2 fw-800">{{ stocks|length }}</div>
-          <div class="text-muted small fw-600 mt-1">Commodities Live</div>
+  <h4 class="market-map-heading" data-aos="fade-up" data-aos-delay="150">Live Market Map</h4>
+  <div class="row g-4 mb-5" data-aos="fade-up" data-aos-delay="200">
+    <div class="col-6 col-md-3">
+      <div class="stat-card-miller">
+        <div class="d-flex justify-content-between mb-3">
+          <div class="text-primary fw-800 small text-uppercase">Active Stock</div>
+          <i class="fa fa-warehouse text-primary opacity-25"></i>
         </div>
+        <div class="fs-2 fw-800">{{ stocks|length }}</div>
+        <div class="text-muted small fw-600 mt-1">Commodities Live</div>
       </div>
-      <div class="col-6 col-md-3">
-        <div class="stat-card-miller">
-          <div class="d-flex justify-content-between mb-3">
-            <div class="text-warning fw-800 small text-uppercase">New Requests</div>
-            <i class="fa fa-clock text-warning opacity-25"></i>
-          </div>
-          <div class="fs-2 fw-800">{{ pending_list|length }}</div>
-          <div class="text-muted small fw-600 mt-1">Action Required</div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card-miller">
+        <div class="d-flex justify-content-between mb-3">
+          <div class="text-warning fw-800 small text-uppercase">New Requests</div>
+          <i class="fa fa-clock text-warning opacity-25"></i>
         </div>
+        <div class="fs-2 fw-800">{{ pending_list|length }}</div>
+        <div class="text-muted small fw-600 mt-1">Action Required</div>
       </div>
-      <div class="col-6 col-md-3">
-        <div class="stat-card-miller">
-          <div class="d-flex justify-content-between mb-3">
-            <div class="text-info fw-800 small text-uppercase">In Transit</div>
-            <i class="fa fa-truck text-info opacity-25"></i>
-          </div>
-          <div class="fs-2 fw-800">{{ approved_loading|length }}</div>
-          <div class="text-muted small fw-600 mt-1">Active Loads</div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card-miller">
+        <div class="d-flex justify-content-between mb-3">
+          <div class="text-info fw-800 small text-uppercase">In Transit</div>
+          <i class="fa fa-truck text-info opacity-25"></i>
         </div>
+        <div class="fs-2 fw-800">{{ approved_loading|length }}</div>
+        <div class="text-muted small fw-600 mt-1">Active Loads</div>
       </div>
-      <div class="col-6 col-md-3">
-        <div class="stat-card-miller">
-          <div class="d-flex justify-content-between mb-3">
-            <div class="text-success fw-800 small text-uppercase">Complete Order</div>
-            <i class="fa fa-circle-check text-success opacity-25"></i>
-          </div>
-          <div class="fs-2 fw-800">{{ completed_orders|length }}</div>
-          <div class="text-muted small fw-600 mt-1">Completed Trades</div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card-miller">
+        <div class="d-flex justify-content-between mb-3">
+          <div class="text-success fw-800 small text-uppercase">Complete Order</div>
+          <i class="fa fa-circle-check text-success opacity-25"></i>
         </div>
+        <div class="fs-2 fw-800">{{ completed_orders|length }}</div>
+        <div class="text-muted small fw-600 mt-1">Completed Trades</div>
       </div>
     </div>
   </div>
