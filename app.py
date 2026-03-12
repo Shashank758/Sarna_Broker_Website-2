@@ -1861,6 +1861,21 @@ def miller_dashboard():
         for phone in buyer_phones:
             send_sms(phone, message)
         
+        # 🔔 Push Notification to All Users
+        try:
+            miller_name = session.get("name", "A miller")
+            notif_title = "New Commodity Posted"
+            notif_body = f"{miller_name} posted a new commodity: {crop}. Price: ₹{price}/unit."
+            
+            # Broadcast to all buyers
+            cur.execute("""
+                INSERT INTO notifications (user_id, title, message)
+                SELECT id, %s, %s FROM users WHERE role = 'buyer' AND id != %s
+            """, (notif_title, notif_body, miller_id))
+            con.commit()
+        except Exception as notif_err:
+            logger.warning(f"Notification error (non-fatal, stock posted): {notif_err}")
+
         log_activity("Stock Posted", new_stock_id, f"Crop: {crop}, Qty: 100000, Price: {price}, Note: {note}")
         return redirect(url_for('miller_dashboard'))
 
@@ -2903,6 +2918,17 @@ def miller_upload_final_invoice(booking_id):
             total_amount = loaded_qty * price
             message = f"📄 Final invoice uploaded for Order {order_id}. Amount: ₹{total_amount}. Please review and proceed with payment."
             send_sms(buyer_phone, message)
+            
+            # 🔔 Push Notification to Buyer
+            try:
+                notif_title = "Final Invoice Uploaded"
+                notif_body = f"Miller uploaded final invoice for Order {order_id}. Amount: ₹{total_amount}."
+                cur.execute("""
+                    INSERT INTO notifications (user_id, title, message)
+                    VALUES (%s, %s, %s)
+                """, (buyer_id, notif_title, notif_body))
+            except Exception as e:
+                logger.warning(f"Notification error (invoice upload): {e}")
 
     con.commit()
     con.close()
@@ -2954,6 +2980,17 @@ def miller_mark_payment_done(booking_id):
         if buyer_phone:
             message = f"✅ Payment received for Order {order_id}. Amount: ₹{amount}. Thank you!"
             send_sms(buyer_phone, message)
+            
+            # 🔔 Push Notification to Buyer
+            try:
+                notif_title = "Payment Completed"
+                notif_body = f"Miller marked payment as received for Order {order_id}. Amount: ₹{amount}."
+                cur.execute("""
+                    INSERT INTO notifications (user_id, title, message)
+                    VALUES (%s, %s, %s)
+                """, (buyer_id, notif_title, notif_body))
+            except Exception as e:
+                logger.warning(f"Notification error (payment done): {e}")
 
     con.commit()
     con.close()
@@ -3128,6 +3165,17 @@ def miller_edit_truck_final_invoice(invoice_id):
         if buyer_phone:
             message = f"📄 Final invoice updated for Order {order_id}. Please review the updated invoice."
             send_sms(buyer_phone, message)
+            
+            # 🔔 Push Notification to Buyer
+            try:
+                notif_title = "Invoice Updated"
+                notif_body = f"Miller updated final invoice for Order {order_id}."
+                cur.execute("""
+                    INSERT INTO notifications (user_id, title, message)
+                    VALUES (%s, %s, %s)
+                """, (buyer_id, notif_title, notif_body))
+            except Exception as e:
+                logger.warning(f"Notification error (invoice updated): {e}")
 
     con.commit()
     con.close()
@@ -3182,6 +3230,17 @@ def miller_mark_truck_payment_done(invoice_id):
             amount = loaded_qty * price
             message = f"✅ Payment received for Order {order_id} (Truck). Amount: ₹{amount}. Thank you!"
             send_sms(buyer_phone, message)
+            
+            # 🔔 Push Notification to Buyer
+            try:
+                notif_title = "Payment Completed"
+                notif_body = f"Miller marked truck payment as received for Order {order_id}. Amount: ₹{amount}."
+                cur.execute("""
+                    INSERT INTO notifications (user_id, title, message)
+                    VALUES (%s, %s, %s)
+                """, (buyer_id, notif_title, notif_body))
+            except Exception as e:
+                logger.warning(f"Notification error (truck payment done): {e}")
 
     con.commit()
     log_activity("Truck Payment Done", invoice_id, f"Payment marked for truck {invoice_id} of Order {order_id}")
@@ -4656,6 +4715,8 @@ def book_miller_stock(stock_id):
                     buyer_name = buyer_row[0] if buyer_row else 'A buyer'
                     notif_title = "New Stock Booking"
                     notif_body = f"Buyer {buyer_name} booked {int(qty)} Qt of {crop_name}. Order: {order_id}"
+                    
+                    # Notify ONLY the specific miller
                     cur.execute("""
                         INSERT INTO notifications (user_id, title, message)
                         VALUES (%s, %s, %s)
@@ -4728,6 +4789,18 @@ def cancel_booking(id):
             if miller_phone:
                 message = f"❌ Order {order_id} cancelled by buyer. {crop} - Qty: {qty}. Stock returned to inventory."
                 send_sms(miller_phone, message)
+            
+            # 🔔 Push Notification to Miller
+            try:
+                buyer_name = session.get("name", "A buyer")
+                notif_title = "Order Cancelled"
+                notif_body = f"{buyer_name} cancelled Order {order_id}. {crop} - Qty: {qty}."
+                cur.execute("""
+                    INSERT INTO notifications (user_id, title, message)
+                    VALUES (%s, %s, %s)
+                """, (miller_id, notif_title, notif_body))
+            except Exception as e:
+                logger.warning(f"Notification error (cancel booking): {e}")
         
         con.commit()
         log_activity("Booking Cancelled", id, f"Order {order_id} cancelled by buyer")
@@ -4854,6 +4927,18 @@ def buyer_update_loading(id):
             truck_part = f" Truck: {truck_number}" if truck_number else ""
             message = f"🚚 Loading update for Order {order_id}: {crop} - Loaded: {loaded_qty}/{total_qty}.{truck_part} Invoice uploaded."
             send_sms(miller_phone, message)
+            
+            # 🔔 Push Notification to Miller
+            try:
+                truck_part = f" for Truck {truck_number}" if truck_number else ""
+                notif_title = "Loading Update"
+                notif_body = f"Order {order_id}: Loaded {loaded_qty}/{total_qty} Qt of {crop}{truck_part}. Invoice uploaded."
+                cur.execute("""
+                    INSERT INTO notifications (user_id, title, message)
+                    VALUES (%s, %s, %s)
+                """, (miller_id, notif_title, notif_body))
+            except Exception as e:
+                logger.warning(f"Notification error (loading update): {e}")
 
     con.commit()
     con.close()
@@ -5032,6 +5117,18 @@ def miller_update_qc(invoice_id):
             truck_part = f" Truck: {truck_number}." if truck_number else ""
             message = f"✅ QC verified for Order {order_id},{truck_part} Truck Qty: {loaded_qty}. {qc_details}"
             send_sms(buyer_phone, message)
+            
+            # 🔔 Push Notification to Buyer
+            try:
+                truck_part = f" for Truck {truck_number}" if truck_number else ""
+                notif_title = "QC Verified"
+                notif_body = f"Miller verified QC for Order {order_id}{truck_part}. Truck Qty: {loaded_qty} Qt."
+                cur.execute("""
+                    INSERT INTO notifications (user_id, title, message)
+                    VALUES (%s, %s, %s)
+                """, (buyer_id, notif_title, notif_body))
+            except Exception as e:
+                logger.warning(f"Notification error (qc verified): {e}")
 
     con.commit()
     con.close()
