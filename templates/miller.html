@@ -11,37 +11,48 @@
 
   /* ── HERO SECTION ── */
   .miller-hero {
-    background-color: #f8fafc;
-    background-image:
-      url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230a8a54' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    padding: 30px 0 90px;
+    background: linear-gradient(180deg, #fefce8 0%, #f0fdf4 100%);
+    padding: 30px 0 60px;
     position: relative;
     border-bottom: 1px solid #e2e8f0;
+    min-height: 350px;
+  }
+
+  .miller-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+    background-size: 28px 28px;
+    opacity: 0.6;
+    pointer-events: none;
+    z-index: 0;
   }
 
   .miller-hero>* {
     position: relative;
-    z-index: 1;
+    z-index: 10;
   }
 
   .miller-hero .dashboard-title-small {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 800;
-    letter-spacing: 0.25em;
-    color: #475569;
+    letter-spacing: 0.15em;
+    color: #044329 !important;
     text-transform: uppercase;
-    margin-bottom: 8px;
   }
 
   .miller-hero h1 {
-    font-size: 2.8rem;
+    font-size: 3.2rem;
     font-weight: 900;
     letter-spacing: -0.01em;
-    color: #044329;
+    color: #0f5132;
     line-height: 1.1;
     text-transform: uppercase;
     margin-bottom: 6px;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Arial Black', Impact, sans-serif;
+    transform: scaleX(1.05);
   }
 
   .miller-hero p {
@@ -52,6 +63,15 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
+  }
+
+  .welcome-card-miller {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    padding: 20px 24px;
+    margin-top: 10px;
   }
 
   /* ── DASHBOARD CONTAINER ── */
@@ -83,124 +103,7 @@
     flex-shrink: 0;
   }
 
-  /* ═══════════════════════════════════
-     STAT CARDS — Enterprise KPI Tiles
-     ═══════════════════════════════════ */
-  .stat-card-miller {
-    background: #fff;
-    border-radius: 16px;
-    padding: 24px 22px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    height: 100%;
-    position: relative;
-    overflow: hidden;
-  }
-
-  /* Bottom accent bar */
-  .stat-card-miller::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 6px;
-    transition: height 0.32s ease;
-  }
-
-  .col-6:nth-child(1) .stat-card-miller::after {
-    background: #10b981;
-  }
-
-  .col-6:nth-child(2) .stat-card-miller::after {
-    background: #f59e0b;
-  }
-
-  .col-6:nth-child(3) .stat-card-miller::after {
-    background: #3b82f6;
-  }
-
-  .col-6:nth-child(4) .stat-card-miller::after {
-    background: #10b981;
-  }
-
-  .stat-card-miller:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
-    border-color: #cbd5e1;
-  }
-
-  /* Color labels */
-  .stat-card-miller .text-primary {
-    color: #0a8a54 !important;
-  }
-
-  .stat-card-miller .text-warning {
-    color: #b45309 !important;
-  }
-
-  .stat-card-miller .text-info {
-    color: #0e7490 !important;
-  }
-
-  .stat-card-miller .text-success {
-    color: #15803d !important;
-  }
-
-  .stat-card-miller .small.text-uppercase {
-    font-size: 0.68rem;
-    letter-spacing: 0.1em;
-    font-weight: 800;
-  }
-
-  /* Icon area */
-  .stat-card-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-  }
-
-  .col-6:nth-child(1) .stat-card-icon {
-    background: rgba(16, 185, 129, 0.1);
-    color: #10b981;
-  }
-
-  .col-6:nth-child(2) .stat-card-icon {
-    background: rgba(245, 158, 11, 0.1);
-    color: #f59e0b;
-  }
-
-  .col-6:nth-child(3) .stat-card-icon {
-    background: rgba(59, 130, 246, 0.1);
-    color: #3b82f6;
-  }
-
-  .col-6:nth-child(4) .stat-card-icon {
-    background: rgba(16, 185, 129, 0.1);
-    color: #10b981;
-  }
-
-  /* Large number */
-  .stat-card-miller .fs-2 {
-    font-size: 2.2rem !important;
-    font-weight: 800;
-    color: #475569;
-    line-height: 1;
-    margin-top: 12px;
-    letter-spacing: -0.02em;
-  }
-
-  .stat-card-miller .text-muted.small {
-    font-size: 0.85rem;
-    color: #94a3b8 !important;
-    font-weight: 600;
-    margin-top: 4px;
-  }
+  /* (Stat cards specific to the V1 design were removed for V2 Welcome Card) */
 
   /* ═══════════════════════════════
      TAB PILLS — Pill capsules
@@ -279,6 +182,57 @@
 
   .stock-table-modern tbody tr:hover {
     background: #f0fdf4;
+  }
+
+  /* Input fields within commodity cards */
+  .card-form-grp {
+    margin-bottom: 2px;
+  }
+
+  .card-input-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #94a3b8;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  .card-input-wrapper {
+    background: #f4fbf4;
+    border: 1px solid #dcfce7;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    height: 38px;
+    transition: all 0.2s;
+  }
+
+  .card-input-wrapper:focus-within {
+    border-color: #86efac;
+    background: #f0fdf4;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.1);
+  }
+
+  .card-input-wrapper input {
+    border: none;
+    background: transparent;
+    font-weight: 700;
+    color: #0f172a;
+    width: 100%;
+    outline: none;
+    font-size: 0.9rem;
+    padding: 0;
+  }
+
+  .card-input-unit {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #94a3b8;
+    margin-left: 6px;
+    white-space: nowrap;
   }
 
   /* ═══════════════════════════════
@@ -465,12 +419,8 @@
   }
 
   .stock-card-body .form-label {
-    font-size: 0.72rem;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: #64748b;
-    font-weight: 800;
-    margin-bottom: 8px;
+    /* Kept for backward compat */
+    display: none;
   }
 
   .stock-card-body .form-control,
@@ -482,19 +432,9 @@
     font-size: 0.88rem;
   }
 
-  .stock-card-body .form-control:focus,
-  .stock-card-body .enterprise-input-sm:focus {
-    border-color: #0a8a54;
-    box-shadow: 0 0 0 3px rgba(10, 138, 84, 0.08) !important;
-  }
-
   .stock-card-body .input-group-text {
-    border-radius: 10px !important;
-    border: 1.5px solid #e2e8f0;
-    background: #f8fafc !important;
-    color: #64748b !important;
-    font-weight: 800;
-    font-size: 0.8rem;
+    /* Kept for backward compat */
+    display: none;
   }
 
   .stock-divider {
@@ -717,9 +657,49 @@
 
 {% block content %}
 <section class="miller-hero">
-  <div class="container text-center">
+  <div class="container">
+    <!-- Welcome Card -->
+    <div class="welcome-card-miller" data-aos="fade-down">
+      <div class="d-flex flex-wrap justify-content-between align-items-center">
+        <!-- User Greeting -->
+        <div class="d-flex align-items-center gap-3 mb-3 mb-lg-0">
+          <div
+            style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #f87171, #fbbf24, #38bdf8); display: flex; align-items: center; justify-content: center; box-shadow: inset 0 2px 4px rgba(255,255,255,0.3);">
+            <i class="fa fa-sun text-white fs-4" style="text-shadow: 0 2px 4px rgba(0,0,0,0.2);"></i>
+          </div>
+          <div>
+            <h5 class="fw-bold mb-1 text-dark" style="font-size: 1.15rem; letter-spacing: -0.01em;">Good Morning, User!
+              <span class="fs-5">🙏</span>
+            </h5>
+            <div class="text-muted" style="font-size: 0.85rem; font-weight: 500;">Today is a good day for trading —
+              <span class="fw-bold text-success">{{ stocks|length }}</span> commodities are live in your mandi.
+            </div>
+          </div>
+        </div>
+
+        <!-- Metric Stats -->
+        <div class="d-flex align-items-center gap-4 text-end">
+          <div class="pe-4 border-end">
+            <h3 class="mb-0 text-success fw-900" style="font-style: italic; letter-spacing: -0.04em;">₹2.4L</h3>
+            <div class="text-muted text-uppercase fw-bold" style="font-size: 0.65rem; letter-spacing: 0.05em;">Today's
+              Value</div>
+          </div>
+          <div class="pe-4 border-end">
+            <h3 class="mb-0 text-success fw-900" style="font-style: italic; letter-spacing: -0.04em;">14</h3>
+            <div class="text-muted text-uppercase fw-bold" style="font-size: 0.65rem; letter-spacing: 0.05em;">Active
+              Buyers</div>
+          </div>
+          <div>
+            <h3 class="mb-0 text-success fw-900" style="font-style: italic; letter-spacing: -0.04em;">96%</h3>
+            <div class="text-muted text-uppercase fw-bold" style="font-size: 0.65rem; letter-spacing: 0.05em;">Fill Rate
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Top Nav Tabs -->
-    <div class="d-flex justify-content-center mb-4 pb-2" data-aos="zoom-in">
+    <div class="d-flex justify-content-center mt-5 mb-5" data-aos="zoom-in">
       <div class="nav-pills-premium nav nav-pills" id="millerTabs" role="tablist">
         <button class="nav-link active" id="stock-tab" data-bs-toggle="pill" data-bs-target="#stock" type="button"
           role="tab">Live Rate</button>
@@ -732,77 +712,25 @@
       </div>
     </div>
 
-    <div class="dashboard-title-small" data-aos="fade-up">MILLER DASHBOARD</div>
-    <h1 data-aos="fade-up" data-aos-delay="50">{{ miller_name }}</h1>
+    <!-- Hero Title -->
+    <div class="text-center mt-3 mb-2" data-aos="fade-up">
+      <div class="d-flex align-items-center justify-content-center mb-2">
+        <hr style="width: 40px; border-color: #044329; opacity: 1;" class="my-0">
+        <span class="mx-3 dashboard-title-small">MILLER DASHBOARD</span>
+        <hr style="width: 40px; border-color: #044329; opacity: 1;" class="my-0">
+      </div>
+      <h1>{{ miller_name }}</h1>
+      {% if miller_address %}
+      <p>
+        <i class="fa fa-map-marker-alt text-success"></i> {{ miller_address }}
+      </p>
+      {% endif %}
+    </div>
 
-    {% if miller_address %}
-    <p data-aos="fade-up" data-aos-delay="100">
-      <i class="fa fa-map-marker-alt" style="color:#0a8a54;"></i> {{ miller_address }}
-    </p>
-    {% else %}
-    <p data-aos="fade-up" data-aos-delay="100">
-      <i class="fa fa-map-marker-alt" style="color:#0a8a54;"></i> Industrial Dashboard & Supply Chain Oversight
-    </p>
-    {% endif %}
   </div>
 </section>
 
-<div class="container dashboard-container">
-  <h4 class="market-map-heading" data-aos="fade-up" data-aos-delay="150"></h4>
-  <div class="row g-4 mb-5" data-aos="fade-up" data-aos-delay="200">
-    <!-- Stat Card 1 -->
-    <div class="col-6 col-md-3">
-      <div class="stat-card-miller">
-        <div class="d-flex justify-content-between mb-2">
-          <div class="fw-800 small text-uppercase" style="color: #64748b; letter-spacing: 0.1em;">Active Stock</div>
-          <div class="stat-card-icon">
-            <i class="fa-solid fa-warehouse"></i>
-          </div>
-        </div>
-        <div class="fs-2">{{ stocks|length }}</div>
-        <div class="text-muted small">Commodities Live</div>
-      </div>
-    </div>
-    <!-- Stat Card 2 -->
-    <div class="col-6 col-md-3">
-      <div class="stat-card-miller">
-        <div class="d-flex justify-content-between mb-2">
-          <div class="fw-800 small text-uppercase" style="color: #64748b; letter-spacing: 0.1em;">New Requests</div>
-          <div class="stat-card-icon">
-            <i class="fa-solid fa-clock"></i>
-          </div>
-        </div>
-        <div class="fs-2">{{ pending_list|length }}</div>
-        <div class="text-muted small">Action Required</div>
-      </div>
-    </div>
-    <!-- Stat Card 3 -->
-    <div class="col-6 col-md-3">
-      <div class="stat-card-miller">
-        <div class="d-flex justify-content-between mb-2">
-          <div class="fw-800 small text-uppercase" style="color: #64748b; letter-spacing: 0.1em;">In Transit</div>
-          <div class="stat-card-icon">
-            <i class="fa-solid fa-truck"></i>
-          </div>
-        </div>
-        <div class="fs-2">{{ approved_loading|length }}</div>
-        <div class="text-muted small">Active Loads</div>
-      </div>
-    </div>
-    <!-- Stat Card 4 -->
-    <div class="col-6 col-md-3">
-      <div class="stat-card-miller">
-        <div class="d-flex justify-content-between mb-2">
-          <div class="fw-800 small text-uppercase" style="color: #64748b; letter-spacing: 0.1em;">Completed</div>
-          <div class="stat-card-icon">
-            <i class="fa-solid fa-circle-check"></i>
-          </div>
-        </div>
-        <div class="fs-2">{{ completed_orders|length }}</div>
-        <div class="text-muted small">Completed Trades</div>
-      </div>
-    </div>
-  </div>
+<div class="container" style="position: relative; z-index: 10; padding-bottom: 60px; margin-top: -10px;">
 
   <div class="miller-tab-content tab-content" id="millerTabsContent">
     <!-- STOCK TAB -->
@@ -825,101 +753,119 @@
 
       {% if stocks %}
       <div class="row g-4" id="stock-grid">
+        {% set theme_colors = ['#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899'] %}
+        {% set theme_bgs = ['#d1fae5', '#fef3c7', '#dbeafe', '#ede9fe', '#fce7f3'] %}
         {% for s in stocks %}
+        {% set c_idx = loop.index0 % 5 %}
+        {% set t_color = theme_colors[c_idx] %}
+        {% set t_bg = theme_bgs[c_idx] %}
         <div class="col-md-6 col-lg-4 stock-item">
-          <div class="card h-100 stock-card">
-            <div
-              class="card-header bg-white border-bottom-0 d-flex justify-content-between align-items-center stock-card-header">
-              <h5 class="fw-800 text-dark mb-0 text-capitalize stock-title d-flex align-items-center">
-                <i class="fa fa-leaf text-success me-2 opacity-50"></i> {{ s[2] }}
-              </h5>
-              <span
-                class="badge stock-status {{ 'bg-success-subtle text-success' if s[9] == 'open' else 'bg-secondary text-white' }} fw-800"
-                style="padding: 8px 16px !important; border-radius: 8px !important;">
-                {{ s[9]|upper }}
-              </span>
+          <div class="card h-100 stock-card" style="border-top: 4px solid {{ t_color }};">
+            <div class="card-header bg-white border-bottom-0 d-flex justify-content-between align-items-start"
+              style="padding: 20px 24px 12px;">
+              <div class="d-flex align-items-center gap-3">
+                <div
+                  style="width: 46px; height: 46px; border-radius: 12px; background: {{ t_bg }}; display: flex; align-items: center; justify-content: center;">
+                  <i class="fa fa-seedling" style="color: {{ t_color }}; font-size: 1.2rem;"></i>
+                </div>
+                <div>
+                  <h5 class="fw-800 text-dark mb-0 text-capitalize" style="font-size: 1.1rem; letter-spacing: -0.02em;">
+                    {{ s[2] }}</h5>
+                  <div class="text-muted" style="font-size: 0.7rem; font-weight: 600;">Kharif · Grade A · {{ s[6] or
+                    'Local' }}</div>
+                </div>
+              </div>
+              <div class="text-end">
+                <h4 class="mb-0 fw-900"
+                  style="color: #044329; font-size: 1.4rem; font-style: italic; letter-spacing: -0.04em;">₹{{ s[4]|int
+                  }}</h4>
+                <div class="fw-bold"
+                  style="font-size: 0.7rem; color: {{ t_color }}; display: flex; align-items: center; justify-content: flex-end;">
+                  <i class="fa fa-caret-up me-1"></i>0.3%</div>
+              </div>
             </div>
 
-            <div class="card-body stock-card-body">
+            <div class="card-body stock-card-body" style="padding: 12px 24px 24px;">
               <form method="POST" action="/update_miller_stock/{{ s[0] }}">
                 <div class="row g-3">
                   <!-- Row 1: Qty & Price -->
-                  <div class="col-12 col-sm-6">
-                    <label class="form-label small fw-800 text-muted mb-1">Booking Qty</label>
-                    <div class="input-group input-group-sm">
-                      <input type="number" name="quantity" value="{{ s[3] }}"
-                        class="form-control enterprise-input-sm fw-600" min="0">
-                      <span class="input-group-text bg-light text-muted fw-800 border-start-0">Qt</span>
+                  <div class="col-6">
+                    <label class="card-input-label">Booking Qty</label>
+                    <div class="card-input-wrapper">
+                      <input type="number" name="quantity" value="{{ s[3] }}" min="0">
+                      <span class="card-input-unit">Qt</span>
                     </div>
                   </div>
-                  <div class="col-12 col-sm-6">
-                    <label class="form-label small fw-800 text-muted mb-1">Price</label>
-                    <div class="input-group input-group-sm">
-                      <span class="input-group-text bg-light text-muted fw-800 border-end-0">₹</span>
-                      <input type="number" name="price" value="{{ s[4] }}" step="0.01"
-                        class="form-control enterprise-input-sm fw-600">
+                  <div class="col-6">
+                    <label class="card-input-label">Price / Qt</label>
+                    <div class="card-input-wrapper">
+                      <span class="card-input-unit me-2 ms-0" style="font-size: 0.85rem; color: #1e293b;">₹</span>
+                      <input type="number" name="price" value="{{ s[4] }}" step="0.01">
                     </div>
                   </div>
 
                   <!-- Row 2: Moisture & Wt Deduction -->
-                  <div class="col-12 col-sm-6">
-                    <label class="form-label small fw-800 text-muted mb-1">Moisture (%)</label>
-                    <input type="text" name="moisture" value="{{ s[16] or '' }}"
-                      class="form-control enterprise-input-sm fw-600" placeholder="e.g. 12">
+                  <div class="col-6">
+                    <label class="card-input-label">Moisture %</label>
+                    <div class="card-input-wrapper">
+                      <input type="text" name="moisture" value="{{ s[16] or '' }}">
+                      <span class="card-input-unit">%</span>
+                    </div>
                   </div>
-                  <div class="col-12 col-sm-6">
-                    <label class="form-label small fw-800 text-muted mb-1">Wt. Deduction</label>
-                    <input type="text" name="weight_deduction" value="{{ s[13] or '' }}"
-                      class="form-control enterprise-input-sm fw-600" placeholder="e.g. 1kg/q">
+                  <div class="col-6">
+                    <label class="card-input-label">Wt. Deduction</label>
+                    <div class="card-input-wrapper">
+                      <input type="text" name="weight_deduction" value="{{ s[13] or '' }}">
+                      <span class="card-input-unit">kg/qtl</span>
+                    </div>
                   </div>
 
                   <!-- Row 3: Durations -->
-                  <div class="col-12 col-sm-6">
-                    <label class="form-label small fw-800 text-muted mb-1"><i class="fa fa-truck me-1"></i>Delivery
-                      (Days)</label>
-                    <input type="number" name="duration" value="{{ s[17] or '' }}"
-                      class="form-control enterprise-input-sm fw-600" placeholder="e.g. 5">
+                  <div class="col-6">
+                    <label class="card-input-label"><i class="fa fa-truck text-warning me-1"></i> Delivery</label>
+                    <div class="card-input-wrapper">
+                      <input type="number" name="duration" value="{{ s[17] or '' }}" placeholder="e.g. 5">
+                      <span class="card-input-unit">days</span>
+                    </div>
                   </div>
-                  <div class="col-12 col-sm-6">
-                    <label class="form-label small fw-800 text-muted mb-1"><i class="fa fa-money-bill me-1"></i>Payment
-                      (Days)</label>
-                    <input type="text" name="payment_duration" value="{{ s[14] or '' }}"
-                      class="form-control enterprise-input-sm fw-600" placeholder="e.g. 7">
-                  </div>
-
-                  <!-- Row 4: Extra Condition -->
-                  <div class="col-12">
-                    <label class="form-label small fw-800 text-muted mb-1">Extra Condition</label>
-                    <input type="text" name="extra_condition" value="{{ s[15] or '' }}"
-                      class="form-control enterprise-input-sm fw-600" placeholder="Any additional terms...">
+                  <div class="col-6">
+                    <label class="card-input-label"><i class="fa fa-credit-card text-info me-1"></i> Payment</label>
+                    <div class="card-input-wrapper">
+                      <input type="text" name="payment_duration" value="{{ s[14] or '' }}" placeholder="e.g. 7">
+                      <span class="card-input-unit">days</span>
+                    </div>
                   </div>
                 </div>
 
-                <hr class="stock-divider">
+                <hr class="stock-divider" style="margin: 16px 0; border-color: #f1f5f9;">
 
                 <!-- Action Buttons -->
-                <div class="d-flex gap-3 align-items-center mt-2">
-                  <div class="d-flex gap-2">
-                    {% if s[9] == 'open' %}
-                    <button type="submit" formaction="/miller/toggle_stock_status/{{ s[0] }}"
-                      class="btn btn-light text-secondary stock-icon-btn" title="Hide from Market">
-                      <i class="fa fa-eye-slash"></i>
-                    </button>
-                    {% else %}
-                    <button type="submit" formaction="/miller/toggle_stock_status/{{ s[0] }}"
-                      class="btn btn-light text-secondary stock-icon-btn" title="Show on Market">
-                      <i class="fa fa-eye"></i>
-                    </button>
-                    {% endif %}
+                <div class="d-flex gap-2">
+                  {% if s[9] == 'open' %}
+                  <button type="submit" formaction="/miller/toggle_stock_status/{{ s[0] }}"
+                    class="btn btn-outline-danger stock-icon-btn d-flex align-items-center justify-content-center"
+                    title="Hide from Market"
+                    style="width: 42px; height: 42px; border-radius: 8px; border-color: #cbd5e1; color: #f43f5e; padding: 0;">
+                    <i class="fa fa-ban"></i>
+                  </button>
+                  {% else %}
+                  <button type="submit" formaction="/miller/toggle_stock_status/{{ s[0] }}"
+                    class="btn btn-outline-success stock-icon-btn d-flex align-items-center justify-content-center"
+                    title="Show on Market"
+                    style="width: 42px; height: 42px; border-radius: 8px; border-color: #cbd5e1; color: #10b981; padding: 0;">
+                    <i class="fa fa-eye"></i>
+                  </button>
+                  {% endif %}
 
-                    <button type="submit" formaction="/miller/delete_stock/{{ s[0] }}"
-                      class="btn btn-light text-danger stock-icon-btn"
-                      onclick="return confirm('Delete this stock listing?')">
-                      <i class="fa fa-trash"></i>
-                    </button>
-                  </div>
+                  <button type="submit" formaction="/miller/delete_stock/{{ s[0] }}"
+                    class="btn btn-outline-secondary stock-icon-btn d-flex align-items-center justify-content-center"
+                    onclick="return confirm('Delete this stock listing?')"
+                    style="width: 42px; height: 42px; border-radius: 8px; border-color: #cbd5e1; color: #94a3b8; padding: 0;">
+                    <i class="fa fa-trash"></i>
+                  </button>
 
-                  <button class="btn btn-enterprise shadow-sm stock-save" title="Save Changes">SAVE DETAILS</button>
+                  <button class="btn flex-grow-1 fw-bold text-white shadow-sm" title="Save Changes"
+                    style="border-radius: 8px; background: #0f5132;">SAVE DETAILS</button>
                 </div>
               </form>
             </div>
