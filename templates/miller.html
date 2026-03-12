@@ -11,54 +11,12 @@
 
   /* ── HERO SECTION ── */
   .miller-hero {
-    background: linear-gradient(160deg, #1b7d50 0%, #14654a 35%, #0d5238 65%, #074028 100%);
-    color: white;
-    padding: 36px 0 120px;
-    border-radius: 0 0 40px 40px;
-    position: relative;
-    overflow: hidden;
-    box-shadow:
-      0 20px 60px rgba(7, 64, 40, 0.35),
-      0 4px 16px rgba(0, 0, 0, 0.1);
-  }
-
-  /* Crosshatch texture */
-  .miller-hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
+    background-color: #f8fafc;
     background-image:
-      linear-gradient(45deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-      linear-gradient(-45deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-    background-size: 32px 32px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* Connected network decoration */
-  .miller-hero::after {
-    content: '';
-    position: absolute;
-    top: 10px;
-    right: -20px;
-    width: 380px;
-    height: 340px;
-    background:
-      /* Nodes */
-      radial-gradient(circle 4px at 30% 22%, rgba(52, 211, 153, 0.55) 100%, transparent 100%),
-      radial-gradient(circle 3px at 68% 18%, rgba(255, 255, 255, 0.3) 100%, transparent 100%),
-      radial-gradient(circle 5px at 52% 48%, rgba(52, 211, 153, 0.6) 100%, transparent 100%),
-      radial-gradient(circle 3px at 22% 62%, rgba(255, 255, 255, 0.25) 100%, transparent 100%),
-      radial-gradient(circle 3px at 78% 68%, rgba(255, 255, 255, 0.3) 100%, transparent 100%),
-      radial-gradient(circle 3px at 42% 82%, rgba(255, 255, 255, 0.2) 100%, transparent 100%),
-      radial-gradient(circle 6px at 50% 45%, rgba(52, 211, 153, 0.5) 100%, transparent 100%),
-      /* Connection lines */
-      linear-gradient(135deg, transparent 28%, rgba(255, 255, 255, 0.06) 28.5%, rgba(255, 255, 255, 0.06) 29%, transparent 29.5%),
-      linear-gradient(200deg, transparent 40%, rgba(255, 255, 255, 0.05) 40.5%, rgba(255, 255, 255, 0.05) 41%, transparent 41.5%),
-      linear-gradient(160deg, transparent 55%, rgba(52, 211, 153, 0.08) 55.5%, rgba(52, 211, 153, 0.08) 56%, transparent 56.5%);
-    opacity: 0.85;
-    pointer-events: none;
-    z-index: 0;
+      url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230a8a54' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    padding: 30px 0 90px;
+    position: relative;
+    border-bottom: 1px solid #e2e8f0;
   }
 
   .miller-hero>* {
@@ -66,24 +24,39 @@
     z-index: 1;
   }
 
-  .miller-hero h1 {
-    font-size: 2rem;
+  .miller-hero .dashboard-title-small {
+    font-size: 0.8rem;
     font-weight: 800;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.25em;
+    color: #475569;
     text-transform: uppercase;
-    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+    margin-bottom: 8px;
+  }
+
+  .miller-hero h1 {
+    font-size: 2.8rem;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    color: #044329;
+    line-height: 1.1;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-family: 'Inter', sans-serif;
   }
 
   .miller-hero p {
-    font-size: 0.88rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    opacity: 0.85;
+    font-size: 0.95rem;
+    color: #64748b;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
   }
 
   /* ── DASHBOARD CONTAINER ── */
   .dashboard-container {
-    margin-top: -70px;
+    margin-top: -50px;
     position: relative;
     z-index: 10;
     padding-bottom: 60px;
@@ -116,51 +89,46 @@
   .stat-card-miller {
     background: #fff;
     border-radius: 16px;
-    padding: 24px 22px 22px;
-    border: 1px solid rgba(226, 232, 240, 0.7);
-    box-shadow:
-      0 1px 3px rgba(0, 0, 0, 0.04),
-      0 4px 12px rgba(0, 0, 0, 0.03);
+    padding: 24px 22px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
     transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     height: 100%;
     position: relative;
     overflow: hidden;
   }
 
-  /* Colored left accent bar */
+  /* Bottom accent bar */
   .stat-card-miller::after {
     content: '';
     position: absolute;
-    top: 12px;
+    bottom: 0;
     left: 0;
-    width: 4px;
-    height: calc(100% - 24px);
-    border-radius: 0 4px 4px 0;
+    width: 100%;
+    height: 6px;
     transition: height 0.32s ease;
   }
 
   .col-6:nth-child(1) .stat-card-miller::after {
-    background: linear-gradient(180deg, #0a8a54, #34d399);
+    background: #10b981;
   }
 
   .col-6:nth-child(2) .stat-card-miller::after {
-    background: linear-gradient(180deg, #d97706, #fbbf24);
+    background: #f59e0b;
   }
 
   .col-6:nth-child(3) .stat-card-miller::after {
-    background: linear-gradient(180deg, #0891b2, #67e8f9);
+    background: #3b82f6;
   }
 
   .col-6:nth-child(4) .stat-card-miller::after {
-    background: linear-gradient(180deg, #16a34a, #86efac);
+    background: #10b981;
   }
 
   .stat-card-miller:hover {
     transform: translateY(-6px);
-    box-shadow:
-      0 8px 24px rgba(0, 0, 0, 0.06),
-      0 20px 48px rgba(0, 0, 0, 0.08);
-    border-color: rgba(226, 232, 240, 0.4);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+    border-color: #cbd5e1;
   }
 
   /* Color labels */
@@ -187,76 +155,86 @@
   }
 
   /* Icon area */
-  .stat-card-miller i.fa {
-    font-size: 2rem;
-    opacity: 0.1 !important;
-    transition: all 0.35s ease;
+  .stat-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
   }
 
-  .stat-card-miller:hover i.fa {
-    opacity: 0.2 !important;
-    transform: scale(1.1) rotate(-5deg);
+  .col-6:nth-child(1) .stat-card-icon {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+  }
+
+  .col-6:nth-child(2) .stat-card-icon {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+  }
+
+  .col-6:nth-child(3) .stat-card-icon {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+  }
+
+  .col-6:nth-child(4) .stat-card-icon {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
   }
 
   /* Large number */
   .stat-card-miller .fs-2 {
-    font-size: 2.4rem !important;
+    font-size: 2.2rem !important;
     font-weight: 800;
-    color: #0f172a;
+    color: #475569;
     line-height: 1;
-    margin-top: 8px;
-    letter-spacing: -0.03em;
-    -webkit-text-fill-color: #0f172a;
-    background: none;
-    -webkit-background-clip: unset;
-    background-clip: unset;
+    margin-top: 12px;
+    letter-spacing: -0.02em;
   }
 
   .stat-card-miller .text-muted.small {
-    font-size: 0.78rem;
+    font-size: 0.85rem;
     color: #94a3b8 !important;
     font-weight: 600;
     margin-top: 4px;
   }
 
   /* ═══════════════════════════════
-     TAB PILLS — Frosted Capsules
+     TAB PILLS — Pill capsules
      ═══════════════════════════════ */
   .nav-pills-premium {
-    background: rgba(255, 255, 255, 0.07);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    padding: 4px;
+    background: #fff;
+    padding: 6px;
     border-radius: 50px;
     display: inline-flex;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
     position: relative;
     z-index: 2;
   }
 
   .nav-pills-premium .nav-link {
-    color: rgba(255, 255, 255, 0.7);
+    color: #475569;
     border-radius: 50px;
-    padding: 10px 22px;
+    padding: 10px 24px;
     font-weight: 700;
-    font-size: 0.82rem;
-    transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-    letter-spacing: 0.01em;
-    border: 1.5px solid transparent;
-    white-space: nowrap;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+    border: none;
   }
 
   .nav-pills-premium .nav-link:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.06);
+    color: #044329;
+    background: #f8fafc;
   }
 
   .nav-pills-premium .nav-link.active {
-    background: #fff;
+    background: #e6f4ea;
     color: #0a8a54;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     font-weight: 800;
-    border-color: rgba(10, 138, 84, 0.1);
   }
 
   /* ═══════════════════════════════
@@ -279,11 +257,11 @@
   .stock-table-modern thead th {
     background: #f8fafc;
     border-bottom: 2px solid #e2e8f0;
-    color: #64748b;
+    color: #475569;
     font-weight: 800;
     text-transform: uppercase;
-    font-size: 0.65rem;
-    letter-spacing: 1.2px;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
     padding: 14px 18px;
   }
 
@@ -428,9 +406,10 @@
   }
 
   .stock-card {
-    border-radius: 16px !important;
+    background: #fff;
+    border-radius: 20px !important;
     border: 1px solid #e2e8f0 !important;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02) !important;
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
@@ -462,9 +441,9 @@
   }
 
   .stock-card-header {
-    background: #fafbfc;
-    padding: 18px 20px 14px !important;
-    border-bottom: 1px solid #f1f5f9;
+    background: transparent;
+    padding: 24px 24px 16px !important;
+    border-bottom: none !important;
   }
 
   .stock-title {
@@ -486,12 +465,12 @@
   }
 
   .stock-card-body .form-label {
-    font-size: 0.68rem;
-    letter-spacing: 0.08em;
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
-    color: #94a3b8;
-    font-weight: 700;
-    margin-bottom: 6px;
+    color: #64748b;
+    font-weight: 800;
+    margin-bottom: 8px;
   }
 
   .stock-card-body .form-control,
@@ -531,15 +510,15 @@
   }
 
   .stock-icon-btn {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 10px !important;
-    border: 1px solid #e2e8f0 !important;
-    background: #fff !important;
-    color: #64748b;
+    border-radius: 12px !important;
+    border: 1px solid #cbd5e1 !important;
+    background: #f8fafc !important;
+    color: #475569;
     transition: all 0.2s ease;
   }
 
@@ -550,10 +529,12 @@
   }
 
   .stock-save {
-    min-height: 40px;
-    border-radius: 999px !important;
-    font-weight: 700;
-    font-size: 0.84rem;
+    height: 44px;
+    border-radius: 12px !important;
+    font-weight: 800;
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
+    width: 100%;
   }
 
   /* ═══════════════════════════════════
@@ -737,7 +718,8 @@
 {% block content %}
 <section class="miller-hero">
   <div class="container text-center">
-    <div class="d-flex justify-content-center mb-4" data-aos="zoom-in">
+    <!-- Top Nav Tabs -->
+    <div class="d-flex justify-content-center mb-4 pb-2" data-aos="zoom-in">
       <div class="nav-pills-premium nav nav-pills" id="millerTabs" role="tablist">
         <button class="nav-link active" id="stock-tab" data-bs-toggle="pill" data-bs-target="#stock" type="button"
           role="tab">Live Rate</button>
@@ -749,13 +731,18 @@
           role="tab">Completed Orders</button>
       </div>
     </div>
-    <h1 class="fw-800 text-white mb-2" data-aos="fade-up">{{ miller_name }}</h1>
+
+    <div class="dashboard-title-small" data-aos="fade-up">MILLER DASHBOARD</div>
+    <h1 data-aos="fade-up" data-aos-delay="50">{{ miller_name }}</h1>
+
     {% if miller_address %}
-    <p class="text-white opacity-75 fw-600 mb-0" data-aos="fade-up" data-aos-delay="100"><i
-        class="fa fa-map-marker-alt me-2"></i>{{ miller_address }}</p>
+    <p data-aos="fade-up" data-aos-delay="100">
+      <i class="fa fa-map-marker-alt" style="color:#0a8a54;"></i> {{ miller_address }}
+    </p>
     {% else %}
-    <p class="text-white opacity-75 fw-600 mb-0" data-aos="fade-up" data-aos-delay="100">Industrial Dashboard & Supply
-      Chain Oversight</p>
+    <p data-aos="fade-up" data-aos-delay="100">
+      <i class="fa fa-map-marker-alt" style="color:#0a8a54;"></i> Industrial Dashboard & Supply Chain Oversight
+    </p>
     {% endif %}
   </div>
 </section>
@@ -763,44 +750,56 @@
 <div class="container dashboard-container">
   <h4 class="market-map-heading" data-aos="fade-up" data-aos-delay="150"></h4>
   <div class="row g-4 mb-5" data-aos="fade-up" data-aos-delay="200">
+    <!-- Stat Card 1 -->
     <div class="col-6 col-md-3">
       <div class="stat-card-miller">
-        <div class="d-flex justify-content-between mb-3">
-          <div class="text-primary fw-800 small text-uppercase">Active Stock</div>
-          <i class="fa fa-warehouse text-primary opacity-25"></i>
+        <div class="d-flex justify-content-between mb-2">
+          <div class="fw-800 small text-uppercase" style="color: #64748b; letter-spacing: 0.1em;">Active Stock</div>
+          <div class="stat-card-icon">
+            <i class="fa-solid fa-warehouse"></i>
+          </div>
         </div>
-        <div class="fs-2 fw-800">{{ stocks|length }}</div>
-        <div class="text-muted small fw-600 mt-1">Commodities Live</div>
+        <div class="fs-2">{{ stocks|length }}</div>
+        <div class="text-muted small">Commodities Live</div>
       </div>
     </div>
+    <!-- Stat Card 2 -->
     <div class="col-6 col-md-3">
       <div class="stat-card-miller">
-        <div class="d-flex justify-content-between mb-3">
-          <div class="text-warning fw-800 small text-uppercase">New Requests</div>
-          <i class="fa fa-clock text-warning opacity-25"></i>
+        <div class="d-flex justify-content-between mb-2">
+          <div class="fw-800 small text-uppercase" style="color: #64748b; letter-spacing: 0.1em;">New Requests</div>
+          <div class="stat-card-icon">
+            <i class="fa-solid fa-clock"></i>
+          </div>
         </div>
-        <div class="fs-2 fw-800">{{ pending_list|length }}</div>
-        <div class="text-muted small fw-600 mt-1">Action Required</div>
+        <div class="fs-2">{{ pending_list|length }}</div>
+        <div class="text-muted small">Action Required</div>
       </div>
     </div>
+    <!-- Stat Card 3 -->
     <div class="col-6 col-md-3">
       <div class="stat-card-miller">
-        <div class="d-flex justify-content-between mb-3">
-          <div class="text-info fw-800 small text-uppercase">In Transit</div>
-          <i class="fa fa-truck text-info opacity-25"></i>
+        <div class="d-flex justify-content-between mb-2">
+          <div class="fw-800 small text-uppercase" style="color: #64748b; letter-spacing: 0.1em;">In Transit</div>
+          <div class="stat-card-icon">
+            <i class="fa-solid fa-truck"></i>
+          </div>
         </div>
-        <div class="fs-2 fw-800">{{ approved_loading|length }}</div>
-        <div class="text-muted small fw-600 mt-1">Active Loads</div>
+        <div class="fs-2">{{ approved_loading|length }}</div>
+        <div class="text-muted small">Active Loads</div>
       </div>
     </div>
+    <!-- Stat Card 4 -->
     <div class="col-6 col-md-3">
       <div class="stat-card-miller">
-        <div class="d-flex justify-content-between mb-3">
-          <div class="text-success fw-800 small text-uppercase">Complete Order</div>
-          <i class="fa fa-circle-check text-success opacity-25"></i>
+        <div class="d-flex justify-content-between mb-2">
+          <div class="fw-800 small text-uppercase" style="color: #64748b; letter-spacing: 0.1em;">Completed</div>
+          <div class="stat-card-icon">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
         </div>
-        <div class="fs-2 fw-800">{{ completed_orders|length }}</div>
-        <div class="text-muted small fw-600 mt-1">Completed Trades</div>
+        <div class="fs-2">{{ completed_orders|length }}</div>
+        <div class="text-muted small">Completed Trades</div>
       </div>
     </div>
   </div>
@@ -808,12 +807,16 @@
   <div class="miller-tab-content tab-content" id="millerTabsContent">
     <!-- STOCK TAB -->
     <div class="tab-pane fade show active" id="stock" role="tabpanel">
-      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 stock-toolbar">
-        <h4 class="fw-800 mb-0">Live Rate</h4>
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 stock-toolbar"
+        style="background: transparent; border: none; box-shadow: none; padding: 0;">
+        <h4 class="fw-800 mb-0 d-flex align-items-center" style="color: #0f172a; font-size: 1.3rem;">
+          Live Rate Board <div
+            style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; margin-left: 10px;"></div>
+        </h4>
         <div class="d-flex gap-2 align-items-center">
           <input type="text" id="stockSearch" class="form-control enterprise-input-sm stock-search"
-            placeholder="🔍 Search crop, status..."
-            oninput="universalSearch('stockSearch', '#stock table tbody', 'tr')">
+            placeholder="Search crop..." oninput="universalSearch('stockSearch', '#stock table tbody', 'tr')"
+            style="border-radius: 12px !important;">
           <a href="/miller/post-stock" class="btn btn-enterprise px-4 fw-800 py-2 stock-cta">
             <i class="fa fa-plus-circle me-2"></i> Post New Commodity
           </a>
@@ -827,9 +830,12 @@
           <div class="card h-100 stock-card">
             <div
               class="card-header bg-white border-bottom-0 d-flex justify-content-between align-items-center stock-card-header">
-              <h5 class="fw-800 text-dark mb-0 text-capitalize stock-title">{{ s[2] }}</h5>
+              <h5 class="fw-800 text-dark mb-0 text-capitalize stock-title d-flex align-items-center">
+                <i class="fa fa-leaf text-success me-2 opacity-50"></i> {{ s[2] }}
+              </h5>
               <span
-                class="badge stock-status {{ 'bg-success-subtle text-success' if s[9] == 'open' else 'bg-danger-subtle text-danger' }} fw-800">
+                class="badge stock-status {{ 'bg-success-subtle text-success' if s[9] == 'open' else 'bg-secondary text-white' }} fw-800"
+                style="padding: 8px 16px !important; border-radius: 8px !important;">
                 {{ s[9]|upper }}
               </span>
             </div>
@@ -892,29 +898,28 @@
                 <hr class="stock-divider">
 
                 <!-- Action Buttons -->
-                <div class="d-flex justify-content-between align-items-center stock-actions">
+                <div class="d-flex gap-3 align-items-center mt-2">
                   <div class="d-flex gap-2">
                     {% if s[9] == 'open' %}
                     <button type="submit" formaction="/miller/toggle_stock_status/{{ s[0] }}"
-                      class="btn btn-light text-secondary btn-sm stock-icon-btn" title="Hide from Market">
+                      class="btn btn-light text-secondary stock-icon-btn" title="Hide from Market">
                       <i class="fa fa-eye-slash"></i>
                     </button>
                     {% else %}
                     <button type="submit" formaction="/miller/toggle_stock_status/{{ s[0] }}"
-                      class="btn btn-light text-secondary btn-sm stock-icon-btn" title="Show on Market">
+                      class="btn btn-light text-secondary stock-icon-btn" title="Show on Market">
                       <i class="fa fa-eye"></i>
                     </button>
                     {% endif %}
 
                     <button type="submit" formaction="/miller/delete_stock/{{ s[0] }}"
-                      class="btn btn-light text-danger btn-sm stock-icon-btn"
+                      class="btn btn-light text-danger stock-icon-btn"
                       onclick="return confirm('Delete this stock listing?')">
                       <i class="fa fa-trash"></i>
                     </button>
                   </div>
 
-                  <button class="btn btn-enterprise btn-sm px-4 fw-800 shadow-sm stock-save" title="Save Changes">Save
-                    Details</button>
+                  <button class="btn btn-enterprise shadow-sm stock-save" title="Save Changes">SAVE DETAILS</button>
                 </div>
               </form>
             </div>
@@ -928,6 +933,96 @@
         <h5 class="fw-800 text-muted">No stock listings found</h5>
       </div>
       {% endif %}
+
+      <!-- MARKET PULSE UI -->
+      <div class="mt-5" data-aos="fade-up">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="fw-800 mb-0 d-flex align-items-center" style="color: #0f172a; font-size: 1.2rem;">
+            MARKET PULSE <span
+              style="font-size: 0.85rem; color: #64748b; font-weight: 600; text-transform: none; margin-left: 10px; letter-spacing: 0;">/
+              Average Crop Prices</span>
+          </h4>
+          <div class="d-flex gap-2">
+            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill fw-800 shadow-sm"
+              style="font-size: 0.75rem;"><i class="fa fa-arrow-trend-up text-success me-1"></i> +2.4% Today</span>
+          </div>
+        </div>
+        <div class="card bg-white border-0" style="border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+          <div class="card-body p-4 p-md-5">
+            <!-- Static Bar Chart representation -->
+            <div class="d-flex align-items-end justify-content-between gap-2"
+              style="height: 200px; padding-bottom: 20px; border-bottom: 1px dashed #e2e8f0;">
+
+              <div class="d-flex flex-column align-items-center flex-grow-1 group" style="cursor: pointer;">
+                <div class="fw-800 text-dark mb-2"
+                  style="font-size: 0.75rem; opacity: 0; transition: opacity 0.2s; transition-delay: 0.1s;">₹3,400</div>
+                <div
+                  style="width: 100%; max-width: 48px; height: 60%; background: #10b981; border-radius: 8px 8px 0 0; transition: all 0.2s;"
+                  onmouseover="this.style.filter='brightness(1.1)'; this.previousElementSibling.style.opacity='1'"
+                  onmouseout="this.style.filter='none'; this.previousElementSibling.style.opacity='0'"></div>
+                <div class="mt-3 small fw-800 text-muted text-uppercase"
+                  style="letter-spacing: 0.05em; font-size: 0.7rem;">Wheat</div>
+              </div>
+
+              <div class="d-flex flex-column align-items-center flex-grow-1" style="cursor: pointer;">
+                <div class="fw-800 text-dark mb-2" style="font-size: 0.75rem; opacity: 0; transition: opacity 0.2s;">
+                  ₹2,100</div>
+                <div
+                  style="width: 100%; max-width: 48px; height: 40%; background: #f59e0b; border-radius: 8px 8px 0 0; transition: all 0.2s;"
+                  onmouseover="this.style.filter='brightness(1.1)'; this.previousElementSibling.style.opacity='1'"
+                  onmouseout="this.style.filter='none'; this.previousElementSibling.style.opacity='0'"></div>
+                <div class="mt-3 small fw-800 text-muted text-uppercase"
+                  style="letter-spacing: 0.05em; font-size: 0.7rem;">Paddy</div>
+              </div>
+
+              <div class="d-flex flex-column align-items-center flex-grow-1" style="cursor: pointer;">
+                <div class="fw-800 text-dark mb-2" style="font-size: 0.75rem; opacity: 0; transition: opacity 0.2s;">
+                  ₹5,200</div>
+                <div
+                  style="width: 100%; max-width: 48px; height: 85%; background: #3b82f6; border-radius: 8px 8px 0 0; transition: all 0.2s;"
+                  onmouseover="this.style.filter='brightness(1.1)'; this.previousElementSibling.style.opacity='1'"
+                  onmouseout="this.style.filter='none'; this.previousElementSibling.style.opacity='0'"></div>
+                <div class="mt-3 small fw-800 text-muted text-uppercase"
+                  style="letter-spacing: 0.05em; font-size: 0.7rem;">Mustard</div>
+              </div>
+
+              <div class="d-flex flex-column align-items-center flex-grow-1" style="cursor: pointer;">
+                <div class="fw-800 text-dark mb-2" style="font-size: 0.75rem; opacity: 0; transition: opacity 0.2s;">
+                  ₹4,800</div>
+                <div
+                  style="width: 100%; max-width: 48px; height: 75%; background: #8b5cf6; border-radius: 8px 8px 0 0; transition: all 0.2s;"
+                  onmouseover="this.style.filter='brightness(1.1)'; this.previousElementSibling.style.opacity='1'"
+                  onmouseout="this.style.filter='none'; this.previousElementSibling.style.opacity='0'"></div>
+                <div class="mt-3 small fw-800 text-muted text-uppercase"
+                  style="letter-spacing: 0.05em; font-size: 0.7rem;">Soybean</div>
+              </div>
+
+              <div class="d-flex flex-column align-items-center flex-grow-1" style="cursor: pointer;">
+                <div class="fw-800 text-dark mb-2" style="font-size: 0.75rem; opacity: 0; transition: opacity 0.2s;">
+                  ₹1,800</div>
+                <div
+                  style="width: 100%; max-width: 48px; height: 35%; background: #ec4899; border-radius: 8px 8px 0 0; transition: all 0.2s;"
+                  onmouseover="this.style.filter='brightness(1.1)'; this.previousElementSibling.style.opacity='1'"
+                  onmouseout="this.style.filter='none'; this.previousElementSibling.style.opacity='0'"></div>
+                <div class="mt-3 small fw-800 text-muted text-uppercase"
+                  style="letter-spacing: 0.05em; font-size: 0.7rem;">Maize</div>
+              </div>
+
+              <div class="d-flex flex-column align-items-center flex-grow-1" style="cursor: pointer;">
+                <div class="fw-800 text-dark mb-2" style="font-size: 0.75rem; opacity: 0; transition: opacity 0.2s;">
+                  ₹6,100</div>
+                <div
+                  style="width: 100%; max-width: 48px; height: 100%; background: #14b8a6; border-radius: 8px 8px 0 0; transition: all 0.2s;"
+                  onmouseover="this.style.filter='brightness(1.1)'; this.previousElementSibling.style.opacity='1'"
+                  onmouseout="this.style.filter='none'; this.previousElementSibling.style.opacity='0'"></div>
+                <div class="mt-3 small fw-800 text-muted text-uppercase"
+                  style="letter-spacing: 0.05em; font-size: 0.7rem;">Cotton</div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- REQUESTS TAB -->

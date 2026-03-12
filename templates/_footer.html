@@ -1,4 +1,69 @@
 ﻿<!-- ================= UNIFIED FOOTER ================= -->
+<style>
+  .sarna-footer {
+    background: #042f1f;
+    /* Deep Premium Default Dark Green */
+    color: #cbd5e1;
+    padding: 60px 0 20px;
+    font-size: 0.9rem;
+    border-top: 1px solid #06402b;
+  }
+
+  .sarna-footer .footer-brand {
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    letter-spacing: -0.02em;
+  }
+
+  .sarna-footer h6 {
+    color: #ffffff;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.85rem;
+    margin-bottom: 24px;
+  }
+
+  .sarna-footer ul li {
+    margin-bottom: 12px;
+  }
+
+  .sarna-footer ul li a {
+    color: #94a3b8;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .sarna-footer ul li a:hover {
+    color: #10b981;
+  }
+
+  .sarna-footer .footer-social a {
+    color: #ffffff;
+    background: #06452e;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    margin-right: 8px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+
+  .sarna-footer .footer-social a:hover {
+    background: #10b981;
+    transform: translateY(-2px);
+  }
+
+  .sarna-footer .border-accent {
+    border-color: #06452e !important;
+  }
+</style>
+
 <footer class="sarna-footer">
   <div class="container">
     <div class="row g-4">
@@ -18,41 +83,55 @@
         </div>
       </div>
 
+      <!-- Support Links -->
+      <div class="col-lg-2 col-md-4">
+        <h6>Explore</h6>
+        <ul class="list-unstyled">
+          <li><a href="/market">Live Market</a></li>
+          <li><a href="/directory">Directory</a></li>
+          <li><a href="/post_crop">Post Commodity</a></li>
+          <li><a href="/miller/pending-payments">Payments</a></li>
+        </ul>
+      </div>
+
+      <!-- Legal Links -->
+      <div class="col-lg-2 col-md-4">
+        <h6>Legal</h6>
+        <ul class="list-unstyled">
+          <li><a href="/privacy-policy">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+          <li><a href="#">Security</a></li>
+          <li><a href="#">Cookies</a></li>
+        </ul>
+      </div>
+
       <!-- CONTACT -->
-      <div class="col-lg-3 col-md-6">
+      <div class="col-lg-3 col-md-4">
         <h6>Contact Us</h6>
         <ul class="list-unstyled">
-          <li class="mb-2">
-            <i class="fa fa-phone me-2" style="color: var(--accent);"></i>
-            +91 XXXXX XXXXX
-          </li>
-          <li class="mb-2">
-            <i class="fa fa-envelope me-2" style="color: var(--accent);"></i>
-            support@sarnamandi.com
-          </li>
-          <li class="mb-2">
-            <i class="fa fa-location-dot me-2" style="color: var(--accent);"></i>
-            Rajasthan, India
-          </li>
-          <li class="mb-2">
-            <i class="fa fa-clock me-2" style="color: var(--accent);"></i>
-            Mon - Sat: 9:00 AM - 6:00 PM
-          </li>
+          <li><i class="fa fa-phone me-2 text-success"></i> +91 XXXXX XXXXX</li>
+          <li><i class="fa fa-envelope me-2 text-success"></i> support@sarnamandi.com</li>
+          <li><i class="fa fa-location-dot me-2 text-success"></i> Rajasthan, India</li>
         </ul>
       </div>
 
     </div>
 
     <!-- BOTTOM BAR -->
-    <div class="footer-bottom">
+    <div class="footer-bottom border-top border-accent pt-4 mt-5">
       <div class="row align-items-center">
-        <div class="col-md-6 text-md-start text-center mb-2 mb-md-0">
-          © 2026 <strong>Saarna Canvessars</strong>. All Rights Reserved.
+        <div class="col-md-6 text-md-start text-center mb-3 mb-md-0" style="color: #64748b;">
+          &copy; 2026 <strong class="text-white">Saarna Canvessars</strong>. All Rights Reserved.
         </div>
-        <div class="col-md-6 text-md-end text-center">
-          <a href="/privacy-policy" class="me-3">Privacy Policy</a>
-          <a href="#" class="me-3">Terms of Service</a>
-          <a href="#">Support</a>
+        <div class="col-md-6 text-md-end text-center dropdown">
+          <button class="btn btn-sm btn-outline-success dropdown-toggle text-white" type="button"
+            data-bs-toggle="dropdown" aria-expanded="false" style="border-color: #06452e;">
+            <i class="fa fa-globe me-1"></i> English
+          </button>
+          <ul class="dropdown-menu dropdown-menu-dark">
+            <li><a class="dropdown-item active" href="#">English</a></li>
+            <li><a class="dropdown-item" href="#">Hindi</a></li>
+          </ul>
         </div>
       </div>
     </div>
