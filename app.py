@@ -1991,6 +1991,44 @@ ORDER BY mb.created_at DESC
     # QC Pending: Verification OR Final Hisab upload
     qc_pending_count = sum(1 for r in rows if (r[9] != 'verified' or r[11] is None))
 
+    # 🔹 MARKET PULSE: CROP PRICE COMPARISON ACROSS MILLERS
+    # Fetch all open stocks from all millers to group them for comparison
+    cur.execute("""
+        SELECT ms.crop, ms.price, mp.mill_name, ms.miller_id
+        FROM miller_stock ms
+        JOIN miller_profiles mp ON ms.miller_id = mp.miller_id
+        WHERE ms.status = 'open'
+        ORDER BY ms.crop, ms.price ASC
+    """)
+    all_open_stocks = cur.fetchall()
+
+    market_pulse_data = {}
+    for crop, price, m_name, m_id in all_open_stocks:
+        crop_id = crop.lower().strip()
+        if crop_id not in market_pulse_data:
+            market_pulse_data[crop_id] = {
+                "display_name": crop.capitalize(),
+                "prices": []
+            }
+        # Avoid duplicate miller entries for same crop in comparison
+        if not any(p['miller_id'] == m_id for p in market_pulse_data[crop_id]['prices']):
+            market_pulse_data[crop_id]['prices'].append({
+                "price": price,
+                "miller_name": m_name,
+                "miller_id": m_id
+            })
+
+    # Limit to top 6 crops for display stability and sort them
+    sorted_crops = sorted(market_pulse_data.keys())[:6]
+    market_pulse_display = {k: market_pulse_data[k] for k in sorted_crops}
+
+    # Find global max price for chart scaling (bar heights)
+    max_price = 1
+    for data in market_pulse_display.values():
+        for p_info in data['prices']:
+            if float(p_info['price']) > max_price:
+                max_price = float(p_info['price'])
+
     con.close()
 
     # Fetch Miller Address & Name
@@ -2019,7 +2057,9 @@ ORDER BY mb.created_at DESC
     approved_bookings_count=approved_bookings_count,
     qc_pending_count=qc_pending_count,
     miller_address=miller_address,
-    miller_name=miller_name
+    miller_name=miller_name,
+    market_pulse_display=market_pulse_display,
+    max_price=max_price
 )
 
 @app.route("/miller/delete_stock/<int:id>", methods=["POST"])
