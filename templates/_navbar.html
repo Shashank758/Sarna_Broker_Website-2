@@ -222,23 +222,7 @@
 
       <!-- UI WIDGETS -->
       {% if session.user_id %}
-      <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0 ms-lg-4">
-
-        <!-- Live Clock -->
-        <div class="nav-pill-widget text-dark fw-bold"
-          style="padding: 6px 14px; border-radius: 8px; font-size: 0.8rem; background: #f8fafc; border: 1px solid #e2e8f0; font-family: monospace; white-space: nowrap;"
-          id="nav-clock">
-          --:--:--
-        </div>
-        <script>
-          setInterval(() => {
-            const el = document.getElementById('nav-clock');
-            if (el) {
-              const now = new Date();
-              el.innerText = now.toLocaleTimeString('en-GB', { hour12: false });
-            }
-          }, 1000);
-        </script>
+      <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0 ms-lg-2">
 
         <!-- Weather Widget -->
         <div class="nav-pill-widget d-flex align-items-center gap-1 fw-bold"
