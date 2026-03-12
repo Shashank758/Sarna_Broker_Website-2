@@ -107,64 +107,74 @@
         font-weight: 800;
     }
 
-    /* ── MARKET COMMODITY CARDS ── */
+    /* ── MARKET COMMODITY CARDS (ROW LAYOUT) ── */
     .market-stock-card {
         background: #fff;
-        border-radius: 18px;
+        border-radius: 16px;
         border: 1px solid #e2e8f0;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.3s ease;
         overflow: hidden;
-        position: relative;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+        gap: 20px;
     }
 
     .market-stock-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
         border-color: #10b981;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        transform: translateX(4px);
     }
 
     .card-header-premium {
-        padding: 18px 20px;
-        border-bottom: 1px solid #f1f5f9;
+        padding: 0;
+        border-bottom: none;
         display: flex;
         align-items: center;
         gap: 15px;
-        background: #fafafa;
+        background: transparent;
+        min-width: 250px;
     }
 
     .icon-box-premium {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         flex-shrink: 0;
     }
 
     .card-body-premium {
-        padding: 20px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-grow: 1;
+        gap: 30px;
     }
 
     .price-tag-premium {
-        font-size: 1.5rem;
+        font-size: 1.4rem;
         font-weight: 900;
         color: #0f5132;
-        letter-spacing: -0.02em;
+        min-width: 100px;
     }
 
     .price-tag-premium small {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         color: #64748b;
-        font-weight: 600;
     }
 
     .detail-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-        margin-top: 15px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-top: 0;
+        flex-grow: 1;
     }
 
     .detail-item-premium {
@@ -185,31 +195,65 @@
     }
 
     .detail-value-premium {
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         font-weight: 700;
         color: #334155;
     }
 
     .btn-book-premium {
-        background: #0f5132;
-        color: #fff;
+        background: #0f5132 !important;
+        color: #fff !important;
         font-weight: 800;
-        border-radius: 12px;
-        padding: 12px;
-        width: 100%;
+        border-radius: 10px;
+        padding: 10px 20px;
+        width: auto;
         border: none;
-        transition: all 0.2s;
-        margin-top: 20px;
+        white-space: nowrap;
+        font-size: 0.85rem;
+        transition: all 0.2s ease;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 0 !important;
     }
 
     .btn-book-premium:hover {
-        background: #064e3b;
+        background: #0a4026 !important;
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(15, 81, 50, 0.2);
-        color: #fff;
+    }
+
+    @media (max-width: 1200px) {
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+    }
+
+    @media (max-width: 992px) {
+        .market-stock-card {
+            flex-direction: column;
+            align-items: stretch;
+            padding: 20px;
+        }
+
+        .card-header-premium {
+            min-width: auto;
+            margin-bottom: 15px;
+        }
+
+        .card-body-premium {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 15px;
+        }
+
+        .btn-book-premium {
+            width: 100%;
+        }
     }
 
     /* ── MODALS ── */
@@ -372,7 +416,7 @@
             <div class="row g-4" id="stockCardsContainer">
                 {% if miller_stocks %}
                 {% for stock in miller_stocks %}
-                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index * 30 }}">
+                <div class="col-12" data-aos="fade-up" data-aos-delay="{{ loop.index * 30 }}">
                     <div class="market-stock-card">
                         <!-- Header -->
                         <div class="card-header-premium">
@@ -380,30 +424,30 @@
                                 <i class="fa fa-seedling"></i>
                             </div>
                             <div>
-                                <div class="fw-800 text-dark mb-0 fs-5">{{ stock[2] }}</div>
-                                <div class="text-muted small fw-600"><i class="fa fa-industry me-1"></i>{{ stock[10] }}
+                                <div class="fw-800 text-dark mb-0 fs-6">{{ stock[2] }}</div>
+                                <div class="text-muted" style="font-size: 0.75rem; font-weight: 600;">{{ stock[10] }}
                                 </div>
                             </div>
-                            <div class="ms-auto">
-                                <span class="badge rounded-pill bg-success px-2 py-1"
-                                    style="font-size: 0.65rem;">LIVE</span>
+                            <div>
+                                <span
+                                    class="badge rounded-pill bg-success-subtle text-success border border-success-subtle py-1"
+                                    style="font-size: 0.6rem;">LIVE</span>
                             </div>
                         </div>
 
                         <!-- Body -->
                         <div class="card-body-premium">
-                            <div class="d-flex justify-content-between align-items-end mb-3">
-                                <div class="price-tag-premium">₹{{ stock[4] }}<small>/Qt</small></div>
-                                <div class="text-end">
-                                    <div class="detail-label-premium">Available Stock</div>
-                                    <div class="detail-value-premium text-primary">{{ stock[3] }} Qt</div>
-                                </div>
-                            </div>
+                            <div class="price-tag-premium">₹{{ stock[4] }}<small>/Qt</small></div>
 
                             <div class="detail-grid">
                                 <div class="detail-item-premium">
+                                    <span class="detail-label-premium">Available</span>
+                                    <span class="detail-value-premium text-primary">{{ stock[3] }} Qt</span>
+                                </div>
+                                <div class="detail-item-premium">
                                     <span class="detail-label-premium">Location</span>
-                                    <span class="detail-value-premium">{{ stock[13] }}, {{ stock[14] }}</span>
+                                    <span class="detail-value-premium text-truncate" style="max-width: 120px;">{{
+                                        stock[13] }}</span>
                                 </div>
                                 <div class="detail-item-premium">
                                     <span class="detail-label-premium">Bag Type</span>
@@ -415,19 +459,13 @@
                                     <span class="detail-value-premium text-info">{{ stock[19] }}%</span>
                                 </div>
                                 {% endif %}
-                                {% if stock[17] %}
-                                <div class="detail-item-premium">
-                                    <span class="detail-label-premium">Payment</span>
-                                    <span class="detail-value-premium text-success">{{ stock[17] }}</span>
-                                </div>
-                                {% endif %}
                             </div>
 
                             <!-- Book button (buyers only) -->
                             {% if session.role == 'buyer' %}
                             <button class="btn btn-book-premium" data-bs-toggle="modal"
                                 data-bs-target="#bookModal{{ stock[0] }}">
-                                <i class="fa fa-file-signature me-2"></i>Book This Stock
+                                <i class="fa fa-file-signature me-2"></i>BOOK THIS STOCK
                             </button>
                             {% endif %}
                         </div>
