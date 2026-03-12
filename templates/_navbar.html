@@ -227,34 +227,51 @@
 <style>
   /* Navbar Personalization */
   .sarna-navbar {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   }
 
   .brand-badge {
-    height: 40px;
-    width: 40px;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(5px);
+    height: 38px;
+    width: 38px;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .brand-badge:hover {
+    background: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 0 16px rgba(255, 255, 255, 0.1);
   }
 
   .navbar-nav .nav-link {
-    font-size: 0.95rem;
-    letter-spacing: -0.2px;
+    font-size: 0.9rem;
+    letter-spacing: -0.01em;
   }
 
   .dropdown-item {
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     font-weight: 500;
-    padding: 8px 16px;
+    padding: 9px 16px;
     color: var(--text-light);
+    border-radius: 8px;
+    transition: all 0.2s ease;
   }
 
   .dropdown-item:hover {
     background-color: var(--primary-subtle);
     color: var(--primary);
+    transform: translateX(2px);
+  }
+
+  .dropdown-menu {
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-xl);
+    animation: fadeInDown 0.2s ease;
   }
 </style>
