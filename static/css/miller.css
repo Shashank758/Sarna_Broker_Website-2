@@ -1,0 +1,1524 @@
+/* ============================================================
+   MILLER DASHBOARD — PREMIUM DIGITAL MANDI CSS
+   Saarna Canvessars · Seller Panel
+   ============================================================ */
+
+/* ─── KEYFRAMES ─── */
+@keyframes miller-grain {
+
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+
+    25% {
+        transform: translate(-2%, 1%);
+    }
+
+    50% {
+        transform: translate(1%, -1%);
+    }
+
+    75% {
+        transform: translate(-1%, 2%);
+    }
+}
+
+@keyframes miller-float {
+
+    0%,
+    100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-12px) rotate(2deg);
+    }
+}
+
+@keyframes miller-pulse-ring {
+    0% {
+        transform: scale(1);
+        opacity: 0.4;
+    }
+
+    100% {
+        transform: scale(1.8);
+        opacity: 0;
+    }
+}
+
+@keyframes miller-shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+@keyframes miller-progress-stripe {
+    0% {
+        background-position: 0 0;
+    }
+
+    100% {
+        background-position: 40px 0;
+    }
+}
+
+@keyframes miller-badge-pulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.35);
+    }
+
+    50% {
+        box-shadow: 0 0 0 8px rgba(245, 158, 11, 0);
+    }
+}
+
+@keyframes miller-slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes miller-icon-bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-4px);
+    }
+}
+
+@keyframes miller-check-pop {
+    0% {
+        transform: scale(0.6);
+        opacity: 0;
+    }
+
+    60% {
+        transform: scale(1.15);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes miller-card-entrance {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ─── HERO SECTION ─── */
+.miller-hero {
+    background: linear-gradient(160deg, #065f3a 0%, #0a8a54 35%, #0d9e60 60%, #10b981 100%);
+    color: white;
+    padding: 60px 0 110px;
+    border-radius: 0 0 48px 48px;
+    position: relative;
+    overflow: hidden;
+}
+
+.miller-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 85% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.05) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.miller-hero::after {
+    content: '';
+    position: absolute;
+    inset: -50%;
+    width: 200%;
+    height: 200%;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+    animation: miller-grain 8s steps(4) infinite;
+    z-index: 1;
+}
+
+.miller-hero>.container {
+    position: relative;
+    z-index: 5;
+}
+
+.miller-hero h1 {
+    font-size: 2rem;
+    letter-spacing: -0.03em;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+
+.miller-hero p {
+    font-size: 0.95rem;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Floating decorative dots */
+.miller-hero .container::before,
+.miller-hero .container::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.miller-hero .container::before {
+    width: 180px;
+    height: 180px;
+    top: -60px;
+    right: -40px;
+    animation: miller-float 6s ease-in-out infinite;
+}
+
+.miller-hero .container::after {
+    width: 100px;
+    height: 100px;
+    bottom: -30px;
+    left: 10%;
+    animation: miller-float 8s ease-in-out infinite reverse;
+}
+
+/* ─── TAB PILLS — FROSTED CAPSULE ─── */
+.nav-pills-premium {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 5px;
+    border-radius: 50px;
+    display: inline-flex;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    gap: 3px;
+}
+
+.nav-pills-premium .nav-link {
+    color: rgba(255, 255, 255, 0.8);
+    border-radius: 50px;
+    padding: 10px 22px;
+    font-weight: 700;
+    font-size: 0.82rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    letter-spacing: 0.01em;
+    border: 1px solid transparent;
+}
+
+.nav-pills-premium .nav-link:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-pills-premium .nav-link.active {
+    background: #fff;
+    color: var(--primary);
+    box-shadow:
+        0 4px 16px rgba(0, 0, 0, 0.12),
+        0 1px 3px rgba(0, 0, 0, 0.08);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.02);
+}
+
+.nav-pills-premium .nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    background: var(--primary);
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(10, 138, 84, 0.4);
+}
+
+/* ─── DASHBOARD CONTAINER ─── */
+.dashboard-container {
+    margin-top: -65px;
+    position: relative;
+    z-index: 10;
+    padding-bottom: 80px;
+}
+
+/* ─── STAT CARDS — GLASSMORPHIC ─── */
+.stat-card-miller {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 22px;
+    padding: 22px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.06),
+        0 1px 2px rgba(0, 0, 0, 0.04);
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card-miller::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    border-radius: 4px 0 0 4px;
+    transition: width 0.3s ease;
+}
+
+/* Color-coded left accent borders per stat */
+.stat-card-miller:nth-child(1)::before,
+.col-6:nth-child(1) .stat-card-miller::before {
+    background: linear-gradient(180deg, var(--primary), var(--primary-light));
+}
+
+.stat-card-miller:nth-child(2)::before,
+.col-6:nth-child(2) .stat-card-miller::before {
+    background: linear-gradient(180deg, #f59e0b, #fbbf24);
+}
+
+.stat-card-miller:nth-child(3)::before,
+.col-6:nth-child(3) .stat-card-miller::before {
+    background: linear-gradient(180deg, #3b82f6, #60a5fa);
+}
+
+.stat-card-miller:nth-child(4)::before,
+.col-6:nth-child(4) .stat-card-miller::before {
+    background: linear-gradient(180deg, #10b981, #34d399);
+}
+
+.stat-card-miller::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: linear-gradient(105deg,
+            transparent 40%,
+            rgba(255, 255, 255, 0.5) 50%,
+            transparent 60%);
+    background-size: 200% 100%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.stat-card-miller:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow:
+        0 16px 48px rgba(0, 0, 0, 0.1),
+        0 4px 12px rgba(0, 0, 0, 0.06);
+    border-color: rgba(10, 138, 84, 0.15);
+}
+
+.stat-card-miller:hover::after {
+    opacity: 1;
+    animation: miller-shimmer 1.5s ease-in-out;
+}
+
+.stat-card-miller .fs-2 {
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #0f172a, #334155);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.stat-card-miller i {
+    font-size: 1.6rem;
+    opacity: 0.15;
+    transition: all 0.3s ease;
+}
+
+.stat-card-miller:hover i {
+    opacity: 0.3;
+    transform: scale(1.15);
+}
+
+.stat-card-miller .text-muted.small {
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+/* Icon glow rings */
+.stat-card-miller .d-flex>i {
+    position: relative;
+}
+
+.stat-card-miller:hover .d-flex>i::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    opacity: 0.15;
+    animation: miller-pulse-ring 1.2s ease-out;
+}
+
+/* ─── TAB CONTENT PANEL ─── */
+.miller-tab-content {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 28px;
+    border: 1px solid rgba(226, 232, 240, 0.7);
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.06),
+        0 1px 3px rgba(0, 0, 0, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    padding: 36px;
+    margin-top: 28px;
+}
+
+.miller-tab-content h4 {
+    letter-spacing: -0.02em;
+    position: relative;
+    padding-bottom: 14px;
+}
+
+.miller-tab-content h4::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 48px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--primary-light));
+    border-radius: 3px;
+}
+
+/* ─── STOCK TOOLBAR ─── */
+.stock-toolbar {
+    background: linear-gradient(135deg, rgba(240, 253, 244, 0.95), rgba(255, 255, 255, 1));
+    border: 1px solid rgba(226, 232, 240, 0.6);
+    border-radius: 22px;
+    padding: 18px 20px;
+    box-shadow:
+        0 8px 28px rgba(15, 23, 42, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.stock-toolbar h4 {
+    letter-spacing: -0.02em;
+    padding-bottom: 0;
+}
+
+.stock-toolbar h4::after {
+    display: none;
+}
+
+.stock-search {
+    width: 310px;
+    border-radius: 999px !important;
+    padding-left: 16px;
+    border: 1.5px solid rgba(148, 163, 184, 0.3);
+    background: rgba(255, 255, 255, 0.9);
+    font-size: 0.88rem;
+    transition: all 0.25s ease;
+}
+
+.stock-search:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(10, 138, 84, 0.1);
+    background: #fff;
+}
+
+.stock-cta {
+    border-radius: 999px !important;
+    box-shadow: 0 8px 24px rgba(10, 138, 84, 0.22);
+    transition: all 0.25s ease;
+}
+
+.stock-cta:hover {
+    box-shadow: 0 12px 32px rgba(10, 138, 84, 0.35);
+    transform: translateY(-2px);
+}
+
+/* ─── STOCK CARDS — PREMIUM ─── */
+.stock-card {
+    border-radius: 20px !important;
+    border: 1px solid rgba(226, 232, 240, 0.7) !important;
+    box-shadow:
+        0 10px 36px rgba(2, 6, 23, 0.06),
+        0 1px 2px rgba(2, 6, 23, 0.04) !important;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: miller-card-entrance 0.5s ease backwards;
+    position: relative;
+}
+
+/* Colored top gradient bar based on status */
+.stock-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--primary-light));
+    z-index: 2;
+}
+
+.stock-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(10, 138, 84, 0.25) !important;
+    box-shadow:
+        0 20px 56px rgba(2, 6, 23, 0.1),
+        0 4px 12px rgba(2, 6, 23, 0.06) !important;
+}
+
+/* Staggered card entrance */
+.stock-item:nth-child(1) .stock-card {
+    animation-delay: 0.05s;
+}
+
+.stock-item:nth-child(2) .stock-card {
+    animation-delay: 0.1s;
+}
+
+.stock-item:nth-child(3) .stock-card {
+    animation-delay: 0.15s;
+}
+
+.stock-item:nth-child(4) .stock-card {
+    animation-delay: 0.2s;
+}
+
+.stock-item:nth-child(5) .stock-card {
+    animation-delay: 0.25s;
+}
+
+.stock-item:nth-child(6) .stock-card {
+    animation-delay: 0.3s;
+}
+
+.stock-card-header {
+    background: linear-gradient(135deg, rgba(240, 253, 244, 0.7), rgba(255, 255, 255, 1));
+    padding: 18px 20px 14px !important;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.4);
+}
+
+.stock-title {
+    font-size: 1.12rem;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+}
+
+.stock-status {
+    border-radius: 999px !important;
+    padding: 7px 14px !important;
+    font-size: 0.68rem !important;
+    letter-spacing: 0.08em;
+    font-weight: 800;
+    border: 1px solid transparent;
+}
+
+/* Status badge color enhancements */
+.stock-status.bg-success-subtle {
+    background: rgba(16, 185, 129, 0.12) !important;
+    border-color: rgba(16, 185, 129, 0.25);
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+}
+
+.stock-status.bg-danger-subtle {
+    background: rgba(239, 68, 68, 0.1) !important;
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+.stock-card-body {
+    padding: 18px 20px 20px !important;
+}
+
+.stock-card-body .form-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #64748b;
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+.stock-card-body .form-control,
+.stock-card-body .enterprise-input-sm {
+    border-radius: 12px !important;
+    border-color: rgba(148, 163, 184, 0.3);
+    box-shadow: none !important;
+    transition: all 0.25s ease;
+    font-size: 0.88rem;
+}
+
+.stock-card-body .form-control:focus,
+.stock-card-body .enterprise-input-sm:focus {
+    border-color: rgba(10, 138, 84, 0.5);
+    box-shadow: 0 0 0 4px rgba(10, 138, 84, 0.1) !important;
+    background: #fff;
+}
+
+.stock-card-body .input-group-text {
+    border-radius: 12px !important;
+    border-color: rgba(148, 163, 184, 0.3);
+    background: #f8fafc !important;
+    color: #64748b !important;
+    font-weight: 800;
+    font-size: 0.78rem;
+}
+
+.stock-divider {
+    margin: 16px 0 !important;
+    opacity: 0.12;
+    border-top: 1.5px dashed rgba(148, 163, 184, 0.5);
+}
+
+/* ─── STOCK ACTION BAR ─── */
+.stock-actions {
+    background: linear-gradient(135deg, rgba(248, 250, 252, 0.95), rgba(241, 245, 249, 0.95));
+    border: 1px solid rgba(226, 232, 240, 0.6);
+    border-radius: 16px;
+    padding: 12px;
+}
+
+.stock-icon-btn {
+    width: 42px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px !important;
+    border: 1px solid rgba(226, 232, 240, 0.9) !important;
+    background: #fff !important;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.stock-icon-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.stock-icon-btn.text-danger:hover {
+    background: rgba(239, 68, 68, 0.08) !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+}
+
+.stock-icon-btn.text-secondary:hover {
+    background: rgba(100, 116, 139, 0.08) !important;
+    border-color: rgba(100, 116, 139, 0.3) !important;
+}
+
+.stock-save {
+    min-height: 42px;
+    border-radius: 999px !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.stock-save::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent);
+    transition: left 0.5s ease;
+}
+
+.stock-save:hover::before {
+    left: 100%;
+}
+
+/* ─── ENTERPRISE INPUT ─── */
+.enterprise-input-sm {
+    background: #fff;
+    border: 1.5px solid rgba(226, 232, 240, 0.8);
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+
+.enterprise-input-sm:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(10, 138, 84, 0.1);
+    outline: none;
+}
+
+/* ─── BOOKING REQUEST CARDS ─── */
+.booking-request-card {
+    background: linear-gradient(145deg, #ffffff, #fafbfc);
+    border-radius: 20px;
+    border: 1px solid rgba(226, 232, 240, 0.7);
+    padding: 24px;
+    height: 100%;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    animation: miller-card-entrance 0.5s ease backwards;
+}
+
+.booking-request-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #f59e0b, #fbbf24);
+    border-radius: 4px 0 0 4px;
+}
+
+.booking-request-card:hover {
+    border-color: rgba(245, 158, 11, 0.3);
+    background: #fff;
+    transform: translateY(-4px);
+    box-shadow:
+        0 16px 48px rgba(0, 0, 0, 0.08),
+        0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* Pending badge pulse */
+.booking-request-card .badge.bg-warning-subtle {
+    animation: miller-badge-pulse 2s ease-in-out infinite;
+}
+
+.booking-request-card .bg-white.rounded-4 {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9) !important;
+    border: 1px solid rgba(226, 232, 240, 0.5) !important;
+    border-radius: 16px !important;
+}
+
+/* Approve button enhancement */
+.booking-request-card .btn-enterprise {
+    position: relative;
+    overflow: hidden;
+}
+
+.booking-request-card .btn-enterprise::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg,
+            transparent 30%,
+            rgba(255, 255, 255, 0.15) 50%,
+            transparent 70%);
+    transition: transform 0.6s ease;
+    transform: translateX(-100%);
+}
+
+.booking-request-card .btn-enterprise:hover::after {
+    transform: translateX(100%);
+}
+
+/* Decline button */
+.booking-request-card .btn-outline-danger {
+    border-radius: 999px;
+    border-width: 1.5px;
+    font-size: 0.85rem;
+}
+
+/* ─── ACTIVE LOADS — LOADING TAB ─── */
+#loading .bg-white.rounded-4 {
+    border-radius: 22px !important;
+    border: 1px solid rgba(226, 232, 240, 0.6) !important;
+    padding: 24px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: miller-card-entrance 0.5s ease backwards;
+    position: relative;
+    overflow: hidden;
+}
+
+#loading .bg-white.rounded-4::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa, #93c5fd);
+    z-index: 1;
+}
+
+#loading .bg-white.rounded-4:hover {
+    transform: translateY(-4px);
+    box-shadow:
+        0 16px 48px rgba(0, 0, 0, 0.08),
+        0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* Order ID badge */
+#loading .badge.bg-primary-subtle {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05)) !important;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    font-size: 0.72rem;
+    padding: 5px 10px;
+}
+
+/* Truck count chip */
+#loading .badge.bg-light {
+    background: #fff !important;
+    border: 1.5px solid rgba(226, 232, 240, 0.8) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+#loading .badge.bg-light i {
+    animation: miller-icon-bounce 2s ease-in-out infinite;
+}
+
+/* Progress section */
+#loading .bg-light.rounded-3 {
+    background: linear-gradient(135deg, #f0fdf4, #f8fafc) !important;
+    border: 1px solid rgba(16, 185, 129, 0.12);
+    border-radius: 14px !important;
+    padding: 16px !important;
+}
+
+/* Progress bar – animated stripes */
+#loading .progress {
+    height: 10px;
+    border-radius: 10px;
+    background-color: rgba(226, 232, 240, 0.6);
+    overflow: hidden;
+}
+
+#loading .progress-bar {
+    border-radius: 10px;
+    background: linear-gradient(90deg, var(--primary), var(--primary-light)) !important;
+    background-size: 40px 40px;
+    position: relative;
+    transition: width 0.6s ease;
+}
+
+#loading .progress-bar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(-45deg,
+            transparent,
+            transparent 8px,
+            rgba(255, 255, 255, 0.15) 8px,
+            rgba(255, 255, 255, 0.15) 16px);
+    animation: miller-progress-stripe 1s linear infinite;
+}
+
+/* Close Order button */
+#loading .btn-light.text-primary {
+    background: rgba(59, 130, 246, 0.06) !important;
+    border: 1.5px solid rgba(59, 130, 246, 0.2) !important;
+    color: #3b82f6 !important;
+    transition: all 0.25s ease;
+}
+
+#loading .btn-light.text-primary:hover {
+    background: rgba(59, 130, 246, 0.12) !important;
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
+    transform: translateY(-2px);
+}
+
+/* ─── COMPLETED ORDERS TAB ─── */
+#payments .bg-white.rounded-4 {
+    border-radius: 20px !important;
+    border: 1px solid rgba(226, 232, 240, 0.6) !important;
+    padding: 24px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: miller-card-entrance 0.5s ease backwards;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Status-colored top ribbon */
+#payments .bg-white.rounded-4::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    z-index: 1;
+}
+
+#payments .bg-white.rounded-4[style*="'#10b981'"]::before,
+#payments .bg-white.rounded-4[style*="#10b981"]::before {
+    background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+#payments .bg-white.rounded-4[style*="'#f59e0b'"]::before,
+#payments .bg-white.rounded-4[style*="#f59e0b"]::before {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+#payments .bg-white.rounded-4:hover {
+    transform: translateY(-4px) scale(1.005);
+    box-shadow:
+        0 20px 56px rgba(0, 0, 0, 0.08),
+        0 4px 12px rgba(0, 0, 0, 0.04);
+    border-color: rgba(10, 138, 84, 0.2) !important;
+}
+
+/* Order ID badge */
+#payments .badge.bg-primary-subtle {
+    background: linear-gradient(135deg, rgba(10, 138, 84, 0.1), rgba(10, 138, 84, 0.05)) !important;
+    border: 1px solid rgba(10, 138, 84, 0.15);
+    font-size: 0.72rem;
+}
+
+/* Payment status badges */
+#payments .badge.bg-success-subtle.fs-6 {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(16, 185, 129, 0.06)) !important;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.12);
+}
+
+#payments .badge.bg-success-subtle.fs-6 i {
+    animation: miller-check-pop 0.5s ease forwards;
+}
+
+#payments .badge.bg-warning-subtle.fs-6 {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(245, 158, 11, 0.06)) !important;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    animation: miller-badge-pulse 2.5s ease-in-out infinite;
+}
+
+/* Trade info boxes */
+#payments .bg-light.rounded-3 {
+    background: linear-gradient(145deg, #f8fafc, #f1f5f9) !important;
+    border: 1px solid rgba(226, 232, 240, 0.5);
+    border-radius: 14px !important;
+    transition: all 0.2s ease;
+}
+
+#payments .bg-light.rounded-3:hover {
+    background: linear-gradient(145deg, #f0fdf4, #f0fdf4) !important;
+    border-color: rgba(10, 138, 84, 0.15);
+}
+
+/* Completed order progress bar */
+#payments .progress {
+    height: 8px;
+    border-radius: 8px;
+    background: rgba(226, 232, 240, 0.5);
+}
+
+#payments .progress-bar.bg-success {
+    background: linear-gradient(90deg, #10b981, #34d399) !important;
+    border-radius: 8px;
+}
+
+/* Truck-wise detail rows */
+#payments .p-3.bg-light.rounded-3.mb-2 {
+    border-radius: 14px !important;
+    border: 1px solid rgba(226, 232, 240, 0.4);
+    transition: all 0.2s ease;
+}
+
+#payments .p-3.bg-light.rounded-3.mb-2:hover {
+    background: #fff !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* Full Details button */
+#payments .btn-outline-primary.rounded-pill {
+    border-width: 1.5px;
+    transition: all 0.25s ease;
+}
+
+#payments .btn-outline-primary.rounded-pill:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(10, 138, 84, 0.15);
+}
+
+/* ─── EMPTY STATES ─── */
+.tab-pane .text-center.py-5 {
+    padding: 60px 20px !important;
+}
+
+.tab-pane .text-center.py-5>i.fa {
+    font-size: 3rem !important;
+    opacity: 0.12;
+    display: block;
+    margin-bottom: 16px;
+    animation: miller-float 4s ease-in-out infinite;
+    color: var(--primary) !important;
+}
+
+.tab-pane .text-center.py-5 h5 {
+    color: #64748b !important;
+    font-size: 1rem;
+    letter-spacing: -0.01em;
+}
+
+.tab-pane .text-center.py-5 p {
+    font-size: 0.88rem;
+    color: #94a3b8;
+}
+
+/* ─── MODAL — CLOSE ORDER ─── */
+.modal-backdrop.show {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+.modal.fade .modal-dialog {
+    transform: translateY(30px) scale(0.95);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal.show .modal-dialog {
+    transform: translateY(0) scale(1);
+}
+
+.modal-content {
+    border-radius: 28px !important;
+    border: 1px solid rgba(226, 232, 240, 0.5) !important;
+    box-shadow:
+        0 24px 80px rgba(0, 0, 0, 0.15),
+        0 8px 24px rgba(0, 0, 0, 0.08) !important;
+    overflow: hidden;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #fafbfc, #fff);
+}
+
+.modal-body .form-control {
+    border-radius: 14px;
+    border: 1.5px solid rgba(226, 232, 240, 0.8);
+    transition: all 0.25s ease;
+}
+
+.modal-body .form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(10, 138, 84, 0.1);
+}
+
+.modal-footer .btn-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border: none;
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.25);
+}
+
+.modal-footer .btn-danger:hover {
+    box-shadow: 0 6px 24px rgba(239, 68, 68, 0.35);
+    transform: translateY(-1px);
+}
+
+.modal-footer .btn-light {
+    border: 1.5px solid rgba(226, 232, 240, 0.8);
+    border-radius: 999px;
+}
+
+/* ─── TABLE STYLES (legacy/fallback) ─── */
+.stock-table-modern thead th {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-bottom: 2px solid rgba(10, 138, 84, 0.12);
+    color: #64748b;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    padding: 16px;
+}
+
+.stock-table-modern tbody td {
+    padding: 16px;
+    vertical-align: middle;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(241, 245, 249, 0.8);
+}
+
+/* ─── QC PANELS ─── */
+.truck-qc-panel {
+    background: #fff;
+    border-radius: 18px;
+    border: 1px solid rgba(226, 232, 240, 0.6);
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.truck-qc-panel:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.qc-form-mini {
+    background: linear-gradient(135deg, #f1f5f9, #f8fafc);
+    border-radius: 14px;
+    padding: 16px;
+    margin-top: 12px;
+    border: 1px solid rgba(226, 232, 240, 0.5);
+}
+
+/* ============================================================
+   RESPONSIVE — MOBILE-FIRST
+   ============================================================ */
+@media (max-width: 767px) {
+    .miller-hero {
+        padding: 28px 0 75px;
+        border-radius: 0 0 32px 32px;
+    }
+
+    .miller-hero h1 {
+        font-size: 1.25rem !important;
+    }
+
+    .miller-hero p {
+        font-size: 0.82rem;
+    }
+
+    /* Pills: horizontal scroll on mobile */
+    .nav-pills-premium {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        gap: 2px;
+        padding: 4px;
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .nav-pills-premium::-webkit-scrollbar {
+        display: none;
+    }
+
+    .nav-pills-premium .nav-link {
+        padding: 8px 16px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .dashboard-container {
+        margin-top: -55px;
+        padding-bottom: 60px;
+    }
+
+    .miller-tab-content {
+        padding: 18px 14px;
+        border-radius: 20px;
+        margin-top: 20px;
+    }
+
+    .miller-tab-content h4 {
+        font-size: 1.05rem;
+    }
+
+    .stat-card-miller {
+        padding: 16px 14px;
+        border-radius: 16px;
+    }
+
+    .stat-card-miller .fs-2 {
+        font-size: 1.35rem !important;
+    }
+
+    .stat-card-miller .text-uppercase {
+        font-size: 0.62rem !important;
+    }
+
+    /* Stock toolbar: stack on mobile */
+    #stock .stock-toolbar {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 10px;
+        padding: 14px;
+        border-radius: 18px;
+    }
+
+    #stock .stock-toolbar h4 {
+        text-align: left;
+        font-size: 1rem;
+    }
+
+    #stock .stock-toolbar .d-flex.gap-2 {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    #stockSearch,
+    .stock-search {
+        width: 100% !important;
+    }
+
+    #stock .btn-enterprise,
+    #stock .stock-cta {
+        width: 100%;
+        justify-content: center;
+        padding: 12px;
+    }
+
+    /* Stock cards */
+    .stock-card {
+        border-radius: 18px !important;
+    }
+
+    .stock-card-header {
+        padding: 14px 16px 10px !important;
+    }
+
+    .stock-title {
+        font-size: 1rem;
+    }
+
+    .stock-status {
+        padding: 5px 10px !important;
+        font-size: 0.62rem !important;
+    }
+
+    .stock-card-body {
+        padding: 14px 16px 16px !important;
+    }
+
+    .stock-item label.form-label {
+        font-size: 0.68rem;
+        margin-bottom: 4px;
+    }
+
+    .stock-item .enterprise-input-sm,
+    .stock-item .form-control {
+        font-size: 0.88rem;
+        padding: 8px 12px;
+        min-height: 40px;
+    }
+
+    .stock-card-body .input-group-text {
+        padding: 6px 10px;
+        font-size: 0.72rem;
+    }
+
+    /* Action buttons: stack full width */
+    .stock-item .d-flex.justify-content-between.align-items-center {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .stock-item .d-flex.justify-content-between.align-items-center .d-flex.gap-2 {
+        justify-content: space-between;
+    }
+
+    .stock-item .d-flex.justify-content-between.align-items-center .d-flex.gap-2 .btn {
+        flex: 1;
+    }
+
+    .stock-item .btn-enterprise {
+        width: 100%;
+    }
+
+    .stock-actions {
+        border-radius: 14px;
+    }
+
+    /* Booking cards */
+    .booking-request-card {
+        padding: 18px 16px;
+        border-radius: 16px;
+    }
+
+    /* Active Load cards */
+    #loading .bg-white.rounded-4 {
+        padding: 18px !important;
+        border-radius: 18px !important;
+    }
+
+    /* Completed order cards */
+    #payments .bg-white.rounded-4 {
+        padding: 18px !important;
+        border-radius: 18px !important;
+    }
+
+    /* Modal */
+    .modal-content {
+        border-radius: 22px !important;
+        margin: 12px;
+    }
+}
+
+/* Extra compact for small screens */
+@media (max-width: 576px) {
+    .miller-hero {
+        padding: 24px 0 65px;
+        border-radius: 0 0 28px 28px;
+    }
+
+    .miller-hero .container::before,
+    .miller-hero .container::after {
+        display: none;
+    }
+
+    .stock-toolbar {
+        border-radius: 16px;
+        padding: 12px;
+    }
+
+    .stock-card {
+        border-radius: 16px !important;
+    }
+
+    .stock-card-header {
+        padding: 12px 14px 10px !important;
+    }
+
+    .stock-title {
+        font-size: 0.95rem;
+    }
+
+    .stock-card-body {
+        padding: 12px 14px !important;
+    }
+
+    .stock-card-body .enterprise-input-sm,
+    .stock-card-body .form-control {
+        padding: 7px 10px;
+        min-height: 38px;
+        font-size: 0.85rem;
+        border-radius: 10px !important;
+    }
+
+    .stock-card-body .input-group-text {
+        font-size: 0.7rem;
+        padding: 5px 8px;
+    }
+
+    .stock-item .card-body .row.g-3 {
+        --bs-gutter-y: 0.6rem;
+    }
+
+    .stock-icon-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px !important;
+    }
+
+    .stock-save {
+        min-height: 40px;
+        font-size: 0.82rem;
+    }
+
+    .stat-card-miller {
+        padding: 14px 12px;
+        border-radius: 14px;
+    }
+
+    .stat-card-miller .fs-2 {
+        font-size: 1.2rem !important;
+    }
+
+    .stat-card-miller i {
+        font-size: 1.2rem;
+    }
+
+    .miller-tab-content {
+        padding: 14px 10px;
+        border-radius: 16px;
+    }
+
+    .miller-tab-content h4 {
+        font-size: 0.95rem;
+    }
+
+    .miller-tab-content h4::after {
+        width: 32px;
+        height: 2.5px;
+    }
+
+    /* Booking cards mobile compact */
+    .booking-request-card {
+        padding: 16px 14px;
+        border-radius: 14px;
+    }
+
+    .booking-request-card h5 {
+        font-size: 0.95rem;
+    }
+
+    .booking-request-card .p-3 {
+        padding: 10px !important;
+        border-radius: 12px !important;
+    }
+
+    /* Loading tab compact */
+    #loading .bg-white.rounded-4 {
+        padding: 16px !important;
+        border-radius: 16px !important;
+    }
+
+    #loading .bg-light.rounded-3 {
+        padding: 12px !important;
+        border-radius: 12px !important;
+    }
+
+    /* Completed orders compact */
+    #payments .bg-white.rounded-4 {
+        padding: 16px !important;
+        border-radius: 16px !important;
+    }
+
+    #payments .bg-light.rounded-3 {
+        padding: 8px !important;
+        border-radius: 10px !important;
+    }
+
+    #payments .badge.fs-6 {
+        font-size: 0.72rem !important;
+        padding: 5px 10px !important;
+    }
+
+    /* Empty states compact */
+    .tab-pane .text-center.py-5 {
+        padding: 40px 16px !important;
+    }
+
+    .tab-pane .text-center.py-5>i.fa {
+        font-size: 2.2rem !important;
+    }
+
+    .tab-pane .text-center.py-5 h5 {
+        font-size: 0.9rem;
+    }
+}
+
+/* ─── DARK MODE SUPPORT (prefers-color-scheme) ─── */
+@media (prefers-color-scheme: dark) {
+    .stat-card-miller {
+        background: rgba(30, 41, 59, 0.85);
+        border-color: rgba(51, 65, 85, 0.5);
+    }
+
+    .miller-tab-content {
+        background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+        border-color: rgba(51, 65, 85, 0.5);
+    }
+
+    .stock-toolbar {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 1));
+        border-color: rgba(51, 65, 85, 0.5);
+    }
+
+    .stock-card {
+        border-color: rgba(51, 65, 85, 0.5) !important;
+        box-shadow: 0 10px 36px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .stock-card-header {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
+    }
+
+    .booking-request-card {
+        background: linear-gradient(145deg, #1e293b, #0f172a);
+        border-color: rgba(51, 65, 85, 0.5);
+    }
+
+    .stock-actions {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+        border-color: rgba(51, 65, 85, 0.5);
+    }
+
+    .stock-icon-btn {
+        background: rgba(30, 41, 59, 0.9) !important;
+        border-color: rgba(51, 65, 85, 0.8) !important;
+    }
+
+    .enterprise-input-sm {
+        background: rgba(30, 41, 59, 0.8);
+        border-color: rgba(51, 65, 85, 0.6);
+        color: #e2e8f0;
+    }
+
+    .truck-qc-panel {
+        background: #1e293b;
+        border-color: rgba(51, 65, 85, 0.5);
+    }
+
+    .qc-form-mini {
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+        border-color: rgba(51, 65, 85, 0.4);
+    }
+}
+
+/* ─── SCROLLBAR CUSTOMIZATION ─── */
+.miller-tab-content ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.miller-tab-content ::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.miller-tab-content ::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.3);
+    border-radius: 3px;
+}
+
+.miller-tab-content ::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.5);
+}
+
+/* ─── PRINT STYLES ─── */
+@media print {
+    .miller-hero {
+        background: #065f3a !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        border-radius: 0;
+    }
+
+    .stock-card,
+    .booking-request-card,
+    .stat-card-miller,
+    .miller-tab-content {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+        break-inside: avoid;
+    }
+
+    .nav-pills-premium,
+    .stock-cta,
+    .stock-actions {
+        display: none !important;
+    }
+}
