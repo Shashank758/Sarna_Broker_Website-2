@@ -45,10 +45,8 @@
     <!-- Brand -->
     <a class="navbar-brand d-flex align-items-center"
       href="{% if session.role == 'admin' %}/admin{% elif session.role == 'miller' %}/miller{% elif session.role == 'buyer' %}/market{% else %}/market{% endif %}">
-      <div class="brand-badge me-2"
-        style="background:#10b981; color:white; border:none; box-shadow:0 2px 8px rgba(0,0,0,0.2);">
-        <i class="fa fa-seedling"></i>
-      </div>
+      <img src="{{ url_for('static', filename='image/WhatsApp Image 2026-03-10 at 8.34.27 PM.jpeg') }}" alt="Logo"
+        class="brand-badge me-2" style="height: 38px; width: 38px; object-fit: cover; border-radius: 10px;">
       <span style="color:#34d399; font-weight:800; font-size:1.15rem; letter-spacing:-0.02em;">Saarna <span
           class="fw-medium" style="color:#1e293b;">Canvessars</span></span>
     </a>
