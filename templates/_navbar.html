@@ -46,7 +46,7 @@
     <a class="navbar-brand d-flex align-items-center"
       href="{% if session.role == 'admin' %}/admin{% elif session.role == 'miller' %}/miller{% elif session.role == 'buyer' %}/market{% else %}/market{% endif %}">
       <img src="{{ url_for('static', filename='image/logo.png') }}" alt="Logo" class="brand-badge me-2"
-        style="height: 48px; width: 48px; border-radius: 50%; object-fit: cover;">
+        style="height: 55px; width: 55px; border-radius: 50%; object-fit: cover; border: none; padding: 0; background: transparent;">
       <span style="color:#34d399; font-weight:800; font-size:1.15rem; letter-spacing:-0.02em;">Saarna <span
           class="fw-medium" style="color:#1e293b;">Canvessars</span></span>
     </a>
