@@ -10,6 +10,8 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from twilio.rest import Client
 from dotenv import load_dotenv
+from urllib.parse import urlparse, unquote
+import time
 
 
 load_dotenv()
@@ -285,22 +287,44 @@ def get_all_buyer_phones():
 def get_db():
     db_url = os.environ.get("DATABASE_URL")
     if not db_url:
+        logger.error("DATABASE_URL environment variable is not set")
         raise RuntimeError("DATABASE_URL environment variable is not set")
     
-    # Use SSL for production (Render), but disable for local
-    if "render" in db_url or "aws" in db_url:
-        ssl_mode = "require"
-    else:
-        ssl_mode = "prefer" # Allow local without SSL
-
+    ssl_mode = "require"
     try:
-        con = psycopg2.connect(db_url, sslmode=ssl_mode)
-    except psycopg2.OperationalError:
-       # Fallback for local if prefer/require fails (e.g. windows local pg often needs disable)
-       con = psycopg2.connect(db_url, sslmode="disable")
-       
-    con.autocommit = False
-    return con
+        parsed = urlparse(db_url)
+        username = parsed.username
+        # Support special characters by unquoting
+        password = unquote(parsed.password) if parsed.password else None
+        hostname = parsed.hostname
+        port = parsed.port or 5432
+        database = parsed.path[1:]
+
+        max_retries = 3
+        for attempt in range(1, max_retries + 1):
+            try:
+                # Avoid logging the password
+                logger.debug(f"Connecting to DB: {hostname}:{port}/{database} (Attempt {attempt})")
+                con = psycopg2.connect(
+                    dbname=database,
+                    user=username,
+                    password=password,
+                    host=hostname,
+                    port=port,
+                    sslmode=ssl_mode
+                )
+                con.autocommit = False
+                logger.info("Database connection established")
+                return con
+            except psycopg2.OperationalError as e:
+                logger.warning(f"Connection attempt {attempt} failed: {e}")
+                if attempt == max_retries:
+                    logger.error("Database connection failed after max retries")
+                    raise e
+                time.sleep(2)
+    except Exception as e:
+        logger.error(f"Error parsing DATABASE_URL or connecting: {e}")
+        raise e
 
 
 def log_activity(action, target_id=None, details=None, user_id=None, role=None):
@@ -5967,10 +5991,14 @@ def mark_notifications_read():
 
 
 
-if __name__ == "__main__":
+# Run database migrations on startup (Gunicorn compatible)
+try:
+    logger.info("Running startup migrations...")
     init_db()
-    try:
-        run_migrations()
-    except Exception as e:
-        logger.warning(f"Migration warning: {e}")
+    run_migrations()
+    logger.info("Startup migrations completed")
+except Exception as e:
+    logger.warning(f"Startup Migration warning/failure: {e}")
+
+if __name__ == "__main__":
     app.run(debug=os.environ.get("FLASK_DEBUG", "0") == "1")
