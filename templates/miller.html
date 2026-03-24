@@ -480,6 +480,53 @@
     width: 100%;
   }
 
+  /* ── CARD INPUT SYSTEM ── */
+  .card-input-label {
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 4px;
+  }
+
+  .card-input-wrapper {
+    display: flex;
+    align-items: center;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 7px 10px;
+    gap: 6px;
+    transition: border-color 0.2s;
+  }
+
+  .card-input-wrapper:focus-within {
+    border-color: #0a8a54;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(10, 138, 84, 0.07);
+  }
+
+  .card-input-wrapper input {
+    border: none;
+    background: transparent;
+    outline: none;
+    flex: 1;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #1e293b;
+    min-width: 0;
+  }
+
+  .card-input-unit {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #94a3b8;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
   /* ═══════════════════════════════════
      MOBILE RESPONSIVE — Enterprise
      ═══════════════════════════════════ */
@@ -592,62 +639,8 @@
   }
 
   @media (max-width: 576px) {
-    .stock-toolbar {
-      border-radius: 14px;
-      padding: 12px;
-    }
 
-    .stock-card {
-      border-radius: 14px !important;
-    }
-
-    .stock-card-header {
-      padding: 14px 14px 10px !important;
-    }
-
-    .stock-title {
-      font-size: 0.98rem;
-    }
-
-    .stock-status {
-      padding: 5px 10px !important;
-      font-size: 0.6rem !important;
-    }
-
-    .stock-card-body {
-      padding: 12px 14px 16px !important;
-    }
-
-    .stock-item label.form-label {
-      margin-bottom: 4px;
-    }
-
-    .stock-card-body .enterprise-input-sm,
-    .stock-card-body .form-control {
-      padding: 8px 10px;
-      min-height: 38px;
-      font-size: 0.84rem;
-    }
-
-    .stock-card-body .input-group-text {
-      padding: 6px 10px;
-      font-size: 0.74rem;
-    }
-
-    .stock-item .card-body .row.g-3 {
-      --bs-gutter-y: 0.6rem;
-    }
-
-    .stock-icon-btn {
-      width: 38px;
-      height: 38px;
-    }
-
-    .stock-save {
-      min-height: 38px;
-      font-size: 0.82rem;
-    }
-
+    /* ── Nav pills ── */
     .nav-pills-premium {
       flex-wrap: wrap;
       border-radius: 16px;
@@ -656,8 +649,101 @@
     }
 
     .nav-pills-premium .nav-link {
-      padding: 8px 14px;
-      font-size: 0.7rem;
+      padding: 7px 12px;
+      font-size: 0.68rem;
+    }
+
+    /* ── Stock grid: 1-column on mobile ── */
+    #stock-grid .stock-item {
+      width: 100%;
+    }
+
+    /* ── Card shell ── */
+    .stock-card {
+      border-radius: 18px !important;
+      border: none !important;
+      box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08) !important;
+    }
+
+    /* ── Card header: compact colored banner ── */
+    .stock-card .card-header {
+      padding: 14px 16px 12px !important;
+    }
+
+    .stock-card .card-header h5 {
+      font-size: 1rem !important;
+    }
+
+    .stock-card .card-header .text-muted {
+      font-size: 0.68rem !important;
+    }
+
+    /* Price badge in header */
+    .stock-card .card-header h4 {
+      font-size: 1.25rem !important;
+    }
+
+    /* icon box */
+    .stock-card .card-header>div>div:first-child>div:first-child {
+      width: 38px !important;
+      height: 38px !important;
+      border-radius: 10px !important;
+    }
+
+    /* ── Card body ── */
+    .stock-card-body,
+    .stock-card .card-body {
+      padding: 10px 14px 14px !important;
+    }
+
+    /* ── Input grid: tighter gaps ── */
+    .stock-card .row.g-3 {
+      --bs-gutter-x: 0.6rem;
+      --bs-gutter-y: 0.5rem;
+    }
+
+    /* ── Card input labels ── */
+    .card-input-label {
+      font-size: 0.6rem;
+      margin-bottom: 3px;
+    }
+
+    /* ── Card input wrappers ── */
+    .card-input-wrapper {
+      padding: 6px 8px;
+      border-radius: 8px;
+    }
+
+    .card-input-wrapper input {
+      font-size: 0.85rem;
+    }
+
+    .card-input-unit {
+      font-size: 0.65rem;
+    }
+
+    /* ── Divider ── */
+    .stock-divider {
+      margin: 10px 0 !important;
+    }
+
+    /* ── Action bar ── */
+    .stock-card .d-flex.gap-2:last-child {
+      gap: 6px !important;
+    }
+
+    .stock-icon-btn {
+      width: 36px !important;
+      height: 36px !important;
+      border-radius: 8px !important;
+      flex-shrink: 0;
+    }
+
+    .stock-card .btn.flex-grow-1 {
+      height: 36px;
+      font-size: 0.75rem;
+      letter-spacing: 0.04em;
+      border-radius: 8px !important;
     }
   }
 </style>
