@@ -11,14 +11,14 @@
 
   /* ── HERO SECTION ── */
   .miller-hero {
-    background: linear-gradient(180deg, #fefce8 0%, #f0fdf4 100%);
+    background: transparent;
     padding: 30px 0 60px;
     position: relative;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border-subtle);
   }
 
   body {
-    background-color: #fefce8 !important;
+    background-color: var(--surface) !important;
   }
 
   .miller-hero::before {
@@ -26,9 +26,9 @@
     position: absolute;
     inset: 0;
     background-image:
-      radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+      radial-gradient(rgba(52,211,153,0.06) 1px, transparent 1px);
     background-size: 28px 28px;
-    opacity: 0.6;
+    opacity: 0.5;
     pointer-events: none;
     z-index: 0;
   }
@@ -42,7 +42,7 @@
     font-size: 0.75rem;
     font-weight: 800;
     letter-spacing: 0.15em;
-    color: #044329 !important;
+    color: var(--primary) !important;
     text-transform: uppercase;
   }
 
@@ -50,7 +50,7 @@
     font-size: 3.2rem;
     font-weight: 900;
     letter-spacing: -0.01em;
-    color: #0f5132;
+    color: var(--text-primary);
     line-height: 1.1;
     text-transform: uppercase;
     margin-bottom: 6px;
@@ -60,7 +60,7 @@
 
   .miller-hero p {
     font-size: 0.95rem;
-    color: #64748b;
+    color: var(--text-secondary);
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -69,10 +69,10 @@
   }
 
   .welcome-card-miller {
-    background: #fff;
+    background: var(--surface-card);
     border-radius: 16px;
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-card);
     padding: 20px 24px;
     margin-top: 10px;
   }
@@ -89,7 +89,7 @@
   .market-map-heading {
     font-size: 1.15rem;
     font-weight: 800;
-    color: #1e293b;
+    color: var(--text-primary);
     letter-spacing: -0.01em;
     margin-bottom: 18px;
     display: flex;
@@ -112,18 +112,18 @@
      TAB PILLS — Pill capsules
      ═══════════════════════════════ */
   .nav-pills-premium {
-    background: #fff;
+    background: var(--surface-card);
     padding: 6px;
     border-radius: 50px;
     display: inline-flex;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-card);
     position: relative;
     z-index: 2;
   }
 
   .nav-pills-premium .nav-link {
-    color: #475569;
+    color: var(--text-secondary);
     border-radius: 50px;
     padding: 10px 24px;
     font-weight: 700;
@@ -138,8 +138,8 @@
   }
 
   .nav-pills-premium .nav-link.active {
-    background: #e6f4ea;
-    color: #0a8a54;
+    background: linear-gradient(135deg, rgba(15,155,95,0.2), rgba(52,211,153,0.1));
+    color: #34d399;
     font-weight: 800;
   }
 
@@ -147,12 +147,10 @@
      TAB CONTENT — Glass Panel
      ═══════════════════════════════ */
   .miller-tab-content {
-    background: #fff;
+    background: var(--surface-card);
     border-radius: 20px;
-    border: 1px solid rgba(226, 232, 240, 0.5);
-    box-shadow:
-      0 1px 3px rgba(0, 0, 0, 0.03),
-      0 4px 12px rgba(0, 0, 0, 0.02);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-card);
     padding: 32px;
     margin-top: 24px;
   }
@@ -161,9 +159,9 @@
      STOCK TABLE
      ═══════════════════════════════ */
   .stock-table-modern thead th {
-    background: #f8fafc;
-    border-bottom: 2px solid #e2e8f0;
-    color: #475569;
+    background: rgba(15,155,95,0.06);
+    border-bottom: 2px solid var(--border-subtle);
+    color: var(--text-secondary);
     font-weight: 800;
     text-transform: uppercase;
     font-size: 0.7rem;
@@ -175,8 +173,8 @@
     padding: 16px 18px;
     vertical-align: middle;
     font-weight: 600;
-    border-bottom: 1px solid #f1f5f9;
-    color: #334155;
+    border-bottom: 1px solid var(--border-subtle);
+    color: var(--text-primary);
   }
 
   .stock-table-modern tbody tr {
@@ -184,7 +182,7 @@
   }
 
   .stock-table-modern tbody tr:hover {
-    background: #f0fdf4;
+    background: rgba(15,155,95,0.04);
   }
 
   /* Input fields within commodity cards */
@@ -242,9 +240,9 @@
      BOOKING REQUEST CARDS
      ═══════════════════════════════ */
   .booking-request-card {
-    background: #fff;
+    background: var(--surface-card);
     border-radius: 16px;
-    border: 1px solid rgba(226, 232, 240, 0.6);
+    border: 1px solid var(--border-subtle);
     padding: 22px;
     height: 100%;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -273,9 +271,9 @@
      QC PANELS
      ═══════════════════════════════ */
   .truck-qc-panel {
-    background: #fff;
+    background: var(--surface-card);
     border-radius: 16px;
-    border: 1px solid rgba(226, 232, 240, 0.6);
+    border: 1px solid var(--border-subtle);
     padding: 20px;
     margin-bottom: 14px;
     transition: all 0.25s ease;
@@ -298,14 +296,14 @@
      ENTERPRISE INPUTS
      ═══════════════════════════════ */
   .enterprise-input-sm {
-    background: #fff;
-    border: 1.5px solid #e2e8f0;
+    background: var(--surface-card);
+    border: 1.5px solid var(--border-subtle);
     border-radius: 10px;
     padding: 7px 14px;
     font-size: 0.85rem;
     font-weight: 600;
     transition: all 0.2s ease;
-    color: #334155;
+    color: var(--text-primary);
   }
 
   .enterprise-input-sm:focus {
@@ -318,11 +316,11 @@
      STOCK CARDS — Enterprise Product Grid
      ═══════════════════════════════════════ */
   .stock-toolbar {
-    background: #fff;
-    border: 1px solid rgba(226, 232, 240, 0.6);
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
     border-radius: 16px;
     padding: 16px 20px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+    box-shadow: var(--shadow-card);
     display: flex;
     align-items: center;
   }
@@ -330,7 +328,7 @@
   .stock-toolbar h4 {
     letter-spacing: -0.02em;
     font-size: 1.1rem;
-    color: #1e293b;
+    color: var(--text-primary);
   }
 
   .stock-search {
@@ -363,10 +361,10 @@
   }
 
   .stock-card {
-    background: #fff;
+    background: var(--surface-card);
     border-radius: 20px !important;
-    border: 1px solid #e2e8f0 !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02) !important;
+    border: 1px solid var(--border-subtle) !important;
+    box-shadow: var(--shadow-card) !important;
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
@@ -446,8 +444,8 @@
   }
 
   .stock-actions {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
     border-radius: 12px;
     padding: 10px;
   }
@@ -459,9 +457,9 @@
     align-items: center;
     justify-content: center;
     border-radius: 12px !important;
-    border: 1px solid #cbd5e1 !important;
-    background: #f8fafc !important;
-    color: #475569;
+    border: 1px solid var(--border-subtle) !important;
+    background: var(--surface-card) !important;
+    color: var(--text-secondary);
     transition: all 0.2s ease;
   }
 

@@ -8,26 +8,25 @@
      BUYER/TRADER MARKETPLACE — PREMIUM UI OVERHAUL
      Replicating Miller Panel Aesthetic
      ═══════════════════════════════════════════════════ */
-
     /* ── HERO SECTION ── */
     .market-hero {
-        background: linear-gradient(180deg, #fefce8 0%, #f0fdf4 100%);
+        background: transparent;
         padding: 30px 0 60px;
         position: relative;
-        border-bottom: 1px solid #e2e8f0;
+        border-bottom: 1px solid var(--border-subtle);
     }
 
     body {
-        background-color: #fefce8 !important;
+        background-color: var(--surface) !important;
     }
 
     .market-hero::before {
         content: '';
         position: absolute;
         inset: 0;
-        background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+        background-image: radial-gradient(rgba(52, 211, 153, 0.06) 1.5px, transparent 1.5px);
         background-size: 28px 28px;
-        opacity: 0.6;
+        opacity: 0.5;
         pointer-events: none;
         z-index: 0;
     }
@@ -41,8 +40,7 @@
         font-size: 0.75rem;
         font-weight: 800;
         letter-spacing: 0.15em;
-        color: #4338ca !important;
-        /* Indio/Blue for Buyer contrast */
+        color: var(--primary) !important;
         text-transform: uppercase;
     }
 
@@ -50,7 +48,7 @@
         font-size: 3.2rem;
         font-weight: 900;
         letter-spacing: -0.01em;
-        color: #0f5132;
+        color: var(--text-primary);
         line-height: 1.1;
         text-transform: uppercase;
         margin-bottom: 6px;
@@ -60,7 +58,7 @@
 
     .market-hero p {
         font-size: 0.95rem;
-        color: #64748b;
+        color: var(--text-secondary);
         font-weight: 600;
         display: flex;
         align-items: center;
@@ -69,28 +67,28 @@
     }
 
     .welcome-card-buyer {
-        background: #fff;
+        background: var(--surface-card);
         border-radius: 16px;
-        border: 1px solid rgba(226, 232, 240, 0.8);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+        border: 1px solid var(--border-subtle);
+        box-shadow: var(--shadow-card);
         padding: 20px 24px;
         margin-top: 10px;
     }
 
     /* ── TAB PILLS ── */
     .nav-pills-premium {
-        background: #fff;
+        background: var(--surface-card);
         padding: 6px;
         border-radius: 50px;
         display: inline-flex;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+        border: 1px solid var(--border-subtle);
+        box-shadow: var(--shadow-card);
         position: relative;
         z-index: 2;
     }
 
     .nav-pills-premium .nav-link {
-        color: #475569;
+        color: var(--text-secondary);
         border-radius: 50px;
         padding: 10px 24px;
         font-weight: 700;
@@ -100,21 +98,21 @@
     }
 
     .nav-pills-premium .nav-link:hover {
-        color: #0d9488;
-        background: #f8fafc;
+        color: #34d399;
+        background: rgba(52, 211, 153, 0.05);
     }
 
     .nav-pills-premium .nav-link.active {
-        background: #e6f4ea;
-        color: #0a8a54;
+        background: linear-gradient(135deg, rgba(15, 155, 95, 0.2), rgba(52, 211, 153, 0.1));
+        color: #34d399;
         font-weight: 800;
     }
 
     /* ── MARKET COMMODITY CARDS (ROW LAYOUT) ── */
     .market-stock-card {
-        background: #fff;
+        background: var(--surface-card);
         border-radius: 16px;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--border-subtle);
         transition: all 0.3s ease;
         overflow: hidden;
         margin-bottom: 15px;
@@ -125,8 +123,8 @@
     }
 
     .market-stock-card:hover {
-        border-color: #10b981;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        border-color: rgba(52, 211, 153, 0.3);
+        box-shadow: var(--shadow-glow);
         transform: translateX(4px);
     }
 
@@ -163,13 +161,13 @@
     .price-tag-premium {
         font-size: 1.4rem;
         font-weight: 900;
-        color: #0f5132;
+        color: var(--primary);
         min-width: 100px;
     }
 
     .price-tag-premium small {
         font-size: 0.75rem;
-        color: #64748b;
+        color: var(--text-muted);
     }
 
     .detail-grid {
@@ -181,7 +179,8 @@
     }
 
     .detail-item-premium {
-        background: #f8fafc;
+        background: var(--surface-card);
+        border: 1px solid var(--border-subtle);
         padding: 8px 12px;
         border-radius: 10px;
         display: flex;
@@ -191,7 +190,7 @@
     .detail-label-premium {
         font-size: 0.65rem;
         font-weight: 800;
-        color: #94a3b8;
+        color: var(--text-muted);
         text-transform: uppercase;
         letter-spacing: 0.05em;
         margin-bottom: 2px;
@@ -200,17 +199,17 @@
     .detail-value-premium {
         font-size: 0.8rem;
         font-weight: 700;
-        color: #334155;
+        color: var(--text-primary);
     }
 
     .btn-book-premium {
-        background: #0f5132 !important;
+        background: linear-gradient(135deg, #0f9b5f 0%, #065f3a 100%) !important;
         color: #fff !important;
         font-weight: 800;
         border-radius: 10px;
         padding: 10px 20px;
         width: auto;
-        border: none;
+        border: 1px solid rgba(52, 211, 153, 0.2);
         white-space: nowrap;
         font-size: 0.85rem;
         transition: all 0.2s ease;
@@ -224,7 +223,7 @@
     }
 
     .btn-book-premium:hover {
-        background: #0a4026 !important;
+        background: linear-gradient(135deg, #10b981 0%, #0f9b5f 100%) !important;
         transform: translateY(-2px);
     }
 
@@ -257,17 +256,18 @@
         .btn-book-premium {
             width: 100%;
         }
-    }
-
     /* ── MODALS ── */
     .modal-premium {
         border-radius: 24px;
         overflow: hidden;
+        background: var(--surface-elevated) !important;
+        border: 1px solid var(--border-subtle) !important;
+        color: var(--text-primary) !important;
     }
 
     .modal-premium .modal-header {
-        background: #0f5132;
-        color: #fff;
+        background: linear-gradient(135deg, #0f9b5f, #065f3a) !important;
+        color: #fff !important;
         padding: 24px;
         border: none;
     }
@@ -279,13 +279,15 @@
     .modal-premium .form-control {
         border-radius: 12px;
         padding: 12px 16px;
-        border: 2px solid #e2e8f0;
+        background: var(--surface-card) !important;
+        border: 1.5px solid var(--border-subtle) !important;
+        color: var(--text-primary) !important;
         font-weight: 600;
     }
 
     .modal-premium .form-control:focus {
-        border-color: #10b981;
-        box-shadow: none;
+        border-color: rgba(52, 211, 153, 0.4) !important;
+        box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.08) !important;
     }
 
     @media (max-width: 768px) {
@@ -498,7 +500,7 @@
                     <input type="text" id="marketSearch" class="form-control"
                         style="max-width: 400px; border-radius: 12px; padding: 10px 20px; font-weight: 600; border: 1px solid #e2e8f0; background: #fff;"
                         placeholder="🔍 Search by crop, miller, city..."
-                        oninput="universalSearch('marketSearch', '#stockCardsContainer', '.col-md-6')">
+                        oninput="universalSearch('marketSearch', '#stockCardsContainer', '.col-12')">
 
                     <!-- Location Filter -->
                     <div class="dropdown">

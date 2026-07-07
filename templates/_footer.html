@@ -1,12 +1,18 @@
 <!-- ================= UNIFIED FOOTER ================= -->
 <style>
   .sarna-footer {
-    background: #042f1f;
-    /* Deep Premium Default Dark Green */
-    color: #cbd5e1;
+    background: linear-gradient(180deg, rgba(5, 10, 7, 0.95), #030806);
+    color: rgba(255, 255, 255, 0.55);
     padding: 60px 0 20px;
     font-size: 0.9rem;
-    border-top: 1px solid #06402b;
+    border-top: 1px solid rgba(52, 211, 153, 0.06);
+    transition: background 0.4s ease;
+  }
+
+  [data-theme="light"] .sarna-footer {
+    background: linear-gradient(180deg, #f8fafb, #f0f2f4);
+    color: #64748b;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
   }
 
   .sarna-footer .footer-brand {
@@ -15,6 +21,9 @@
     font-weight: 800;
     margin-bottom: 20px;
     letter-spacing: -0.02em;
+  }
+  [data-theme="light"] .sarna-footer .footer-brand {
+    color: #0f172a;
   }
 
   .sarna-footer h6 {
@@ -25,42 +34,94 @@
     font-size: 0.85rem;
     margin-bottom: 24px;
   }
+  [data-theme="light"] .sarna-footer h6 {
+    color: #0f172a;
+  }
+
+  .sarna-footer p {
+    color: rgba(255, 255, 255, 0.45);
+  }
+  [data-theme="light"] .sarna-footer p {
+    color: #64748b;
+  }
 
   .sarna-footer ul li {
     margin-bottom: 12px;
   }
 
   .sarna-footer ul li a {
-    color: #94a3b8;
+    color: rgba(255, 255, 255, 0.4);
     text-decoration: none;
     transition: color 0.2s;
   }
+  [data-theme="light"] .sarna-footer ul li a {
+    color: #94a3b8;
+  }
 
   .sarna-footer ul li a:hover {
-    color: #10b981;
+    color: #34d399;
   }
 
   .sarna-footer .footer-social a {
     color: #ffffff;
-    background: #06452e;
+    background: rgba(52, 211, 153, 0.1);
+    border: 1px solid rgba(52, 211, 153, 0.1);
     width: 36px;
     height: 36px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
+    border-radius: 10px;
     margin-right: 8px;
     transition: all 0.2s ease;
     text-decoration: none;
   }
+  [data-theme="light"] .sarna-footer .footer-social a {
+    background: rgba(15, 155, 95, 0.08);
+    color: #0f9b5f;
+    border-color: rgba(15, 155, 95, 0.12);
+  }
 
   .sarna-footer .footer-social a:hover {
-    background: #10b981;
+    background: #0f9b5f;
+    color: #fff;
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(15, 155, 95, 0.3);
   }
 
   .sarna-footer .border-accent {
-    border-color: #06452e !important;
+    border-color: rgba(52, 211, 153, 0.08) !important;
+  }
+  [data-theme="light"] .sarna-footer .border-accent {
+    border-color: rgba(0, 0, 0, 0.06) !important;
+  }
+
+  .sarna-footer .text-white {
+    color: var(--text-primary) !important;
+  }
+
+  .sarna-footer .btn-outline-success {
+    color: rgba(255, 255, 255, 0.6) !important;
+    border-color: rgba(52, 211, 153, 0.15) !important;
+  }
+  .sarna-footer .btn-outline-success:hover {
+    background: rgba(52, 211, 153, 0.1) !important;
+    color: #34d399 !important;
+  }
+  [data-theme="light"] .sarna-footer .btn-outline-success {
+    color: #475569 !important;
+    border-color: #cbd5e1 !important;
+  }
+
+  /* Footer contact icons */
+  .sarna-footer .text-success {
+    color: #34d399 !important;
+  }
+  .sarna-footer li {
+    color: rgba(255, 255, 255, 0.45);
+  }
+  [data-theme="light"] .sarna-footer li {
+    color: #64748b;
   }
 </style>
 

@@ -1,171 +1,156 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Commodity | Saarna Canvessars</title>
+{% block title %}New Commodity | Saarna Canvessars{% endblock %}
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css">
+{% block extra_css %}
+<style>
+    /* ── FORM CARD ── */
+    .form-card-premium {
+        background: var(--surface-card);
+        border-radius: 24px;
+        padding: 40px;
+        border: 1px solid var(--border-subtle);
+        box-shadow: var(--shadow-card);
+    }
+    
+    .post-hero {
+        background: transparent;
+        padding: 30px 0 50px;
+        position: relative;
+        border-bottom: 1px solid var(--border-subtle);
+    }
+    
+    body {
+        background-color: var(--surface) !important;
+    }
+    
+    .form-label {
+        color: var(--text-primary);
+        font-weight: 700;
+    }
+    
+    .form-control, .form-select {
+        background-color: var(--surface-card) !important;
+        border: 1.5px solid var(--border-subtle) !important;
+        color: var(--text-primary) !important;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-weight: 600;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: rgba(52, 211, 153, 0.4) !important;
+        box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.08) !important;
+        color: var(--text-primary) !important;
+    }
+    
+    .form-control::placeholder {
+        color: var(--text-muted) !important;
+    }
+</style>
+{% endblock %}
 
-    <style>
-        body {
-            background: #f4f7f6;
-            font-family: 'Segoe UI', 'Inter', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+{% block content %}
+<!-- PAGE HEADER -->
+<section class="post-hero">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1">
+                        <li class="breadcrumb-item"><a href="/miller" class="text-success text-decoration-none fw-600">Dashboard</a></li>
+                        <li class="breadcrumb-item active text-muted fw-600" aria-current="page">New Commodity</li>
+                    </ol>
+                </nav>
+                <h2 class="mb-0 fw-900 text-dark"><i class="fa fa-plus-circle me-2 text-success"></i>New Commodity</h2>
+            </div>
+            <a href="/miller" class="btn btn-outline-success fw-800 px-4 rounded-pill">
+                <i class="fa fa-arrow-left me-1"></i> Back
+            </a>
+        </div>
+    </div>
+</section>
 
-        .page-header {
-            background: linear-gradient(135deg, #0f9b5f 0%, #0d8a54 100%);
-            color: #fff;
-            padding: 30px 0;
-            margin-bottom: 30px;
-        }
-
-        .form-card {
-            background: #fff;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-        }
-    </style>
-</head>
-
-<body>
-
-    {% include '_navbar.html' %}
-
-    <!-- PAGE HEADER -->
-    <div class="page-header">
-        <div class="container">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb mb-1">
-                            <li class="breadcrumb-item"><a href="/miller"
-                                    class="text-white-50 text-decoration-none">Dashboard</a></li>
-                            <li class="breadcrumb-item active text-white" aria-current="page">New Commodity</li>
-                        </ol>
-                    </nav>
-                    <h4 class="mb-0 fw-bold"><i class="fa fa-plus-circle me-2"></i>New Commodity</h4>
+<main class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="form-card-premium" data-aos="fade-up">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show rounded-4" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-                <a href="/miller" class="btn btn-light btn-sm fw-bold">
-                    <i class="fa fa-arrow-left me-1"></i> Back to Dashboard
-                </a>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+                <form method="POST">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="fa fa-seedling me-2 text-success"></i>Crop Type</label>
+                            <select name="crop" class="form-select" required>
+                                <option value="" class="text-muted">Select Crop</option>
+                                <option value="wheat">🌾 Wheat</option>
+                                <option value="rice">🍚 Rice</option>
+                                <option value="mustard">🌻 Mustard</option>
+                                <option value="maize">🌽 Maize</option>
+                                <option value="paddy">🌾 Paddy</option>
+                                <option value="shambha paddy">🌾 Shambha Paddy</option>
+                                <option value="mustard oil cake">🧈 Mustard Oil Cake</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="fa fa-indian-rupee-sign me-2 text-warning"></i>Price / Quintal</label>
+                            <input type="number" name="price" class="form-control" min="1" step="0.01" placeholder="e.g. 2500.50" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="fa fa-weight-hanging me-2 text-success"></i>Quantity (Quintals)</label>
+                            <input type="number" name="quantity" class="form-control" min="1" placeholder="e.g. 100" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="fa fa-clock me-2 text-info"></i>Delivery Duration (Days)</label>
+                            <input type="number" name="duration" class="form-control" min="1" placeholder="e.g. 15">
+                            <small class="text-muted">Deadline calculated from approval date</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="fa fa-tint me-2 text-info"></i>Moisture (%)</label>
+                            <input type="text" name="moisture" class="form-control" placeholder="e.g. 12%, 14%">
+                            <small class="text-muted">Moisture content of the commodity</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="fa fa-balance-scale me-2 text-warning"></i>Weight Deduction</label>
+                            <input type="text" name="weight_deduction" class="form-control" placeholder="e.g. 1 kg per bag, 2% moisture cut">
+                            <small class="text-muted">Any weight deduction terms for this commodity</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="fa fa-calendar-check me-2 text-primary"></i>Payment Duration</label>
+                            <input type="text" name="payment_duration" class="form-control" placeholder="e.g. 7 days, 15 days, On delivery">
+                            <small class="text-muted">Expected payment timeline after delivery</small>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label"><i class="fa fa-file-contract me-2 text-secondary"></i>Extra Condition</label>
+                            <textarea name="extra_condition" class="form-control" rows="2" placeholder="e.g. Must meet ISO standards, No broken grains above 5%"></textarea>
+                            <small class="text-muted">Any additional terms or conditions for this stock</small>
+                        </div>
+
+                        <div class="col-12 mt-4 text-center">
+                            <button type="submit" class="btn btn-book-premium py-3 px-5 rounded-pill shadow-lg w-auto">
+                                <i class="fa fa-paper-plane me-2"></i> Post Commodity
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-
-    <main class="container pb-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-
-                <div class="form-card" data-aos="fade-up">
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                    {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                    {% endfor %}
-                    {% endif %}
-                    {% endwith %}
-
-                    <form method="POST">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold"><i class="fa fa-seedling me-2 text-success"></i>Crop
-                                    Type</label>
-                                <select name="crop" class="form-select" required>
-                                    <option value="">Select Crop</option>
-                                    <option value="wheat">🌾 Wheat</option>
-                                    <option value="rice">🍚 Rice</option>
-                                    <option value="mustard">🌻 Mustard</option>
-                                    <option value="maize">🌽 Maize</option>
-                                    <option value="paddy">🌾 Paddy</option>
-                                    <option value="shambha paddy">🌾 Shambha Paddy</option>
-                                    <option value="mustard oil cake">🧈 Mustard Oil Cake</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold"><i
-                                        class="fa fa-indian-rupee-sign me-2 text-warning"></i>Price / Quintal</label>
-                                <input type="number" name="price" class="form-control" min="1" step="0.01"
-                                    placeholder="e.g. 2500.50" required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold"><i
-                                        class="fa fa-weight-hanging me-2 text-success"></i>Quantity (Quintals)</label>
-                                <input type="number" name="quantity" class="form-control" min="1" placeholder="e.g. 100"
-                                    required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold"><i class="fa fa-clock me-2 text-info"></i>Delivery
-                                    Duration</label>
-                                <input type="number" name="duration" class="form-control" min="1" placeholder="e.g. 15">
-                                <small class="text-muted">Deadline calculated from approval date</small>
-                            </div>
-
-
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold"><i class="fa fa-tint me-2 text-info"></i>Moisture
-                                    (%)</label>
-                                <input type="text" name="moisture" class="form-control" placeholder="e.g. 12%, 14%">
-                                <small class="text-muted">Moisture content of the commodity</small>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold"><i
-                                        class="fa fa-balance-scale me-2 text-warning"></i>Weight Deduction</label>
-                                <input type="text" name="weight_deduction" class="form-control"
-                                    placeholder="e.g. 1 kg per bag, 2% moisture cut">
-                                <small class="text-muted">Any weight deduction terms for this commodity</small>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold"><i
-                                        class="fa fa-calendar-check me-2 text-primary"></i>Payment Duration</label>
-                                <input type="text" name="payment_duration" class="form-control"
-                                    placeholder="e.g. 7 days, 15 days, On delivery">
-                                <small class="text-muted">Expected payment timeline after delivery</small>
-                            </div>
-
-                            <div class="col-12">
-                                <label class="form-label fw-bold"><i
-                                        class="fa fa-file-contract me-2 text-secondary"></i>Extra Condition</label>
-                                <textarea name="extra_condition" class="form-control" rows="2"
-                                    placeholder="e.g. Must meet ISO standards, No broken grains above 5%"></textarea>
-                                <small class="text-muted">Any additional terms or conditions for this stock</small>
-                            </div>
-
-                            <div class="col-12 mt-4">
-                                <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm">
-                                    <i class="fa fa-paper-plane me-2"></i> Post Commodity
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
-        AOS.init({ duration: 600, once: true });
-    </script>
-
-</body>
-
-</html>
+</main>
+{% endblock %}

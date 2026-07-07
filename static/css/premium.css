@@ -26,6 +26,16 @@
     --radius-lg: 20px;
     --radius-xl: 28px;
     color-scheme: dark;
+
+    /* Legacy style.css variable overrides for dark mode */
+    --bg: #0a0f0d;
+    --bg-white: rgba(255,255,255,0.04);
+    --bg-warm: rgba(255,255,255,0.02);
+    --card: rgba(255,255,255,0.04);
+    --text: #f1f5f9;
+    --text-light: rgba(255,255,255,0.7);
+    --border: rgba(255,255,255,0.08);
+    --border-light: rgba(255,255,255,0.05);
 }
 
 [data-theme="light"] {
@@ -42,6 +52,16 @@
     --shadow-card: 0 4px 24px rgba(0,0,0,0.06);
     --shadow-glow: 0 0 30px rgba(15,155,95,0.08);
     color-scheme: light;
+
+    /* Legacy style.css variable overrides for light mode */
+    --bg: #f7f8fa;
+    --bg-white: #ffffff;
+    --bg-warm: #fafbfc;
+    --card: #ffffff;
+    --text: #0f172a;
+    --text-light: #475569;
+    --border: #e2e8f0;
+    --border-light: #f1f5f9;
 }
 
 /* ── BASE OVERRIDES ── */
@@ -505,4 +525,220 @@ h1,h2,h3,h4,h5,h6 { color: var(--text-primary); }
 .welcome-card-miller .text-success, .welcome-card-buyer .text-primary,
 .welcome-card-buyer .text-success, .welcome-card-buyer .text-warning {
     filter: brightness(1.2);
+}
+
+/* ── ADDITIONAL DARK MODE OVERRIDES ── */
+[data-theme="dark"] .list-group-item[style*="background: #fff8f1"],
+[data-theme="dark"] .list-group-item[style*="background:#fff8f1"] {
+    background: rgba(217, 119, 6, 0.12) !important;
+    color: #fdba74 !important;
+}
+[data-theme="dark"] .list-group-item[style*="background: #f0f9ff"],
+[data-theme="dark"] .list-group-item[style*="background:#f0f9ff"] {
+    background: rgba(59, 130, 246, 0.12) !important;
+    color: #93c5fd !important;
+}
+[data-theme="dark"] .list-group-item[style*="background: #f0fdf4"],
+[data-theme="dark"] .list-group-item[style*="background:#f0fdf4"] {
+    background: rgba(16, 185, 129, 0.12) !important;
+    color: #6ee7b7 !important;
+}
+
+[data-theme="dark"] .input-group-text {
+    background: var(--surface-card) !important;
+    border-color: var(--border-subtle) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .alert-info[style*="background: #f0f9ff"],
+[data-theme="dark"] .alert-info[style*="background:#f0f9ff"] {
+    background: rgba(14, 116, 144, 0.15) !important;
+    border-color: rgba(14, 116, 144, 0.25) !important;
+    color: #67e8f9 !important;
+}
+
+[data-theme="dark"] .alert-warning {
+    background: rgba(217, 119, 6, 0.1) !important;
+    border-color: rgba(217, 119, 6, 0.2) !important;
+    color: #fdba74 !important;
+}
+
+/* Clean up table search input background override for dark mode */
+[data-theme="dark"] #marketSearch, [data-theme="dark"] #stockSearch {
+    background: var(--surface-card) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-subtle) !important;
+}
+
+/* ── MILLER APPROVED & QC PANEL OVERRIDES ── */
+[data-theme="dark"] .premium-table-card,
+[data-theme="dark"] .qc-order-card {
+    background: var(--surface-card) !important;
+    border-color: var(--border-subtle) !important;
+    box-shadow: var(--shadow-card) !important;
+}
+
+[data-theme="dark"] .table-enterprise thead th {
+    background: rgba(15, 155, 95, 0.08) !important;
+    border-bottom-color: var(--border-subtle) !important;
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .table-enterprise tbody td {
+    border-bottom-color: var(--border-subtle) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .table-enterprise tbody tr:hover {
+    background-color: rgba(15, 155, 95, 0.04) !important;
+}
+
+[data-theme="dark"] .pill-filter {
+    background: var(--surface-card) !important;
+    border-color: var(--border-subtle) !important;
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .pill-filter:hover {
+    background: rgba(15, 155, 95, 0.1) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .pill-filter.active {
+    background: linear-gradient(135deg, #0f9b5f, #065f3a) !important;
+    color: #fff !important;
+    border-color: transparent !important;
+}
+
+[data-theme="dark"] .qc-snippet-box {
+    background: var(--surface-card) !important;
+    border-color: var(--border-subtle) !important;
+}
+
+[data-theme="dark"] .qc-order-header {
+    background: rgba(15, 155, 95, 0.06) !important;
+    border-bottom-color: var(--border-subtle) !important;
+}
+
+[data-theme="dark"] .qc-truck-item {
+    background: var(--surface-card) !important;
+    border-color: var(--border-subtle) !important;
+}
+
+[data-theme="dark"] .qc-truck-item:hover {
+    background: rgba(15, 155, 95, 0.04) !important;
+    border-color: rgba(52, 211, 153, 0.25) !important;
+}
+
+[data-theme="dark"] .qc-input-group .form-control {
+    background: var(--surface-elevated) !important;
+    border-color: var(--border-subtle) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .qc-input-group .form-control:focus {
+    border-color: rgba(52, 211, 153, 0.4) !important;
+}
+
+[data-theme="dark"] .modal-content {
+    background: var(--surface-elevated) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-subtle) !important;
+}
+
+[data-theme="dark"] .modal-content .modal-header {
+    border-bottom: 1px solid var(--border-subtle) !important;
+}
+
+[data-theme="dark"] .modal-content .modal-footer {
+    border-top: 1px solid var(--border-subtle) !important;
+}
+
+[data-theme="dark"] .enterprise-input {
+    background: var(--surface-card) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-subtle) !important;
+}
+
+[data-theme="dark"] .premium-form-card {
+    background: var(--surface-card) !important;
+    border-color: var(--border-subtle) !important;
+    box-shadow: var(--shadow-card) !important;
+}
+
+[data-theme="dark"] .form-section-title {
+    border-bottom-color: var(--border-subtle) !important;
+}
+
+[data-theme="dark"] .upload-zone {
+    background: var(--surface-elevated) !important;
+    border-color: var(--border-subtle) !important;
+}
+
+[data-theme="dark"] .upload-zone:hover {
+    background: var(--surface-card) !important;
+    border-color: var(--primary) !important;
+}
+
+[data-theme="dark"] .upload-icon {
+    background: rgba(15, 155, 95, 0.1) !important;
+    color: var(--primary) !important;
+}
+
+/* ── ACTIVE & LOADED ORDERS (BUYER PIPELINE) ── */
+[data-theme="dark"] .tracking-header {
+    background: var(--surface-card) !important;
+    border-color: var(--border-subtle) !important;
+}
+
+[data-theme="dark"] .order-card-premium {
+    background: var(--surface-card) !important;
+    border-color: var(--border-subtle) !important;
+    box-shadow: var(--shadow-card) !important;
+}
+
+[data-theme="dark"] .order-title {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .order-meta {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .progress-tracking {
+    background: rgba(0, 0, 0, 0.2) !important;
+    border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-theme="dark"] .truck-card {
+    background: var(--surface-elevated) !important;
+    border-color: var(--border-subtle) !important;
+}
+
+[data-theme="dark"] .action-panel {
+    background: rgba(16, 185, 129, 0.03) !important;
+    border-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+[data-theme="dark"] .search-minimal {
+    background: var(--surface-card) !important;
+    border-color: var(--border-subtle) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .status-active {
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.15) 0%, rgba(129, 140, 248, 0.15) 100%) !important;
+    color: #a5b4fc !important;
+    border-color: rgba(99, 102, 241, 0.2) !important;
+}
+
+[data-theme="dark"] .status-loaded {
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.15) 0%, rgba(52, 211, 153, 0.15) 100%) !important;
+    color: #a7f3d0 !important;
+    border-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+[data-theme="dark"] .settlement-panel {
+    background: rgba(0, 0, 0, 0.15) !important;
+    border-color: var(--border-subtle) !important;
 }

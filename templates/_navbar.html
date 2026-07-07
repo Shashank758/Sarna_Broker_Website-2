@@ -13,27 +13,27 @@
 
 <!-- TOP TICKER -->
 <div class="top-ticker"
-  style="background: #044329; color: white; padding: 8px 0; font-size: 0.8rem; overflow: hidden; position: relative; z-index: 1001; display: flex; align-items: center; width: 100%;">
+  style="background: linear-gradient(90deg, #030a06, #071a10, #030a06); color: rgba(255,255,255,0.8); padding: 8px 0; font-size: 0.8rem; overflow: hidden; position: relative; z-index: 1001; display: flex; align-items: center; width: 100%; border-bottom: 1px solid rgba(52,211,153,0.08);">
   <div
-    style="background: #f59e0b; color: #042f1f; padding: 0 16px; font-weight: 800; font-size: 0.75rem; position: absolute; left: 0; top: 0; height: 100%; display: flex; align-items: center; z-index: 2; border-right: 2px solid #042f1f;">
+    style="background: linear-gradient(135deg, #0f9b5f, #065f3a); color: #fff; padding: 0 16px; font-weight: 800; font-size: 0.75rem; position: absolute; left: 0; top: 0; height: 100%; display: flex; align-items: center; z-index: 2; border-right: 1px solid rgba(52,211,153,0.15);">
     <i class="fa fa-bolt me-1"></i> LIVE
   </div>
   <div style="margin-left: 90px; width: calc(100% - 90px); overflow: hidden; white-space: nowrap;">
     <div style="display: inline-block; animation: ticker 30s linear infinite;">
       <span class="text-success-emphasis fw-bold">▲ 0.8%</span>
-      <span class="text-white-50 mx-3">•</span>
+      <span style="color: rgba(255,255,255,0.3);" class="mx-3">•</span>
       <span class="me-1">Shambha Paddy</span><span class="fw-bold">₹2,180</span><span class="ms-1 text-danger fw-bold">▼
         0.3%</span>
-      <span class="text-white-50 mx-3">•</span>
+      <span style="color: rgba(255,255,255,0.3);" class="mx-3">•</span>
       <span class="me-1">Soybean</span><span class="fw-bold">₹4,250</span><span class="ms-1 text-success fw-bold">▲
         2.1%</span>
-      <span class="text-white-50 mx-3">•</span>
+      <span style="color: rgba(255,255,255,0.3);" class="mx-3">•</span>
       <span class="me-1">Maize</span><span class="fw-bold">₹1,890</span><span class="ms-1 text-danger fw-bold">▼
         0.5%</span>
-      <span class="text-white-50 mx-3">•</span>
+      <span style="color: rgba(255,255,255,0.3);" class="mx-3">•</span>
       <span class="me-1">Chana</span><span class="fw-bold">₹5,120</span><span class="ms-1 text-success fw-bold">▲
         1.7%</span>
-      <span class="text-white-50 mx-3">•</span>
+      <span style="color: rgba(255,255,255,0.3);" class="mx-3">•</span>
       <span class="me-1">Jowar</span><span class="fw-bold">₹2,015</span><span class="ms-1 text-success fw-bold">▲
         0.6%</span>
     </div>
@@ -281,15 +281,24 @@
 </nav>
 
 <style>
-  /* Navbar Personalization - Premium Dark Green */
+  /* Navbar — Theme-Adaptive Premium */
   .sarna-navbar {
-    background: #0f5132;
-    border-bottom: none;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    padding: 12px 0;
+    background: rgba(5, 10, 7, 0.88);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border-bottom: 1px solid rgba(52, 211, 153, 0.08);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    padding: 8px 0;
     position: sticky;
     top: 0;
     z-index: 1000;
+    transition: background 0.4s ease;
+  }
+
+  [data-theme="light"] .sarna-navbar {
+    background: rgba(255, 255, 255, 0.92);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
   }
 
   .brand-badge {
@@ -302,59 +311,158 @@
     transition: all 0.3s ease;
   }
 
+  .sarna-navbar .navbar-brand span {
+    color: #34d399 !important;
+  }
+  .sarna-navbar .navbar-brand span span {
+    color: rgba(255,255,255,0.6) !important;
+  }
+  [data-theme="light"] .sarna-navbar .navbar-brand span {
+    color: #0f9b5f !important;
+  }
+  [data-theme="light"] .sarna-navbar .navbar-brand span span {
+    color: #64748b !important;
+  }
+
   .sarna-navbar .nav-link {
-    font-size: 0.92rem;
+    font-size: 0.88rem;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.8) !important;
+    color: rgba(255, 255, 255, 0.7) !important;
     padding: 8px 16px !important;
-    border-radius: 20px;
+    border-radius: 10px;
     transition: all 0.2s ease;
   }
 
   .sarna-navbar .nav-link:hover {
-    color: #ffffff !important;
-    background: rgba(255, 255, 255, 0.1);
+    color: #fff !important;
+    background: rgba(255, 255, 255, 0.08);
   }
 
   .sarna-navbar .nav-link.active {
-    background: #ffffff !important;
-    color: #0f5132 !important;
+    color: #fff !important;
+    background: linear-gradient(135deg, rgba(15, 155, 95, 0.3), rgba(52, 211, 153, 0.15)) !important;
+    border: 1px solid rgba(52, 211, 153, 0.15);
+    box-shadow: 0 2px 12px rgba(15, 155, 95, 0.15);
     font-weight: 700;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
-  /* Specific override for Dropdown toggles */
+  [data-theme="light"] .sarna-navbar .nav-link {
+    color: #334155 !important;
+  }
+  [data-theme="light"] .sarna-navbar .nav-link:hover {
+    color: #0f9b5f !important;
+    background: rgba(15, 155, 95, 0.06);
+  }
+  [data-theme="light"] .sarna-navbar .nav-link.active {
+    background: rgba(15, 155, 95, 0.1) !important;
+    color: #065f3a !important;
+    border: 1px solid rgba(15, 155, 95, 0.12);
+    box-shadow: 0 2px 8px rgba(15, 155, 95, 0.08);
+  }
+
+  /* Dropdown toggles */
   .navbar-nav .dropdown-toggle.active {
     background: transparent !important;
-    color: var(--primary) !important;
+    color: #34d399 !important;
   }
 
   .dropdown-item {
     font-size: 0.88rem;
     font-weight: 500;
     padding: 9px 16px;
-    color: #475569;
+    color: var(--text-primary);
     border-radius: 8px;
     transition: all 0.2s ease;
   }
 
   .dropdown-item:hover {
-    background-color: var(--primary-subtle);
-    color: var(--primary);
+    background: rgba(15, 155, 95, 0.08);
+    color: #34d399;
     transform: translateX(2px);
   }
 
   .dropdown-menu {
-    border: 1px solid var(--border-light);
-    box-shadow: var(--shadow-xl);
+    background: var(--surface-elevated);
+    border: 1px solid var(--border-subtle);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
     animation: fadeInDown 0.2s ease;
     margin-top: 10px;
+    border-radius: 14px;
+    backdrop-filter: blur(20px);
   }
 
+  /* Weather widget — theme adaptive */
+  .nav-pill-widget {
+    background: rgba(255, 255, 255, 0.06) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+  }
+  [data-theme="light"] .nav-pill-widget {
+    background: #fffdeb !important;
+    border: 1px solid #fcd34d !important;
+    color: #b45309 !important;
+  }
+
+  /* Notification bell — theme adaptive */
+  #notifBellBtn {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.6) !important;
+  }
+  #notifBellBtn:hover {
+    background: rgba(52, 211, 153, 0.1);
+    color: #34d399 !important;
+    border-color: rgba(52, 211, 153, 0.2) !important;
+  }
+  [data-theme="light"] #notifBellBtn {
+    border-color: #fcd34d !important;
+    color: #d97706 !important;
+  }
+
+  /* Notification dropdown — theme adaptive */
+  #notifDropdown {
+    background: var(--surface-elevated) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: 14px !important;
+    backdrop-filter: blur(20px) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4) !important;
+  }
+  #notifDropdown > div:first-child {
+    background: linear-gradient(135deg, #0f9b5f, #065f3a) !important;
+  }
+
+  .logout-btn {
+    color: rgba(255, 255, 255, 0.7) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    transition: all 0.2s ease;
+  }
   .logout-btn:hover {
-    background-color: #f8fafc;
-    border-color: #cbd5e1;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+    color: #fff !important;
+  }
+  [data-theme="light"] .logout-btn {
+    color: #475569 !important;
+    border-color: #cbd5e1 !important;
+  }
+  [data-theme="light"] .logout-btn:hover {
+    background: #f1f5f9 !important;
     color: #0f172a !important;
+  }
+
+  /* Navbar toggler */
+  .navbar-toggler {
+    border-color: rgba(52, 211, 153, 0.15) !important;
+    background: rgba(52, 211, 153, 0.06) !important;
+  }
+  .navbar-toggler i {
+    color: #34d399 !important;
+  }
+  [data-theme="light"] .navbar-toggler {
+    background: rgba(10, 138, 84, 0.06) !important;
+    border-color: rgba(10, 138, 84, 0.1) !important;
+  }
+  [data-theme="light"] .navbar-toggler i {
+    color: #0f9b5f !important;
   }
 
   @media (max-width: 991px) {
