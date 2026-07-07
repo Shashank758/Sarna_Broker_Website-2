@@ -1,3 +1,10 @@
+import sys
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stderr.reconfigure(encoding='utf-8')
+except AttributeError:
+    pass
+
 from flask import Flask, render_template, request, redirect, session, url_for, flash, jsonify, send_from_directory
 import psycopg2
 import psycopg2.extras
@@ -290,7 +297,10 @@ def get_db():
         logger.error("DATABASE_URL environment variable is not set")
         raise RuntimeError("DATABASE_URL environment variable is not set")
     
-    ssl_mode = "require"
+    if "render" in db_url or "aws" in db_url:
+        ssl_mode = "require"
+    else:
+        ssl_mode = "prefer"  # Allow local without SSL
     try:
         parsed = urlparse(db_url)
         username = parsed.username
@@ -1274,7 +1284,7 @@ def upgrade_miller_booking_deadline():
 def run_migrations():
     """Run all database migrations in a single connection to speed up startup."""
     try:
-        print("🔄 Starting database migrations...")
+        print("[INFO] Starting database migrations...")
         
         # Core Initialization
         init_db()
@@ -1348,7 +1358,7 @@ def run_migrations():
         for col, col_type in miller_fields:
             if col not in miller_cols:
                 cur.execute(f"ALTER TABLE miller_profiles ADD COLUMN {col} {col_type}")
-                print(f"✅ Added {col} to miller_profiles")
+                print(f"[INFO] Added {col} to miller_profiles")
 
         # 2. Address Schema Upgrades
         tables = ["miller_profiles", "buyer_profiles"]
@@ -1373,18 +1383,20 @@ def run_migrations():
             for col_name, col_type in address_cols:
                 if col_name not in existing_cols:
                     cur.execute(f"ALTER TABLE {table} ADD COLUMN {col_name} {col_type}")
-                    print(f"✅ Added {col_name} to {table}")
+                    print(f"[INFO] Added {col_name} to {table}")
                     
         # 3. Rename Commodities
         cur.execute("UPDATE miller_stock SET crop = 'rice' WHERE LOWER(crop) = 'chawal'")
         cur.execute("UPDATE miller_stock SET crop = 'mustard' WHERE LOWER(crop) = 'sarso'")
-        print("✅ Migrated legacy commodities.")
+        print("[INFO] Migrated legacy commodities.")
 
         con.commit()
         con.close()
-        print("✅ Database migrations completed successfully.")
+        print("[SUCCESS] Database migrations completed successfully.")
     except Exception as e:
-        print(f"❌ Migration failed: {e}")
+        import traceback
+        traceback.print_exc()
+        print(f"[ERROR] Migration failed: {e}")
         # We catch the error to prevent app crash, logging it for review
 
 

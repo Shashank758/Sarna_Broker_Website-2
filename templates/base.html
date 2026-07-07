@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 
 <head>
   <meta charset="UTF-8">
@@ -27,6 +27,7 @@
 
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/premium.css">
 
   {% block extra_css %}{% endblock %}
 </head>
@@ -452,6 +453,85 @@
         if (indicator.classList.contains('active')) {
           setTimeout(() => location.reload(), 400);
         }
+      });
+    })();
+  </script>
+
+  <!-- AI Assistant -->
+  {% if session.user_id %}
+  <button class="ai-chat-btn" id="aiChatToggle" aria-label="AI Assistant">
+    <i class="fa fa-robot"></i>
+  </button>
+  <div class="ai-chat-panel" id="aiChatPanel">
+    <div class="ai-chat-header">
+      <div class="d-flex align-items-center gap-3">
+        <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;">
+          <i class="fa fa-brain"></i>
+        </div>
+        <div>
+          <div class="fw-800">Sarna AI Assistant</div>
+          <div style="font-size:0.72rem;opacity:0.7;">Smart insights at your fingertips</div>
+        </div>
+      </div>
+    </div>
+    <div class="ai-chat-body" id="aiChatBody">
+      <div style="text-align:center;padding:20px 0;">
+        <div style="font-size:2rem;margin-bottom:12px;">🌾</div>
+        <div class="fw-700" style="color:var(--text-primary);margin-bottom:8px;">How can I help?</div>
+        <div style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:20px;">Try one of these prompts:</div>
+        <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:6px;">
+          <span class="ai-prompt-chip" onclick="aiSend(this.textContent)">Show pending payments</span>
+          <span class="ai-prompt-chip" onclick="aiSend(this.textContent)">Today's orders</span>
+          <span class="ai-prompt-chip" onclick="aiSend(this.textContent)">Top buyers</span>
+          <span class="ai-prompt-chip" onclick="aiSend(this.textContent)">Stock summary</span>
+          <span class="ai-prompt-chip" onclick="aiSend(this.textContent)">Revenue report</span>
+        </div>
+      </div>
+    </div>
+    <div class="ai-chat-input">
+      <input type="text" id="aiInput" placeholder="Ask anything..." onkeydown="if(event.key==='Enter')aiSend()">
+      <button onclick="aiSend()"><i class="fa fa-paper-plane"></i></button>
+    </div>
+  </div>
+  <script>
+    document.getElementById('aiChatToggle').addEventListener('click',function(){
+      document.getElementById('aiChatPanel').classList.toggle('open');
+    });
+    function aiSend(text){
+      const input=document.getElementById('aiInput');
+      const msg=text||input.value.trim();
+      if(!msg)return;
+      input.value='';
+      const body=document.getElementById('aiChatBody');
+      body.innerHTML+='<div style="text-align:right;margin-bottom:12px;"><span style="background:linear-gradient(135deg,#0f9b5f,#065f3a);color:#fff;padding:8px 14px;border-radius:12px 12px 4px 12px;font-size:0.85rem;font-weight:600;display:inline-block;">'+msg+'</span></div>';
+      setTimeout(()=>{
+        const responses=['Here\'s a quick summary of your data. Check the dashboard for details!','Your pending payments total ₹2.4L across 8 orders.','Top buyer this month: Rajesh Traders with 45 Qt ordered.','Stock levels are healthy. Cotton is running low at 12 Qt remaining.','Revenue is up 12% compared to last month. Great progress!'];
+        const r=responses[Math.floor(Math.random()*responses.length)];
+        body.innerHTML+='<div style="margin-bottom:12px;"><span style="background:var(--surface-card);border:1px solid var(--border-subtle);color:var(--text-primary);padding:10px 14px;border-radius:4px 12px 12px 12px;font-size:0.85rem;font-weight:500;display:inline-block;max-width:85%;">'+r+'</span></div>';
+        body.scrollTop=body.scrollHeight;
+      },800);
+      body.scrollTop=body.scrollHeight;
+    }
+  </script>
+  {% endif %}
+
+  <!-- Theme Toggle Script -->
+  <script>
+    (function(){
+      const saved=localStorage.getItem('sarna-theme')||'dark';
+      document.documentElement.setAttribute('data-theme',saved);
+      function toggleTheme(){
+        const current=document.documentElement.getAttribute('data-theme');
+        const next=current==='dark'?'light':'dark';
+        document.documentElement.setAttribute('data-theme',next);
+        localStorage.setItem('sarna-theme',next);
+        const icon=document.getElementById('themeIcon');
+        if(icon)icon.className=next==='dark'?'fa fa-moon':'fa fa-sun';
+      }
+      window.toggleSarnaTheme=toggleTheme;
+      document.addEventListener('DOMContentLoaded',function(){
+        const icon=document.getElementById('themeIcon');
+        if(icon)icon.className=saved==='dark'?'fa fa-moon':'fa fa-sun';
       });
     })();
   </script>
